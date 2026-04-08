@@ -27,13 +27,7 @@ git push
 ### 2. 서버에 반영하기
 
 ```powershell
-$KEY = "C:\Users\pc\Documents\PW\hy_key.pem"
-$SSH = "ubuntu@210.109.15.216"
-
-tar -czf breakout-deploy.tar.gz --exclude=.git --exclude=bak --exclude=config --exclude=scripts --exclude="*.tar.gz" -C . .
-scp -i $KEY breakout-deploy.tar.gz "${SSH}:/tmp/breakout-deploy.tar.gz"
-ssh -i $KEY $SSH "rm -rf /home/ubuntu/breakout/* && cd /home/ubuntu/breakout && tar -xzf /tmp/breakout-deploy.tar.gz && rm /tmp/breakout-deploy.tar.gz && chmod -R 755 /home/ubuntu/breakout"
-Remove-Item breakout-deploy.tar.gz
+.\scripts\deploy.ps1
 ```
 
 ### 3. 확인
