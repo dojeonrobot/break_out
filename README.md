@@ -41,8 +41,8 @@ BREAK-OUT/
 | 챕터 | 구역 | 미션 |
 |------|------|------|
 | Chapter 01 | 사파리 | 도트매트릭스 패턴을 분석하여 마스터 키 해독 |
-| Chapter 02 | 하모니아 | 머지큐브, 일기장, 슬라이드 퍼즐로 문양 수집 |
-| Chapter 03 | 회전목마 | Teachable Machine AI + Arduino 연동 이상감지 |
+| Chapter 02 | 하모니아 | Teachable Machine AI + Arduino 연동 이상감지 |
+| Chapter 03 | 회전목마 | 머지큐브, 일기장, 슬라이드 퍼즐로 문양 수집 |
 
 ## 기술 스택
 
