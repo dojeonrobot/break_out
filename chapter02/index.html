@@ -1,0 +1,2128 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DOROLAND – Chapter 3: 머지큐브 속 비밀</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .cube-pattern-grid {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 0;
+    }
+
+    .cube-cell {
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-position: center;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+
+    .cube-cell.is-unlocked {
+      opacity: 1;
+    }
+
+    .cube .face {
+      background-color: rgba(10,18,34,0.6);
+      background-repeat: no-repeat;
+      background-size: 400% 400%;
+      background-position: 50% 50%;
+      border: 1px solid rgba(41,216,255,0.12);
+      box-shadow: inset 0 0 30px rgba(41,216,255,0.06);
+      background-blend-mode: overlay;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transition: background-position .38s ease, opacity .28s ease, filter .28s ease;
+      opacity: 0.28;
+      filter: grayscale(.4) brightness(.9);
+    }
+
+    .cube .face.face-unlocked {
+      opacity: 1;
+      filter: none;
+      background-color: transparent;
+      background-blend-mode: normal;
+      box-shadow: 0 0 40px rgba(41,216,255,.25) inset;
+    }
+
+    .vault .slot {
+      min-width: 140px;
+      padding: 10px;
+    }
+
+    .vault .glyph {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      max-height: 180px;
+      border-radius: 10px;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      transition: background-position .4s ease, opacity .3s ease, transform .28s ease;
+      opacity: 0.0;
+    }
+    .vault .slot.is-found .glyph { opacity: 1; }
+
+    .slide-modal .modal-content {
+      max-width: 1200px;
+      width: 70vw; 
+    }
+
+    .slide-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 1200px;
+      padding: 30px;
+      background: rgba(10, 18, 34, 0.4);
+      border: 2px solid rgba(41, 216, 255, 0.2);
+      border-radius: 12px;
+
+      aspect-ratio: 16 / 9;
+      height: auto;
+      box-sizing: border-box;
+    }
+
+    .slide-tile {
+      background-size: 400% 300%;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 2px solid rgba(41, 216, 255, 0.3);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      font-weight: 700;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(41, 216, 255, 0.7);
+
+      aspect-ratio: 4 / 3;
+      min-height: 120px;             
+    }
+
+    .slide-tile:hover:not(.empty) {
+      transform: scale(1.05);
+      box-shadow: 0 16px 60px rgba(41, 216, 255, 0.4);
+      border-color: rgba(41, 216, 255, 0.5);
+    }
+
+    .slide-tile.empty {
+      background: transparent;
+      border: 3px dashed rgba(41, 216, 255, 0.2);
+      cursor: default;
+      box-shadow: none;
+    }
+    .slide-info {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .slide-info .result-message {
+      margin-top: 0; 
+      min-height: 0;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="logo">DOROLAND</div>
+      <nav class="menu" aria-label="주요 섹션">
+        <button class="nav-btn" type="button" data-id="hintHud">첫번째 큐브 힌트</button>
+        <button class="nav-btn" type="button" data-id="hintMemory">두번째 큐브 힌트</button>
+        <button class="nav-btn" type="button" data-id="hintVital">세번째 큐브 힌트</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-labelledby="title">
+      <div>
+        <div class="eyebrow">CHAPTER 3</div>
+        <h1 id="title">머지큐브 속 비밀</h1>
+        <p class="subtitle">머지큐브 속 비밀을 파헤치고 힌트를 모아 리코를 구출하자!</p>
+
+        <div class="progress">
+          <span>진행도</span>
+          <div class="dots" role="status" aria-live="polite">
+            <span class="dot" title="1/4"></span>
+            <span class="dot" title="2/4"></span>
+            <span class="dot" title="3/4"></span>
+            <span class="dot" title="4/4"></span>
+          </div>
+          <span class="progress-count">0 / 4</span>
+        </div>
+
+        <div id="glyphVault" class="vault" aria-label="획득한 문양">
+          <div class="slot" data-step="1" aria-live="polite">
+            <div class="slot-header">#1</div>
+            <div class="glyph"></div>
+            <div class="lock">LOCKED</div>
+          </div>
+          <div class="slot" data-step="2" aria-live="polite">
+            <div class="slot-header">#2</div>
+            <div class="glyph"></div>
+            <div class="lock">LOCKED</div>
+          </div>
+          <div class="slot" data-step="3" aria-live="polite">
+            <div class="slot-header">#3</div>
+            <div class="glyph"></div>
+            <div class="lock">LOCKED</div>
+          </div>
+          <div class="slot" data-step="4" aria-live="polite">
+            <div class="slot-header">#4</div>
+            <div class="glyph"></div>
+            <div class="lock">LOCKED</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="holo" aria-hidden="true">
+        <div class="ring"></div>
+        <div class="cube-wrap">
+          <div class="cube" role="img" aria-label="회전하는 홀로그램 큐브">
+            <div class="face f-front">
+              <div class="cube-pattern-grid">
+                <div class="cube-cell cube-cell-1"></div>
+                <div class="cube-cell cube-cell-2"></div>
+                <div class="cube-cell cube-cell-3"></div>
+                <div class="cube-cell cube-cell-4"></div>
+              </div>
+            </div>
+            <div class="face f-back"></div>
+            <div class="face f-right"></div>
+            <div class="face f-left"></div>
+            <div class="face f-top"></div>
+            <div class="face f-bottom"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards" aria-label="미션 카드">
+      <article class="card" id="hud" role="button" tabindex="0" aria-controls="modal" aria-haspopup="dialog">
+        <div class="icon" aria-hidden="true"></div>
+        <h3>첫번째 기억</h3>
+        <p>평화로워 보이는 누군가, <br>
+          어떤 비밀이 숨겨져 있는걸까</p>
+      </article>
+
+      <article class="card" id="memory" role="button" tabindex="0" aria-controls="modal" aria-haspopup="dialog">
+        <div class="icon" aria-hidden="true"></div>
+        <h3>두번째 기억</h3>
+        <p>이 터전을 파괴하고 침범한 누군가...! <br>
+          사실 도로랜드는 이렇게 지어진걸까?</p>
+      </article>
+
+      <article class="card" id="vital" role="button" tabindex="0" aria-controls="modal" aria-haspopup="dialog">
+        <div class="icon" aria-hidden="true"></div>
+        <h3>세번째 기억</h3>
+        <p>여기에 리코가 갇혀있는 것 같다. <br>
+          하지만 어떻게 구출해야하지?</p>
+      </article>
+
+      <article class="card" id="tracker" role="button" tabindex="0" aria-controls="modal" aria-haspopup="dialog">
+        <div class="icon" aria-hidden="true"></div>
+        <h3>코덱스의 기억</h3>
+        <p>많이 봐왔지만, 정체를 알 수 없었던 문양 <br>
+          이젠 진실에 가까워질 차례다.</p>
+      </article>
+    </section>
+
+    <p class="footer">DOROLAND</p>
+  </main>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">타이틀</div>
+        <div><button id="modalClose" class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div id="modalBody" class="modal-body">내용이 여기에 표시됩니다.</div>
+    </div>
+  </div>
+
+  <div id="webtoonModal" class="modal webtoon-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <div class="modal-title">DOROLAND</div>
+      </div>
+      <div class="modal-body">
+        <img src="./images/missions/mission_start.png" alt="미션 시작 웹툰" class="webtoon-image">
+        <p class="start-notice">
+          리코를 구하기 위해 머지큐브 속의 비밀을 파헤쳐봅시다!<br>
+        </p>
+
+        <button id="missionStartBtn" class="btn mission-start" type="button">
+          미션 시작
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="glyphGridModal" class="modal glyph-grid-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <div class="modal-title">첫번째 기억 - 평화로워 보이는 누군가</div>
+        <div><button class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div class="modal-body">
+        <div class="glyph-grid-wrapper">
+          <div class="glyph-grid-container" id="glyphGridContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="diaryModal" class="modal diary-modal-wrap" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content diary-modal" role="document">
+      <div class="modal-header">
+        <div class="modal-title" id="diaryModalTitle">두번째 기억 - 누군가의 낡은 일기장</div>
+        <div><button id="diaryModalClose" class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div id="diaryModalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="completeModal" class="modal webtoon-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <div class="modal-title">DOROLAND</div>
+        <div><button id="completeCloseBtn" class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div class="modal-body">
+        <img src="./images/missions/mission_complete.png" alt="미션 완료" class="webtoon-image">
+        <p class="start-notice">모든 문양을 획득했습니다!<br>미션 완료!</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="qrModal" class="modal qr-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document" style="max-width:420px;">
+      <div class="modal-header">
+        <div class="modal-title">QR</div>
+        <div><button id="qrClose" class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <img id="qrImage" src="./images/qr/qr-1.png" alt="QR 코드" style="max-width:88%;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)">
+        <p style="color:var(--muted);margin-top:10px;" id="qrMessage">QR 코드를 스캔해 다음 기억을 확인하세요.</p>
+        <div style="margin-top:12px;">
+          <button id="qrConfirmBtn" class="btn" type="button">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="slideModal" class="modal slide-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <div class="modal-title">네번째 기억 - 코덱스 문양 복원</div>
+        <div><button class="modal-close" aria-label="닫기">닫기</button></div>
+      </div>
+      <div class="modal-body">
+        <div class="slide-puzzle-wrapper">
+          <div class="slide-grid" id="slideGrid"></div>
+
+          <div class="slide-info">
+            <button id="resetSlidePuzzle" class="answer-btn" type="button">
+              다시 섞기
+            </button>
+            <div id="slideResult" class="result-message"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const CHAPTER_KEY = 'doro_ch3_v1';
+    const patternURL = './images/patterns/codex_pattern.png';
+    const webtoonModal = document.getElementById('webtoonModal');
+    const QR_FOR_STEP = {
+      1: './images/qr/qr-1.png',
+      2: './images/qr/qr-2.png',
+      3: './images/qr/qr-3.png'  
+    };
+
+    function openWebtoonModal() {
+      webtoonModal.classList.add('show');
+      webtoonModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function clearChapterProgressOnReload() {
+      localStorage.removeItem(`${CHAPTER_KEY}_started`);
+      for (let step = 1; step <= 4; step++) {
+        localStorage.removeItem(`${CHAPTER_KEY}_step_${step}_solved`);
+      }
+      ['hintHud','hintMemory','hintVital'].forEach(id=>{
+        localStorage.removeItem(`doro_hint_unlocked_${id}`);
+      });
+          
+      localStorage.removeItem('doro_hint_unlocked_hintMemory_1');
+      localStorage.removeItem('doro_hint_unlocked_hintMemory_2');
+      localStorage.removeItem('doro_hint_unlocked_hintVital_1');
+      localStorage.removeItem('doro_hint_unlocked_hintVital_2');
+
+    }
+
+    function isReloadNavigation() {
+      const nav = performance.getEntriesByType?.('navigation')?.[0];
+      if (nav && nav.type) return nav.type === 'reload';
+      return performance?.navigation?.type === 1;
+    }
+
+    const missionStartBtn = document.getElementById('missionStartBtn');
+    if (missionStartBtn) {
+      missionStartBtn.addEventListener('click', () => {
+        localStorage.setItem(`${CHAPTER_KEY}_started`, '1');
+        missionStartBtn.classList.add('clicked');
+        webtoonModal.classList.remove('show');
+        webtoonModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (bgmEl.paused) bgmEl.play().catch(()=>{});
+        setTimeout(() => openQRModalInfo(1, '첫번째 기억', './images/qr/qr-1.png'), 300);
+      });
+    }
+
+    window.addEventListener('load', () => {
+      if (isReloadNavigation()) {
+        clearChapterProgressOnReload();
+      }
+
+      lockAllExceptFirst();
+
+      const started = localStorage.getItem(`${CHAPTER_KEY}_started`) === '1';
+      if (started) restoreProgressFromStorage();
+
+      setTimeout(() => openWebtoonModal(), 300);
+    });
+
+
+    const bgmEl = document.createElement('audio');
+    bgmEl.id = 'bgmElement';
+    bgmEl.src = './audio/bgm.mp3';
+    bgmEl.loop = true;
+    bgmEl.preload = 'auto';
+    bgmEl.volume = 0.24;
+    bgmEl.style.display = 'none';
+    document.body.appendChild(bgmEl);
+
+    bgmEl.autoplay = true;
+    bgmEl.muted = false;
+    bgmEl.play().catch(()=>{ /* autoplay 차단 시 무시 */ });
+    const patternForStep = {
+      1: './images/patterns/codex_pattern_1-1.png',
+      2: './images/patterns/codex_pattern_1-2.png',
+      3: './images/patterns/codex_pattern_2-1.png',
+      4: './images/patterns/codex_pattern_2-2.png'
+    };
+
+    const cubeCells = [
+      document.querySelector('.cube .cube-cell-1'),
+      document.querySelector('.cube .cube-cell-2'),
+      document.querySelector('.cube .cube-cell-3'),
+      document.querySelector('.cube .cube-cell-4')
+    ];
+
+    const faceMap = { 1: '.cube .f-front', 2: '.cube .f-right', 3: '.cube .f-top', 4: '.cube .f-back' };
+
+    const cubeFacePos = {
+      1: '0% 0%',     // 좌상단
+      2: '100% 100%',   // 우상단
+      3: '100% 0%',   // 좌하단
+      4: '0% 100%'  // 우하단
+    };
+
+    const SLOT_BG_SIZE = 'cover';
+    const CUBE_BG_SIZE = '50% 50%';
+    const slotPatternPos = {
+      1: '50% 50%', // 슬롯 #1
+      2: '50% 50%', // 슬롯 #2
+      3: '50% 50%', // 슬롯 #3
+      4: '50% 50%'  // 슬롯 #4 
+    };
+
+    const stepOrder = { hud:1, memory:2, vital:3, tracker:4 };
+    const idForStep = Object.fromEntries(Object.entries(stepOrder).map(([k,v])=>[v,k]));
+    const acquired = [false,false,false,false];
+    const vault = document.getElementById('glyphVault');
+    const dots = Array.from(document.querySelectorAll('.progress .dots .dot'));
+    const progressText = document.querySelector('.progress .progress-count');
+    const completeModal = document.getElementById('completeModal');
+    const completeCloseBtn = document.getElementById('completeCloseBtn');
+
+    function openCompleteModal(){
+      if(!completeModal) return;
+      completeModal.classList.add('show');
+      completeModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      if (completeCloseBtn) completeCloseBtn.focus();
+    }
+
+    function closeCompleteModal(){
+      if(!completeModal) return;
+      completeModal.classList.remove('show');
+      completeModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+    }
+
+    if (completeCloseBtn) completeCloseBtn.addEventListener('click', closeCompleteModal);
+    if (completeModal) completeModal.addEventListener('click', (e)=>{ if(e.target===completeModal) closeCompleteModal(); });
+
+
+    function revealGlyph(step){
+      const slot = vault.querySelector(`.slot[data-step="${step}"]`);
+      if(!slot) return;
+      if (slot.classList.contains('is-found')) return;
+
+      const patternSrc = patternForStep[step];
+      const glyphEl = slot.querySelector('.glyph');
+      glyphEl.innerHTML = '';
+      glyphEl.style.backgroundImage = patternSrc ? `url('${patternSrc}')` : '';
+      glyphEl.style.backgroundSize = SLOT_BG_SIZE;
+      glyphEl.style.backgroundPosition = slotPatternPos[step] || '50% 50%';
+      glyphEl.style.backgroundRepeat = 'no-repeat';
+
+      slot.classList.add('is-found', 'slot-reveal');
+      setTimeout(() => slot.classList.remove('slot-reveal'), 800);
+
+      const cardId = idForStep[step];
+      if(cardId){
+        const cardEl = document.getElementById(cardId);
+        if(cardEl) {
+          cardEl.classList.add('is-complete', 'reveal-icon');
+          cardEl.setAttribute('aria-disabled','true');
+          setTimeout(() => cardEl.classList.remove('reveal-icon'), 900);
+        }
+      }
+
+      glyphEl.style.animation = 'glyphPop .38s ease';
+      const cellEl = cubeCells[step - 1];
+      if (cellEl && patternSrc) {
+        cellEl.style.backgroundImage = `url('${patternSrc}')`;
+        cellEl.classList.add('is-unlocked');
+      }
+      
+      acquired[step-1] = true;
+      localStorage.setItem(`${CHAPTER_KEY}_step_${step}_solved`, '1');
+      const count = acquired.filter(Boolean).length;
+  
+      dots.forEach((d,i)=> {
+        const isActive = i < count;
+        const wasActive = d.classList.contains('is-active');
+        d.classList.toggle('is-active', isActive);
+  
+        if (isActive && !wasActive) {
+          d.classList.add('dot-flash');
+          setTimeout(() => d.classList.remove('dot-flash'), 600);
+        }
+      });
+  
+      if(progressText) progressText.textContent = `${count} / 4`;
+      if (count === 4) {
+        const holoEl = document.querySelector('.holo');
+        const cubeEl = document.querySelector('.holo .cube');
+
+        if (holoEl) holoEl.classList.add('is-complete');
+        if (cubeEl) {
+          cubeEl.classList.add('is-clickable');
+          cubeEl.setAttribute('tabindex', '0');
+          cubeEl.setAttribute('role', 'button');
+          cubeEl.setAttribute('aria-label', '완성된 홀로그램. 클릭하면 미션 완료 화면이 열립니다.');
+        }
+      }
+      unlockNextAfter(step);
+      
+    }
+
+    function setCardLocked(cardId, locked){
+        const el = document.getElementById(cardId);
+        if(!el) return;
+        el.classList.toggle('is-locked', locked);
+        if(locked){
+          el.setAttribute('aria-disabled','true');
+          el.setAttribute('tabindex','-1');
+        } else {
+          el.removeAttribute('aria-disabled');
+          el.setAttribute('tabindex','0');
+        }
+      }
+
+    function lockAllExceptFirst(){
+      setCardLocked('hud', false);
+      setCardLocked('memory', true);
+      setCardLocked('vital', true);
+      setCardLocked('tracker', true);
+    }
+
+    function unlockNextAfter(step){
+      if(step === 1) setCardLocked('memory', false);
+      if(step === 2) setCardLocked('vital', false);
+      if(step === 3) setCardLocked('tracker', false);
+    }
+    
+    const holoEl = document.querySelector('.holo');
+    const cubeEl = document.querySelector('.holo .cube');
+
+    function isAllGlyphsComplete(){
+      return acquired.every(Boolean);
+    }
+
+    if (cubeEl) {
+      cubeEl.addEventListener('click', () => {
+        if (isAllGlyphsComplete()) openCompleteModal();
+      });
+
+      cubeEl.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && isAllGlyphsComplete()) {
+          e.preventDefault();
+          openCompleteModal();
+        }
+      });
+    }
+
+    const glyphGridModal = document.getElementById('glyphGridModal');
+    const glyphGridContainer = document.getElementById('glyphGridContainer');
+    const glyphImageList = [
+      { key: 'bluecloud',   file: 'bluecloud.png',   label: 'BLUE CLOUD' },
+      { key: 'butterfly',   file: 'butterfly.png',   label: 'BUTTERFLY' },
+      { key: 'heart',       file: 'heart.png',       label: 'HEART' },
+      { key: 'ice',         file: 'ice.png',         label: 'ICE' },
+      { key: 'light',       file: 'light.png',       label: 'LIGHT' },
+      { key: 'moon',        file: 'moon.png',        label: 'MOON' },
+      { key: 'pinkflower',  file: 'pinkflower.png',  label: 'PINK FLOWER' },
+      { key: 'purpleflower',file: 'purpleflower.png',label: 'PURPLE FLOWER' },
+      { key: 'sprout',      file: 'sprout.png',      label: 'SPROUT' },
+      { key: 'star',        file: 'star.png',        label: 'STAR' },
+      { key: 'water',       file: 'water.png',       label: 'WATER' },
+      { key: 'whitecloud',  file: 'whitecloud.png',  label: 'WHITE CLOUD' },
+      ];
+    const glyphPatterns = glyphImageList.map(g => g.key);
+
+    let selectedGlyphs = [];
+    // 첫번째 기억 정답(나비, 새싹, 달, 아이스)
+    const correctOrder = [1, 8, 5, 3];
+    let isAnswerPhase = false;
+
+  function ensureGlyphModalUI() {
+    const body = glyphGridModal.querySelector('.modal-body');
+    if (!document.getElementById('selectedCount')) {
+      const tracker = document.createElement('div');
+      tracker.className = 'selection-tracker';
+      tracker.innerHTML = `
+        <div class="selection-tracker-item">
+          <span class="selection-tracker-label">선택</span>
+          <span id="selectedCount" class="selection-tracker-value">0/3</span>
+        </div>
+        <div id="selectedGlyphsDisplay"></div>`;
+      body.appendChild(tracker);
+    }
+
+    if (!document.getElementById('resultMessage')) {
+      const msg = document.createElement('div');
+      msg.id = 'resultMessage';
+      msg.className = 'result-message';
+      msg.setAttribute('role', 'alert');
+      body.appendChild(msg);
+    }
+  }
+
+  function populateGlyphGrid() {
+    ensureGlyphModalUI();
+    glyphGridContainer.innerHTML = '';
+    selectedGlyphs = [];
+    isAnswerPhase = false;
+    const indices = glyphImageList.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    indices.forEach((patternIndex) => {
+      const imgInfo = glyphImageList[patternIndex];
+
+      const card = document.createElement('div');
+      card.className = 'glyph-card';
+      card.dataset.pattern = imgInfo.key;
+      card.dataset.index = patternIndex;
+      card.style.backgroundImage = `url('./${imgInfo.file}')`;
+      card.style.backgroundSize = '70% auto';
+      card.style.backgroundPosition = 'center';
+      card.style.backgroundRepeat = 'no-repeat';
+
+      card.addEventListener('click', () =>
+        selectGlyph(imgInfo.key, card, patternIndex)
+      );
+
+      glyphGridContainer.appendChild(card);
+    });
+
+    const resultMessage = document.getElementById('resultMessage');
+    if (resultMessage) {
+      resultMessage.classList.remove('show', 'correct', 'incorrect');
+      resultMessage.textContent = '';
+    }
+    updateSelectionDisplay();
+  }
+
+  function selectGlyph(pattern, cardElement, index) {
+    if (isAnswerPhase) return;
+
+    const isAlreadySelected = selectedGlyphs.some(s => s.index === index);
+
+    if (isAlreadySelected) {
+      selectedGlyphs = selectedGlyphs.filter(s => s.index !== index);
+      cardElement.classList.remove('selected');
+      cardElement.removeAttribute('data-order');
+    } else if (selectedGlyphs.length < 4) {
+      selectedGlyphs.push({ pattern, index });
+      cardElement.classList.add('selected');
+      cardElement.setAttribute('data-order', selectedGlyphs.length);
+
+      if (selectedGlyphs.length === 4) {
+        setTimeout(() => checkAnswer(), 500);
+      }
+    }
+
+    updateSelectionDisplay();
+  }
+
+  function updateSelectionDisplay() {
+    const selectedCount = document.getElementById('selectedCount');
+    const selectedGlyphsDisplay = document.getElementById('selectedGlyphsDisplay');
+    if (!selectedCount || !selectedGlyphsDisplay) return;
+
+    selectedCount.textContent = `${selectedGlyphs.length}/4`;
+    selectedGlyphsDisplay.innerHTML = '';
+
+    selectedGlyphs.forEach((s, idx) => {
+      const info = glyphImageList[s.index];
+      const label = info?.label || s.pattern.toUpperCase();
+
+      const item = document.createElement('div');
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.gap = '4px';
+      item.style.padding = '6px 10px';
+      item.style.background = 'rgba(41, 216, 255, 0.15)';
+      item.style.borderRadius = '6px';
+      item.style.border = '1px solid rgba(41, 216, 255, 0.3)';
+      item.innerHTML =
+        `<span style="color: var(--magenta); font-weight: 800; font-size: 14px;">${idx + 1}</span>` +
+        `<span style="color: var(--text); font-weight: 600;">${label}</span>`;
+      selectedGlyphsDisplay.appendChild(item);
+    });
+  }
+
+  function checkAnswer() {
+    isAnswerPhase = true;
+    ensureGlyphModalUI();
+    const resultMessage = document.getElementById('resultMessage');
+
+    const selectedIndexes = selectedGlyphs.map(s => s.index);
+    const isCorrect =
+      selectedIndexes[0] === correctOrder[0] &&
+      selectedIndexes[1] === correctOrder[1] &&
+      selectedIndexes[2] === correctOrder[2] &&
+      selectedIndexes[3] === correctOrder[3];
+
+    resultMessage.classList.add('show');
+
+    if (isCorrect) {
+      resultMessage.classList.remove('incorrect');
+      resultMessage.classList.add('correct');
+      resultMessage.textContent = '🎉 정답입니다! 축하합니다!';
+
+      selectedGlyphs.forEach(s => {
+        const card = glyphGridContainer.querySelector(
+          `[data-index="${s.index}"]`
+        );
+        if (card) {
+          card.style.boxShadow =
+            '0 0 30px rgba(0, 255, 150, 0.8), inset 0 0 20px rgba(0, 255, 150, 0.3)';
+          card.style.borderColor = '#00ff9a';
+        }
+      });
+
+      glyphGridContainer.querySelectorAll('.glyph-card').forEach(card => {
+        if (!selectedGlyphs.some(s => s.index === parseInt(card.dataset.index))) {
+          card.classList.add('disabled');
+        }
+      });
+
+      setTimeout(() => {
+        openQRModal(1, '두번째 기억', './images/qr/qr-2.png');
+      }, 900);
+    } else {
+      resultMessage.classList.remove('correct');
+      resultMessage.classList.add('incorrect');
+      resultMessage.textContent = '❌ 틀렸습니다. 다시 시도해주세요.';
+
+      selectedGlyphs.forEach(s => {
+        const card = glyphGridContainer.querySelector(
+          `[data-index="${s.index}"]`
+        );
+        if (card) {
+          card.style.animation = 'shake 0.4s ease';
+        }
+      });
+
+      setTimeout(() => {
+        selectedGlyphs = [];
+        isAnswerPhase = false;
+        glyphGridContainer.querySelectorAll('.glyph-card').forEach(card => {
+          card.classList.remove('selected', 'disabled');
+          card.removeAttribute('data-order');
+          card.style.boxShadow = '';
+          card.style.borderColor = '';
+          card.style.animation = '';
+        });
+        updateSelectionDisplay();
+        resultMessage.classList.remove('show');
+      }, 2500);
+    }
+  }
+  const diaryModal = document.getElementById('diaryModal');
+  const diaryModalTitle = document.getElementById('diaryModalTitle');
+  const diaryModalBody = document.getElementById('diaryModalBody');
+  const diaryModalClose = document.getElementById('diaryModalClose');
+
+  function openDiaryModal(titleText){
+    if (diaryModalBody) diaryModalBody.innerHTML = diaryTemplateHTML();
+
+    diaryModal.classList.add('show');
+    diaryModal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    if (diaryModalClose) diaryModalClose.focus();
+
+    // ✅ 다이어리 이벤트 바인딩(기존 함수 재사용)
+    initDiaryHandlers();
+  }
+
+  function closeDiaryModal(){
+    diaryModal.classList.remove('show');
+    diaryModal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    if (lastFocusedCard) lastFocusedCard.focus();
+  }
+
+  // 닫기/배경 클릭/ESC
+  if (diaryModalClose) diaryModalClose.addEventListener('click', closeDiaryModal);
+  if (diaryModal) diaryModal.addEventListener('click', (e)=>{ if (e.target === diaryModal) closeDiaryModal(); });
+
+  const slideModal = document.getElementById('slideModal');
+  const slideGrid = document.getElementById('slideGrid');
+  const moveCountEl = document.getElementById('moveCount');
+  const slideResult = document.getElementById('slideResult');
+  const resetSlideBtn = document.getElementById('resetSlidePuzzle');
+  const slideModalClose = slideModal.querySelector('.modal-close');
+
+  const SLIDE_ROWS = 3;
+  const SLIDE_COLS = 4;
+  const TOTAL_TILES = SLIDE_ROWS * SLIDE_COLS;
+  const EMPTY_TILE = TOTAL_TILES - 1;
+  let slideBoard = [];
+  
+  let slidePuzzleInitialized = false;
+
+  function initSlidePuzzle() {
+    slideBoard = Array.from({ length: TOTAL_TILES }, (_, idx) => idx);
+    shuffleSlideBoard();
+    slideResult.classList.remove('show', 'correct', 'incorrect');
+    renderSlideBoard();
+    slidePuzzleInitialized = true;
+  }
+
+  function shuffleSlideBoard() {
+    do {
+      slideBoard = Array.from({ length: TOTAL_TILES }, (_, idx) => idx);
+      for (let i = slideBoard.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [slideBoard[i], slideBoard[j]] = [slideBoard[j], slideBoard[i]];
+      }
+    } while (!isSlideSolvable(slideBoard) || isSlideSolved(slideBoard));
+  }
+
+  function isSlideSolvable(board) {
+    let inv = 0;
+    for (let i = 0; i < board.length; i++) {
+      for (let j = i + 1; j < board.length; j++) {
+        if (board[i] === EMPTY_TILE || board[j] === EMPTY_TILE) continue;
+        if (board[i] > board[j]) inv++;
+      }
+    }
+
+    if (SLIDE_COLS % 2 !== 0) {
+      return inv % 2 === 0;
+    } else {
+      const emptyRowFromBottom =
+        SLIDE_ROWS - Math.floor(board.indexOf(EMPTY_TILE) / SLIDE_COLS);
+      return (inv + emptyRowFromBottom) % 2 === 1;
+    }
+  }
+
+  function isSlideSolved(board) {
+    return board.every((v, i) => v === i);
+  }
+
+  function renderSlideBoard() {
+    slideGrid.innerHTML = '';
+
+    slideBoard.forEach((tileIndex, pos) => {
+      const tile = document.createElement('div');
+      tile.className = 'slide-tile';
+      tile.dataset.index = tileIndex;
+
+      if (tileIndex === EMPTY_TILE) {
+        tile.className += ' empty';
+      } else {
+        const row = Math.floor(tileIndex / SLIDE_COLS);
+        const col = tileIndex % SLIDE_COLS;
+        tile.style.backgroundImage = `url('./images/missions/mission_last.png')`;
+        const xStep = SLIDE_COLS > 1 ? 100 / (SLIDE_COLS - 1) : 0;
+        const yStep = SLIDE_ROWS > 1 ? 100 / (SLIDE_ROWS - 1) : 0;
+        tile.style.backgroundPosition = `${col * xStep}% ${row * yStep}%`;
+        tile.style.backgroundSize = `${SLIDE_COLS * 100}% ${SLIDE_ROWS * 100}%`;
+      }
+
+      tile.addEventListener('click', () => handleSlideTileClick(pos));
+      slideGrid.appendChild(tile);
+    });
+  }
+
+  function handleSlideTileClick(pos) {
+    const emptyPos = slideBoard.indexOf(EMPTY_TILE);
+    if (!isAdjacentSlide(pos, emptyPos)) return;
+
+    [slideBoard[pos], slideBoard[emptyPos]] = [slideBoard[emptyPos], slideBoard[pos]];
+    renderSlideBoard();
+
+    if (isSlideSolved(slideBoard)) {
+      slideResult.textContent = '퍼즐을 완성했습니다!';
+      slideResult.classList.remove('incorrect');
+      slideResult.classList.add('show', 'correct');
+
+      setTimeout(() => {
+        revealGlyph(4);
+        closeSlideModal();
+      }, 1200);
+    }
+  }
+
+  function isAdjacentSlide(a, b) {
+    const ax = a % SLIDE_COLS, ay = Math.floor(a / SLIDE_COLS);
+    const bx = b % SLIDE_COLS, by = Math.floor(b / SLIDE_COLS);
+    return Math.abs(ax - bx) + Math.abs(ay - by) === 1;
+  }
+
+  function openSlideModal() {
+     if (!slidePuzzleInitialized) {
+      initSlidePuzzle();
+      } else {
+        renderSlideBoard();
+      }
+    slideModal.classList.add('show');
+    slideModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    slideModalClose.focus();
+  }
+
+  function closeSlideModal() {
+    slideModal.classList.remove('show');
+    slideModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocusedCard) lastFocusedCard.focus();
+  }
+
+  resetSlideBtn.addEventListener('click', () => initSlidePuzzle());
+  slideModalClose.addEventListener('click', closeSlideModal);
+  slideModal.addEventListener('click', e => {
+    if (e.target === slideModal) closeSlideModal();
+  });
+
+    const contents = {
+      hud:{ title:'첫번째 기억', type:'glyph' },
+      memory:{ title:'두번째 기억', type:'diary' },
+      vital:{ title:'세번째 기억', type:'keyPuzzle' },
+      tracker:{ title:'네번째 기억', type:'slide' },
+      hintHud:{ title:'첫번째 기억 힌트', html:'<p>무슨 힌트를 줄까</p>' },
+      hintMemory:{ title:'두번째 기억 힌트', html:'<p>무슨 힌트를 줄까.</p>' },
+      hintVital:{ title:'세번째 기억 힌트', html:'<p>무슨 힌트를 줄까.</p>' }
+    };
+
+    // 힌트 정답
+    const HINT_PASSWORDS = {
+      hintHud: '4849', //1
+      hintMemory_1: '3933', //2-1
+      hintMemory_2: '7281', //2-2
+      hintVital_1: '5838', //3-1
+      hintVital_2: '1602' //3-2
+    };
+
+    const HINT_CONTENTS = {
+      hintHud: `
+        <div style="
+          background:rgba(10,18,34,0.45);
+          border:1px solid rgba(41,216,255,0.25);
+          border-radius:14px;
+          padding:20px 22px;
+          text-align:center;
+        ">
+          <div style="
+            font-size:20px;
+            font-weight:800;
+            margin-bottom:12px;
+          ">
+            🎼 하모니아의 악보 분석 결과
+          </div>
+
+          <p style="
+            line-height:1.7;
+            margin:0;
+            font-size:16px;
+            font-weight:600;
+          ">
+            두 악보를 비교해보니<br>
+            <span style="color:#ff7a00; font-weight:800;">
+              비어있는 음
+            </span>이 있어요.<br><br>
+
+            동물을 클릭해 각 음에 해당하는 <b>번호</b>를 찾고<br>
+            <span style="color:#6be3ff; font-weight:800;">
+              키패드
+            </span>에 입력해주세요.
+          </p>
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:14px;
+          font-weight:700;
+          color:#ff9f43;
+          text-align:center;
+        ">
+          👉 동물을 하나씩 클릭해보세요
+        </div>
+      `,
+      hintMemory_1: `
+        <div style="
+          background:rgba(10,18,34,0.45);
+          border:1px solid rgba(41,216,255,0.25);
+          border-radius:14px;
+          padding:20px 22px;
+          text-align:center;
+        ">
+          <div style="
+            font-size:20px;
+            font-weight:800;
+            margin-bottom:12px;
+          ">
+            🌸 첫번째 큐브 관찰 포인트
+          </div>
+
+          <p style="
+            line-height:1.7;
+            margin:0;
+            font-size:16px;
+            font-weight:600;
+          ">
+            첫번째 큐브 곳곳에 숨겨진<br>
+            <span style="color:#ff7a00; font-weight:800;">
+              꽃
+            </span>을 찾아보세요.<br><br>
+
+            보이는 꽃의 <b>개수</b>를 세어보는 것이 중요해요.
+          </p>
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:14px;
+          font-weight:700;
+          color:#ff9f43;
+          text-align:center;
+        ">
+          👉 큐브를 천천히 돌려보세요
+        </div>
+      `,
+
+      hintMemory_2: `
+        <div style="
+          background:rgba(10,18,34,0.45);
+          border:1px solid rgba(41,216,255,0.25);
+          border-radius:14px;
+          padding:20px 22px;
+          text-align:center;
+        ">
+          <div style="
+            font-size:20px;
+            font-weight:800;
+            margin-bottom:12px;
+          ">
+            🏗 공사장 인부들의 이야기
+          </div>
+
+          <p style="
+            line-height:1.7;
+            margin:0;
+            font-size:16px;
+            font-weight:600;
+          ">
+            공사장 인부들의 <b>퀴즈</b>를 통해<br>
+            일기장에 적힌 <span style="color:#6be3ff; font-weight:800;">
+              소장님의 이야기
+            </span>를 들어보세요.<br><br>
+
+            여러 선택지 중<br>
+            <b>소장님의 마음에 쏙 드는 답변</b>이 있어요.
+          </p>
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:14px;
+          font-weight:700;
+          color:#ff9f43;
+          text-align:center;
+        ">
+          👉 인부들의 퀴즈를 풀면서 일기장을 확인해보세요
+        </div>
+      `,
+       hintVital_1: `
+        <div style="
+          background:rgba(10,18,34,0.45);
+          border:1px solid rgba(41,216,255,0.25);
+          border-radius:14px;
+          padding:20px 22px;
+          text-align:center;
+        ">
+          <div style="font-size:20px; font-weight:800; margin-bottom:12px;">
+            🧬 바이러스 코드 힌트
+          </div>
+
+          <p style="line-height:1.7; margin:0; font-size:16px; font-weight:600;">
+            배열 속에 있는 <span style="color:#ff7a00; font-weight:800;">6개의 숫자</span>는<br>
+            <b>모두 동일한 개수</b>만큼 등장해요.
+          </p>
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:14px;
+          font-weight:700;
+          color:#ff9f43;
+          text-align:center;
+        ">
+          👉 같은 숫자가 몇 번씩 나오는지 세어보세요
+        </div>
+      `,
+      hintVital_2: `
+        <div style="
+          background:rgba(10,18,34,0.45);
+          border:1px solid rgba(41,216,255,0.25);
+          border-radius:14px;
+          padding:20px 22px;
+          text-align:center;
+        ">
+          <div style="
+            font-size:20px;
+            font-weight:800;
+            margin-bottom:12px;
+          ">
+            📡 고장난 전광판의 신호
+          </div>
+
+          <p style="
+            line-height:1.7;
+            margin:0;
+            font-size:16px;
+            font-weight:600;
+          ">
+            고장난 전광판에는<br>
+            <span style="color:#ff7a00; font-weight:800;">
+              SIGNAL
+            </span>이 필요합니다.<br><br>
+
+            ‘SIGNAL’을 찾아 전광판을 클릭해보세요.<br>
+            웹에서 얻은 <b>KEY</b>의 값만큼<br>
+            큐브 속 <span style="color:#6be3ff; font-weight:800;">
+              KEY
+            </span>를 눌러 원판을 돌려보세요.
+          </p>
+        </div>
+
+        <div style="
+          margin-top:14px;
+          font-size:14px;
+          font-weight:700;
+          color:#ff9f43;
+          text-align:center;
+        ">
+          👉 원판 속 SIGNAL에 해당하는 글자를 찾아보세요
+        </div>
+      `
+
+    };
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalClose = document.getElementById('modalClose');
+    const glyphModalClose = glyphGridModal.querySelector('.modal-close');
+    let lastFocusedCard = null;
+    
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    if (glyphModalClose) glyphModalClose.addEventListener('click', closeGlyphModal);
+    if (glyphGridModal) glyphGridModal.addEventListener('click', e => { if (e.target === glyphGridModal) closeGlyphModal(); });
+ 
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (modal.classList.contains('show')) closeModal();
+        if (glyphGridModal.classList.contains('show')) closeGlyphModal();
+        if (diaryModal && diaryModal.classList.contains('show')) closeDiaryModal();
+        if (qrModal && qrModal.classList.contains('show')) closeQRModal();
+        if (slideModal && slideModal.classList.contains('show')) closeSlideModal();
+      }
+    });
+
+    // 두번째 기억 정답
+    const DIARY_PAGE_PASSWORDS = ['95','42','821','90','주사위','3'];
+    const DIARY_FINAL_PASSWORD = 'evolution';
+    const DIARY_TOTAL_PAGES = 7;
+
+    const DIARY_PAGES = [
+      './images/diary/Diary1.png',
+      './images/diary/Diary2.png',
+      './images/diary/Diary3.png',
+      './images/diary/Diary4.png',
+      './images/diary/Diary5.png',
+      './images/diary/Diary6.png',
+      './images/diary/Diary7.png'
+    ];
+
+function openHintGate(hintId) {
+  const titleMap = {
+    hintHud: '첫번째 큐브 힌트',
+    hintMemory: '두번째 큐브 힌트',
+    hintVital: '세번째 큐브 힌트'
+  };
+  modalTitle.textContent = titleMap[hintId] || '힌트';
+
+  // 공통: 모달 오픈
+  function openModalShell() {
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+  // ✅ 1) 첫번째 힌트(단일)
+  if (hintId === 'hintHud') {
+    const storageKey = `doro_hint_unlocked_${hintId}`;
+    const alreadyUnlocked = localStorage.getItem(storageKey) === '1';
+
+    if (alreadyUnlocked) {
+      modalBody.innerHTML = HINT_CONTENTS[hintId] || '<p>힌트가 준비되지 않았습니다.</p>';
+      openModalShell();
+      return;
+    }
+
+    modalBody.innerHTML = `
+      <div style="text-align:center;">
+        <p style="margin:0 0 12px; color: var(--muted); font-weight:600; line-height:1.5;">
+          비밀번호를 입력하면 힌트를 볼 수 있어요.<br>
+          <span style="color:#ff7a00; font-size:20px; letter-spacing:0.3px;">
+            SIGNAL BREAK BOX에 있는 지령을 수행하세요.
+          </span>
+        </p>
+
+        <div style="display:flex; gap:10px; justify-content:center; align-items:center;">
+          <input id="hintPassInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호" />
+          <button id="hintPassBtn" class="diary-pass-btn" type="button">확인</button>
+        </div>
+        <div id="hintPassMsg" class="result-message" style="margin-top:12px;"></div>
+      </div>
+    `;
+    openModalShell();
+
+    const input = document.getElementById('hintPassInput');
+    const btn = document.getElementById('hintPassBtn');
+    const msg = document.getElementById('hintPassMsg');
+
+    function setMsg(ok, text) {
+      msg.classList.add('show');
+      msg.classList.toggle('correct', !!ok);
+      msg.classList.toggle('incorrect', !ok);
+      msg.textContent = text;
+    }
+
+    function submitHint() {
+      const v = (input.value || '').trim();
+      if (v === (HINT_PASSWORDS[hintId] || '')) {
+        setMsg(true, '✅ 힌트가 열렸습니다!');
+        localStorage.setItem(storageKey, '1');
+        setTimeout(() => {
+          modalBody.innerHTML = HINT_CONTENTS[hintId] || '<p>힌트가 준비되지 않았습니다.</p>';
+        }, 700);
+      } else {
+        setMsg(false, '❌ 비밀번호가 틀렸습니다.');
+        input.focus(); input.select();
+      }
+    }
+
+    btn.addEventListener('click', submitHint);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitHint(); });
+    input.focus();
+    return;
+  }
+
+  // ✅ 공통: 2단계 힌트 렌더러 (2번/3번 똑같이 사용)
+  function renderTwoStepHint(options) {
+    const {
+      titleText,
+      tab1Label, tab2Label,
+      stepKey1, stepKey2,   // HINT_CONTENTS 키
+      passKey1, passKey2,   // HINT_PASSWORDS 키
+      storageKey1, storageKey2,
+      defaultTab = '1'
+    } = options;
+
+    modalTitle.textContent = titleText;
+
+    const u1 = localStorage.getItem(storageKey1) === '1';
+    const u2 = localStorage.getItem(storageKey2) === '1';
+    const step2Enabled = u1;
+
+    modalBody.innerHTML = `
+      <div style="text-align:center;">
+        <p style="margin:0 0 14px; color: var(--muted); font-weight:600; line-height:1.5;">
+          비밀번호를 입력하면 힌트를 볼 수 있어요.<br>
+          <span style="color:#ff7a00; font-size:20px; letter-spacing:0.3px;">
+            SIGNAL BREAK BOX에 있는 지령을 수행하세요.
+          </span>
+        </p>
+
+        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:14px;">
+          <button id="tab1" class="diary-pass-btn" type="button"
+            style="padding:10px 14px; opacity:${u1 ? '1' : '0.95'};">
+            ${tab1Label} ${u1 ? '✅' : ''}
+          </button>
+          <button id="tab2" class="diary-pass-btn" type="button"
+            ${step2Enabled ? '' : 'disabled'}
+            style="padding:10px 14px; opacity:${step2Enabled ? (u2 ? '1' : '0.7') : '0.35'};">
+            ${tab2Label} ${u2 ? '✅' : ''}
+          </button>
+        </div>
+
+        <div id="panel" style="text-align:left; max-width:520px; margin:0 auto;"></div>
+      </div>
+    `;
+    openModalShell();
+
+    const panel = document.getElementById('panel');
+    const tab1 = document.getElementById('tab1');
+    const tab2 = document.getElementById('tab2');
+
+    function showUnlocked(stepKey) {
+      panel.innerHTML = `
+        <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px;">
+          ${HINT_CONTENTS[stepKey] || '<p>힌트가 준비되지 않았습니다.</p>'}
+        </div>
+      `;
+    }
+
+    function showGate(stepKey, passKey, storageKey, nextTab) {
+      panel.innerHTML = `
+        <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px;">
+          <div style="font-weight:800; margin-bottom:10px; color:var(--text);">
+            비밀번호를 입력하세요
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input id="passInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호" />
+            <button id="passBtn" class="diary-pass-btn" type="button">확인</button>
+          </div>
+          <div id="passMsg" class="result-message" style="margin-top:12px;"></div>
+        </div>
+      `;
+
+      const input = document.getElementById('passInput');
+      const btn = document.getElementById('passBtn');
+      const msg = document.getElementById('passMsg');
+
+      function setMsg(ok, text) {
+        msg.classList.add('show');
+        msg.classList.toggle('correct', !!ok);
+        msg.classList.toggle('incorrect', !ok);
+        msg.textContent = text;
+      }
+
+      function submit() {
+        const v = (input.value || '').trim();
+        if (v === (HINT_PASSWORDS[passKey] || '')) {
+          setMsg(true, '✅ 힌트가 열렸습니다!');
+          localStorage.setItem(storageKey, '1');
+          setTimeout(() => {
+            // ✅ 방금 푼 탭 유지
+            renderTwoStepHint({ ...options, defaultTab: nextTab });
+          }, 600);
+        } else {
+          setMsg(false, '❌ 비밀번호가 틀렸습니다.');
+          input.focus(); input.select();
+        }
+      }
+
+      btn.addEventListener('click', submit);
+      input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submit(); });
+      input.focus();
+    }
+
+    function openStep1() {
+      const unlocked = localStorage.getItem(storageKey1) === '1';
+      if (unlocked) showUnlocked(stepKey1);
+      else showGate(stepKey1, passKey1, storageKey1, '1');
+    }
+
+    function openStep2() {
+      const enabled = localStorage.getItem(storageKey1) === '1';
+      if (!enabled) {
+        panel.innerHTML = `
+          <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px; text-align:center;">
+            <div style="font-weight:800; margin-bottom:8px;">🔒 아직 잠겨있어요.</div>
+            <div style="color:var(--muted); font-weight:600;">먼저 <b>${tab1Label}</b>을 열어주세요.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const unlocked = localStorage.getItem(storageKey2) === '1';
+      if (unlocked) showUnlocked(stepKey2);
+      else showGate(stepKey2, passKey2, storageKey2, '2');
+    }
+
+    tab1.addEventListener('click', openStep1);
+    tab2.addEventListener('click', openStep2);
+
+    // ✅ 기본 탭 선택
+    if (defaultTab === '2') openStep2();
+    else openStep1();
+  }
+
+  // ✅ 2) 두번째 힌트(단계형)
+  if (hintId === 'hintMemory') {
+    renderTwoStepHint({
+      titleText: '두번째 큐브 힌트',
+      tab1Label: '힌트 2-1',
+      tab2Label: '힌트 2-2',
+      stepKey1: 'hintMemory_1',
+      stepKey2: 'hintMemory_2',
+      passKey1: 'hintMemory_1',
+      passKey2: 'hintMemory_2',
+      storageKey1: 'doro_hint_unlocked_hintMemory_1',
+      storageKey2: 'doro_hint_unlocked_hintMemory_2',
+      defaultTab: '1'
+    });
+    return;
+  }
+
+  // ✅ 3) 세번째 힌트(단계형)
+  if (hintId === 'hintVital') {
+    renderTwoStepHint({
+      titleText: '세번째 큐브 힌트',
+      tab1Label: '힌트 3-1',
+      tab2Label: '힌트 3-2',
+      stepKey1: 'hintVital_1',
+      stepKey2: 'hintVital_2',
+      passKey1: 'hintVital_1',
+      passKey2: 'hintVital_2',
+      storageKey1: 'doro_hint_unlocked_hintVital_1',
+      storageKey2: 'doro_hint_unlocked_hintVital_2',
+      defaultTab: '1'
+    });
+    return;
+  }
+}
+
+
+    function diaryTemplateHTML() {
+      return `
+        <div class="diary-viewer">
+          <div class="diary-frame">
+            <img id="diaryImage" class="diary-image" src="${DIARY_PAGES[0]}" alt="Diary page 1">
+             <div id="diaryFinalGate" class="diary-final-gate" aria-hidden="true">
+          <div class="diary-final-card">
+            <div class="diary-final-title">마지막 페이지 잠금</div>
+            <div class="diary-final-desc">비밀번호를 입력하면 QR이 열립니다.</div>
+
+            <div class="diary-gate-row">
+              <input id="diaryFinalPassInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호">
+              <button id="diaryFinalPassBtn" class="diary-pass-btn" type="button">확인</button>
+            </div>
+
+            <div id="diaryFinalMsg" class="result-message"></div>
+          </div>
+        </div>
+          </div>
+
+          <div class="diary-controls">
+            <button id="diaryPrev" class="diary-arrow" type="button" aria-label="이전 페이지">◀</button>
+            <div class="diary-page-indicator">
+              <span id="diaryPageNum">1</span> / ${DIARY_TOTAL_PAGES}
+            </div>
+            <button id="diaryNext" class="diary-arrow" type="button" aria-label="다음 페이지">▶</button>
+          </div>
+
+          <div id="diaryGate" class="diary-gate" aria-live="polite">
+            <div class="diary-gate-title">비밀번호를 입력하면 다음 페이지로 이동합니다.</div>
+            <div class="diary-gate-row">
+              <input id="diaryPassInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호">
+              <button id="diaryPassBtn" class="diary-pass-btn" type="button">확인</button>
+            </div>
+            <div id="diaryGateMsg" class="result-message"></div>
+          </div>
+
+          <button id="diaryCompleteBtn" class="btn diary-complete-btn" type="button" style="display:none;">
+            확인
+          </button>
+        </div>
+      `;
+    }
+
+    function initDiaryHandlers() {
+      const img = document.getElementById('diaryImage');
+      const pageNumEl = document.getElementById('diaryPageNum');
+      const prevBtn = document.getElementById('diaryPrev');
+      const nextBtn = document.getElementById('diaryNext');
+
+      const gate = document.getElementById('diaryGate');
+      const passInput = document.getElementById('diaryPassInput');
+      const passBtn = document.getElementById('diaryPassBtn');
+      const gateMsg = document.getElementById('diaryGateMsg');
+
+      const completeBtn = document.getElementById('diaryCompleteBtn');
+      const finalGate = document.getElementById('diaryFinalGate');
+      const finalPassInput = document.getElementById('diaryFinalPassInput');
+      const finalPassBtn = document.getElementById('diaryFinalPassBtn');
+      const finalMsg = document.getElementById('diaryFinalMsg');
+
+      let currentPage = 0;
+      let nextPending = false;
+      
+      const frame = document.querySelector('.diary-frame');
+      let isFlipping = false;
+
+      
+        let isTransitioning = false;
+
+      function fadeToPage(nextPageIndex, direction /* 'next' | 'prev' */) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+
+        const outX = direction === 'prev' ? 10 : -10;
+        img.style.transform = `translateX(${outX}px)`;
+
+        img.classList.remove('is-fade-in');
+        img.classList.add('is-fade-out');
+
+        const OUT_MS = 320;
+        const IN_MS  = 350;
+
+        setTimeout(() => {
+          currentPage = nextPageIndex;
+          img.src = DIARY_PAGES[currentPage];
+          img.alt = `Diary page ${currentPage + 1}`;
+          pageNumEl.textContent = String(currentPage + 1);
+
+          completeBtn.style.display =
+            (currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
+
+          hideGate();
+          hideFinalGate();
+
+          img.classList.remove('is-fade-out');
+          img.classList.add('is-fade-in');
+          img.style.transform = 'translateX(0)';
+
+          setTimeout(() => {
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage >= DIARY_TOTAL_PAGES - 1;
+
+            isTransitioning = false;
+          }, IN_MS);
+
+        }, OUT_MS);
+      }
+
+      
+      function hideGate() {
+        gate.classList.remove('show');
+        gateMsg.classList.remove('show', 'correct', 'incorrect');
+        gateMsg.textContent = '';
+        passInput.value = '';
+        nextPending = false;
+      }
+
+      function showGate() {
+        gate.classList.add('show');
+        gateMsg.classList.remove('show', 'correct', 'incorrect');
+        gateMsg.textContent = '';
+        passInput.value = '';
+        passInput.focus();
+        nextPending = true;
+      }
+
+      function showFinalGate(){
+        if (!finalGate) return;
+        finalGate.classList.add('show');
+        finalGate.setAttribute('aria-hidden','false');
+
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+
+        finalMsg.classList.remove('show','correct','incorrect');
+        finalMsg.textContent = '';
+        finalPassInput.value = '';
+        finalPassInput.focus();
+      }
+
+      function hideFinalGate(){
+        if (!finalGate) return;
+        finalGate.classList.remove('show');
+        finalGate.setAttribute('aria-hidden','true');
+        finalMsg.classList.remove('show','correct','incorrect');
+        finalMsg.textContent = '';
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage >= DIARY_TOTAL_PAGES - 1;
+      }
+
+  
+
+      function renderPage() {
+        img.src = DIARY_PAGES[currentPage];
+        img.alt = `Diary page ${currentPage + 1}`;
+        pageNumEl.textContent = String(currentPage + 1);
+
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage >= DIARY_TOTAL_PAGES - 1;
+
+        completeBtn.style.display = (currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
+        completeBtn.textContent = '확인';
+
+        hideGate();
+        hideFinalGate();
+      }
+
+        function openDiaryQR(){
+          openQRModal(2, '세번째 기억', './images/qr/qr-3.png');
+          qrModal.dataset.closeMainOnConfirm = 'true';
+        }
+
+        function attemptFinalUnlock(){
+          const v = finalPassInput.value.trim();
+          finalMsg.classList.add('show');
+
+          if (v.trim().toLowerCase() === DIARY_FINAL_PASSWORD.toLowerCase()) {
+            finalMsg.classList.remove('incorrect');
+            finalMsg.classList.add('correct');
+            finalMsg.textContent = '✅ 비밀번호가 맞습니다!';
+
+            setTimeout(() => {
+              hideFinalGate();
+              openDiaryQR();
+            }, 900);
+          } else {
+            finalMsg.classList.remove('correct');
+            finalMsg.classList.add('incorrect');
+            finalMsg.textContent = '❌ 비밀번호가 틀렸습니다.';
+            finalPassInput.focus();
+            finalPassInput.select();
+          }
+        }
+
+        finalPassBtn.addEventListener('click', attemptFinalUnlock);
+        finalPassInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') attemptFinalUnlock();
+        });
+
+
+      prevBtn.addEventListener('click', () => {
+        if (currentPage === 0) return;
+        fadeToPage(currentPage - 1, 'prev');
+      });
+
+
+      nextBtn.addEventListener('click', () => {
+        if (currentPage >= DIARY_TOTAL_PAGES - 1) return;
+        showGate();
+      });
+
+      function attemptUnlockNext() {
+        if (!nextPending) return;
+
+        const v = passInput.value.trim();
+        gateMsg.classList.add('show');
+
+        const expected = DIARY_PAGE_PASSWORDS[currentPage]; // ✅ 현재 페이지에서 다음으로 갈 때의 비번
+
+        if (v === expected) {
+          gateMsg.classList.remove('incorrect');
+          gateMsg.classList.add('correct');
+          gateMsg.textContent = '✅ 비밀번호가 맞습니다!';
+
+          setTimeout(() => {
+            fadeToPage(Math.min(currentPage + 1, DIARY_TOTAL_PAGES - 1), 'next');
+          }, 2300);
+
+        } else {
+          gateMsg.classList.remove('correct');
+          gateMsg.classList.add('incorrect');
+          gateMsg.textContent = '❌ 비밀번호가 틀렸습니다.';
+          passInput.focus();
+          passInput.select();
+        }
+      }
+
+      passBtn.addEventListener('click', attemptUnlockNext);
+      passInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') attemptUnlockNext();
+      });
+
+      completeBtn.addEventListener('click', () => {
+        if (currentPage === DIARY_TOTAL_PAGES - 1) {
+          showFinalGate();
+        }
+      });
+
+      renderPage();
+    }
+    
+    const VITAL_GRID = [
+      ['0','5','0','3','2','?'],
+      ['1','4','1','0','1','4'],
+      ['4','5','2','5','0','5'],
+      ['1','2','3','2','1','4'],
+      ['2','3','?','5','2','3'],
+      ['1','4','3','0','5','4'],
+    ];
+
+    function vitalTemplateHTML(){
+      let qCount = 0; // 물음표 순서 추적 (위 → 아래)
+
+      const cells = VITAL_GRID.flat().map((v) => {
+        if (v === '?') {
+          qCount += 1;
+          const colorClass = qCount === 1 ? 'q-red' : 'q-yellow';
+          return `<div class="key-cell is-q ${colorClass}">?</div>`;
+        }
+        return `<div class="key-cell">${v}</div>`;
+      }).join('');
+
+
+      return `
+        <div class="key-puzzle">
+          <div class="key-head">
+            <div class="key-title">바이러스를 해결하는 <span class="key-accent">KEY</span>를 찾아주세요.</div>
+            <div class="key-sub">아래 6×6 배열에서 물음표( ? )에 들어갈 숫자를 추론해 <b>KEY</b>로 입력하세요.</div>
+          </div>
+
+          <div class="key-grid" aria-label="6x6 숫자 배열">
+            ${cells}
+          </div>
+
+          <div class="key-input-area">
+            <div class="key-input-label">KEY 입력</div>
+
+            <div class="key-row" style="gap:12px;">
+              <input
+                id="vitalKeyInputRed"
+                class="key-input red-input"
+                type="text"
+                inputmode="numeric"
+                maxlength="1"
+              />
+              <input
+                id="vitalKeyInputYellow"
+                class="key-input yellow-input"
+                type="text"
+                inputmode="numeric"
+                maxlength="1"
+              />
+              <button id="vitalKeyBtn" class="key-btn" type="button">확인</button>
+            </div>
+            <div id="vitalKeyMsg" class="result-message"></div>
+        </div>
+      `;
+    }
+
+    function initVitalKeyPuzzle(){
+      const redEl = document.getElementById('vitalKeyInputRed');
+      const yellowEl = document.getElementById('vitalKeyInputYellow');
+      const btn = document.getElementById('vitalKeyBtn');
+      const msg = document.getElementById('vitalKeyMsg');
+
+      function setMsg(ok, text){
+        msg.classList.add('show');
+        msg.classList.toggle('correct', !!ok);
+        msg.classList.toggle('incorrect', !ok);
+        msg.textContent = text;
+      }
+
+      // 숫자 1자리만
+      [redEl, yellowEl].forEach(el=>{
+        if(!el) return;
+        el.addEventListener('input', ()=>{
+          el.value = el.value.replace(/\D/g,'').slice(0,1);
+        });
+        el.addEventListener('keydown', (e)=>{
+          if(e.key === 'Enter') submitKey();
+        });
+      });
+
+      function submitKey(){
+        const red = (redEl?.value || '').replace(/\D/g,'').slice(0,1);       // 빨강(=3)
+        const yellow = (yellowEl?.value || '').replace(/\D/g,'').slice(0,1); // 노랑(=0)
+
+        if (redEl) redEl.value = red;
+        if (yellowEl) yellowEl.value = yellow;
+
+        const key = `${yellow}${red}`; // ✅ 노랑→빨강 = 03
+
+        if (key === '03') {
+          setMsg(true, '✅ KEY=03 — 바이러스가 해제되었습니다!');
+          if (redEl) redEl.disabled = true;
+          if (yellowEl) yellowEl.disabled = true;
+          if (btn) btn.disabled = true;
+
+          setTimeout(() => { revealGlyph(3); closeModal(); }, 650);
+        } else {
+          setMsg(false, '❌ KEY가 아닙니다.');
+          if (yellowEl) { yellowEl.focus(); yellowEl.select(); }
+        }
+      }
+
+      if (btn) btn.addEventListener('click', submitKey);
+
+      // 시작 포커스(원하면 노랑부터도 가능)
+      if (redEl) redEl.focus();
+    }
+
+
+    function openSolvedCardModal(step, title){
+    const patternImg = patternForStep[step]
+      ? `<img src="${patternForStep[step]}" style="max-width:260px; width:60%; margin:14px auto 10px; display:block; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.55);" />`
+      : '';
+
+    const qrSrc = QR_FOR_STEP[step];
+    const qrBlock = qrSrc ? `
+      <div style="margin-top:14px;">
+        <div style="font-weight:800; font-size:14px; color:var(--text); margin-bottom:8px;">
+          📌 QR 코드
+        </div>
+        <img src="${qrSrc}" alt="QR 코드" style="max-width:180px; width:45%; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.45);" />
+        <div style="margin-top:8px; color:var(--muted); font-weight:600; font-size:13px; line-height:1.4;">
+          QR을 스캔해 다음 기억을 확인하세요.
+        </div>
+      </div>
+    ` : '';
+
+    modalTitle.textContent = title || '완료';
+    modalBody.innerHTML = `
+      <div style="text-align:center;">
+        <div style="font-weight:800; font-size:18px; margin-top:4px;">
+          ✅ 이미 문양을 획득했어요!
+        </div>
+        <p style="margin:10px 0 14px; color:var(--muted); font-weight:600; line-height:1.5;">
+          이 기억은 이미 해결 완료 상태입니다.<br>
+          문양과 QR을 다시 확인할 수 있어요.
+        </p>
+
+        <!-- 🔽 문양 + QR 나란히 -->
+        <div style="
+          display:flex;
+          justify-content:center;
+          gap:20px;
+          flex-wrap:wrap;
+          margin:18px 0;
+        ">
+          <!-- 문양 -->
+          <div style="
+            width:330px;
+            aspect-ratio:1/1;
+            border-radius:14px;
+            overflow:hidden;
+            box-shadow:0 12px 40px rgba(0,0,0,.55);
+          ">
+            <img
+              src="${patternForStep[step]}"
+              alt="문양"
+              style="width:100%; height:100%; object-fit:cover;"
+            />
+          </div>
+
+          <!-- QR -->
+          <div style="
+            width:330px;
+            aspect-ratio:1/1;
+            border-radius:14px;
+            overflow:hidden;
+            box-shadow:0 12px 40px rgba(0,0,0,.45);
+            background:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+          ">
+            <img
+              src="${QR_FOR_STEP[step]}"
+              alt="QR 코드"
+              style="width:100%; height:100%; object-fit:contain;"
+            />
+          </div>
+        </div>
+
+        <div style="
+          font-size:13px;
+          color:var(--muted);
+          font-weight:600;
+          margin-bottom:14px;
+        ">
+          📌 QR을 스캔해 다음 기억을 확인하세요.
+        </div>
+
+        <div style="margin-top:8px;">
+          <button class="btn" type="button"
+            onclick="document.getElementById('modalClose').click()">
+            닫기
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    modalClose.focus();
+  }
+
+
+    function openModalFor(id){
+      const data = contents[id] || { title:'정보', html:'<p>관련 정보 없음.</p>' };
+
+      const modalContentEl = modal.querySelector('.modal-content');
+      if (modalContentEl) modalContentEl.classList.remove('diary-modal');
+
+      if(data.type === 'glyph'){
+        if (isStepSolved(1)) {
+          openSolvedCardModal(1, data.title);
+          return;
+        }
+
+        populateGlyphGrid();
+        glyphGridModal.classList.add('show');
+        glyphGridModal.setAttribute('aria-hidden','false');
+        glyphModalClose.focus();
+        document.body.style.overflow = 'hidden';
+      }
+      else if (data.type === 'slide') {
+        if (isStepSolved(4)) {
+          openSolvedCardModal(4, data.title);
+          return;
+        }
+        openSlideModal();
+      }
+      else if (data.type === 'diary') {
+        if (isStepSolved(2)) {
+          openSolvedCardModal(2, data.title);
+          return;
+        }
+        lastFocusedCard = lastFocusedCard || document.getElementById('memory');
+        openDiaryModal(data.title);
+      }
+      else if (data.type === 'keyPuzzle') {
+        if (isStepSolved(3)) {
+          openSolvedCardModal(3, data.title);
+          return;
+        }
+
+        modalTitle.textContent = data.title;
+        modalBody.innerHTML = vitalTemplateHTML();
+
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+        modalClose.focus();
+        document.body.style.overflow = 'hidden';
+
+        initVitalKeyPuzzle();
+      }
+      else {
+        modalTitle.textContent = data.title;
+        modalBody.innerHTML = data.html;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+        modalClose.focus();
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function isStepSolved(step){
+      return localStorage.getItem(`${CHAPTER_KEY}_step_${step}_solved`) === '1';
+    }
+        
+    function restoreProgressFromStorage(){
+      for(let step=1; step<=4; step++){
+        acquired[step-1] = isStepSolved(step);
+      }
+      for(let step=1; step<=4; step++){
+        if(isStepSolved(step)) revealGlyph(step);
+      }
+    }
+
+    function closeModal(){
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      if (lastFocusedCard) lastFocusedCard.focus();
+    }
+
+    function closeGlyphModal(){
+      glyphGridModal.classList.remove('show');
+      glyphGridModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      if (lastFocusedCard) lastFocusedCard.focus();
+    }
+
+    document.querySelectorAll('.card[role="button"]').forEach(card=>{
+      card.addEventListener('click', e=>{ lastFocusedCard = e.currentTarget; openModalFor(card.id); });
+      card.addEventListener('keydown', e=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); lastFocusedCard = e.currentTarget; openModalFor(card.id); }
+      });
+    });
+
+    document.querySelectorAll('.nav-btn').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        lastFocusedCard = e.currentTarget;
+        const id = btn.dataset.id;
+        if (id && id.startsWith('hint')) openHintGate(id);
+        else openModalFor(id);
+      });
+      btn.addEventListener('keydown', e=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          lastFocusedCard = e.currentTarget;
+          const id = btn.dataset.id;
+          if (id && id.startsWith('hint')) openHintGate(id);
+          else openModalFor(id);
+        }
+      });
+    });
+
+
+    const qrModal = document.getElementById('qrModal');
+    const qrConfirmBtn = document.getElementById('qrConfirmBtn');
+    const qrCloseBtn = document.getElementById('qrClose');
+    const qrImage = document.getElementById('qrImage');
+
+    function openQRModalInfo(step, title = '', imageSrc = '') {
+      qrModal.dataset.step = String(step || 1);
+      qrModal.dataset.closeMainOnConfirm = 'false';
+      qrModal.dataset.isInfoOnly = 'true';
+      const qrTitle = qrModal.querySelector('.modal-title');
+      const qrMsg = document.getElementById('qrMessage');
+      if (qrTitle) qrTitle.textContent = title || '기억 - QR 코드';
+      if (imageSrc) qrImage.src = imageSrc;
+      if (qrMsg) qrMsg.textContent = 'QR 코드를 스캔해 다음 기억을 확인하세요.';
+      qrConfirmBtn.textContent = '확인';
+      qrModal.classList.add('show');
+      qrModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      qrConfirmBtn.focus();
+    }
+
+    function openQRModal(step, title = '', imageSrc = '') {
+      qrModal.dataset.step = String(step || 1);
+      qrModal.dataset.closeMainOnConfirm = 'false';
+      qrModal.dataset.isInfoOnly = 'false';
+      const qrTitle = qrModal.querySelector('.modal-title');
+      const qrMsg = document.getElementById('qrMessage');
+      if (qrTitle) qrTitle.textContent = title || '기억 - QR 코드';
+      if (imageSrc) qrImage.src = imageSrc;
+      if (qrMsg) qrMsg.textContent = 'QR 코드를 스캔해 다음 기억을 확인하세요.';
+      qrConfirmBtn.textContent = '확인';
+      qrModal.classList.add('show');
+      qrModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      qrConfirmBtn.focus();
+    }
+
+    function closeQRModal() {
+      qrModal.classList.remove('show');
+      qrModal.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      if (lastFocusedCard) lastFocusedCard.focus();
+    }
+    function resetAllProgress(){
+      localStorage.removeItem(`${CHAPTER_KEY}_started`);
+      for(let step=1; step<=4; step++){
+        localStorage.removeItem(`${CHAPTER_KEY}_step_${step}_solved`);
+      }
+      location.reload();
+    }
+
+    qrConfirmBtn.addEventListener('click', () => {
+      const step = parseInt(qrModal.dataset.step || '1', 10);
+      const isInfoOnly = qrModal.dataset.isInfoOnly === 'true';
+      
+      if (isInfoOnly) {
+        closeQRModal();
+      } else {
+        revealGlyph(step);
+        closeQRModal();
+
+        if (glyphGridModal && glyphGridModal.classList.contains('show')) {
+          closeGlyphModal();
+        }
+
+        if (qrModal.dataset.closeMainOnConfirm === 'true') {
+          qrModal.dataset.closeMainOnConfirm = 'false';
+          // 공용 모달이 열려있으면 닫고
+          if (modal && modal.classList.contains('show')) closeModal();
+          // 다이어리 모달이 열려있으면 닫기
+          if (diaryModal && diaryModal.classList.contains('show')) closeDiaryModal();
+        }
+
+
+      }
+    });
+
+    qrCloseBtn.addEventListener('click', () => {
+      closeQRModal();
+    });
+
+    qrModal.addEventListener('click', e => { if (e.target === qrModal) closeQRModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && qrModal.classList.contains('show')) closeQRModal(); });
+
+  </script>
+</body>
+</html>

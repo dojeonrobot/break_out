@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOROLAND - Break Out Dashboard</title>
+  
+  <!-- Google Fonts: Hahmlet 추가 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind 설정: 기본 폰트를 Hahmlet으로 변경 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Hahmlet', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* 미션 시작 클릭 시 카드 및 배너 애니메이션 효과 */
+    @keyframes shine-sweep {
+      0% { left: -100%; opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+    @keyframes pop-image {
+      0% { transform: scale(1.1); filter: brightness(1); }
+      40% { transform: scale(1.2) translateY(-2%); filter: brightness(1.25) contrast(1.15); }
+      100% { transform: scale(1.1); filter: brightness(1); }
+    }
+    @keyframes click-bounce {
+      0% { transform: scale(1); }
+      40% { transform: scale(0.97); }
+      100% { transform: scale(1); }
+    }
+    .animate-click {
+      animation: click-bounce 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    }
+    .animate-click .banner-shine {
+      display: block !important;
+      animation: shine-sweep 0.6s ease-in-out forwards;
+    }
+    .animate-click img {
+      animation: pop-image 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 font-sans relative overflow-x-hidden">
+
+  <!-- 메인 배경 이미지 (가장 아래 레이어 z-[-10]) -->
+  <div class="fixed inset-0 z-[-10] bg-[url('assets/images/bg.png')] bg-cover bg-center bg-no-repeat bg-fixed">
+    <!-- 투명 검정 오버레이 (조금 다크하게 눌러주는 레이어) -->
+    <div class="absolute inset-0 bg-[#040814]/65"></div>
+  </div>
+
+  <!-- 은은한 빛 효과 (오로라 느낌 z-[-5]) -->
+  <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/10 rounded-full blur-[120px] z-[-5] pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px] z-[-5] pointer-events-none"></div>
+
+  <!-- 반딧불이 / 별빛 파티클 (배경과 어우러지도록 유지 z-[-1]) -->
+  <div class="fixed top-[15%] left-[20%] w-1.5 h-1.5 bg-teal-200 rounded-full shadow-[0_0_10px_#5eead4] animate-pulse z-[-1]"></div>
+  <div class="fixed top-[30%] right-[25%] w-1 h-1 bg-white rounded-full shadow-[0_0_8px_white] animate-ping z-[-1]" style="animation-duration: 3s;"></div>
+  <div class="fixed bottom-[40%] left-[10%] w-2 h-2 bg-blue-200 rounded-full shadow-[0_0_12px_#bfdbfe] animate-pulse z-[-1]" style="animation-duration: 4s;"></div>
+  <div class="fixed top-[60%] right-[15%] w-1 h-1 bg-teal-100 rounded-full shadow-[0_0_8px_#ccfbf1] animate-pulse z-[-1]" style="animation-duration: 2.5s;"></div>
+  <div class="fixed bottom-[20%] right-[40%] w-1.5 h-1.5 bg-emerald-200 rounded-full shadow-[0_0_10px_#a7f3d0] animate-pulse z-[-1]" style="animation-duration: 5s;"></div>
+
+  <!-- 하단 그라데이션 실루엣 효과 -->
+  <div class="fixed bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-[#02050D] to-transparent z-0 pointer-events-none"></div>
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center relative z-20">
+    
+    <!-- Hero Section -->
+    <header class="w-full flex flex-col items-center text-center mb-20 relative z-30">
+      
+      <!-- 공식 로고 적용 (빛 번짐을 유발하던 필터를 제거하고 원본의 선명함 유지) -->
+      <div class="mb-4 w-full max-w-[300px] sm:max-w-[400px] px-4 relative z-50 flex justify-center">
+        <!-- 배경에 묻히지 않도록 깔끔한 어두운 그림자만 살짝 적용 -->
+        <img src="assets/images/logo.png" alt="도로랜드 공식 로고" class="w-full h-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] relative z-50" style="image-rendering: -webkit-optimize-contrast;" />
+      </div>
+      
+      <div class="relative inline-block mt-6 mb-4 z-30 px-8">
+        <i data-lucide="sparkles" class="absolute left-0 -top-4 w-6 h-6 text-teal-400 animate-pulse"></i>
+        <h2 class="text-xl sm:text-2xl lg:text-[1.75rem] font-bold text-white tracking-wide leading-relaxed drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)] break-keep">
+          기술은 자연을 해치지 않아, 우리가 올바르게 사용한다면..<br/>
+          <span class="block mt-2">도로랜드가 멈춘 지금, 다시 움직이게 할 수 있는 건 너 뿐이야</span>
+        </h2>
+        <i data-lucide="sparkles" class="absolute right-0 -bottom-4 w-6 h-6 text-blue-400 animate-pulse" style="animation-delay: 1s;"></i>
+      </div>
+      
+      <!-- 가독성을 높인 배지 스타일 -->
+      <div class="mt-8 px-8 py-2.5 bg-[#0B1528]/80 border border-teal-500/40 rounded-full backdrop-blur-md shadow-[0_0_20px_rgba(20,184,166,0.2)] z-30 flex items-center justify-center">
+        <p class="text-sm tracking-wide">
+          <span class="text-teal-400 font-black">BREAK OUT ADVENTURE</span>
+          <span class="text-slate-400 mx-2 font-light">|</span>
+          <span class="text-slate-200 font-medium">각 구역의 미션을 해결하세요</span>
+        </p>
+      </div>
+    </header>
+
+    <!-- Main Mission Grid -->
+    <main class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-30">
+      
+      <!-- Chapter 1 (사파리) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-emerald-500/30" onclick="handleEnterChapter(1, 'active', this)">
+        <!-- Banner -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-emerald-100 bg-emerald-50">
+          <img src="assets/images/chapter1-logo.png" alt="챕터 1 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <!-- 빛 스캔 애니메이션 오버레이 -->
+          <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
+        </div>
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
+          <div class="flex items-center mb-2 space-x-2">
+            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-emerald-100">
+              Chapter 01
+            </span>
+            <span class="text-xs font-bold text-emerald-600/70">사파리 구역</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">도트매트릭스 암호 해독</h3>
+          
+          <!-- 미션 브리핑 박스 -->
+          <div class="bg-slate-50 rounded-xl p-4 mb-6 flex-grow flex items-center justify-center border border-slate-100/80 shadow-inner">
+            <p class="text-slate-600 leading-relaxed font-medium text-sm text-center break-keep">
+              숨겨진 코드를 찾아 규칙을 발견하고, <br> 매트릭스 패널에 정확한 키를 입력하여 <br> 다음 구역으로 이동하세요.
+            </p>
+          </div>
+
+          <div class="mt-auto">
+            <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transform group-hover:-translate-y-0.5">
+              <span>미션 시작하기</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 2 (하모니아) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-purple-500/30" onclick="handleEnterChapter(2, 'active', this)">
+        <!-- Banner -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-purple-100 bg-purple-50">
+          <img src="assets/images/chapter2-logo.png" alt="챕터 2 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <!-- 빛 스캔 애니메이션 오버레이 -->
+          <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
+        </div>
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
+          <div class="flex items-center mb-2 space-x-2">
+            <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-purple-100">
+              Chapter 02
+            </span>
+            <span class="text-xs font-bold text-purple-600/70">하모니아 구역</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">진술서 데이터 분석</h3>
+          
+          <div class="bg-slate-50 rounded-xl p-4 mb-6 flex-grow flex items-center justify-center border border-slate-100/80 shadow-inner">
+            <p class="text-slate-600 leading-relaxed font-medium text-sm text-center break-keep">
+              주어진 진술서들을 바탕으로 데이터를 분석하고, 머신러닝 시스템을 학습시켜 미션의 <br> 정답을 찾아보세요.
+            </p>
+          </div>
+
+          <div class="mt-auto">
+            <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-purple-500 to-fuchsia-400 hover:from-purple-400 hover:to-fuchsia-300 shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transform group-hover:-translate-y-0.5">
+              <span>미션 시작하기</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 3 (머지큐브) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-rose-500/30" onclick="handleEnterChapter(3, 'active', this)">
+        <!-- Banner -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-rose-100 bg-rose-50">
+          <img src="assets/images/chapter3-logo.png" alt="챕터 3 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <!-- 빛 스캔 애니메이션 오버레이 -->
+          <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
+        </div>
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
+          <div class="flex items-center mb-2 space-x-2">
+            <span class="px-2.5 py-1 bg-rose-50 text-rose-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-rose-100">
+              Chapter 03
+            </span>
+            <span class="text-xs font-bold text-rose-600/70">회전목마 구역</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">머지큐브 방탈출</h3>
+          
+          <div class="bg-slate-50 rounded-xl p-4 mb-6 flex-grow flex items-center justify-center border border-slate-100/80 shadow-inner">
+            <p class="text-slate-600 leading-relaxed font-medium text-sm text-center break-keep">
+              머지큐브와 코스페이시스로 구현된 가상 공간을 넘나들며 함정을 피하고 갇힌 리코를 구출하세요.
+            </p>
+          </div>
+
+          <div class="mt-auto">
+            <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-rose-500 to-pink-400 hover:from-rose-400 hover:to-pink-300 shadow-md shadow-rose-500/20 group-hover:shadow-rose-500/40 transform group-hover:-translate-y-0.5">
+              <span>미션 시작하기</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 4 (잠김) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 opacity-80" onclick="handleEnterChapter(4, 'locked', this)">
+        <div class="flex-grow flex flex-col items-center justify-center relative bg-slate-100 p-8 text-center min-h-[420px]">
+          <!-- 해치 패턴 -->
+          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px);"></div>
+          
+          <div class="bg-white/50 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 relative z-10">
+            <i data-lucide="lock" class="w-10 h-10 text-slate-400" stroke-width="2"></i>
+          </div>
+          
+          <span class="px-3 py-1 bg-slate-200 text-slate-500 text-[11px] font-black tracking-widest uppercase rounded-md border border-slate-300 mb-4 relative z-10">
+            Chapter 04
+          </span>
+          <h3 class="text-3xl font-black text-slate-300 tracking-widest relative z-10 mb-6">COMING SOON</h3>
+          <div class="w-12 h-1 bg-slate-300 rounded-full relative z-10"></div>
+        </div>
+      </div>
+
+      <!-- Chapter 5 (잠김) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 opacity-80" onclick="handleEnterChapter(5, 'locked', this)">
+        <div class="flex-grow flex flex-col items-center justify-center relative bg-slate-100 p-8 text-center min-h-[420px]">
+          <!-- 해치 패턴 -->
+          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px);"></div>
+          
+          <div class="bg-white/50 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 relative z-10">
+            <i data-lucide="lock" class="w-10 h-10 text-slate-400" stroke-width="2"></i>
+          </div>
+          
+          <span class="px-3 py-1 bg-slate-200 text-slate-500 text-[11px] font-black tracking-widest uppercase rounded-md border border-slate-300 mb-4 relative z-10">
+            Chapter 05
+          </span>
+          <h3 class="text-3xl font-black text-slate-300 tracking-widest relative z-10 mb-6">COMING SOON</h3>
+          <div class="w-12 h-1 bg-slate-300 rounded-full relative z-10"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full relative z-40 py-12 mt-10 border-t border-white/10 bg-[#040813]/50 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
+      <div class="font-black text-2xl text-white mb-4 md:mb-0 opacity-80">DOROLAND</div>
+      <p>© DOROLAND Break Out Adventure. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Lucide 아이콘 초기화
+    lucide.createIcons();
+
+    // 챕터별 URL 매핑
+    const chapterUrls = {
+      1: './chapter01/index.html',
+      2: './chapter02/index.html',
+      3: './chapter03/index.html'
+    };
+
+    // 카드 클릭 이벤트 핸들러
+    function handleEnterChapter(id, status, element) {
+      if (status === 'locked') return;
+
+      if (chapterUrls[id]) {
+        window.location.href = chapterUrls[id];
+      }
+    }
+  </script>
+</body>
+</html>

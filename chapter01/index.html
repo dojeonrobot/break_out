@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도로랜드 사파리 - 마스터 키 미션</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #c4e1c5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .ratio-16-9-container {
+            position: relative;
+            width: 100vw;
+            height: 56.25vw;
+            max-height: 100vh;
+            max-width: 177.77vh;
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 8px solid #84b589;
+        }
+
+        .clipboard-clip {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            height: 28px;
+            background: #e2e8f0;
+            border: 2px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            z-index: 10;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.05), 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            text-align: left;
+            border-left: 5px solid transparent;
+        }
+        .tab-active {
+            background-color: #e6f2e8;
+            border-left-color: #4ade80;
+            color: #166534;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            background-color: #ffffff;
+            color: #64748b;
+        }
+        .tab-inactive:hover {
+            background-color: #f8fafc;
+            border-left-color: #cbd5e1;
+        }
+
+        .glitch-text {
+            color: #ef4444;
+            text-shadow: 1.5px 0 #22c55e, -1.5px 0 #3b82f6;
+            animation: glitch 1.5s infinite;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 0.05em;
+        }
+        @keyframes glitch {
+            0% { text-shadow: 1.5px 0 #22c55e, -1.5px 0 #3b82f6; }
+            20% { text-shadow: -1.5px 0 #22c55e, 1.5px 0 #3b82f6; }
+            40% { text-shadow: 1.5px 0 #22c55e, -1.5px 0 #3b82f6; }
+            60% { text-shadow: -1.5px 0 #22c55e, 1.5px 0 #3b82f6; }
+            80% { text-shadow: 1.5px 0 #22c55e, -1.5px 0 #3b82f6; }
+            100% { text-shadow: -1.5px 0 #22c55e, 1.5px 0 #3b82f6; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ratio-16-9-container">
+        <div class="clipboard-clip"></div>
+
+        <!-- 헤더 영역 -->
+        <header class="pt-10 pb-5 px-10 border-b-2 border-dashed border-gray-200 flex justify-between items-end flex-shrink-0">
+            <div>
+                <h1 class="text-5xl font-black text-gray-800 tracking-tight">
+                    <span class="text-[#4ade80]">DOROLAND</span> SAFARI
+                </h1>
+                <p class="text-gray-500 font-bold mt-2 text-base">고장난 전광판을 고치기 위해 단서를 모아 마스터 키를 찾아주세요!</p>
+            </div>
+            <!-- 에러 배지 영역 -->
+            <div class="text-right pb-1">
+                <span class="bg-red-50 border-2 border-red-200 px-6 py-3 rounded-xl text-2xl font-black glitch-text shadow-sm inline-block tracking-wider">[SYS.ERR] FAILURE</span>
+            </div>
+        </header>
+
+        <!-- 메인 컨텐츠 영역 -->
+        <main class="flex-grow flex overflow-hidden bg-[#fafafa]">
+            
+            <!-- 왼쪽: 사이드바 (미션 목록 고정) -->
+            <div class="w-1/4 min-w-[240px] bg-white border-r border-gray-200 flex flex-col p-5 overflow-y-auto z-0 shadow-sm">
+                
+                <div class="font-black text-lg text-gray-400 mb-4 px-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    미션 목록
+                </div>
+
+                <!-- 미션 목록 컨테이너 -->
+                <div id="tabs-container" class="flex flex-col gap-3">
+                    <!-- JS에서 탭 버튼 생성됨 -->
+                </div>
+
+            </div>
+
+            <!-- 오른쪽: 문제 이미지 및 힌트 영역 -->
+            <div class="w-3/4 flex flex-col p-8 h-full gap-5 relative">
+                
+                <!-- 문제 제목 및 모드 전환 토글 -->
+                <div class="flex justify-between items-end flex-shrink-0">
+                    <div>
+                        <h2 id="mission-title" class="text-3xl font-black text-gray-800">MISSION 1</h2>
+                        <p id="mission-subtitle" class="text-gray-500 font-bold text-base mt-1">초기 단서 수집</p>
+                    </div>
+                    
+                    <!-- 우측 상단으로 이동한 전환 토글 -->
+                    <div class="flex p-1.5 bg-gray-200 rounded-xl shadow-inner mb-1">
+                        <button id="btn-mode-mission" onclick="setMode('mission')" class="px-5 py-2.5 text-base font-black rounded-lg bg-white text-[#22c55e] shadow transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            미션 이미지
+                        </button>
+                        <button id="btn-mode-hint" onclick="setMode('hint')" class="px-5 py-2.5 text-base font-black rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5.0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            힌트 보기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 메인 문제 이미지 영역 -->
+                <div id="mission-content" class="flex-grow bg-white border-2 border-gray-200 rounded-2xl shadow-sm flex justify-center items-center overflow-hidden p-6 relative group cursor-pointer" onclick="openModal()">
+                    
+                    <!-- 크게 보기 버튼 -->
+                    <button id="enlarge-btn" class="absolute top-5 right-5 bg-gray-900/80 hover:bg-[#22c55e] text-white px-4 py-2 rounded-xl text-base font-bold flex items-center gap-2 transition-colors z-10 hidden shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                        크게 보기
+                    </button>
+
+                    <img id="mission-image" src="" alt="문제 이미지" class="max-w-full max-h-full object-contain hidden transition-transform duration-300 group-hover:scale-[1.02]" onerror="imageError()">
+                    
+                    <div id="image-placeholder" class="text-center p-8 text-gray-400">
+                        <svg class="w-20 h-20 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="font-bold text-lg">문제가 준비 중입니다.</p>
+                    </div>
+                </div>
+
+                <!-- 힌트 컨테이너 -->
+                <div id="hints-content" class="hidden flex-grow overflow-y-auto flex-col gap-6 pr-2">
+                    <!-- JS에서 동적으로 잠금 힌트 박스 생성됨 -->
+                </div>
+
+            </div>
+        </main>
+
+        <!-- 최하단: 마스터 키 최종 정답 입력란 -->
+        <footer class="bg-gray-800 hover:shadow-[0_-15px_30px_rgba(74,222,128,0.25)] transition-all duration-300 ease-out text-white py-5 hover:py-8 px-10 flex justify-between items-center flex-shrink-0 z-20 cursor-pointer group relative border-t-4 border-transparent hover:border-[#4ade80]" onclick="openDotModal()" title="정답 확인하기">
+            <div class="flex flex-col transition-transform duration-300 group-hover:scale-105 group-hover:translate-x-3">
+                <div class="flex items-center gap-4">
+                    <svg class="w-8 h-8 text-yellow-400 drop-shadow-md transition-transform duration-300 group-hover:scale-125 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    <span class="font-black text-2xl tracking-wider transition-colors duration-300 group-hover:text-yellow-400">FINAL MASTER KEY</span>
+                </div>
+                <span class="text-[#4ade80] text-base font-bold mt-1.5 ml-12 animate-pulse group-hover:text-[#22c55e]">👉 여기를 클릭해서 도트를 찍어보고 정답을 찾아보세요!</span>
+            </div>
+            
+            <div class="flex items-center gap-5 cursor-default" onclick="event.stopPropagation()" title="">
+                <div class="flex gap-3">
+                    <input type="text" id="ans1" placeholder="?" class="w-14 h-14 text-center text-2xl font-black text-gray-900 rounded-lg bg-gray-100 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-400 uppercase transition-all" maxlength="1">
+                    <input type="text" id="ans2" placeholder="?" class="w-14 h-14 text-center text-2xl font-black text-gray-900 rounded-lg bg-gray-100 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-400 uppercase transition-all" maxlength="1">
+                    <input type="text" id="ans3" placeholder="?" class="w-16 h-14 text-center text-2xl font-black text-gray-900 rounded-lg bg-gray-100 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-400 uppercase transition-all" maxlength="2">
+                    <input type="text" id="ans4" placeholder="?" class="w-16 h-14 text-center text-2xl font-black text-gray-900 rounded-lg bg-gray-100 focus:bg-white focus:outline-none focus:ring-4 focus:ring-green-400 uppercase transition-all" maxlength="2">
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- 이미지 크게 보기 전체화면 모달 -->
+    <div id="image-modal" class="fixed inset-0 z-[100] bg-black/90 hidden flex justify-center items-center p-4 backdrop-blur-sm" onclick="closeModal()">
+        <button class="absolute top-8 right-10 text-white hover:text-[#4ade80] transition-colors z-50 p-2">
+            <svg class="w-16 h-16 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <img id="modal-image" src="" alt="크게 보기" class="w-full h-full max-w-[95vw] max-h-[95vh] object-contain drop-shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- 도트매트릭스 시뮬레이터 모달 -->
+    <div id="dot-modal" class="fixed inset-0 z-[100] bg-black/80 hidden flex justify-center items-center p-4 backdrop-blur-sm" onclick="closeDotModal()">
+        <div class="bg-[#f0f5f1] rounded-2xl w-full max-w-6xl p-12 relative shadow-2xl flex flex-col border-[8px] border-[#84b589]" onclick="event.stopPropagation()">
+            
+            <div class="absolute top-[-8px] left-1/2 -translate-x-1/2 w-56 h-10 bg-gray-200 border-4 border-gray-300 rounded-b-xl shadow-md z-10"></div>
+
+            <button class="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors" onclick="closeDotModal()">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="text-center mt-6 mb-10">
+                <h2 class="text-6xl font-black text-gray-900 mb-5 tracking-tighter">MASTER KEY <span class="text-4xl">🗝️</span></h2>
+                <p class="text-gray-800 font-bold text-xl">3개의 도트매트릭스를 활용해 <span class="text-[#c0392b] font-black">마지막 마스터 키</span>를 얻으면 고장난 전광판을 고칠 수 있습니다.</p>
+            </div>
+
+            <div class="flex gap-8 justify-center mb-8">
+                <!-- Grid 1 -->
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-gray-800 mb-4 text-2xl">Dot.01</span>
+                    <div class="grid grid-cols-8 grid-rows-8 gap-[4px] bg-[#4a4a4a] p-3 rounded-lg shadow-inner w-[220px] h-[220px]" id="grid-1"></div>
+                    <input type="text" id="dot-code-1" placeholder="코드" class="mt-5 w-28 text-center font-black text-2xl border-b-4 border-gray-400 bg-transparent focus:border-[#4ade80] focus:outline-none uppercase">
+                </div>
+                <!-- Grid 2 -->
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-gray-800 mb-4 text-2xl">Dot.02</span>
+                    <div class="grid grid-cols-8 grid-rows-8 gap-[4px] bg-[#4a4a4a] p-3 rounded-lg shadow-inner w-[220px] h-[220px]" id="grid-2"></div>
+                    <input type="text" id="dot-code-2" placeholder="코드" class="mt-5 w-28 text-center font-black text-2xl border-b-4 border-gray-400 bg-transparent focus:border-[#4ade80] focus:outline-none uppercase">
+                </div>
+                <!-- Grid 3 -->
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-gray-800 mb-4 text-2xl">Dot.03</span>
+                    <div class="grid grid-cols-8 grid-rows-8 gap-[4px] bg-[#4a4a4a] p-3 rounded-lg shadow-inner w-[220px] h-[220px]" id="grid-3"></div>
+                    <input type="text" id="dot-code-3" placeholder="코드" class="mt-5 w-28 text-center font-black text-2xl border-b-4 border-gray-400 bg-transparent focus:border-[#4ade80] focus:outline-none uppercase">
+                </div>
+                
+                <!-- 등호(=) 기호 -->
+                <div class="flex items-center justify-center mb-16 px-4">
+                    <span class="text-7xl font-black text-gray-700">=</span>
+                </div>
+
+                <!-- Grid 4 -->
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-gray-800 mb-4 text-2xl">?</span>
+                    <div class="grid grid-cols-8 grid-rows-8 gap-[4px] bg-[#4a4a4a] p-3 rounded-lg shadow-inner w-[220px] h-[220px]" id="grid-4"></div>
+                    <input type="text" id="dot-code-4" placeholder="코드" class="mt-5 w-28 text-center font-black text-2xl border-b-4 border-gray-400 bg-transparent focus:border-[#4ade80] focus:outline-none uppercase">
+                </div>
+            </div>
+
+            <div class="text-center mt-4 flex flex-col items-center gap-5">
+                <div class="bg-white px-8 py-4 rounded-xl shadow-sm border border-gray-200 inline-flex flex-col gap-2 text-left">
+                    <span class="text-base font-bold text-gray-800">💡 1. 하얀색 동그라미를 클릭해서 찾은 정답(숫자/기호) 모양을 예쁘게 색칠해보세요.</span>
+                    <span class="text-base font-black text-[#c0392b]">🚀 2. 도트매트릭스에 그려진 모양을 보고, 실제로 작동하는 코드를 직접 만들어보세요!</span>
+                </div>
+                <button onclick="checkDotModalAnswer()" class="bg-[#4ade80] hover:bg-[#22c55e] text-gray-900 font-black py-3 px-10 rounded-xl text-lg shadow-md transition-transform hover:scale-105">
+                    정답 확인하기
+                </button>
+                <div id="dot-result-message" class="hidden text-2xl font-black mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 미션 및 힌트 데이터 정의
+        const missions = [
+            {
+                id: 1, title: "MISSION 1", subtitle: "1번 도트매트릭스", imgSrc: "./images/001.png",
+                hints: [
+                    { pwd: "5656", imgSrc: "./images/007.png", unlocked: true, revealed: false },
+                    { pwd: "4545", imgSrc: "./images/008.png", unlocked: false, revealed: false }
+                ]
+            },
+            {
+                id: 2, title: "MISSION 2", subtitle: "2번 도트매트릭스", imgSrc: "./images/002.png",
+                hints: [
+                    { pwd: "5656", imgSrc: "./images/009.png", unlocked: true, revealed: false },
+                    { pwd: "4545", imgSrc: "./images/010.png", unlocked: false, revealed: false }
+                ]
+            },
+            {
+                id: 3, title: "MISSION 3", subtitle: "3번 도트매트릭스", imgSrc: "./images/003.png",
+                hints: [
+                    { pwd: "5656", imgSrc: "./images/011.png", unlocked: true, revealed: false },
+                    { pwd: "4545", imgSrc: "./images/012.png", unlocked: false, revealed: false }
+                ]
+            },
+            {
+                id: 4, title: "MISSION 4", subtitle: "문자 변환표", imgSrc: "./images/004.png",
+                hints: [
+                    { pwd: "5656", imgSrc: "./images/013.png", unlocked: false, revealed: false }
+                ]
+            },
+            {
+                id: 5, title: "MISSION 5", subtitle: "기호 변환표", imgSrc: "./images/005.png",
+                hints: [
+                    { pwd: "4545", imgSrc: "./images/014.png", unlocked: false, revealed: false }
+                ]
+            }
+        ];
+
+        let currentMissionId = 1;
+        let currentMode = 'mission';
+
+        function init() {
+            const tabsContainer = document.getElementById('tabs-container');
+            
+            missions.forEach(mission => {
+                const button = document.createElement('button');
+                button.id = `tab-btn-${mission.id}`;
+                
+                button.innerHTML = `
+                    <div class="font-black text-xl mb-1">${mission.title}</div>
+                    <div class="text-sm opacity-70">${mission.subtitle}</div>
+                `;
+                
+                button.className = `tab-btn p-4 rounded-xl cursor-pointer ${mission.id === currentMissionId ? 'tab-active' : 'tab-inactive border border-gray-100'}`;
+                button.onclick = () => loadMission(mission.id);
+                
+                tabsContainer.appendChild(button);
+            });
+
+            loadMission(1);
+        }
+
+        function loadMission(id) {
+            currentMissionId = id;
+            const mission = missions.find(m => m.id === id);
+
+            missions.forEach(m => {
+                const btn = document.getElementById(`tab-btn-${m.id}`);
+                if (m.id === id) {
+                    btn.classList.replace('tab-inactive', 'tab-active');
+                    btn.classList.remove('border-gray-100');
+                } else {
+                    btn.classList.replace('tab-active', 'tab-inactive');
+                    btn.classList.add('border-gray-100');
+                }
+            });
+
+            document.getElementById('mission-title').innerText = mission.title;
+            document.getElementById('mission-subtitle').innerText = mission.subtitle;
+            
+            const imgElement = document.getElementById('mission-image');
+            const placeholderElement = document.getElementById('image-placeholder');
+            const enlargeBtn = document.getElementById('enlarge-btn');
+            
+            if (mission.imgSrc) {
+                imgElement.src = mission.imgSrc;
+                imgElement.classList.remove('hidden');
+                placeholderElement.classList.add('hidden');
+                enlargeBtn.classList.remove('hidden');
+            } else {
+                imgElement.classList.add('hidden');
+                placeholderElement.classList.remove('hidden');
+                enlargeBtn.classList.add('hidden');
+            }
+
+            // 힌트 목록 다시 렌더링
+            renderHints();
+        }
+
+        function renderHints() {
+            const container = document.getElementById('hints-content');
+            container.innerHTML = '';
+            
+            const mission = missions.find(m => m.id === currentMissionId);
+
+            mission.hints.forEach((hint, index) => {
+                const hintBox = document.createElement('div');
+                hintBox.className = 'bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-4 relative overflow-hidden flex-shrink-0';
+
+                const titleLabel = document.createElement('span');
+                titleLabel.className = 'text-base font-black text-[#22c55e] bg-green-100 w-max px-4 py-1.5 rounded-lg shadow-sm';
+                titleLabel.innerText = `HINT 0${index + 1}`;
+                hintBox.appendChild(titleLabel);
+
+                if (hint.revealed) {
+                    // 완전히 해제되어 이미지가 보이는 상태
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'relative mt-3 group cursor-pointer overflow-hidden rounded-xl';
+                    
+                    const hintImg = document.createElement('img');
+                    hintImg.src = hint.imgSrc;
+                    hintImg.alt = `힌트 이미지 ${index + 1}`;
+                    hintImg.className = 'w-full max-h-[50vh] rounded-xl border border-gray-200 shadow-sm object-contain transition-transform duration-300 group-hover:scale-[1.02]';
+                    
+                    const enlargeBtn = document.createElement('button');
+                    enlargeBtn.className = 'absolute top-4 right-4 bg-gray-900/80 hover:bg-[#22c55e] text-white px-4 py-2 rounded-xl text-base font-bold flex items-center gap-2 transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 shadow-md';
+                    enlargeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg> 크게 보기';
+
+                    // 클릭 시 전체화면
+                    imgContainer.onclick = function() {
+                        const modal = document.getElementById('image-modal');
+                        const modalImg = document.getElementById('modal-image');
+                        modalImg.src = hintImg.src;
+                        modal.classList.remove('hidden');
+                    };
+                    
+                    hintImg.onerror = function() {
+                        imgContainer.outerHTML = `<div class="p-6 bg-red-50 text-red-500 rounded-xl text-lg font-bold text-center border border-red-200 shadow-sm mt-3">이미지를 불러올 수 없습니다.<br>(${hint.imgSrc})</div>`;
+                    };
+
+                    imgContainer.appendChild(hintImg);
+                    imgContainer.appendChild(enlargeBtn);
+                    hintBox.appendChild(imgContainer);
+                    hintBox.classList.add('border-l-[6px]', 'border-l-[#4ade80]');
+
+                } else if (hint.unlocked && !hint.revealed) {
+                    // 비밀번호는 없지만, 아직 클릭해서 보지 않은 상태
+                    const revealArea = document.createElement('div');
+                    revealArea.className = 'flex flex-col items-center justify-center p-8 bg-[#f0fdf4] rounded-xl border-2 border-[#bbf7d0] border-dashed gap-3 mt-2 text-center';
+                    
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '🎁';
+                    icon.className = 'text-5xl mb-2 hover:scale-110 transition-transform cursor-pointer';
+                    icon.onclick = () => {
+                        hint.revealed = true;
+                        renderHints();
+                    };
+                    revealArea.appendChild(icon);
+
+                    const helpText = document.createElement('div');
+                    helpText.className = 'text-base text-[#166534] font-bold text-center';
+                    helpText.innerHTML = '잠겨있지 않은 힌트입니다!<br>힌트를 바로 볼 수 있지만 조금 더 문제를 풀어보고 열람해주세요!';
+                    revealArea.appendChild(helpText);
+
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-[#4ade80] text-gray-900 text-lg font-black px-8 py-3 rounded-xl hover:bg-[#22c55e] transition-colors shadow-md mt-2';
+                    btn.innerText = '클릭해서 힌트 보기';
+                    btn.onclick = () => {
+                        hint.revealed = true;
+                        renderHints();
+                    };
+
+                    revealArea.appendChild(btn);
+                    hintBox.appendChild(revealArea);
+                    
+                } else {
+                    // 잠김: 비밀번호 입력란 표시
+                    const lockArea = document.createElement('div');
+                    lockArea.className = 'flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl border border-gray-200 border-dashed gap-3 mt-2';
+                    
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '🔒';
+                    icon.className = 'text-4xl mb-2 opacity-50';
+                    lockArea.appendChild(icon);
+
+                    const helpText = document.createElement('span');
+                    helpText.className = 'text-base text-gray-500 font-bold';
+                    helpText.innerText = '비밀번호를 입력해 잠금을 해제하세요.';
+                    lockArea.appendChild(helpText);
+
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'flex gap-3 w-full max-w-sm mt-2';
+
+                    const input = document.createElement('input');
+                    input.type = 'password';
+                    input.placeholder = '비밀번호 입력';
+                    input.className = 'flex-1 w-full bg-white border-2 border-gray-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-green-400 font-bold tracking-widest text-center transition-colors shadow-inner';
+                    input.id = `hint-pwd-${index}`;
+                    
+                    input.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') unlockHint(index);
+                    });
+
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-gray-800 text-white text-base font-bold px-6 py-3 rounded-xl hover:bg-[#22c55e] transition-colors whitespace-nowrap shadow-md';
+                    btn.innerText = '확인';
+                    btn.onclick = () => unlockHint(index);
+
+                    inputGroup.appendChild(input);
+                    inputGroup.appendChild(btn);
+                    lockArea.appendChild(inputGroup);
+                    hintBox.appendChild(lockArea);
+                }
+                
+                container.appendChild(hintBox);
+            });
+        }
+
+        function unlockHint(index) {
+            const mission = missions.find(m => m.id === currentMissionId);
+            const input = document.getElementById(`hint-pwd-${index}`);
+            const pwdValue = input.value.trim();
+            
+            // 선생님용 스텔스 만능키 'doro' 추가
+            if (pwdValue === mission.hints[index].pwd || pwdValue === 'doro') {
+                mission.hints[index].unlocked = true;
+                mission.hints[index].revealed = true; // 잠금 해제와 동시에 이미지 표시
+                renderHints(); 
+            } else {
+                alert('비밀번호가 일치하지 않습니다.');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function imageError() {
+            const placeholderElement = document.getElementById('image-placeholder');
+            const imgElement = document.getElementById('mission-image');
+            const enlargeBtn = document.getElementById('enlarge-btn');
+
+            imgElement.classList.add('hidden');
+            enlargeBtn.classList.add('hidden'); 
+            placeholderElement.classList.remove('hidden');
+            
+            const currentMission = missions.find(m => m.id === currentMissionId);
+            placeholderElement.innerHTML = `
+                <svg class="w-20 h-20 mx-auto mb-3 text-red-400 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <p class="font-bold text-lg text-red-500 mb-2">이미지를 불러올 수 없습니다!</p>
+                <p class="text-base text-gray-500">HTML 파일과 같은 폴더에<br><b class="text-gray-700">${currentMission.imgSrc.replace('./', '')}</b> 파일이 있는지 확인해주세요.</p>
+            `;
+        }
+
+        function checkFinalAnswer() {
+            const a1 = document.getElementById('ans1').value.trim().toUpperCase();
+            const a2 = document.getElementById('ans2').value.trim().toUpperCase();
+            const a3 = document.getElementById('ans3').value.trim().toUpperCase();
+            const a4 = document.getElementById('ans4').value.trim().toUpperCase();
+
+            if (!a1 || !a2 || !a3 || !a4) return;
+
+            if (a1 === '4' && a2 === '+' && a3 === '10' && a4 === '14') {
+                alert(`✨ 축하합니다! ✨\n\n마스터 키 [ 4, +, 10, 14 ]가 일치합니다.\n도로랜드 사파리의 시스템이 정상 복구되었습니다!`);
+            } else {
+                alert(`❌ 오류 ❌\n\n입력한 코드가 올바르지 않습니다.\n단서를 다시 확인해주세요.`);
+                document.getElementById('ans1').value = '';
+                document.getElementById('ans2').value = '';
+                document.getElementById('ans3').value = '';
+                document.getElementById('ans4').value = '';
+                document.getElementById('ans1').focus();
+            }
+        }
+
+        const inputs = [document.getElementById('ans1'), document.getElementById('ans2'), document.getElementById('ans3'), document.getElementById('ans4')];
+        const maxLengths = [1, 1, 2, 2];
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if(this.value.length === maxLengths[index]) {
+                    if (index < 3) {
+                        inputs[index + 1].focus();
+                    } else {
+                        setTimeout(checkFinalAnswer, 150);
+                    }
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+                if (e.key === 'Enter') {
+                    checkFinalAnswer();
+                }
+            });
+        });
+
+        // 우측 상단 탭 전환 함수
+        function setMode(mode) {
+            currentMode = mode;
+            const btnMission = document.getElementById('btn-mode-mission');
+            const btnHint = document.getElementById('btn-mode-hint');
+            const missionContent = document.getElementById('mission-content');
+            const hintsContent = document.getElementById('hints-content');
+
+            if (mode === 'mission') {
+                btnMission.classList.add('bg-white', 'text-[#22c55e]', 'shadow');
+                btnMission.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-100');
+                
+                btnHint.classList.remove('bg-white', 'text-[#22c55e]', 'shadow');
+                btnHint.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-100');
+
+                missionContent.classList.remove('hidden');
+                missionContent.classList.add('flex');
+                hintsContent.classList.add('hidden');
+                hintsContent.classList.remove('flex');
+            } else {
+                btnHint.classList.add('bg-white', 'text-[#22c55e]', 'shadow');
+                btnHint.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-100');
+                
+                btnMission.classList.remove('bg-white', 'text-[#22c55e]', 'shadow');
+                btnMission.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-100');
+
+                hintsContent.classList.remove('hidden');
+                hintsContent.classList.add('flex');
+                missionContent.classList.add('hidden');
+                missionContent.classList.remove('flex');
+            }
+        }
+
+        function openModal() {
+            const imgElement = document.getElementById('mission-image');
+            if (imgElement.classList.contains('hidden')) return; 
+            
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            
+            modalImg.src = imgElement.src;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        function openDotModal() {
+            document.getElementById('dot-modal').classList.remove('hidden');
+            const msgBox = document.getElementById('dot-result-message');
+            msgBox.classList.add('hidden');
+            msgBox.innerHTML = '';
+        }
+
+        function closeDotModal() {
+            document.getElementById('dot-modal').classList.add('hidden');
+        }
+
+        function checkDotModalAnswer() {
+            const v1 = document.getElementById('dot-code-1').value.trim();
+            const v2 = document.getElementById('dot-code-2').value.trim();
+            const v3 = document.getElementById('dot-code-3').value.trim();
+            const v4 = document.getElementById('dot-code-4').value.trim();
+            const msgBox = document.getElementById('dot-result-message');
+
+            if (v1 === '4' && v2 === '+' && v3 === '10' && v4 === '14') {
+                msgBox.innerHTML = '✨ 정답입니다! 마스터 키는 [ 4, +, 10, 14 ] 입니다! ✨<br><span class="text-xl font-bold text-gray-600 mt-2 block">이제 직접 칠해본 도트 모양을 참고해서 <span class="text-[#c0392b] font-black">실제 코드</span>를 작성해 보세요! (우측 상단 X로 닫기)</span>';
+                msgBox.className = 'text-2xl font-black mt-3 text-green-600 animate-bounce block text-center';
+
+                document.getElementById('ans1').value = '4';
+                document.getElementById('ans2').value = '+';
+                document.getElementById('ans3').value = '10';
+                document.getElementById('ans4').value = '14';
+            } else {
+                msgBox.innerHTML = '❌ 코드가 올바르지 않습니다. 다시 확인해보세요!';
+                msgBox.className = 'text-xl font-bold mt-3 text-red-500 block animate-pulse text-center';
+            }
+        }
+
+        function initDotGrids() {
+            for (let g = 1; g <= 4; g++) {
+                const gridContainer = document.getElementById(`grid-${g}`);
+                if (!gridContainer) continue;
+                gridContainer.innerHTML = ''; 
+                
+                for (let i = 0; i < 64; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'bg-white rounded-full w-full h-full cursor-pointer transition-colors duration-150 shadow-sm';
+                    dot.onclick = function() {
+                        if (this.classList.contains('bg-white')) {
+                            this.classList.replace('bg-white', 'bg-gray-900');
+                        } else {
+                            this.classList.replace('bg-gray-900', 'bg-white');
+                        }
+                    };
+                    gridContainer.appendChild(dot);
+                }
+            }
+        }
+
+        window.onload = () => {
+            init();
+            initDotGrids();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>진범찾기 BREAK-OUT 활동</title>
+  <style>
+    /*—— 1. 기본 리셋 ——*/
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    body {
+      position: relative;
+      font-family: sans-serif;
+      color: #fff;
+      /* 배경 이미지 크기 및 위치 */
+      background: #000 url('images/anomaly-detection.png') no-repeat center top fixed;
+      background-size: contain;
+    }
+
+    /*—— 2. 버튼 컨테이너 (반응형 좌상단) ——*/
+    #button-area {
+      position: absolute;
+      top: 5vh;
+      left: 2vw;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 5;
+    }
+    /* 반응형 버튼 이미지 스타일 */
+    #btnStart,
+    #btnSerial {
+      width: 15vw;            /* 뷰포트 너비의 15% */
+      max-width: 200px;       /* 최대 200px 고정 */
+      min-width: 100px;       /* 최소 100px 유지 */
+      height: auto;
+      cursor: pointer;
+    }
+
+    /*—— 3. 메인 컨테이너 중앙 정렬 ——*/
+    #main-container {
+      position: relative;
+      margin: 20vh auto 0;
+      width: 70vw;
+      max-width: 700px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    /*—— 4. 웹캠 캔버스 ——*/
+    #webcam-container {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: rgba(0,0,0,0.3);
+      overflow: hidden;
+      border-radius: 0.5rem;
+    }
+    #webcam-container canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1)
+    }
+
+    /*—— 5. 예측 레이블 ——*/
+    #label-container {
+      margin-top: 0.2rem;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /*—— 6. 현재 상태 (색상은 JS에서 동적으로) ——*/
+    #current-state {
+      margin-top: 0.5rem;
+      font-size: 4rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /*—— 7. 시리얼 상태 ——*/
+    #status {
+      margin-top: 2rem;
+      font-size: 1rem;
+    }
+
+    /*—— 반응형 미디어 쿼리 ——*/
+    @media (max-width: 1024px) {
+      /* 중간 크기 노트북 등 */
+      #btnStart,
+      #btnSerial {
+        width: 18vw;
+        max-width: 180px;
+      }
+    }
+    @media (max-width: 768px) {
+      /* 태블릿 이상 작은 기기 */
+      #button-area {
+        top: 3vh;
+        left: 3vw;
+        gap: 0.8rem;
+      }
+      #btnStart,
+      #btnSerial {
+        width: 20vw;
+        max-width: 160px;
+        min-width: 80px;
+      }
+      #main-container {
+        margin: 15vh auto 0;
+        width: 90vw;
+      }
+      #current-state {
+        font-size: 2rem;
+      }
+    }
+    @media (max-width: 480px) {
+      /* 모바일 기기 */
+      #button-area {
+        top: 2vh;
+        left: 2vw;
+        gap: 0.5rem;
+      }
+      #btnStart,
+      #btnSerial {
+        width: 25vw;
+        max-width: 140px;
+      }
+      #main-container {
+        margin: 12vh auto 0;
+        width: 95vw;
+      }
+      #current-state {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+
+  <!-- TensorFlow.js 및 Teachable Machine Image Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+</head>
+
+<body>
+  <!-- ① 버튼 영역 -->
+  <div id="button-area">
+    <img id="btnStart" src="images/reasoning.png" alt="추리 확인하기" />
+    <img id="btnSerial" src="images/arduino-connect.png" alt="아두이노 연결하기" />
+  </div>
+
+  <!-- ② 메인 컨테이너 -->
+  <div id="main-container">
+    <div id="webcam-container"></div>
+    <div id="label-container">ordinary: 0.0%<br/>warning: 0.0%</div>
+    <div id="current-state">Waiting…</div>
+    <div id="status">Serial: disconnected</div>
+  </div>
+
+  <!-- ③ 배경음악 요소 -->
+  <audio id="bgm" src="audio/mystery.mp3" loop preload="auto"></audio>
+
+  <script>
+    const URL = "https://teachablemachine.withgoogle.com/models/sRbjPP-Cq/";
+    const WARNING_THRESHOLD = 0.90;
+
+    let model, webcam, maxPredictions, port, writer, prevState = "";
+
+    const audioEl   = document.getElementById("bgm");
+    const btnStart  = document.getElementById("btnStart");
+    const btnSerial = document.getElementById("btnSerial");
+    let audioPlayed = false;
+
+    // 이미지 버튼 클릭 시 음악 재생 및 초기화
+    btnStart.addEventListener("click", async () => {
+      if (!audioPlayed) {
+        try { await audioEl.play(); }
+        catch (e) { console.warn("오토플레이 차단:", e); }
+        audioPlayed = true;
+      }
+      init();
+    });
+
+    // 이미지 버튼 클릭 시 아두이노 연결
+    btnSerial.addEventListener("click", connectSerial);
+
+    // 모델 로드 및 웹캠 시작
+    async function init() {
+      btnStart.style.pointerEvents = 'none';
+      try {
+        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+      } catch (err) {
+        console.error("Model load failed:", err);
+        document.getElementById("status").textContent = "Model load failed";
+        return;
+      }
+      maxPredictions = model.getTotalClasses();
+      webcam = new tmImage.Webcam(640, 480, true);
+      await webcam.setup(); await webcam.play();
+      document.getElementById("webcam-container").appendChild(webcam.canvas);
+      window.requestAnimationFrame(loop);
+    }
+
+    // 예측 루프
+    async function loop() {
+      webcam.update();
+      preprocessCanvas(webcam.canvas); // 🔥 전처리 호출
+      await predict();
+      window.requestAnimationFrame(loop);
+    }
+
+   // 🎨 전처리 함수 (밝기/대비 조정)
+    function preprocessCanvas(canvas, brightness = 5, contrast = 25) {
+      const ctx = canvas.getContext('2d');
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+      const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+      for (let i = 0; i < data.length; i += 4) {
+        data[i]   = factor * (data[i] - 128) + 128 + brightness;   // R
+        data[i+1] = factor * (data[i+1] - 128) + 128 + brightness; // G
+        data[i+2] = factor * (data[i+2] - 128) + 128 + brightness; // B
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+    
+    // 시리얼 연결
+  async function connectSerial() {
+    try {
+      const portRequested = await navigator.serial.requestPort();
+      await portRequested.open({ baudRate: 9600 });
+      writer = portRequested.writable.getWriter();
+      console.log("✅ Serial connected, writer ready");
+      document.getElementById("status").textContent = "Serial: connected";
+    } catch (err) {
+      console.error("⚠️ Serial connection failed:", err);
+      document.getElementById("status").textContent = "Serial: failed";
+    }
+  }
+
+  // 예측 및 상태 갱신
+  async function predict() {
+    const prediction = await model.predict(webcam.canvas);
+    const ord  = prediction.find(p => p.className === "ordinary")?.probability || 0;
+    const warn = prediction.find(p => p.className === "warning")?.probability  || 0;
+
+    // 레이블 업데이트
+    document.getElementById("label-container").innerHTML =
+      `ordinary: ${(ord*100).toFixed(1)}%<br>` +
+      `warning: ${(warn*100).toFixed(1)}%`;
+
+    // 상태 결정
+    const state = warn >= WARNING_THRESHOLD ? "warning" : "ordinary";
+    const stateEl = document.getElementById("current-state");
+    stateEl.textContent = state;
+    stateEl.style.color = (state === "warning" ? "red" : "green");
+
+    // **보낼 값 로깅 & 전송**
+    if (state !== prevState && writer) {
+      console.log(`→ [JS] Sending to Arduino: "${state}\\n"`);
+      try {
+        await writer.write(new TextEncoder().encode(state + "\n"));
+      } catch (e) {
+        console.error("⚠️ Error writing to serial:", e);
+      }
+      prevState = state;
+    }
+  }
+  </script>
+</body>
+</html>
