@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    BREAK-OUT 배포 스크립트
+    BREAK-OUT deploy script
 
 .EXAMPLE
     .\scripts\deploy.ps1
@@ -71,9 +71,15 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# -- extract + permission --
+# -- extract + permission + cache bust --
 Write-Host "[5/5] Deploying..." -ForegroundColor Cyan
+$ts = [int](Get-Date -UFormat %s)
 ssh -i $KEY $SSH_TARGET "rm -rf ${RemoteDir}/* && cd ${RemoteDir} && tar -xzf /tmp/breakout-deploy.tar.gz && rm /tmp/breakout-deploy.tar.gz && chmod 755 /home/ubuntu && chmod -R 755 ${RemoteDir}" 2>&1 | Out-Null
+
+# cache bust: upload and run script
+$bustScript = Join-Path $ProjectRoot "scripts\cache-bust.sh"
+scp -i $KEY $bustScript "${SSH_TARGET}:/tmp/cache-bust.sh" 2>&1 | Out-Null
+ssh -i $KEY $SSH_TARGET "bash /tmp/cache-bust.sh $ts $RemoteDir && rm /tmp/cache-bust.sh" 2>&1 | Out-Null
 
 # -- cleanup --
 Remove-Item $tarFile -ErrorAction SilentlyContinue

@@ -13,6 +13,16 @@
 
 ---
 
+## 새 PC에서 처음 사용할 때
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+PowerShell 스크립트 실행 허용 설정. PC마다 한 번만 하면 됨.
+
+---
+
 ## 배포 순서
 
 ### 1. GitHub에 올리기
