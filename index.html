@@ -13,13 +13,23 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Tailwind 설정: 기본 폰트를 Hahmlet으로 변경 -->
+  <!-- Tailwind 설정: 기본 폰트를 Hahmlet으로 변경 및 흔들림 애니메이션 추가 -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
             sans: ['Hahmlet', 'sans-serif'],
+          },
+          keyframes: {
+            shake: {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '25%': { transform: 'translateX(-5px)' },
+              '75%': { transform: 'translateX(5px)' },
+            }
+          },
+          animation: {
+            'shake': 'shake 0.2s ease-in-out 0s 2',
           }
         }
       }
@@ -85,10 +95,10 @@
     <!-- Hero Section -->
     <header class="w-full flex flex-col items-center text-center mb-20 relative z-30">
       
-      <!-- 공식 로고 적용 (빛 번짐을 유발하던 필터를 제거하고 원본의 선명함 유지) -->
+      <!-- 공식 로고 적용 -->
       <div class="mb-4 w-full max-w-[300px] sm:max-w-[400px] px-4 relative z-50 flex justify-center">
         <!-- 배경에 묻히지 않도록 깔끔한 어두운 그림자만 살짝 적용 -->
-        <img src="images/logo.png" alt="도로랜드 공식 로고" class="w-full h-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] relative z-50" style="image-rendering: -webkit-optimize-contrast;" />
+        <img src="images/logo.png" alt="도로랜드 공식 로고" class="w-full h-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] relative z-50" onerror="this.src='https://via.placeholder.com/400x150?text=DOROLAND+LOGO'" style="image-rendering: -webkit-optimize-contrast;" />
       </div>
       
       <div class="relative inline-block mt-6 mb-4 z-30 px-8">
@@ -117,17 +127,20 @@
       <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-emerald-500/30" onclick="handleEnterChapter(1, 'active', this)">
         <!-- Banner -->
         <div class="h-48 w-full relative overflow-hidden border-b border-emerald-100 bg-emerald-50">
-          <img src="images/chapter1-logo.png" alt="챕터 1 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <img src="images/chapter1-logo.png" alt="챕터 1 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+1'"/>
           <!-- 빛 스캔 애니메이션 오버레이 -->
           <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
         </div>
         <!-- Content -->
         <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
-          <div class="flex items-center mb-2 space-x-2">
-            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-emerald-100">
-              Chapter 01
-            </span>
-            <span class="text-xs font-bold text-emerald-600/70">사파리 구역</span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-emerald-100">
+                Chapter 01
+              </span>
+              <span class="text-xs font-bold text-emerald-600/70">사파리 구역</span>
+            </div>
+            <i data-lucide="lock" class="w-4 h-4 text-emerald-500 opacity-60"></i>
           </div>
           <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">도트매트릭스 암호 해독</h3>
           
@@ -140,7 +153,7 @@
 
           <div class="mt-auto">
             <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transform group-hover:-translate-y-0.5">
-              <span>미션 시작하기</span>
+              <span>입장하기</span>
               <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
             </div>
           </div>
@@ -151,17 +164,20 @@
       <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-purple-500/30" onclick="handleEnterChapter(2, 'active', this)">
         <!-- Banner -->
         <div class="h-48 w-full relative overflow-hidden border-b border-purple-100 bg-purple-50">
-          <img src="images/chapter2-logo.png" alt="챕터 2 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <img src="images/chapter2-logo.png" alt="챕터 2 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+2'" />
           <!-- 빛 스캔 애니메이션 오버레이 -->
           <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
         </div>
         <!-- Content -->
         <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
-          <div class="flex items-center mb-2 space-x-2">
-            <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-purple-100">
-              Chapter 02
-            </span>
-            <span class="text-xs font-bold text-purple-600/70">하모니아 구역</span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-purple-100">
+                Chapter 02
+              </span>
+              <span class="text-xs font-bold text-purple-600/70">하모니아 구역</span>
+            </div>
+            <i data-lucide="lock" class="w-4 h-4 text-purple-500 opacity-60"></i>
           </div>
           <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">진술서 데이터 분석</h3>
           
@@ -173,7 +189,7 @@
 
           <div class="mt-auto">
             <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-purple-500 to-fuchsia-400 hover:from-purple-400 hover:to-fuchsia-300 shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transform group-hover:-translate-y-0.5">
-              <span>미션 시작하기</span>
+              <span>입장하기</span>
               <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
             </div>
           </div>
@@ -184,17 +200,20 @@
       <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-rose-500/30" onclick="handleEnterChapter(3, 'active', this)">
         <!-- Banner -->
         <div class="h-48 w-full relative overflow-hidden border-b border-rose-100 bg-rose-50">
-          <img src="images/chapter3-logo.png" alt="챕터 3 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          <img src="images/chapter3-logo.png" alt="챕터 3 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+3'"/>
           <!-- 빛 스캔 애니메이션 오버레이 -->
           <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
         </div>
         <!-- Content -->
         <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
-          <div class="flex items-center mb-2 space-x-2">
-            <span class="px-2.5 py-1 bg-rose-50 text-rose-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-rose-100">
-              Chapter 03
-            </span>
-            <span class="text-xs font-bold text-rose-600/70">회전목마 구역</span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 bg-rose-50 text-rose-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-rose-100">
+                Chapter 03
+              </span>
+              <span class="text-xs font-bold text-rose-600/70">회전목마 구역</span>
+            </div>
+            <i data-lucide="lock" class="w-4 h-4 text-rose-500 opacity-60"></i>
           </div>
           <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">머지큐브 방탈출</h3>
           
@@ -206,7 +225,7 @@
 
           <div class="mt-auto">
             <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-rose-500 to-pink-400 hover:from-rose-400 hover:to-pink-300 shadow-md shadow-rose-500/20 group-hover:shadow-rose-500/40 transform group-hover:-translate-y-0.5">
-              <span>미션 시작하기</span>
+              <span>입장하기</span>
               <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
             </div>
           </div>
@@ -260,24 +279,128 @@
     </div>
   </footer>
 
+  <!-- 비밀번호 입력 모달 -->
+  <div id="passwordModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- 배경 오버레이 (클릭 시 닫힘) -->
+    <div class="absolute inset-0 bg-[#040813]/80 backdrop-blur-sm" onclick="closeModal()"></div>
+    
+    <!-- 모달 컨텐츠 -->
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 overflow-hidden transform transition-all border border-slate-100">
+      <div class="p-8">
+        <div class="flex justify-between items-start mb-6">
+          <div>
+            <div class="flex items-center space-x-2 text-rose-500 mb-1">
+              <i data-lucide="shield-alert" class="w-5 h-5"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">Security Alert</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800">접근 제한 구역</h3>
+          </div>
+          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors p-1 bg-slate-100 rounded-full">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        
+        <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+          <span id="modalChapterName" class="font-bold text-slate-800">해당 챕터</span>에 입장하려면 관리자 비밀번호를 입력해야 합니다.
+        </p>
+        
+        <div class="relative">
+          <i data-lucide="key-round" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+          <input type="password" id="chapterPassword" 
+            class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-lg tracking-[0.3em] font-bold bg-slate-50 transition-all" 
+            placeholder="비밀번호 입력" 
+            onkeyup="if(event.key === 'Enter') checkPassword()">
+        </div>
+        
+        <p id="passwordError" class="text-rose-500 text-sm mt-3 hidden text-center font-medium flex items-center justify-center">
+          <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i> 비밀번호가 일치하지 않습니다.
+        </p>
+        
+        <div class="mt-8 flex space-x-3">
+          <button onclick="closeModal()" class="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors">
+            취소
+          </button>
+          <button onclick="checkPassword()" class="flex-[2] py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors shadow-md flex items-center justify-center space-x-2">
+            <span>잠금 해제</span>
+            <i data-lucide="unlock" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script>
     // Lucide 아이콘 초기화
     lucide.createIcons();
 
-    // 챕터별 URL 매핑
-    const chapterUrls = {
-      1: './chapter01/index.html',
-      2: './chapter02/index.html',
-      3: './chapter03/index.html'
+    // 챕터별 정보 (이름 추가)
+    const chapterData = {
+      1: { url: './chapter01/index.html', name: 'Chapter 01 : 사파리 구역' },
+      2: { url: './chapter02/index.html', name: 'Chapter 02 : 하모니아 구역' },
+      3: { url: './chapter03/index.html', name: 'Chapter 03 : 회전목마 구역' }
     };
 
-    // 카드 클릭 이벤트 핸들러
+    // 현재 선택된 챕터 ID 저장 변수
+    let currentTargetChapterId = null;
+
+    // 카드 클릭 이벤트 핸들러 수정
     function handleEnterChapter(id, status, element) {
       if (status === 'locked') return;
 
-      if (chapterUrls[id]) {
-        window.location.href = chapterUrls[id];
+      if (chapterData[id]) {
+        currentTargetChapterId = id;
+        openModal(chapterData[id].name);
+      }
+    }
+
+    // 모달 열기
+    function openModal(chapterName) {
+      const modal = document.getElementById('passwordModal');
+      const input = document.getElementById('chapterPassword');
+      const errorMsg = document.getElementById('passwordError');
+      const nameSpan = document.getElementById('modalChapterName');
+      
+      nameSpan.textContent = chapterName;
+      modal.classList.remove('hidden');
+      input.value = '';
+      errorMsg.classList.add('hidden');
+      input.classList.remove('border-rose-500', 'ring-rose-500');
+      
+      // 모달이 화면에 나타난 직후 인풋에 포커스 주어 바로 타이핑 가능하게 함
+      setTimeout(() => input.focus(), 50);
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      const modal = document.getElementById('passwordModal');
+      modal.classList.add('hidden');
+      currentTargetChapterId = null;
+    }
+
+    // 비밀번호 확인 및 처리
+    function checkPassword() {
+      const input = document.getElementById('chapterPassword');
+      const errorMsg = document.getElementById('passwordError');
+      const password = input.value;
+      
+      // 설정된 비밀번호: 1111
+      if (password === '1111') {
+        // 성공: 해당 챕터 URL로 이동
+        if(currentTargetChapterId && chapterData[currentTargetChapterId]) {
+          window.location.href = chapterData[currentTargetChapterId].url;
+        }
+      } else {
+        // 실패: 에러 메시지 표시 및 흔들림 애니메이션 효과
+        errorMsg.classList.remove('hidden');
+        input.classList.add('border-rose-500', 'ring-1', 'ring-rose-500', 'animate-shake');
+        input.value = '';
+        input.focus();
+        
+        // 애니메이션이 끝나면 클래스 제거 (재사용을 위해)
+        setTimeout(() => {
+          input.classList.remove('animate-shake');
+        }, 400);
       }
     }
   </script>
