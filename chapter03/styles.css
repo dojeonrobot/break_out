@@ -1016,3 +1016,90 @@ h1{ font-size:clamp(32px,5vw,52px); margin:8px 0 10px; line-height:1.06; text-sh
   color: #ffc53d;
   box-shadow: 0 0 12px rgba(255, 197, 61, 0.6);
 }
+
+.card.is-complete.is-reviewable {
+  position: relative;
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto;
+  cursor: pointer;
+  border-color: rgba(41, 216, 255, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(41, 216, 255, 0.2),
+    0 12px 36px rgba(0, 0, 0, 0.35),
+    inset 0 0 24px rgba(41, 216, 255, 0.08);
+}
+
+.card.is-complete.is-reviewable {
+  position: relative;
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto;
+  cursor: pointer;
+  border-color: rgba(41, 216, 255, 0.45);
+  padding-bottom: 58px; /* 기존 설명문과 하단 안내 문구 간격 확보 */
+  box-shadow:
+    0 0 0 1px rgba(41, 216, 255, 0.2),
+    0 12px 36px rgba(0, 0, 0, 0.35),
+    inset 0 0 24px rgba(41, 216, 255, 0.08);
+}
+
+.card.is-complete.is-reviewable::after {
+  content: "이전 QR을 확인하려면 클릭";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: rgba(41, 216, 255, 0.12);
+  border: 1px solid rgba(41, 216, 255, 0.42);
+  color: #6be3ff;
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: 0 0 18px rgba(41, 216, 255, 0.16);
+  animation: qrHintPulse 1.8s ease-in-out infinite;
+}
+
+.card.is-complete.is-reviewable p {
+  margin-bottom: 0;
+  padding-right: 2px;
+}
+
+.card.is-complete.is-reviewable:hover {
+  transform: translateY(-3px);
+  border-color: rgba(41, 216, 255, 0.75);
+  box-shadow:
+    0 0 0 1px rgba(41, 216, 255, 0.35),
+    0 18px 50px rgba(41, 216, 255, 0.18),
+    inset 0 0 28px rgba(41, 216, 255, 0.12);
+}
+
+.card.is-complete.is-reviewable:hover::after {
+  background: rgba(41, 216, 255, 0.22);
+  color: #ffffff;
+}
+
+.card.is-complete.is-reviewable.is-locked {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+@keyframes qrHintPulse {
+  0%, 100% {
+    opacity: 0.72;
+    box-shadow: 0 0 12px rgba(41, 216, 255, 0.14);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 26px rgba(41, 216, 255, 0.38);
+  }
+}

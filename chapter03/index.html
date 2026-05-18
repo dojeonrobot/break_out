@@ -511,8 +511,12 @@
       if(cardId){
         const cardEl = document.getElementById(cardId);
         if(cardEl) {
-          cardEl.classList.add('is-complete', 'reveal-icon');
-          cardEl.setAttribute('aria-disabled','true');
+          cardEl.classList.add('is-complete', 'is-reviewable', 'reveal-icon');
+
+          // 완료된 카드는 다시 QR을 확인할 수 있어야 하므로 비활성화 처리 제거
+          cardEl.removeAttribute('aria-disabled');
+          cardEl.setAttribute('tabindex', '0');
+
           setTimeout(() => cardEl.classList.remove('reveal-icon'), 900);
         }
       }
@@ -1831,101 +1835,121 @@ function openHintGate(hintId) {
 
 
     function openSolvedCardModal(step, title){
-    const patternImg = patternForStep[step]
-      ? `<img src="${patternForStep[step]}" style="max-width:260px; width:60%; margin:14px auto 10px; display:block; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.55);" />`
-      : '';
+      const solvedQrList = step === 1
+        ? [
+            {
+              label: '첫번째 QR',
+              desc: '첫번째 기억을 시작할 때 확인하는 QR입니다.',
+              src: './images/qr/qr-1.png'
+            },
+            {
+              label: '두번째 QR',
+              desc: '두번째 기억으로 이동하는 QR입니다.',
+              src: './images/qr/qr-2.png'
+            }
+          ]
+        : [
+            {
+              label: '세번째 QR',
+              desc: 'QR을 스캔해 다음 기억을 확인하세요.',
+              src: QR_FOR_STEP[step]
+            }
+          ];
 
-    const qrSrc = QR_FOR_STEP[step];
-    const qrBlock = qrSrc ? `
-      <div style="margin-top:14px;">
-        <div style="font-weight:800; font-size:14px; color:var(--text); margin-bottom:8px;">
-          📌 QR 코드
-        </div>
-        <img src="${qrSrc}" alt="QR 코드" style="max-width:180px; width:45%; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.45);" />
-        <div style="margin-top:8px; color:var(--muted); font-weight:600; font-size:13px; line-height:1.4;">
-          QR을 스캔해 다음 기억을 확인하세요.
-        </div>
-      </div>
-    ` : '';
-
-    modalTitle.textContent = title || '완료';
-    modalBody.innerHTML = `
-      <div style="text-align:center;">
-        <div style="font-weight:800; font-size:18px; margin-top:4px;">
-          ✅ 이미 문양을 획득했어요!
-        </div>
-        <p style="margin:10px 0 14px; color:var(--muted); font-weight:600; line-height:1.5;">
-          이 기억은 이미 해결 완료 상태입니다.<br>
-          문양과 QR을 다시 확인할 수 있어요.
-        </p>
-
-        <!-- 🔽 문양 + QR 나란히 -->
-        <div style="
-          display:flex;
-          justify-content:center;
-          gap:20px;
-          flex-wrap:wrap;
-          margin:18px 0;
-        ">
-          <!-- 문양 -->
+      const qrCardsHTML = solvedQrList
+        .filter(qr => qr.src)
+        .map(qr => `
           <div style="
-            width:330px;
-            aspect-ratio:1/1;
-            border-radius:14px;
-            overflow:hidden;
-            box-shadow:0 12px 40px rgba(0,0,0,.55);
-          ">
-            <img
-              src="${patternForStep[step]}"
-              alt="문양"
-              style="width:100%; height:100%; object-fit:cover;"
-            />
-          </div>
-
-          <!-- QR -->
-          <div style="
-            width:330px;
-            aspect-ratio:1/1;
+            width:280px;
             border-radius:14px;
             overflow:hidden;
             box-shadow:0 12px 40px rgba(0,0,0,.45);
             background:#fff;
-            display:flex;
-            align-items:center;
-            justify-content:center;
+            padding:16px;
           ">
+            <div style="
+              color:#111827;
+              font-size:16px;
+              font-weight:900;
+              margin-bottom:10px;
+              text-align:center;
+            ">
+              ${qr.label}
+            </div>
+
             <img
-              src="${QR_FOR_STEP[step]}"
-              alt="QR 코드"
-              style="width:100%; height:100%; object-fit:contain;"
+              src="${qr.src}"
+              alt="${qr.label}"
+              style="
+                width:100%;
+                aspect-ratio:1/1;
+                object-fit:contain;
+                display:block;
+              "
             />
+
+            <div style="
+              margin-top:10px;
+              color:#4b5563;
+              font-size:12px;
+              font-weight:700;
+              line-height:1.4;
+              text-align:center;
+              word-break:keep-all;
+            ">
+              ${qr.desc}
+            </div>
+          </div>
+        `).join('');
+
+      modalTitle.textContent = title || '완료';
+
+      modalBody.innerHTML = `
+        <div style="text-align:center;">
+          <div style="font-weight:800; font-size:18px; margin-top:4px;">
+            ✅ 이미 완료한 기억이에요!
+          </div>
+
+          <p style="margin:10px 0 18px; color:var(--muted); font-weight:600; line-height:1.5;">
+            이전에 확인했던 QR을 다시 볼 수 있어요.<br>
+            필요한 QR을 선택해 스캔하세요.
+          </p>
+
+          <div style="
+            display:flex;
+            justify-content:center;
+            align-items:flex-start;
+            gap:24px;
+            flex-wrap:wrap;
+            margin:18px auto 22px;
+            max-width:720px;
+          ">
+            ${qrCardsHTML}
+          </div>
+
+          <div style="
+            font-size:13px;
+            color:var(--muted);
+            font-weight:600;
+            margin-bottom:14px;
+          ">
+            📌 필요한 QR을 선택해 스캔하세요.
+          </div>
+
+          <div style="margin-top:8px;">
+            <button class="btn" type="button"
+              onclick="document.getElementById('modalClose').click()">
+              닫기
+            </button>
           </div>
         </div>
+      `;
 
-        <div style="
-          font-size:13px;
-          color:var(--muted);
-          font-weight:600;
-          margin-bottom:14px;
-        ">
-          📌 QR을 스캔해 다음 기억을 확인하세요.
-        </div>
-
-        <div style="margin-top:8px;">
-          <button class="btn" type="button"
-            onclick="document.getElementById('modalClose').click()">
-            닫기
-          </button>
-        </div>
-      </div>
-    `;
-
-    modal.classList.add('show');
-    modal.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-    modalClose.focus();
-  }
-
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      modalClose.focus();
+    }
 
     function openModalFor(id){
       const data = contents[id] || { title:'정보', html:'<p>관련 정보 없음.</p>' };
