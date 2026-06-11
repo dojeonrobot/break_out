@@ -32,6 +32,100 @@ body {
   cursor: pointer;
 }
 
+/*-- 2-1. 모델 URL 입력 영역 (우측, 차분한 패널) --*/
+#url-area {
+  position: absolute;
+  top: 5vh;
+  right: 2vw;
+  z-index: 5;
+}
+#url-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.1rem;
+  width: 18vw;
+  max-width: 260px;
+  min-width: 150px;
+  box-sizing: border-box;
+  background: rgba(20, 33, 53, 0.86);
+  border: 1.5px solid rgba(224, 168, 90, 0.5);
+  border-radius: 0.6rem;
+  box-shadow: 0 0 0 1px rgba(224, 168, 90, 0.12),
+              0 4px 16px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+}
+#url-box label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ecc886;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+#url-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #aebccd;
+}
+#modelUrl {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem;
+  font-size: 0.78rem;
+  color: #f0f5fb;
+  background: rgba(8, 14, 24, 0.65);
+  border: 1px solid rgba(224, 168, 90, 0.4);
+  border-radius: 0.4rem;
+  transition: border-color 0.2s;
+}
+#modelUrl::placeholder { color: #7d8aa0; }
+#modelUrl:focus {
+  outline: none;
+  border-color: rgba(236, 200, 134, 0.9);
+}
+#url-buttons {
+  display: flex;
+  gap: 0.45rem;
+}
+#btnApplyUrl,
+#btnResetUrl {
+  flex: 1;
+  padding: 0.55rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+#btnApplyUrl {
+  color: #e6f4ea;
+  background: rgba(64, 122, 90, 0.92);
+  border-color: rgba(130, 185, 150, 0.45);
+}
+#btnResetUrl {
+  color: #d8e0ec;
+  background: rgba(54, 68, 90, 0.92);
+  border-color: rgba(170, 190, 215, 0.35);
+}
+#btnApplyUrl:hover { background: rgba(78, 142, 106, 1); }
+#btnResetUrl:hover { background: rgba(66, 82, 108, 1); }
+#btnApplyUrl:active,
+#btnResetUrl:active { transform: scale(0.97); }
+
+#url-msg {
+  margin: 0;
+  min-height: 1.15rem;
+  font-size: 0.82rem;
+  font-weight: bold;
+  text-align: center;
+}
+#url-msg.msg-ok      { color: #93c8a6; }
+#url-msg.msg-pending { color: #e0b878; }
+#url-msg.msg-error   { color: #e88f8f; }
+#url-msg.msg-idle    { color: #9aa8bb; font-weight: normal; }
+
 /*-- 3. 메인 컨테이너 --*/
 #main-container {
   position: relative;
@@ -104,6 +198,18 @@ body {
   }
   #current-state {
     font-size: 2rem;
+  }
+  /* 좁은 화면: URL 영역을 본문 아래 중앙으로 */
+  #url-area {
+    position: static;
+    transform: none;
+    margin: 1.5rem auto 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  #url-box {
+    width: 80vw;
+    max-width: 360px;
   }
 }
 @media (max-width: 480px) {

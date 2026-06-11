@@ -17,6 +17,22 @@
     <img id="btnSerial" src="images/arduino-connect.png" alt="아두이노 연결하기" />
   </div>
 
+  <!-- 🔧 모델 URL 입력 영역 (우측) -->
+  <div id="url-area">
+    <div id="url-box">
+      <label for="modelUrl">🔗 모델 URL</label>
+      <p id="url-desc">여러분이 만든 인공지능 모델 URL을<br>아래 빈칸에 업로드 해주세요!</p>
+      <input id="modelUrl" type="text"
+             value=""
+             placeholder="예: https://teachablemachine.withgoogle.com/models/..." />
+      <div id="url-buttons">
+        <button id="btnApplyUrl" type="button">적용</button>
+        <button id="btnResetUrl" type="button">초기화</button>
+      </div>
+      <p id="url-msg"></p>
+    </div>
+  </div>
+
   <!-- ② 메인 컨테이너 -->
   <div id="main-container">
     <div id="webcam-container"></div>
@@ -29,15 +45,105 @@
   <audio id="bgm" src="audio/mystery.mp3" loop preload="auto"></audio>
 
   <script>
-    const URL = "https://teachablemachine.withgoogle.com/models/sRbjPP-Cq/";
+    // 🔧 기본 모델 URL (지금 업로드되어 있는 모델)
+    const DEFAULT_URL = "https://teachablemachine.withgoogle.com/models/sRbjPP-Cq/";
     const WARNING_THRESHOLD = 0.90;
 
     let model, webcam, maxPredictions, port, writer, prevState = "";
+    let webcamRunning = false; // 🔧 웹캠/예측 루프 실행 여부
 
-    const audioEl   = document.getElementById("bgm");
-    const btnStart  = document.getElementById("btnStart");
-    const btnSerial = document.getElementById("btnSerial");
+    const audioEl       = document.getElementById("bgm");
+    const btnStart      = document.getElementById("btnStart");
+    const btnSerial     = document.getElementById("btnSerial");
+    const modelUrlInput = document.getElementById("modelUrl");
+    const btnApplyUrl   = document.getElementById("btnApplyUrl");
+    const btnResetUrl   = document.getElementById("btnResetUrl");
+    const urlMsg        = document.getElementById("url-msg");
     let audioPlayed = false;
+
+    // 🔧 실제로 모델에 사용되는 "적용된" URL (입력칸은 항상 빈칸으로 시작)
+    let activeUrl = DEFAULT_URL;
+
+    const PROMPT_MSG = "✏️ URL 입력 후 '적용'을 눌러주세요";
+
+    // 끝에 / 자동 보정 (빈 값이면 기본 URL)
+    function normalizeUrl(u) {
+      u = (u || "").trim();
+      if (!u) return DEFAULT_URL;
+      if (!u.endsWith("/")) u += "/";
+      return u;
+    }
+
+    function setMsg(text, cls) {
+      urlMsg.textContent = text;
+      urlMsg.className = cls;
+    }
+
+    // 🔧 모델 로드 헬퍼
+    async function loadModel(baseUrl) {
+      model = await tmImage.load(baseUrl + "model.json", baseUrl + "metadata.json");
+      maxPredictions = model.getTotalClasses();
+      prevState = ""; // 모델 바뀌면 상태 초기화
+    }
+
+    // 🔧 "적용" 버튼: URL 반영 + 실행 중이면 모델 즉시 교체
+    btnApplyUrl.addEventListener("click", async () => {
+      const typed = modelUrlInput.value.trim();
+      activeUrl = typed ? normalizeUrl(typed) : DEFAULT_URL;
+      const okMsg = typed ? "✅ 입력한 모델이 적용되었습니다!" : "✅ 기본 모델이 적용되었습니다!";
+
+      if (webcamRunning) {
+        // 이미 카메라가 켜진 상태면 새 모델을 바로 불러와서 교체
+        setMsg("⏳ 새 모델 적용 중…", "msg-pending");
+        btnApplyUrl.disabled = true;
+        try {
+          await loadModel(activeUrl);
+          setMsg(okMsg, "msg-ok");
+        } catch (e) {
+          console.error("Model load failed:", e);
+          setMsg("❌ 모델 로드 실패 — URL을 확인하세요", "msg-error");
+        } finally {
+          btnApplyUrl.disabled = false;
+        }
+      } else {
+        // 아직 시작 전이면 URL만 저장 (추리 확인하기 누를 때 로드됨)
+        setMsg(okMsg, "msg-ok");
+      }
+    });
+
+    // 🔧 "초기화" 버튼: 빈칸으로 비우고 기본 모델로 (실행 중이면 즉시 교체)
+    btnResetUrl.addEventListener("click", async () => {
+      modelUrlInput.value = "";
+      activeUrl = DEFAULT_URL;
+
+      if (webcamRunning) {
+        setMsg("⏳ 기본 모델 적용 중…", "msg-pending");
+        btnResetUrl.disabled = true;
+        try {
+          await loadModel(activeUrl);
+          setMsg("✅ 기본 모델로 초기화되었습니다", "msg-ok");
+        } catch (e) {
+          console.error("Model load failed:", e);
+          setMsg("❌ 모델 로드 실패", "msg-error");
+        } finally {
+          btnResetUrl.disabled = false;
+        }
+      } else {
+        setMsg(PROMPT_MSG, "msg-idle");
+      }
+    });
+
+    // 🔧 입력칸을 고치면 "아직 적용 안 됨" 안내
+    modelUrlInput.addEventListener("input", () => {
+      if (modelUrlInput.value.trim()) {
+        setMsg("⚠️ 아직 적용 안 됨 — '적용'을 눌러주세요", "msg-pending");
+      } else {
+        setMsg(PROMPT_MSG, "msg-idle");
+      }
+    });
+
+    // 초기 상태: 안내 문구만 표시 (적용 문구 아님)
+    setMsg(PROMPT_MSG, "msg-idle");
 
     // 이미지 버튼 클릭 시 음악 재생 및 초기화
     btnStart.addEventListener("click", async () => {
@@ -54,18 +160,23 @@
 
     // 모델 로드 및 웹캠 시작
     async function init() {
+      if (webcamRunning) return; // 🔧 이미 시작했으면 중복 실행 방지
       btnStart.style.pointerEvents = 'none';
+
+      // 🔧 "적용"된 URL을 사용 (입력칸이 비어 있으면 기본 모델)
       try {
-        model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+        await loadModel(activeUrl);
       } catch (err) {
         console.error("Model load failed:", err);
         document.getElementById("status").textContent = "Model load failed";
+        setMsg("❌ 모델 로드 실패 — URL을 확인하세요", "msg-error");
+        btnStart.style.pointerEvents = 'auto'; // 🔧 실패 시 다시 누를 수 있게
         return;
       }
-      maxPredictions = model.getTotalClasses();
       webcam = new tmImage.Webcam(640, 480, true);
       await webcam.setup(); await webcam.play();
       document.getElementById("webcam-container").appendChild(webcam.canvas);
+      webcamRunning = true; // 🔧 실행 중 표시 (이후 '적용'은 즉시 모델 교체)
       window.requestAnimationFrame(loop);
     }
 
