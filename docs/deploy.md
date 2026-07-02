@@ -28,7 +28,7 @@ PowerShell 스크립트 실행 허용 설정. PC마다 한 번만 하면 됨.
 ### 1. GitHub에 올리기
 
 ```powershell
-cd C:\Users\pc\Documents\BREAK-OUT
+cd C:\Users\pc\Documents\break-out
 git add -A
 git commit -m "변경 내용 설명"
 git push

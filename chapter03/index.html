@@ -652,15 +652,17 @@
     }
   }
 
-  function populateGlyphGrid() {
+  function populateGlyphGrid(reviewMode = false) {
     ensureGlyphModalUI();
     glyphGridContainer.innerHTML = '';
     selectedGlyphs = [];
-    isAnswerPhase = false;
+    isAnswerPhase = reviewMode; // 리뷰 모드면 클릭 잠금
     const indices = glyphImageList.map((_, i) => i);
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
+    if (!reviewMode) {
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
     }
 
     indices.forEach((patternIndex) => {
@@ -675,9 +677,11 @@
       card.style.backgroundPosition = 'center';
       card.style.backgroundRepeat = 'no-repeat';
 
-      card.addEventListener('click', () =>
-        selectGlyph(imgInfo.key, card, patternIndex)
-      );
+      if (!reviewMode) {
+        card.addEventListener('click', () =>
+          selectGlyph(imgInfo.key, card, patternIndex)
+        );
+      }
 
       glyphGridContainer.appendChild(card);
     });
@@ -687,6 +691,40 @@
       resultMessage.classList.remove('show', 'correct', 'incorrect');
       resultMessage.textContent = '';
     }
+
+    if (reviewMode) {
+      // 정답 글리프를 순서대로 강조 표시
+      selectedGlyphs = correctOrder.map(idx => ({
+        pattern: glyphImageList[idx].key,
+        index: idx
+      }));
+
+      correctOrder.forEach((idx, order) => {
+        const card = glyphGridContainer.querySelector(`[data-index="${idx}"]`);
+        if (card) {
+          card.classList.add('selected');
+          card.setAttribute('data-order', order + 1);
+          card.style.boxShadow =
+            '0 0 30px rgba(0, 255, 150, 0.8), inset 0 0 20px rgba(0, 255, 150, 0.3)';
+          card.style.borderColor = '#00ff9a';
+        }
+      });
+
+      glyphGridContainer.querySelectorAll('.glyph-card').forEach(card => {
+        if (!correctOrder.includes(parseInt(card.dataset.index))) {
+          card.classList.add('disabled');
+        }
+      });
+
+      if (resultMessage) {
+        const answerLabels = correctOrder
+          .map((idx, i) => `${i + 1}. ${glyphImageList[idx].label}`)
+          .join('  →  ');
+        resultMessage.classList.add('show', 'correct');
+        resultMessage.textContent = `✅ 정답 순서: ${answerLabels}`;
+      }
+    }
+
     updateSelectionDisplay();
   }
 
@@ -812,7 +850,7 @@
   const diaryModalBody = document.getElementById('diaryModalBody');
   const diaryModalClose = document.getElementById('diaryModalClose');
 
-  function openDiaryModal(titleText){
+  function openDiaryModal(titleText, reviewMode = false){
     if (diaryModalBody) diaryModalBody.innerHTML = diaryTemplateHTML();
 
     diaryModal.classList.add('show');
@@ -821,7 +859,7 @@
     if (diaryModalClose) diaryModalClose.focus();
 
     // ✅ 다이어리 이벤트 바인딩(기존 함수 재사용)
-    initDiaryHandlers();
+    initDiaryHandlers(reviewMode);
   }
 
   function closeDiaryModal(){
@@ -849,8 +887,10 @@
   let slideBoard = [];
   
   let slidePuzzleInitialized = false;
+  let slideReviewMode = false;
 
   function initSlidePuzzle() {
+    slideReviewMode = false;
     slideBoard = Array.from({ length: TOTAL_TILES }, (_, idx) => idx);
     shuffleSlideBoard();
     slideResult.classList.remove('show', 'correct', 'incorrect');
@@ -898,7 +938,7 @@
       tile.className = 'slide-tile';
       tile.dataset.index = tileIndex;
 
-      if (tileIndex === EMPTY_TILE) {
+      if (tileIndex === EMPTY_TILE && !slideReviewMode) {
         tile.className += ' empty';
       } else {
         const row = Math.floor(tileIndex / SLIDE_COLS);
@@ -910,7 +950,9 @@
         tile.style.backgroundSize = `${SLIDE_COLS * 100}% ${SLIDE_ROWS * 100}%`;
       }
 
-      tile.addEventListener('click', () => handleSlideTileClick(pos));
+      if (!slideReviewMode) {
+        tile.addEventListener('click', () => handleSlideTileClick(pos));
+      }
       slideGrid.appendChild(tile);
     });
   }
@@ -940,12 +982,24 @@
     return Math.abs(ax - bx) + Math.abs(ay - by) === 1;
   }
 
-  function openSlideModal() {
-     if (!slidePuzzleInitialized) {
-      initSlidePuzzle();
+  function openSlideModal(reviewMode = false) {
+    slideReviewMode = reviewMode;
+    if (reviewMode) {
+      // 정답: 완성된 그림 표시 (조작 불가)
+      slideBoard = Array.from({ length: TOTAL_TILES }, (_, idx) => idx);
+      renderSlideBoard();
+      slideResult.textContent = '✅ 정답 — 복원된 코덱스 문양';
+      slideResult.classList.remove('incorrect');
+      slideResult.classList.add('show', 'correct');
+      if (resetSlideBtn) resetSlideBtn.style.display = 'none';
+    } else {
+      if (resetSlideBtn) resetSlideBtn.style.display = '';
+      if (!slidePuzzleInitialized) {
+        initSlidePuzzle();
       } else {
         renderSlideBoard();
       }
+    }
     slideModal.classList.add('show');
     slideModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -1512,7 +1566,7 @@ function openHintGate(hintId) {
       `;
     }
 
-    function initDiaryHandlers() {
+    function initDiaryHandlers(reviewMode = false) {
       const img = document.getElementById('diaryImage');
       const pageNumEl = document.getElementById('diaryPageNum');
       const prevBtn = document.getElementById('diaryPrev');
@@ -1561,7 +1615,7 @@ function openHintGate(hintId) {
           pageNumEl.textContent = String(currentPage + 1);
 
           completeBtn.style.display =
-            (currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
+            (!reviewMode && currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
 
           hideGate();
           hideFinalGate();
@@ -1632,7 +1686,7 @@ function openHintGate(hintId) {
         prevBtn.disabled = currentPage === 0;
         nextBtn.disabled = currentPage >= DIARY_TOTAL_PAGES - 1;
 
-        completeBtn.style.display = (currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
+        completeBtn.style.display = (!reviewMode && currentPage === DIARY_TOTAL_PAGES - 1) ? 'inline-flex' : 'none';
         completeBtn.textContent = '확인';
 
         hideGate();
@@ -1680,7 +1734,11 @@ function openHintGate(hintId) {
 
       nextBtn.addEventListener('click', () => {
         if (currentPage >= DIARY_TOTAL_PAGES - 1) return;
-        showGate();
+        if (reviewMode) {
+          fadeToPage(currentPage + 1, 'next'); // 비밀번호 없이 바로 다음 장
+        } else {
+          showGate();
+        }
       });
 
       function attemptUnlockNext() {
@@ -1715,12 +1773,30 @@ function openHintGate(hintId) {
       });
 
       completeBtn.addEventListener('click', () => {
+        if (reviewMode) return;
         if (currentPage === DIARY_TOTAL_PAGES - 1) {
           showFinalGate();
         }
       });
 
       renderPage();
+
+      if (reviewMode) {
+        // 열람 모드: 모든 잠금 숨기고 안내 표시
+        hideGate();
+        if (finalGate) hideFinalGate();
+        completeBtn.style.display = 'none';
+
+        const viewer = document.querySelector('.diary-viewer');
+        if (viewer && !document.getElementById('diaryReviewNote')) {
+          const note = document.createElement('div');
+          note.id = 'diaryReviewNote';
+          note.style.cssText =
+            'margin-top:10px;text-align:center;color:var(--muted);font-weight:700;font-size:13px;';
+          note.textContent = '🔓 열람 모드 · 비밀번호 없이 ▶ 버튼으로 모든 페이지를 넘겨볼 수 있어요.';
+          viewer.appendChild(note);
+        }
+      }
     }
     
     const VITAL_GRID = [
@@ -1732,14 +1808,16 @@ function openHintGate(hintId) {
       ['1','4','3','0','5','4'],
     ];
 
-    function vitalTemplateHTML(){
+    function vitalTemplateHTML(reviewMode = false){
       let qCount = 0; // 물음표 순서 추적 (위 → 아래)
+      const qAnswers = ['3','0']; // 1번째 ?(빨강)=3, 2번째 ?(노랑)=0
 
       const cells = VITAL_GRID.flat().map((v) => {
         if (v === '?') {
           qCount += 1;
           const colorClass = qCount === 1 ? 'q-red' : 'q-yellow';
-          return `<div class="key-cell is-q ${colorClass}">?</div>`;
+          const shown = reviewMode ? qAnswers[qCount - 1] : '?';
+          return `<div class="key-cell is-q ${colorClass}">${shown}</div>`;
         }
         return `<div class="key-cell">${v}</div>`;
       }).join('');
@@ -1781,7 +1859,7 @@ function openHintGate(hintId) {
       `;
     }
 
-    function initVitalKeyPuzzle(){
+    function initVitalKeyPuzzle(reviewMode = false){
       const redEl = document.getElementById('vitalKeyInputRed');
       const yellowEl = document.getElementById('vitalKeyInputYellow');
       const btn = document.getElementById('vitalKeyBtn');
@@ -1792,6 +1870,15 @@ function openHintGate(hintId) {
         msg.classList.toggle('correct', !!ok);
         msg.classList.toggle('incorrect', !ok);
         msg.textContent = text;
+      }
+
+      if (reviewMode) {
+        // 정답을 채워서 보여주고 입력 잠금
+        if (redEl) { redEl.value = '3'; redEl.disabled = true; }
+        if (yellowEl) { yellowEl.value = '0'; yellowEl.disabled = true; }
+        if (btn) btn.disabled = true;
+        setMsg(true, '✅ 정답: KEY = 03  (빨강 = 3, 노랑 = 0)');
+        return;
       }
 
       // 숫자 1자리만
@@ -1911,8 +1998,8 @@ function openHintGate(hintId) {
           </div>
 
           <p style="margin:10px 0 18px; color:var(--muted); font-weight:600; line-height:1.5;">
-            이전에 확인했던 QR을 다시 볼 수 있어요.<br>
-            필요한 QR을 선택해 스캔하세요.
+            이전에 확인했던 QR과 문제를 다시 볼 수 있어요.<br>
+            QR을 선택해 스캔하거나, 아래 버튼으로 문제를 다시 확인하세요.
           </p>
 
           <div style="
@@ -1936,7 +2023,10 @@ function openHintGate(hintId) {
             📌 필요한 QR을 선택해 스캔하세요.
           </div>
 
-          <div style="margin-top:8px;">
+          <div style="margin-top:8px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button class="btn" type="button" id="reviewProblemBtn">
+              📝 이전 문제 다시 보기
+            </button>
             <button class="btn" type="button"
               onclick="document.getElementById('modalClose').click()">
               닫기
@@ -1945,10 +2035,56 @@ function openHintGate(hintId) {
         </div>
       `;
 
+      const reviewProblemBtn = document.getElementById('reviewProblemBtn');
+      if (reviewProblemBtn) {
+        reviewProblemBtn.addEventListener('click', () => openPuzzleForReview(step));
+      }
+
       modal.classList.add('show');
       modal.setAttribute('aria-hidden','false');
       document.body.style.overflow = 'hidden';
       modalClose.focus();
+    }
+
+    // 완료한 기억의 '문제'를 다시 열어 확인할 수 있게 함 (완료 상태여도 재진입 허용)
+    function openPuzzleForReview(step){
+      const id = idForStep[step];
+      const data = (id && contents[id]) ? contents[id] : {};
+      const title = data.title || '문제';
+
+      // 완료 안내(공용) 모달 숨김
+      function hideSharedModal(){
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden','true');
+      }
+
+      if (step === 1) {
+        // 첫번째 기억: 문양 퍼즐 — 정답 표시
+        hideSharedModal();
+        populateGlyphGrid(true);
+        glyphGridModal.classList.add('show');
+        glyphGridModal.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        if (glyphModalClose) glyphModalClose.focus();
+      } else if (step === 2) {
+        // 두번째 기억: 다이어리 — 비밀번호 없이 열람
+        hideSharedModal();
+        lastFocusedCard = lastFocusedCard || document.getElementById('memory');
+        openDiaryModal(title, true);
+      } else if (step === 3) {
+        // 세번째 기억: 키패드 퍼즐 — 정답 표시 (공용 모달 재사용)
+        modalTitle.textContent = title;
+        modalBody.innerHTML = vitalTemplateHTML(true);
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        if (modalClose) modalClose.focus();
+        initVitalKeyPuzzle(true);
+      } else if (step === 4) {
+        // 네번째 기억: 슬라이드 퍼즐 — 완성된 그림 표시
+        hideSharedModal();
+        openSlideModal(true);
+      }
     }
 
     function openModalFor(id){
