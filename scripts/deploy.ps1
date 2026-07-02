@@ -115,7 +115,7 @@ if ($LASTEXITCODE -ne 0) {
 # cache bust: upload and run script
 $bustScript = Join-Path $ProjectRoot "scripts\cache-bust.sh"
 scp -i $KEY $bustScript "${SSH_TARGET}:/tmp/cache-bust.sh" 2>&1 | Out-Null
-$bustOut = ssh -i $KEY $SSH_TARGET "sed -i 's/\r\$//' /tmp/cache-bust.sh && bash /tmp/cache-bust.sh $ts $RemoteDir && rm /tmp/cache-bust.sh" 2>&1
+$bustOut = ssh -i $KEY $SSH_TARGET "sed -i 's/\r`$//' /tmp/cache-bust.sh && bash /tmp/cache-bust.sh $ts $RemoteDir && rm /tmp/cache-bust.sh" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[ERROR] Cache bust failed" -ForegroundColor Red
     Write-Host "  $bustOut" -ForegroundColor DarkGray
