@@ -29,8 +29,8 @@ if (-not (Test-Path $KEY)) {
     exit 1
 }
 
-# -- git commit + push --
-Write-Host "[1/7] Git commit & push..." -ForegroundColor Cyan
+# -- git sync: commit -> pull --rebase -> push --
+Write-Host "[1/7] Git sync (commit + pull + push)..." -ForegroundColor Cyan
 Push-Location $ProjectRoot
 $changes = git status --porcelain
 if ($changes) {
@@ -46,6 +46,18 @@ if ($changes) {
 } else {
     Write-Host "  no changes to commit" -ForegroundColor Green
 }
+
+# pull first so a deploy from this PC never overwrites another PC's pushed work
+$pullOut = git pull --rebase 2>&1
+if ($LASTEXITCODE -ne 0) {
+    git rebase --abort 2>&1 | Out-Null
+    Pop-Location
+    Write-Host "[ERROR] git pull failed - GitHub의 변경과 충돌. 직접 해결 후 다시 배포하세요." -ForegroundColor Red
+    Write-Host "  $pullOut" -ForegroundColor DarkGray
+    exit 1
+}
+Write-Host "  pulled (GitHub 최신과 동기화됨)" -ForegroundColor Green
+
 $pushOut = git push 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "  [WARN] git push failed (deploy continues)" -ForegroundColor Yellow
