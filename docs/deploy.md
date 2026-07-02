@@ -25,24 +25,16 @@ PowerShell 스크립트 실행 허용 설정. PC마다 한 번만 하면 됨.
 
 ## 배포 순서
 
-### 1. GitHub에 올리기
+배포 스크립트 하나로 **git 커밋 + push + 서버 반영 + 검증**까지 자동으로 처리됩니다.
 
 ```powershell
-cd C:\Users\pc\Documents\break-out
-git add -A
-git commit -m "변경 내용 설명"
-git push
+cd C:\Users\pc\Documents\BREAK-OUT
+.\scripts\deploy.ps1 -Message "변경 내용 설명"
 ```
 
-### 2. 서버에 반영하기
-
-```powershell
-.\scripts\deploy.ps1
-```
-
-### 3. 확인
-
-https://breakout.doroedu.co.kr 접속해서 확인.
+- `-Message`를 생략하면 `deploy 2026-07-02 11:30` 형식의 기본 메시지로 커밋됩니다.
+- 변경사항이 없으면 커밋은 건너뛰고 배포만 진행합니다.
+- 마지막에 사이트 주요 URL이 정상(200)인지 자동 확인하고, 실패 시 빨간 에러가 표시됩니다.
 
 ---
 

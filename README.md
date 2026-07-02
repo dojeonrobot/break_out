@@ -10,7 +10,7 @@
 index.html 더블 클릭 → 메인 대시보드 → 챕터 카드 클릭 → 각 미션 시작
 ```
 
-> ⚠️ Chapter 03은 **웹캠**과 **Web Serial API**를 사용하므로 Chrome/Edge 브라우저를 권장합니다.
+> ⚠️ Chapter 02는 **웹캠**과 **Web Serial API**를 사용하므로 Chrome/Edge 브라우저를 권장합니다.
 
 ## 프로젝트 구조
 
@@ -24,16 +24,17 @@ BREAK-OUT/
 │   ├── images/             ← 미션/힌트 이미지 (001~014)
 │   └── docs/               ← PDF 교사자료
 │
-├── chapter02/              ← 하모니아 구역: 머지큐브 속 비밀
+├── chapter02/              ← 하모니아 구역: AI 이상감지 시스템
 │   ├── index.html
 │   ├── styles.css
-│   ├── images/             ← diary, cubes, patterns, missions, icons, qr
-│   └── audio/              ← BGM + 음계 사운드
+│   ├── images/
+│   └── audio/
 │
-└── chapter03/              ← 회전목마 구역: AI 이상감지 시스템
+└── chapter03/              ← 회전목마 구역: 머지큐브 속 비밀
     ├── index.html
-    ├── images/
-    └── audio/
+    ├── styles.css
+    ├── images/             ← diary, cubes, patterns, missions, icons, qr
+    └── audio/              ← BGM + 음계 사운드
 ```
 
 ## 챕터 소개
