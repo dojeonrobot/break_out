@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     BREAK-OUT deploy script (git commit + push + server deploy)
 
@@ -90,8 +90,19 @@ $excludes = @(
     "--exclude=docs",
     "--exclude=*.tar.gz",
     "--exclude=*.pem",
-    "--exclude=CLAUDE.md"
+    "--exclude=CLAUDE.md",
+    "--exclude=desktop.ini",
+    "--exclude=Thumbs.db"
 )
+
+# Windows read-only folders (e.g. from a desktop.ini icon customization) get
+# archived as dr-xr-xr-x, which makes extraction on the server fail.
+Get-ChildItem -Path $ProjectRoot -Recurse -Directory -Force -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -notmatch '\\\.git\\?' -and ($_.Attributes -band [IO.FileAttributes]::ReadOnly) } |
+    ForEach-Object {
+        Write-Host "  clearing read-only attribute: $($_.FullName)" -ForegroundColor Yellow
+        attrib -R $_.FullName
+    }
 
 Push-Location $ProjectRoot
 tar -czf $tarFile $excludes -C $ProjectRoot .
@@ -116,10 +127,23 @@ if ($LASTEXITCODE -ne 0) {
 # -- extract + permission + cache bust --
 Write-Host "[6/7] Deploying..." -ForegroundColor Cyan
 $ts = [int](Get-Date -UFormat %s)
-$deployOut = ssh -i $KEY $SSH_TARGET "chmod -R u+rwX ${RemoteDir} && rm -rf ${RemoteDir}/* && cd ${RemoteDir} && tar -xzf /tmp/breakout-deploy.tar.gz --no-same-permissions && rm /tmp/breakout-deploy.tar.gz && chmod 755 /home/ubuntu && chmod -R 755 ${RemoteDir}" 2>&1
+# Unpack into a staging dir and swap it in only on success, so a failed extract
+# never leaves the live site emptied out.
+$remoteCmd = @(
+    "rm -rf ${RemoteDir}.new",
+    "mkdir -p ${RemoteDir}.new",
+    "tar -xzf /tmp/breakout-deploy.tar.gz -C ${RemoteDir}.new --no-same-permissions --delay-directory-restore",
+    "rm -f /tmp/breakout-deploy.tar.gz",
+    "chmod -R u+rwX ${RemoteDir}",
+    "rm -rf ${RemoteDir}",
+    "mv ${RemoteDir}.new ${RemoteDir}",
+    "chmod 755 /home/ubuntu",
+    "chmod -R 755 ${RemoteDir}"
+) -join " && "
+$deployOut = ssh -i $KEY $SSH_TARGET $remoteCmd 2>&1
 if ($LASTEXITCODE -ne 0) {
     Remove-Item $tarFile -ErrorAction SilentlyContinue
-    Write-Host "[ERROR] Server deploy step failed" -ForegroundColor Red
+    Write-Host "[ERROR] Server deploy step failed (live site left untouched)" -ForegroundColor Red
     Write-Host "  $deployOut" -ForegroundColor DarkGray
     exit 1
 }
