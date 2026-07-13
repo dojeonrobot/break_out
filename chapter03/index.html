@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
@@ -375,15 +375,6 @@
       for (let step = 1; step <= 4; step++) {
         localStorage.removeItem(`${CHAPTER_KEY}_step_${step}_solved`);
       }
-      ['hintHud','hintMemory','hintVital'].forEach(id=>{
-        localStorage.removeItem(`doro_hint_unlocked_${id}`);
-      });
-          
-      localStorage.removeItem('doro_hint_unlocked_hintMemory_1');
-      localStorage.removeItem('doro_hint_unlocked_hintMemory_2');
-      localStorage.removeItem('doro_hint_unlocked_hintVital_1');
-      localStorage.removeItem('doro_hint_unlocked_hintVital_2');
-
     }
 
     function isReloadNavigation() {
@@ -1023,225 +1014,9 @@
       hud:{ title:'첫번째 기억', type:'glyph' },
       memory:{ title:'두번째 기억', type:'diary' },
       vital:{ title:'세번째 기억', type:'keyPuzzle' },
-      tracker:{ title:'네번째 기억', type:'slide' },
-      hintHud:{ title:'첫번째 기억 힌트', html:'<p>무슨 힌트를 줄까</p>' },
-      hintMemory:{ title:'두번째 기억 힌트', html:'<p>무슨 힌트를 줄까.</p>' },
-      hintVital:{ title:'세번째 기억 힌트', html:'<p>무슨 힌트를 줄까.</p>' }
+      tracker:{ title:'네번째 기억', type:'slide' }
     };
 
-    // 힌트 정답
-    const HINT_PASSWORDS = {
-      hintHud: '4849', //1
-      hintMemory_1: '3933', //2-1
-      hintMemory_2: '7281', //2-2
-      hintVital_1: '5838', //3-1
-      hintVital_2: '1602' //3-2
-    };
-
-    const HINT_CONTENTS = {
-      hintHud: `
-        <div style="
-          background:rgba(10,18,34,0.45);
-          border:1px solid rgba(41,216,255,0.25);
-          border-radius:14px;
-          padding:20px 22px;
-          text-align:center;
-        ">
-          <div style="
-            font-size:20px;
-            font-weight:800;
-            margin-bottom:12px;
-          ">
-            🎼 하모니아의 악보 분석 결과
-          </div>
-
-          <p style="
-            line-height:1.7;
-            margin:0;
-            font-size:16px;
-            font-weight:600;
-          ">
-            두 악보를 비교해보니<br>
-            <span style="color:#ff7a00; font-weight:800;">
-              비어있는 음
-            </span>이 있어요.<br><br>
-
-            동물을 클릭해 각 음에 해당하는 <b>번호</b>를 찾고<br>
-            <span style="color:#6be3ff; font-weight:800;">
-              키패드
-            </span>에 입력해주세요.
-          </p>
-        </div>
-
-        <div style="
-          margin-top:14px;
-          font-size:14px;
-          font-weight:700;
-          color:#ff9f43;
-          text-align:center;
-        ">
-          👉 동물을 하나씩 클릭해보세요
-        </div>
-      `,
-      hintMemory_1: `
-        <div style="
-          background:rgba(10,18,34,0.45);
-          border:1px solid rgba(41,216,255,0.25);
-          border-radius:14px;
-          padding:20px 22px;
-          text-align:center;
-        ">
-          <div style="
-            font-size:20px;
-            font-weight:800;
-            margin-bottom:12px;
-          ">
-            🌸 첫번째 큐브 관찰 포인트
-          </div>
-
-          <p style="
-            line-height:1.7;
-            margin:0;
-            font-size:16px;
-            font-weight:600;
-          ">
-            첫번째 큐브 곳곳에 숨겨진<br>
-            <span style="color:#ff7a00; font-weight:800;">
-              꽃
-            </span>을 찾아보세요.<br><br>
-
-            보이는 꽃의 <b>개수</b>를 세어보는 것이 중요해요.
-          </p>
-        </div>
-
-        <div style="
-          margin-top:14px;
-          font-size:14px;
-          font-weight:700;
-          color:#ff9f43;
-          text-align:center;
-        ">
-          👉 큐브를 천천히 돌려보세요
-        </div>
-      `,
-
-      hintMemory_2: `
-        <div style="
-          background:rgba(10,18,34,0.45);
-          border:1px solid rgba(41,216,255,0.25);
-          border-radius:14px;
-          padding:20px 22px;
-          text-align:center;
-        ">
-          <div style="
-            font-size:20px;
-            font-weight:800;
-            margin-bottom:12px;
-          ">
-            🏗 공사장 인부들의 이야기
-          </div>
-
-          <p style="
-            line-height:1.7;
-            margin:0;
-            font-size:16px;
-            font-weight:600;
-          ">
-            공사장 인부들의 <b>퀴즈</b>를 통해<br>
-            일기장에 적힌 <span style="color:#6be3ff; font-weight:800;">
-              소장님의 이야기
-            </span>를 들어보세요.<br><br>
-
-            여러 선택지 중<br>
-            <b>소장님의 마음에 쏙 드는 답변</b>이 있어요.
-          </p>
-        </div>
-
-        <div style="
-          margin-top:14px;
-          font-size:14px;
-          font-weight:700;
-          color:#ff9f43;
-          text-align:center;
-        ">
-          👉 인부들의 퀴즈를 풀면서 일기장을 확인해보세요
-        </div>
-      `,
-       hintVital_1: `
-        <div style="
-          background:rgba(10,18,34,0.45);
-          border:1px solid rgba(41,216,255,0.25);
-          border-radius:14px;
-          padding:20px 22px;
-          text-align:center;
-        ">
-          <div style="font-size:20px; font-weight:800; margin-bottom:12px;">
-            🧬 바이러스 코드 힌트
-          </div>
-
-          <p style="line-height:1.7; margin:0; font-size:16px; font-weight:600;">
-            배열 속에 있는 <span style="color:#ff7a00; font-weight:800;">6개의 숫자</span>는<br>
-            <b>모두 동일한 개수</b>만큼 등장해요.
-          </p>
-        </div>
-
-        <div style="
-          margin-top:14px;
-          font-size:14px;
-          font-weight:700;
-          color:#ff9f43;
-          text-align:center;
-        ">
-          👉 같은 숫자가 몇 번씩 나오는지 세어보세요
-        </div>
-      `,
-      hintVital_2: `
-        <div style="
-          background:rgba(10,18,34,0.45);
-          border:1px solid rgba(41,216,255,0.25);
-          border-radius:14px;
-          padding:20px 22px;
-          text-align:center;
-        ">
-          <div style="
-            font-size:20px;
-            font-weight:800;
-            margin-bottom:12px;
-          ">
-            📡 고장난 전광판의 신호
-          </div>
-
-          <p style="
-            line-height:1.7;
-            margin:0;
-            font-size:16px;
-            font-weight:600;
-          ">
-            고장난 전광판에는<br>
-            <span style="color:#ff7a00; font-weight:800;">
-              SIGNAL
-            </span>이 필요합니다.<br><br>
-
-            ‘SIGNAL’을 찾아 전광판을 클릭해보세요.<br>
-            웹에서 얻은 <b>KEY</b>의 값만큼<br>
-            큐브 속 <span style="color:#6be3ff; font-weight:800;">
-              KEY
-            </span>를 눌러 원판을 돌려보세요.
-          </p>
-        </div>
-
-        <div style="
-          margin-top:14px;
-          font-size:14px;
-          font-weight:700;
-          color:#ff9f43;
-          text-align:center;
-        ">
-          👉 원판 속 SIGNAL에 해당하는 글자를 찾아보세요
-        </div>
-      `
-
-    };
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
@@ -1265,7 +1040,7 @@
     });
 
     // 두번째 기억 정답
-    const DIARY_PAGE_PASSWORDS = ['95','42','821','90','주사위','3'];
+    const DIARY_PAGE_PASSWORDS = ['','95','42','821','주사위','3'];
     const DIARY_FINAL_PASSWORD = 'evolution';
     const DIARY_TOTAL_PAGES = 7;
 
@@ -1279,248 +1054,28 @@
       './images/diary/Diary7.png'
     ];
 
-function openHintGate(hintId) {
-  const titleMap = {
-    hintHud: '첫번째 큐브 힌트',
-    hintMemory: '두번째 큐브 힌트',
-    hintVital: '세번째 큐브 힌트'
-  };
-  modalTitle.textContent = titleMap[hintId] || '힌트';
+    function openHintGate(hintId) {
+      const titleMap = {
+        hintHud: '첫번째 큐브 힌트',
+        hintMemory: '두번째 큐브 힌트',
+        hintVital: '세번째 큐브 힌트'
+      };
+      modalTitle.textContent = titleMap[hintId] || '힌트';
 
-  // 공통: 모달 오픈
-  function openModalShell() {
-    modal.classList.add('show');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    modalClose.focus();
-  }
-
-  // ✅ 1) 첫번째 힌트(단일)
-  if (hintId === 'hintHud') {
-    const storageKey = `doro_hint_unlocked_${hintId}`;
-    const alreadyUnlocked = localStorage.getItem(storageKey) === '1';
-
-    if (alreadyUnlocked) {
-      modalBody.innerHTML = HINT_CONTENTS[hintId] || '<p>힌트가 준비되지 않았습니다.</p>';
-      openModalShell();
-      return;
-    }
-
-    modalBody.innerHTML = `
-      <div style="text-align:center;">
-        <p style="margin:0 0 12px; color: var(--muted); font-weight:600; line-height:1.5;">
-          비밀번호를 입력하면 힌트를 볼 수 있어요.<br>
-          <span style="color:#ff7a00; font-size:20px; letter-spacing:0.3px;">
-            SIGNAL BREAK BOX에 있는 지령을 수행하세요.
-          </span>
-        </p>
-
-        <div style="display:flex; gap:10px; justify-content:center; align-items:center;">
-          <input id="hintPassInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호" />
-          <button id="hintPassBtn" class="diary-pass-btn" type="button">확인</button>
-        </div>
-        <div id="hintPassMsg" class="result-message" style="margin-top:12px;"></div>
-      </div>
-    `;
-    openModalShell();
-
-    const input = document.getElementById('hintPassInput');
-    const btn = document.getElementById('hintPassBtn');
-    const msg = document.getElementById('hintPassMsg');
-
-    function setMsg(ok, text) {
-      msg.classList.add('show');
-      msg.classList.toggle('correct', !!ok);
-      msg.classList.toggle('incorrect', !ok);
-      msg.textContent = text;
-    }
-
-    function submitHint() {
-      const v = (input.value || '').trim();
-      if (v === (HINT_PASSWORDS[hintId] || '')) {
-        setMsg(true, '✅ 힌트가 열렸습니다!');
-        localStorage.setItem(storageKey, '1');
-        setTimeout(() => {
-          modalBody.innerHTML = HINT_CONTENTS[hintId] || '<p>힌트가 준비되지 않았습니다.</p>';
-        }, 700);
-      } else {
-        setMsg(false, '❌ 비밀번호가 틀렸습니다.');
-        input.focus(); input.select();
-      }
-    }
-
-    btn.addEventListener('click', submitHint);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitHint(); });
-    input.focus();
-    return;
-  }
-
-  // ✅ 공통: 2단계 힌트 렌더러 (2번/3번 똑같이 사용)
-  function renderTwoStepHint(options) {
-    const {
-      titleText,
-      tab1Label, tab2Label,
-      stepKey1, stepKey2,   // HINT_CONTENTS 키
-      passKey1, passKey2,   // HINT_PASSWORDS 키
-      storageKey1, storageKey2,
-      defaultTab = '1'
-    } = options;
-
-    modalTitle.textContent = titleText;
-
-    const u1 = localStorage.getItem(storageKey1) === '1';
-    const u2 = localStorage.getItem(storageKey2) === '1';
-    const step2Enabled = u1;
-
-    modalBody.innerHTML = `
-      <div style="text-align:center;">
-        <p style="margin:0 0 14px; color: var(--muted); font-weight:600; line-height:1.5;">
-          비밀번호를 입력하면 힌트를 볼 수 있어요.<br>
-          <span style="color:#ff7a00; font-size:20px; letter-spacing:0.3px;">
-            SIGNAL BREAK BOX에 있는 지령을 수행하세요.
-          </span>
-        </p>
-
-        <div style="display:flex; justify-content:center; gap:10px; margin-bottom:14px;">
-          <button id="tab1" class="diary-pass-btn" type="button"
-            style="padding:10px 14px; opacity:${u1 ? '1' : '0.95'};">
-            ${tab1Label} ${u1 ? '✅' : ''}
-          </button>
-          <button id="tab2" class="diary-pass-btn" type="button"
-            ${step2Enabled ? '' : 'disabled'}
-            style="padding:10px 14px; opacity:${step2Enabled ? (u2 ? '1' : '0.7') : '0.35'};">
-            ${tab2Label} ${u2 ? '✅' : ''}
-          </button>
-        </div>
-
-        <div id="panel" style="text-align:left; max-width:520px; margin:0 auto;"></div>
-      </div>
-    `;
-    openModalShell();
-
-    const panel = document.getElementById('panel');
-    const tab1 = document.getElementById('tab1');
-    const tab2 = document.getElementById('tab2');
-
-    function showUnlocked(stepKey) {
-      panel.innerHTML = `
-        <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px;">
-          ${HINT_CONTENTS[stepKey] || '<p>힌트가 준비되지 않았습니다.</p>'}
-        </div>
-      `;
-    }
-
-    function showGate(stepKey, passKey, storageKey, nextTab) {
-      panel.innerHTML = `
-        <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px;">
-          <div style="font-weight:800; margin-bottom:10px; color:var(--text);">
-            비밀번호를 입력하세요
-          </div>
-          <div style="display:flex; gap:10px; align-items:center;">
-            <input id="passInput" class="diary-pass" type="text" inputmode="text" placeholder="비밀번호" />
-            <button id="passBtn" class="diary-pass-btn" type="button">확인</button>
-          </div>
-          <div id="passMsg" class="result-message" style="margin-top:12px;"></div>
+      modalBody.innerHTML = `
+        <div style="text-align:center; padding:22px 6px;">
+          <p style="margin:0; color:var(--text); font-weight:700; font-size:17px; line-height:1.7;">
+            아직 힌트를 확인할 수 없어요.<br>
+            <span style="color:#ff7a00;">미션을 받아서 먼저 깨보세요!</span>
+          </p>
         </div>
       `;
 
-      const input = document.getElementById('passInput');
-      const btn = document.getElementById('passBtn');
-      const msg = document.getElementById('passMsg');
-
-      function setMsg(ok, text) {
-        msg.classList.add('show');
-        msg.classList.toggle('correct', !!ok);
-        msg.classList.toggle('incorrect', !ok);
-        msg.textContent = text;
-      }
-
-      function submit() {
-        const v = (input.value || '').trim();
-        if (v === (HINT_PASSWORDS[passKey] || '')) {
-          setMsg(true, '✅ 힌트가 열렸습니다!');
-          localStorage.setItem(storageKey, '1');
-          setTimeout(() => {
-            // ✅ 방금 푼 탭 유지
-            renderTwoStepHint({ ...options, defaultTab: nextTab });
-          }, 600);
-        } else {
-          setMsg(false, '❌ 비밀번호가 틀렸습니다.');
-          input.focus(); input.select();
-        }
-      }
-
-      btn.addEventListener('click', submit);
-      input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submit(); });
-      input.focus();
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      modalClose.focus();
     }
-
-    function openStep1() {
-      const unlocked = localStorage.getItem(storageKey1) === '1';
-      if (unlocked) showUnlocked(stepKey1);
-      else showGate(stepKey1, passKey1, storageKey1, '1');
-    }
-
-    function openStep2() {
-      const enabled = localStorage.getItem(storageKey1) === '1';
-      if (!enabled) {
-        panel.innerHTML = `
-          <div style="background:rgba(10,18,34,0.35); border:1px solid rgba(41,216,255,0.18); border-radius:12px; padding:16px; text-align:center;">
-            <div style="font-weight:800; margin-bottom:8px;">🔒 아직 잠겨있어요.</div>
-            <div style="color:var(--muted); font-weight:600;">먼저 <b>${tab1Label}</b>을 열어주세요.</div>
-          </div>
-        `;
-        return;
-      }
-
-      const unlocked = localStorage.getItem(storageKey2) === '1';
-      if (unlocked) showUnlocked(stepKey2);
-      else showGate(stepKey2, passKey2, storageKey2, '2');
-    }
-
-    tab1.addEventListener('click', openStep1);
-    tab2.addEventListener('click', openStep2);
-
-    // ✅ 기본 탭 선택
-    if (defaultTab === '2') openStep2();
-    else openStep1();
-  }
-
-  // ✅ 2) 두번째 힌트(단계형)
-  if (hintId === 'hintMemory') {
-    renderTwoStepHint({
-      titleText: '두번째 큐브 힌트',
-      tab1Label: '힌트 2-1',
-      tab2Label: '힌트 2-2',
-      stepKey1: 'hintMemory_1',
-      stepKey2: 'hintMemory_2',
-      passKey1: 'hintMemory_1',
-      passKey2: 'hintMemory_2',
-      storageKey1: 'doro_hint_unlocked_hintMemory_1',
-      storageKey2: 'doro_hint_unlocked_hintMemory_2',
-      defaultTab: '1'
-    });
-    return;
-  }
-
-  // ✅ 3) 세번째 힌트(단계형)
-  if (hintId === 'hintVital') {
-    renderTwoStepHint({
-      titleText: '세번째 큐브 힌트',
-      tab1Label: '힌트 3-1',
-      tab2Label: '힌트 3-2',
-      stepKey1: 'hintVital_1',
-      stepKey2: 'hintVital_2',
-      passKey1: 'hintVital_1',
-      passKey2: 'hintVital_2',
-      storageKey1: 'doro_hint_unlocked_hintVital_1',
-      storageKey2: 'doro_hint_unlocked_hintVital_2',
-      defaultTab: '1'
-    });
-    return;
-  }
-}
-
 
     function diaryTemplateHTML() {
       return `
@@ -1736,6 +1291,8 @@ function openHintGate(hintId) {
         if (currentPage >= DIARY_TOTAL_PAGES - 1) return;
         if (reviewMode) {
           fadeToPage(currentPage + 1, 'next'); // 비밀번호 없이 바로 다음 장
+        } else if (!DIARY_PAGE_PASSWORDS[currentPage]) {
+          fadeToPage(currentPage + 1, 'next');
         } else {
           showGate();
         }
