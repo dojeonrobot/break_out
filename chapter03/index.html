@@ -356,6 +356,7 @@
   </div>
   <script>
     const CHAPTER_KEY = 'doro_ch3_v1';
+    const DIARY_PROGRESS_KEY = `${CHAPTER_KEY}_diary_page`;
     const patternURL = './images/patterns/codex_pattern.png';
     const webtoonModal = document.getElementById('webtoonModal');
     const QR_FOR_STEP = {
@@ -375,6 +376,7 @@
       for (let step = 1; step <= 4; step++) {
         localStorage.removeItem(`${CHAPTER_KEY}_step_${step}_solved`);
       }
+      localStorage.removeItem(DIARY_PROGRESS_KEY);
     }
 
     function isReloadNavigation() {
@@ -1139,6 +1141,12 @@
       const finalMsg = document.getElementById('diaryFinalMsg');
 
       let currentPage = 0;
+      if (!reviewMode) {
+        const savedDiaryPage = parseInt(localStorage.getItem(DIARY_PROGRESS_KEY) || '0', 10);
+        if (!Number.isNaN(savedDiaryPage) && savedDiaryPage >= 0 && savedDiaryPage < DIARY_TOTAL_PAGES) {
+          currentPage = savedDiaryPage;
+        }
+      }
       let nextPending = false;
       
       const frame = document.querySelector('.diary-frame');
@@ -1165,6 +1173,9 @@
 
         setTimeout(() => {
           currentPage = nextPageIndex;
+          if (!reviewMode) {
+            localStorage.setItem(DIARY_PROGRESS_KEY, String(currentPage));
+          }
           img.src = DIARY_PAGES[currentPage];
           img.alt = `Diary page ${currentPage + 1}`;
           pageNumEl.textContent = String(currentPage + 1);
@@ -1261,6 +1272,7 @@
             finalMsg.classList.remove('incorrect');
             finalMsg.classList.add('correct');
             finalMsg.textContent = '✅ 비밀번호가 맞습니다!';
+            localStorage.removeItem(DIARY_PROGRESS_KEY);
 
             setTimeout(() => {
               hideFinalGate();
@@ -1804,6 +1816,7 @@
       for(let step=1; step<=4; step++){
         localStorage.removeItem(`${CHAPTER_KEY}_step_${step}_solved`);
       }
+      localStorage.removeItem(DIARY_PROGRESS_KEY);
       location.reload();
     }
 

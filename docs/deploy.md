@@ -29,7 +29,7 @@ PowerShell 스크립트 실행 허용 설정. PC마다 한 번만 하면 됨.
 
 ```powershell
 cd C:\Users\pc\Documents\BREAK-OUT
-.\scripts\deploy.ps1 -Message "변경 내용 설명"
+  
 ```
 
 - `-Message`를 생략하면 `deploy 2026-07-02 11:30` 형식의 기본 메시지로 커밋됩니다.
