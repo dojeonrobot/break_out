@@ -117,10 +117,11 @@
   .badge-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px}
   .badge-card{
     position:relative; overflow:hidden;
-    border:1px solid var(--border); border-radius:16px; padding:18px 16px 16px 58px; background:linear-gradient(160deg,#F7FAFF,#fff);
-    box-shadow:0 3px 10px rgba(20,32,54,.06); text-align:center; min-height:228px;
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    border:1px solid var(--border); border-radius:16px; padding:0; background:linear-gradient(160deg,#F7FAFF,#fff);
+    box-shadow:0 3px 10px rgba(20,32,54,.06);
+    display:flex; align-items:center; justify-content:center;
   }
+  .bc-img{display:block; width:100%; height:auto; object-fit:contain}
   .bc-strip{
     position:absolute; left:0; top:0; bottom:0; width:42px;
     display:flex; align-items:center; justify-content:center;
@@ -2332,12 +2333,7 @@ function renderVaultBody(){
     }
     body.innerHTML = `<div class="badge-grid">` + BADGE_PEOPLE.map(p=>`
       <div class="badge-card">
-        <div class="bc-strip">${p.badge} · ${p.accessShort}</div>
-        <div class="bc-photo"><img src="images/chars/${p.en.toLowerCase()}.png" alt="${esc(p.ko)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span style="display:none">${IC_PERSON_BIG}</span></div>
-        <div class="bc-name">${p.ko}<span class="bc-en">${p.en}</span></div>
-        <div class="bc-kbadge">${p.areaKo}</div>
-        <div class="bc-title">${p.titleEn}</div>
-        <div class="bc-access">${p.access}</div>
+        <img class="bc-img" src="images/chars/${p.en.toLowerCase()}.png" alt="${esc(p.ko)} ${esc(p.badge)}" />
       </div>`).join('') + `</div>`;
   } else {
     const open = calendarUnlocked();

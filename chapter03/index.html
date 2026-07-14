@@ -139,6 +139,63 @@
       min-height: 0;
       white-space: nowrap;
     }
+
+    .diary-fullscreen-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(41, 216, 255, 0.35);
+      background: rgba(7, 10, 24, 0.6);
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 3;
+      backdrop-filter: blur(4px);
+    }
+    .diary-fullscreen-btn:hover {
+      background: rgba(7, 10, 24, 0.8);
+      border-color: rgba(41, 216, 255, 0.7);
+    }
+
+    .diary-fullscreen-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(2, 6, 12, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .diary-fullscreen-overlay.show {
+      display: flex;
+    }
+    .diary-fullscreen-overlay img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+    .diary-fullscreen-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .diary-fullscreen-close:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
   </style>
 </head>
 <body>
@@ -148,9 +205,7 @@
     <div class="container nav">
       <div class="logo">DOROLAND</div>
       <nav class="menu" aria-label="주요 섹션">
-        <button class="nav-btn" type="button" data-id="hintHud">첫번째 큐브 힌트</button>
-        <button class="nav-btn" type="button" data-id="hintMemory">두번째 큐브 힌트</button>
-        <button class="nav-btn" type="button" data-id="hintVital">세번째 큐브 힌트</button>
+        <button class="nav-btn" type="button" data-id="hint">힌트</button>
       </nav>
     </div>
   </header>
@@ -302,6 +357,11 @@
       </div>
       <div id="diaryModalBody" class="modal-body"></div>
     </div>
+  </div>
+
+  <div id="diaryFullscreenOverlay" class="diary-fullscreen-overlay" aria-hidden="true">
+    <button id="diaryFullscreenClose" class="diary-fullscreen-close" type="button" aria-label="닫기">✕</button>
+    <img id="diaryFullscreenImage" src="" alt="">
   </div>
 
   <div id="completeModal" class="modal webtoon-modal" role="dialog" aria-modal="true" aria-hidden="true">
@@ -866,6 +926,27 @@
   if (diaryModalClose) diaryModalClose.addEventListener('click', closeDiaryModal);
   if (diaryModal) diaryModal.addEventListener('click', (e)=>{ if (e.target === diaryModal) closeDiaryModal(); });
 
+  const diaryFullscreenOverlay = document.getElementById('diaryFullscreenOverlay');
+  const diaryFullscreenImage = document.getElementById('diaryFullscreenImage');
+  const diaryFullscreenClose = document.getElementById('diaryFullscreenClose');
+
+  function openDiaryFullscreen(src, alt){
+    if (!diaryFullscreenOverlay || !diaryFullscreenImage) return;
+    diaryFullscreenImage.src = src;
+    diaryFullscreenImage.alt = alt || '';
+    diaryFullscreenOverlay.classList.add('show');
+    diaryFullscreenOverlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeDiaryFullscreen(){
+    if (!diaryFullscreenOverlay) return;
+    diaryFullscreenOverlay.classList.remove('show');
+    diaryFullscreenOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  if (diaryFullscreenClose) diaryFullscreenClose.addEventListener('click', closeDiaryFullscreen);
+  if (diaryFullscreenOverlay) diaryFullscreenOverlay.addEventListener('click', (e)=>{ if (e.target === diaryFullscreenOverlay) closeDiaryFullscreen(); });
+
   const slideModal = document.getElementById('slideModal');
   const slideGrid = document.getElementById('slideGrid');
   const moveCountEl = document.getElementById('moveCount');
@@ -1033,6 +1114,7 @@
  
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
+        if (diaryFullscreenOverlay && diaryFullscreenOverlay.classList.contains('show')) { closeDiaryFullscreen(); return; }
         if (modal.classList.contains('show')) closeModal();
         if (glyphGridModal.classList.contains('show')) closeGlyphModal();
         if (diaryModal && diaryModal.classList.contains('show')) closeDiaryModal();
@@ -1056,20 +1138,19 @@
       './images/diary/Diary7.png'
     ];
 
-    function openHintGate(hintId) {
-      const titleMap = {
-        hintHud: '첫번째 큐브 힌트',
-        hintMemory: '두번째 큐브 힌트',
-        hintVital: '세번째 큐브 힌트'
-      };
-      modalTitle.textContent = titleMap[hintId] || '힌트';
+    function openHintGate() {
+      modalTitle.textContent = '힌트';
 
       modalBody.innerHTML = `
-        <div style="text-align:center; padding:22px 6px;">
-          <p style="margin:0; color:var(--text); font-weight:700; font-size:17px; line-height:1.7;">
+        <div style="background:rgba(10,18,34,0.45); border:1px solid rgba(41,216,255,0.25); border-radius:14px; padding:22px 20px; text-align:center;">
+          <div style="font-size:20px; font-weight:800; margin-bottom:12px;">💡 HINT</div>
+          <p style="line-height:1.7; margin:0; font-size:16px; font-weight:600;">
             아직 힌트를 확인할 수 없어요.<br>
-            <span style="color:#ff7a00;">미션을 받아서 먼저 깨보세요!</span>
+            <span style="color:#ff7a00; font-weight:800;">미션을 먼저 진행</span>해주세요!
           </p>
+        </div>
+        <div style="margin-top:14px; font-size:14px; font-weight:700; color:#ff9f43; text-align:center;">
+          👉 미션은 뒤편 운영데스크에서 받을 수 있어요!
         </div>
       `;
 
@@ -1084,6 +1165,7 @@
         <div class="diary-viewer">
           <div class="diary-frame">
             <img id="diaryImage" class="diary-image" src="${DIARY_PAGES[0]}" alt="Diary page 1">
+            <button id="diaryFullscreenBtn" class="diary-fullscreen-btn" type="button" aria-label="이미지 전체화면으로 보기">⛶</button>
              <div id="diaryFinalGate" class="diary-final-gate" aria-hidden="true">
           <div class="diary-final-card">
             <div class="diary-final-title">마지막 페이지 잠금</div>
@@ -1125,6 +1207,7 @@
 
     function initDiaryHandlers(reviewMode = false) {
       const img = document.getElementById('diaryImage');
+      const fullscreenBtn = document.getElementById('diaryFullscreenBtn');
       const pageNumEl = document.getElementById('diaryPageNum');
       const prevBtn = document.getElementById('diaryPrev');
       const nextBtn = document.getElementById('diaryNext');
@@ -1292,6 +1375,11 @@
           if (e.key === 'Enter') attemptFinalUnlock();
         });
 
+      if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+          openDiaryFullscreen(img.src, img.alt);
+        });
+      }
 
       prevBtn.addEventListener('click', () => {
         if (currentPage === 0) return;
@@ -1752,17 +1840,13 @@
     document.querySelectorAll('.nav-btn').forEach(btn=>{
       btn.addEventListener('click', e=>{
         lastFocusedCard = e.currentTarget;
-        const id = btn.dataset.id;
-        if (id && id.startsWith('hint')) openHintGate(id);
-        else openModalFor(id);
+        openHintGate();
       });
       btn.addEventListener('keydown', e=>{
         if(e.key==='Enter' || e.key===' '){
           e.preventDefault();
           lastFocusedCard = e.currentTarget;
-          const id = btn.dataset.id;
-          if (id && id.startsWith('hint')) openHintGate(id);
-          else openModalFor(id);
+          openHintGate();
         }
       });
     });
