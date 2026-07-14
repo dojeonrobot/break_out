@@ -232,21 +232,39 @@
         </div>
       </div>
 
-      <!-- Chapter 4 (잠김) -->
-      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 opacity-80" onclick="handleEnterChapter(4, 'locked', this)">
-        <div class="flex-grow flex flex-col items-center justify-center relative bg-slate-100 p-8 text-center min-h-[420px]">
-          <!-- 해치 패턴 -->
-          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px);"></div>
-          
-          <div class="bg-white/50 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 relative z-10">
-            <i data-lucide="lock" class="w-10 h-10 text-slate-400" stroke-width="2"></i>
+      <!-- Chapter 4 (데이터 분석 / Trace Break) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-sky-500/30" onclick="handleEnterChapter(4, 'active', this)">
+        <!-- Banner -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-sky-100 bg-sky-50">
+          <img src="images/chapter4-logo.png" alt="챕터 4 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+4'"/>
+          <!-- 빛 스캔 애니메이션 오버레이 -->
+          <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
+        </div>
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 bg-sky-50 text-sky-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-sky-100">
+                Chapter 04
+              </span>
+              <span class="text-xs font-bold text-sky-600/70">중앙관리실 구역</span>
+            </div>
+            <i data-lucide="lock" class="w-4 h-4 text-sky-500 opacity-60"></i>
           </div>
-          
-          <span class="px-3 py-1 bg-slate-200 text-slate-500 text-[11px] font-black tracking-widest uppercase rounded-md border border-slate-300 mb-4 relative z-10">
-            Chapter 04
-          </span>
-          <h3 class="text-3xl font-black text-slate-300 tracking-widest relative z-10 mb-6">COMING SOON</h3>
-          <div class="w-12 h-1 bg-slate-300 rounded-full relative z-10"></div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">트레이스 브레이크</h3>
+
+          <div class="bg-slate-50 rounded-xl p-4 mb-6 flex-grow flex items-center justify-center border border-slate-100/80 shadow-inner">
+            <p class="text-slate-600 leading-relaxed font-medium text-sm text-center break-keep">
+              도로랜드 데이터 분석기로 출입기록·활동기록을 파헤쳐, 흔적을 남긴 진짜 범인을 찾아내세요.
+            </p>
+          </div>
+
+          <div class="mt-auto">
+            <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-sky-500 to-cyan-400 hover:from-sky-400 hover:to-cyan-300 shadow-md shadow-sky-500/20 group-hover:shadow-sky-500/40 transform group-hover:-translate-y-0.5">
+              <span>입장하기</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -338,7 +356,8 @@
     const chapterData = {
       1: { url: './chapter01/index.html', name: 'Chapter 01 : 사파리 구역' },
       2: { url: './chapter02/index.html', name: 'Chapter 02 : 하모니아 구역' },
-      3: { url: './chapter03/index.html', name: 'Chapter 03 : 회전목마 구역' }
+      3: { url: './chapter03/index.html', name: 'Chapter 03 : 회전목마 구역' },
+      4: { url: './chapter04/index.html', name: 'Chapter 04 : 중앙관리실 구역' }
     };
 
     // 현재 선택된 챕터 ID 저장 변수

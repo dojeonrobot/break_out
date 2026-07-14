@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>도로랜드 데이터 분석기 — 수사 모드</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#FBFCFE; --paper-2:#F3F6FB; --card:#FFFFFF;
+    --ink-900:#142036; --ink-700:#33405A; --ink-500:#647088; --ink-400:#8C97AC; --ink-300:#B4BECE;
+    --border:#DCE4F0; --border-soft:#E9EEF6;
+    --blue-50:#EAF2FE; --blue-500:#4C8AE6; --blue-600:#3076DC; --blue-700:#1F58AC;
+    --warn:#E8901C; --warn-soft:#FFF4DC;
+    --bad:#E63946; --bad-soft:#FCE7E9;
+    --good:#1F9D57; --good-soft:#E7F6EE;
+    --shadow:0 1px 2px rgba(20,32,54,.04), 0 8px 24px rgba(20,32,54,.06);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  /* 한국어 줄바꿈: 어절(단어) 중간에서 잘리지 않도록 */
+  body, button, input, select, textarea{
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
+  body{
+    font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",NanumGothic,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(1200px 500px at 90% -10%, #EAF2FE 0%, transparent 55%),
+      radial-gradient(900px 500px at -5% 110%, #FFF1DC 0%, transparent 50%),
+      var(--paper);
+    color:var(--ink-900); min-height:100vh; line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1320px; margin:0 auto; padding:22px 22px 60px}
+
+  /* ===== 헤더 ===== */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 22px; margin-bottom:18px;
+    background:linear-gradient(120deg,#142036,#1F58AC);
+    color:#fff; border-radius:16px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  .topbar::after{
+    content:""; position:absolute; right:-40px; top:-60px; width:240px; height:240px;
+    border-radius:50%; border:1.5px solid rgba(255,255,255,.14);
+    box-shadow:0 0 0 22px rgba(255,255,255,.05), 0 0 0 60px rgba(255,255,255,.03);
+  }
+  .brand{display:flex; align-items:center; gap:13px; z-index:1}
+  .brand .logo{
+    width:46px; height:46px; border-radius:12px; flex:none;
+    background:linear-gradient(135deg,#4C8AE6,#E8901C);
+    display:grid; place-items:center; font-size:24px;
+    box-shadow:0 6px 16px rgba(0,0,0,.25);
+  }
+  .brand h1{font-size:18px; font-weight:800; letter-spacing:-.4px}
+  .brand p{font-size:12px; color:rgba(255,255,255,.72); font-weight:500; margin-top:1px}
+  .case-badge{
+    z-index:1; font-size:11.5px; font-weight:800; letter-spacing:.4px;
+    padding:7px 13px; border-radius:999px;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22);
+  }
+  /* 기밀 기록실 버튼 */
+  .vault-btn{
+    z-index:1; display:flex; align-items:center; gap:7px; cursor:pointer; font-family:inherit;
+    font-size:12.5px; font-weight:800; color:#fff; padding:8px 14px; border-radius:999px;
+    background:linear-gradient(135deg,var(--warn),#D97A0F); border:1px solid rgba(255,255,255,.25);
+    box-shadow:0 4px 12px rgba(232,144,28,.3);
+  }
+  .vault-btn:hover{filter:brightness(1.06)}
+  .vault-count{font-size:11px; background:rgba(255,255,255,.28); padding:2px 8px; border-radius:999px}
+
+  /* 보관함 모달 */
+  .modal.modal-vault{width:min(1080px,95vw); max-width:none; background:#fff; overflow:hidden}
+  .vault-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:22px 24px 16px; background:linear-gradient(135deg,#142036,#1F58AC); color:#fff; position:relative}
+  .vault-tag{font-size:10.5px; font-weight:800; letter-spacing:2.5px; color:rgba(255,255,255,.6)}
+  .vault-head h3{font-size:20px; font-weight:800; margin:3px 0 4px}
+  .vault-head p{font-size:12.5px; color:rgba(255,255,255,.8)} .vault-head p b{color:#FFD466}
+  .vault-tabs{display:flex; gap:6px; padding:12px 24px 0; background:#fff}
+  .vault-tab{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:13px;
+    padding:10px 16px; border-radius:10px 10px 0 0; color:var(--ink-400); background:var(--paper-2);
+  }
+  .vault-tab.on{background:#fff; color:var(--blue-700); box-shadow:0 -2px 0 var(--blue) inset}
+  .vault-body{padding:24px 28px 30px; max-height:72vh; overflow-y:auto; background:#fff}
+
+  .vault-locked-note{text-align:center; padding:40px 20px; color:var(--ink-400)}
+  .vault-locked-note .vl-ic{margin-bottom:12px}
+  .vl-title{font-size:17px; font-weight:800; color:var(--ink-800); margin-bottom:6px}
+  .vl-desc{font-size:14px; line-height:1.6; margin-bottom:18px} .vl-desc b{color:var(--warn)}
+  .vl-form{display:flex; gap:8px; justify-content:center; margin-bottom:8px}
+  .vl-form input{
+    width:170px; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px;
+    font-family:inherit; font-size:15px; text-align:center; letter-spacing:3px;
+  }
+  .vl-form input:focus{outline:none; border-color:var(--blue)}
+  .vl-form button{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:14px;
+    padding:11px 22px; border-radius:10px; background:var(--blue); color:#fff;
+  }
+  .vl-form button:hover{filter:brightness(1.05)}
+  .vl-err{font-size:13px; color:#D64545; font-weight:700; margin-bottom:4px}
+  .vl-hint{font-size:12px; color:var(--ink-300); margin-top:10px}
+
+  /* 힌트 획득 토스트 */
+  .vault-toast{
+    position:fixed; left:50%; bottom:120px; transform:translateX(-50%) translateY(20px);
+    z-index:220; background:linear-gradient(135deg,#1F9D63,#16834F); color:#fff;
+    font-weight:800; font-size:15px; padding:14px 24px; border-radius:999px;
+    box-shadow:0 12px 36px rgba(31,157,99,.4); opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s; display:flex; align-items:center; gap:9px; white-space:nowrap;
+  }
+  .vault-toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .vt-spark{font-size:17px}
+
+  /* 출입증 카드 그리드 */
+  .badge-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px}
+  .badge-card{
+    position:relative; overflow:hidden;
+    border:1px solid var(--border); border-radius:16px; padding:18px 16px 16px 58px; background:linear-gradient(160deg,#F7FAFF,#fff);
+    box-shadow:0 3px 10px rgba(20,32,54,.06); text-align:center; min-height:228px;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  }
+  .bc-strip{
+    position:absolute; left:0; top:0; bottom:0; width:42px;
+    display:flex; align-items:center; justify-content:center;
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    letter-spacing:1.8px; font-size:11px; font-weight:900;
+    color:#FFD466; background:linear-gradient(180deg,#7A1E2B 0%, #1B2333 100%);
+    border-right:1px solid rgba(255,255,255,.08);
+    text-transform:uppercase;
+  }
+  .bc-photo{display:grid; place-items:center; margin:2px 0 10px}
+  .bc-name{font-size:17px; font-weight:900; color:var(--ink-900); line-height:1.2}
+  .bc-en{display:block; margin-top:5px; font-size:12px; font-weight:700; color:var(--ink-400); letter-spacing:.2px}
+  .bc-kbadge{display:inline-block; margin:9px 0 7px; font-size:11px; font-weight:800; color:#FFCC7A; background:rgba(255,214,107,.10); padding:4px 10px; border-radius:999px; border:1px solid rgba(255,214,107,.16)}
+  .bc-title{font-size:11.5px; font-weight:900; letter-spacing:1.3px; color:#C6D2E6; text-transform:uppercase; line-height:1.35}
+  .bc-access{margin-top:10px; font-size:11px; font-weight:900; letter-spacing:1.3px; color:#FF8A8A; text-transform:uppercase; border-top:1px dashed rgba(255,255,255,.12); padding-top:10px; width:100%}
+  .vault-tip{margin-top:16px; font-size:12.5px; color:var(--ink-500); background:var(--paper-2); padding:11px 14px; border-radius:10px; line-height:1.6}
+  .vault-tip b{color:var(--blue-700)}
+
+  /* 휴가 캘린더 */
+  .cal-wrap{border:1px solid var(--border); border-radius:14px; overflow:hidden; background:#fff}
+  .cal-top{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border-soft)}
+  .cal-logo img{height:26px} 
+  .cal-title-line{font-size:13px; color:var(--warn)} .cal-title-line b{color:var(--warn)}
+  .cal-main{display:flex; gap:0}
+  .cal-left{flex:1; padding:16px 18px; min-width:0}
+  .cal-month{display:flex; align-items:center; gap:14px; margin-bottom:14px}
+  .cm-num{font-size:46px; font-weight:900; color:var(--ink-900); line-height:1}
+  .cm-en{font-size:15px; font-weight:800; color:var(--ink-700); display:flex; flex-direction:column}
+  .cm-en small{font-size:11px; font-weight:600; color:var(--ink-400); margin-top:2px}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:2px}
+  .cal-dow{text-align:left; font-size:11px; font-weight:800; color:var(--ink-300); padding:4px 5px}
+  .cal-dow.s{color:#D4537E}
+  .cal-cell{min-height:58px; padding:6px 7px; border-radius:7px; display:flex; flex-direction:column; gap:3px}
+  .cal-cell.empty{background:transparent; min-height:0}
+  .cal-cell.has-mark{background:var(--paper-2)}
+  .cal-num{font-size:13px; font-weight:700; color:var(--ink-700); line-height:1}
+  .cal-mark{display:flex; align-items:center; gap:4px; margin-top:1px}
+  .cal-bar{flex:none; display:block; width:4px; height:12px; border-radius:2px}
+  .cal-label{font-size:10px; font-weight:800; white-space:nowrap; line-height:1.1}
+  .cal-bar.c-xylo{background:#C0392B} .cal-label.c-xylo{color:#C0392B}
+  .cal-bar.c-zero{background:#E8901C} .cal-label.c-zero{color:#C77A1A}
+  .cal-bar.c-rico{background:#3076DC} .cal-label.c-rico{color:#2A66C2}
+  .cal-bar.c-lumia{background:#2BA6A0} .cal-label.c-lumia{color:#1F857F}
+  .cal-bar.c-core{background:#7C5CD6} .cal-label.c-core{color:#6446C0}
+  .cal-bar.c-nana{background:#D4537E} .cal-label.c-nana{color:#B84369}
+  .cal-bar.c-mimo{background:#46A9F2} .cal-label.c-mimo{color:#2B86D6}
+  .cal-bar.c-haru{background:#5CA632} .cal-label.c-haru{color:#4B8A28}
+  .cal-bar.c-gaon{background:#5965E0} .cal-label.c-gaon{color:#4652C7}
+  .cal-bar.c-echo{background:#C76B1F} .cal-label.c-echo{color:#A55517}
+.cal-monthtabs{display:flex; gap:8px; margin-bottom:16px}
+  .cal-mtab{
+    border:1.5px solid var(--border); cursor:pointer; font-family:inherit; font-weight:800; font-size:14px;
+    padding:10px 20px; border-radius:999px; color:var(--ink-500); background:#fff; transition:.13s;
+  }
+  .cal-mtab.on{
+    background:linear-gradient(135deg,var(--warn),#D97A0F); color:#fff; border-color:transparent;
+    box-shadow:0 4px 12px rgba(232,144,28,.35); transform:translateY(-1px);
+  }
+  .cal-mtab:hover:not(.on){background:var(--paper-2); border-color:var(--ink-300)}
+  .cal-right{flex:0 0 260px; border-left:1px solid var(--border-soft); padding:16px 18px}
+  .cal-up-tag{font-size:10px; font-weight:800; letter-spacing:2px; color:var(--ink-300)}
+  .cal-up-title{font-size:20px; font-weight:900; color:var(--ink-900); margin-bottom:14px}
+  .cal-up-item{
+    display:grid; grid-template-columns:44px minmax(0,1fr); column-gap:12px; align-items:center;
+    min-height:58px; padding:11px 0; border-top:1px solid var(--border-soft)
+  }
+  .cui-date{width:44px; font-size:24px; font-weight:900; color:#C0392B; line-height:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-variant-numeric:tabular-nums}
+  .cui-date small{font-size:8.5px; color:var(--ink-300); font-weight:700; margin-top:4px; letter-spacing:.2px}
+  .cui-info{
+    min-width:0; display:grid; grid-template-rows:auto auto; justify-content:stretch; align-content:center;
+    row-gap:3px; text-align:left;
+  }
+  .cui-info b{font-size:14px; color:var(--ink-900); line-height:1.25; white-space:nowrap}
+  .cui-info span{font-size:11.5px; color:var(--ink-500); line-height:1.35; margin-top:0; white-space:nowrap}
+  .cal-foot{padding:10px 18px; border-top:1px solid var(--border-soft); font-size:11px; color:var(--ink-300)}
+  @media (max-width:680px){ .cal-main{flex-direction:column} .cal-right{flex:none; border-left:none; border-top:1px solid var(--border-soft)} }
+
+  /* ===== 레이아웃 ===== */
+  .layout{display:grid; grid-template-columns:320px 1fr; gap:18px; align-items:start}
+  @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+
+  .card{
+    background:var(--card); border:1px solid var(--border-soft); border-radius:14px;
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .card + .card{margin-top:16px}
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:13px 16px; border-bottom:1px solid var(--border-soft);
+    background:linear-gradient(180deg,#FFFFFF,#FAFCFF);
+  }
+  .card-head .ttl{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:800; color:var(--ink-900)}
+  .card-head .ttl .dot{width:8px;height:8px;border-radius:50%;background:var(--blue-600);box-shadow:0 0 0 4px var(--blue-50)}
+  .card-head .tag{font-size:11px; font-weight:700; color:var(--blue-700); background:var(--blue-50); padding:4px 9px; border-radius:999px}
+  .card-body{padding:16px}
+
+  /* ===== 업로드 ===== */
+  input[type=file]{display:none}
+
+  .zone-guide{font-size:12px; color:var(--ink-500); line-height:1.5; margin-bottom:13px}
+
+  .zone-slots{display:grid; gap:11px}
+  .zone-slot{
+    position:relative; display:block; cursor:pointer;
+    border:1.6px dashed var(--border); border-radius:12px; padding:13px 14px;
+    background:var(--paper-2); transition:.15s;
+  }
+  .zone-slot:hover{background:#fff; transform:translateY(-1px); box-shadow:0 4px 14px rgba(20,32,54,.06)}
+  .zone-slot.drag{background:#fff;}
+  .zone-slot .zs-top{display:flex; align-items:center; gap:11px}
+  .zone-slot .zs-emoji{
+    width:42px; height:42px; border-radius:11px; flex:none; overflow:hidden;
+    display:grid; place-items:center; font-size:22px;
+    background:#fff; border:1px solid var(--border-soft);
+  }
+  .zone-slot .zs-img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .zone-slot .zs-info{flex:1; min-width:0}
+  .zone-slot .zs-zone{font-size:13.5px; font-weight:800; color:var(--ink-900); display:flex; align-items:center; gap:6px}
+  .zone-slot .zs-want{font-size:11px; color:var(--ink-400); margin-top:2px}
+  .zone-slot .zs-status{
+    flex:none; width:26px; height:26px; border-radius:50%;
+    display:grid; place-items:center;
+    border:1.6px dashed var(--border); color:var(--ink-300);
+  }
+  /* 색상 테마 (구역별) */
+  .zone-slot[data-zone="safari"]{ --zc:#E8901C; --zc-soft:#FFF1DC; }
+  .zone-slot[data-zone="harmonia"]{ --zc:#7C5CD6; --zc-soft:#F0EBFB; }
+  .zone-slot[data-zone="carousel"]{ --zc:#2BA6A0; --zc-soft:#E2F5F3; }
+  .zone-slot .zs-emoji{ color:var(--zc); }
+  .zone-slot:hover{ border-color:var(--zc); }
+
+  /* 채워진 상태 */
+  .zone-slot.filled{
+    border-style:solid; border-color:var(--zc);
+    background:linear-gradient(135deg,var(--zc-soft),#FFFFFF);
+  }
+  .zone-slot.filled .zs-emoji{ background:var(--zc); color:#fff; border-color:transparent; }
+  .zone-slot.filled .zs-status{
+    border:none; background:var(--zc); color:#fff;
+  }
+  .zone-slot.filled.viewing{ box-shadow:0 0 0 2px var(--zc) inset, 0 4px 14px rgba(20,32,54,.08); }
+  .zone-slot.filled{cursor:pointer;}
+  .zone-slot.filled:hover{transform:translateY(-1px); box-shadow:0 8px 18px rgba(20,32,54,.10)}
+  .zone-slot .zs-file{
+    margin-top:10px; display:none; grid-template-columns:1fr; gap:8px;
+    font-size:12px; color:var(--ink-700); background:#fff; border:1px solid var(--border-soft);
+    border-radius:10px; padding:10px 11px;
+  }
+  .zone-slot.filled .zs-file{ display:grid; }
+  .zone-slot .zs-fname{font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-900)}
+  .zone-slot .zs-view{
+    display:flex; align-items:center; justify-content:center; width:100%;
+    border:1px solid var(--zc); cursor:pointer; font-family:inherit; flex:none;
+    background:rgba(255,255,255,.78); color:var(--zc); font-weight:900; font-size:12.5px;
+    padding:9px 10px; border-radius:9px; letter-spacing:-.1px;
+  }
+  .zone-slot.viewing .zs-view{ background:var(--zc); color:#fff; box-shadow:0 4px 12px rgba(20,32,54,.14); }
+  .zone-mismatch{
+    margin-top:8px; font-size:11px; font-weight:700; color:var(--bad);
+    background:var(--bad-soft); border:1px solid #F4B0B7; border-radius:7px; padding:6px 9px;
+    display:none;
+  }
+  .zone-slot.mismatch .zone-mismatch{ display:block; }
+
+  /* ===== 수사 결론 (하단 고정 배너) ===== */
+  @keyframes noteIn{from{opacity:0; transform:translateY(-5px)}to{opacity:1;transform:none}}
+  .verdict-bar{
+    position:fixed; left:0; right:0; bottom:0; z-index:70;
+    background:rgba(255,255,255,.92); backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    box-shadow:0 -8px 30px rgba(20,32,54,.10);
+  }
+  /* 잠금 오버레이 */
+  .vb-lock{
+    position:absolute; inset:0; z-index:5;
+    background:rgba(244,247,252,.82); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .verdict-bar.unlocked .vb-lock{display:none}
+  .vb-lock-inner{
+    display:flex; align-items:center; gap:11px;
+    font-size:13.5px; font-weight:700; color:var(--ink-500);
+    padding:0 20px; text-align:center;
+  }
+  .vb-lock-ic{color:var(--ink-400); display:inline-flex; flex:none}
+  .vb-lock-count{
+    flex:none; font-size:12px; font-weight:800; color:var(--warn);
+    background:var(--warn-soft); padding:3px 10px; border-radius:999px;
+  }
+  .vb-inner{
+    max-width:1320px; margin:0 auto; padding:12px 22px 14px;
+    display:flex; flex-direction:column; gap:11px;
+  }
+  .vb-top{display:flex; align-items:center; justify-content:space-between; gap:16px}
+  .vb-head{display:flex; align-items:center; gap:12px; flex:none}
+  .vb-icon{
+    width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--warn),#D97A0F); box-shadow:0 6px 16px rgba(232,144,28,.3);
+  }
+  .vb-title{font-size:16px; font-weight:800; color:var(--ink-900); letter-spacing:-.3px}
+  .vb-sub{font-size:11.5px; color:var(--ink-400); margin-top:1px}
+  .vb-fields{display:grid; grid-template-columns:repeat(5,1fr); gap:12px}
+  .vb-field{min-width:0}
+  .vb-field label{display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; color:var(--ink-600); margin-bottom:4px}
+  .vb-field select{width:100%; padding:10px 11px; font-size:13px}
+  .vf-tag{
+    font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:5px;
+    background:var(--paper-2); color:var(--ink-400); border:1px solid var(--border);
+  }
+  .vf-tag.open{background:var(--good-soft); color:var(--good); border-color:#B7E3C9}
+  .verdict-btn{
+    flex:none; border:none; cursor:pointer; font-family:inherit;
+    background:linear-gradient(135deg,var(--warn),#D97A0F); color:#fff;
+    padding:12px 22px; border-radius:12px; font-size:14px; font-weight:800;
+    box-shadow:0 4px 14px rgba(232,144,28,.3); display:flex; align-items:center; gap:8px;
+  }
+  .verdict-btn:hover:not(:disabled){filter:brightness(1.05)}
+  .verdict-btn:disabled{background:var(--ink-300); box-shadow:none; cursor:default}
+  .verdict-btn #verdictCount{
+    font-size:11.5px; background:rgba(255,255,255,.25); padding:2px 8px; border-radius:999px;
+  }
+  /* 배너가 있을 때 본문이 가리지 않도록 */
+  body.with-bar .wrap{padding-bottom:200px}
+  body.with-bar .hint-fab{bottom:180px}
+
+  /* ===== 의심 확정 결과 — 도로랜드 기밀 파일 무드 ===== */
+  .modal.modal-file{
+    width:min(1080px, 94vw); max-width:none; background:none; box-shadow:none; overflow:visible;
+  }
+  .verdict-result .vfile{
+    position:relative; border-radius:18px; padding:30px 36px;
+    font-size:17px; line-height:1.6; overflow:hidden;
+    display:flex; gap:34px; align-items:stretch;
+    animation:fileIn .35s cubic-bezier(.2,.9,.3,1.1);
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 5px),
+      radial-gradient(120% 80% at 80% -10%, rgba(229,57,70,.16), transparent 55%),
+      linear-gradient(160deg, #20283A 0%, #161C2B 55%, #10141F 100%);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 30px 80px rgba(8,11,20,.6), inset 0 1px 0 rgba(255,255,255,.05);
+    color:#D7DEEC;
+  }
+  /* 가로 2단: 왼쪽 헤더/멘트/버튼(고정폭), 오른쪽 본문(넓게) */
+  .vf-left{flex:0 0 300px; display:flex; flex-direction:column; min-width:0}
+  .vf-right{flex:1; display:flex; flex-direction:column; justify-content:center; min-width:0}
+  .vf-left .vr-close{margin-top:auto}
+  @media (max-width:720px){
+    .verdict-result .vfile{flex-direction:column; gap:18px}
+    .vf-left, .vf-right{flex:none}
+    .vf-left .vr-close{margin-top:8px}
+  }
+  @keyframes fileIn{from{opacity:0; transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+  /* 상단 기밀 헤더줄 */
+  .vfile-tag{
+    display:flex; align-items:center; gap:10px; margin-bottom:14px;
+    font-size:12px; font-weight:800; letter-spacing:2.5px; color:#E5707C; text-transform:uppercase;
+  }
+  .vfile-tag::after{content:''; height:1px; flex:1; background:linear-gradient(90deg,rgba(229,112,124,.4),transparent)}
+  .vr-title{font-size:23px; font-weight:800; margin-bottom:11px; display:flex; align-items:flex-start; gap:11px; color:#fff; letter-spacing:-.3px; line-height:1.3}
+  .vr-title .vt-ic{flex:none; display:inline-flex; margin-top:2px}
+  .vr-title .vt-ic svg{width:26px; height:26px}
+  .vr-sub{font-size:15px; color:#9AA6BD; margin:0 0 16px}
+  .vr-sub b{color:#CBD4E6}
+
+  /* 빨간 실 장식 (대각선) */
+  .vfile-thread{position:absolute; inset:0; pointer-events:none; z-index:1; opacity:.5}
+
+  /* 단서 핀 카드들 */
+  .vr-clues{position:relative; z-index:2; display:flex; flex-direction:column; gap:9px; margin-bottom:16px}
+  .vr-clue{
+    position:relative; display:flex; align-items:center; gap:12px;
+    padding:11px 14px 11px 16px; border-radius:9px;
+    background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .vr-clue.ok{border-color:rgba(74,200,140,.35)}
+  .vr-clue.no{border-color:rgba(229,90,90,.4); background:rgba(229,90,90,.07)}
+  .vr-clue .pin{
+    position:absolute; left:-5px; top:-5px; width:13px; height:13px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #FF7A85, #C0392B);
+    box-shadow:0 2px 5px rgba(0,0,0,.5), inset 0 -1px 2px rgba(0,0,0,.3);
+  }
+  .vr-clue.ok .pin{background:radial-gradient(circle at 35% 30%, #6FE3A8, #1F9D63)}
+  .vrc-ic{flex:none; width:24px; height:24px; display:grid; place-items:center}
+  .vrc-label{flex:none; font-weight:800; color:#A7B2C8; min-width:78px; font-size:12.5px; letter-spacing:.3px}
+  .vrc-val{flex:1; color:#fff; font-weight:700; font-size:14.5px}
+  .vr-clue.no .vrc-val{color:#F3A6A6}
+  .vrc-state{flex:none; font-size:10.5px; font-weight:800; padding:3px 10px; border-radius:999px; letter-spacing:.5px}
+  .vr-clue.ok .vrc-state{background:rgba(74,200,140,.16); color:#5FD49B}
+  .vr-clue.no .vrc-state{background:rgba(229,90,90,.18); color:#FF8A8A}
+
+  /* 비밀 본문 (정답) */
+  .vr-secret{
+    position:relative; z-index:2;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+    border-left:4px solid #E5707C; border-radius:11px; padding:18px 20px; margin-bottom:0;
+  }
+  .vr-secret p{margin:0 0 11px; color:#C4CDDF; font-size:16px; line-height:1.7} .vr-secret p:last-child{margin:0}
+  .vr-secret b{color:#fff}
+  .vr-detective{position:relative; z-index:2; margin:0 0 16px; font-size:15px; color:#94A0B6}
+  .vr-score{
+    position:relative; z-index:2; margin:0 0 4px;
+    display:inline-block; font-size:14px; font-weight:800; color:#FFD466;
+    background:rgba(255,212,102,.1); border:1px solid rgba(255,212,102,.28);
+    padding:8px 14px; border-radius:9px;
+  }
+  .vr-detective b{color:#E5707C}
+
+  /* 오답 상단 카운트 */
+  .vr-count{position:relative; z-index:2; margin:0 0 16px; font-size:16px; line-height:1.65; color:#AEB8CD}
+  .vr-count b{color:#fff; font-size:18px}
+  .vr-tip{position:relative; z-index:2; margin:14px 0 0; font-size:14px; color:#8893A8; line-height:1.6}
+  .vr-tip b{color:#B6C0D4}
+
+  /* 오답 간접 힌트 카드 */
+  .vr-hints{position:relative; z-index:2; display:flex; flex-direction:column; gap:11px; margin-bottom:0}
+  .vr-hintcard{
+    display:flex; gap:13px; align-items:flex-start;
+    padding:15px 17px; border-radius:12px;
+    background:rgba(255,212,102,.06); border:1px solid rgba(255,212,102,.18);
+    border-left:4px solid #E8B43C;
+  }
+  .vh-ic{flex:none; display:inline-flex; margin-top:2px}
+  .vh-ic svg{width:24px; height:24px}
+  .vh-text{font-size:15.5px; line-height:1.62; color:#C4CDDF}
+  .vh-text b{color:#FFE0A3; font-weight:700}
+  .vr-more{position:relative; z-index:2; margin:12px 0 0; font-size:14px; color:#8893A8; text-align:center}
+
+  /* 도로랜드 기밀 도장 */
+  .vr-stamp{
+    position:absolute; top:24px; right:26px; z-index:5;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    font-weight:900; color:#E5404D; padding:11px 18px;
+    border:4px solid #E5404D; border-radius:9px;
+    transform:rotate(-13deg) scale(2.6); opacity:0;
+    box-shadow:inset 0 0 0 2px rgba(229,64,77,.3); pointer-events:none;
+    background:rgba(229,64,77,.06);
+  }
+  .vr-stamp .s-big{font-size:23px; letter-spacing:4px; line-height:1}
+  .vr-stamp .s-small{font-size:10px; letter-spacing:2.5px; opacity:.85}
+  .vr-stamp.go{animation:stampIn .5s cubic-bezier(.2,1.4,.4,1) forwards}
+  @keyframes stampIn{
+    0%{opacity:0; transform:rotate(-13deg) scale(2.6)}
+    60%{opacity:.92; transform:rotate(-13deg) scale(.9)}
+    100%{opacity:.9; transform:rotate(-13deg) scale(1)}
+  }
+
+  .vr-close{
+    position:relative; z-index:2;
+    display:block; margin-top:22px; width:100%; border:none; cursor:pointer;
+    font-family:inherit; font-weight:800; font-size:16px; padding:15px; border-radius:12px;
+    color:#fff; letter-spacing:.5px;
+  }
+  .vfile.ok .vr-close{background:linear-gradient(135deg,#1F9D63,#16834F); box-shadow:0 6px 18px rgba(31,157,99,.35)}
+  .vfile.no .vr-close{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); color:#D7DEEC}
+  .vfile.no .vr-close:hover{background:rgba(255,255,255,.14)}
+  .vfile.ok .vr-close:hover{filter:brightness(1.08)}
+
+
+  /* ===== 메인 ===== */
+  .guide{
+    background:linear-gradient(135deg,#142036,#1F58AC); color:#fff; border-radius:16px;
+    padding:30px 32px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  .guide::before{
+    content:""; position:absolute; right:14px; top:6px; width:130px; height:130px; opacity:.12;
+    background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><circle cx='11' cy='11' r='6.4' fill='white' opacity='.5'/><circle cx='11' cy='11' r='6.4' fill='none' stroke='white' stroke-width='1.6'/><path d='M15.8 15.8 20 20' stroke='white' stroke-width='1.9' stroke-linecap='round'/></svg>");
+  }
+  .guide h2{font-size:25px; font-weight:800; letter-spacing:-.5px; z-index:1; position:relative; line-height:1.3; padding-right:170px}
+  .guide .lead{font-size:15.5px; color:rgba(255,255,255,.9); margin-top:12px; max-width:660px; position:relative; z-index:1; line-height:1.65}
+  .guide ol{list-style:none; counter-reset:g; display:grid; gap:11px; margin-top:24px; position:relative; z-index:1}
+  .guide li{
+    counter-increment:g; display:grid; grid-template-columns:34px 1fr; gap:14px; align-items:center;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:12px;
+    padding:15px 18px; color:#fff;
+  }
+  .guide li::before{
+    content:counter(g); width:32px; height:32px; border-radius:50%;
+    background:#FFD66B; color:#142036; font-weight:900; font-size:15px;
+    display:grid; place-items:center;
+  }
+  .guide .g-step{display:flex; flex-direction:column; gap:3px}
+  .guide .g-step b{color:#FFD66B; font-weight:800; font-size:15.5px; line-height:1.3}
+  .guide .g-step span{color:rgba(255,255,255,.9); font-size:14px; line-height:1.5}
+
+  /* 필터 바 */
+  .filterbar{display:grid; gap:13px}
+  .fb-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px}
+  .field{display:grid; gap:5px}
+  .field label{font-size:12px; font-weight:800; color:var(--ink-700); display:flex; align-items:center; gap:5px}
+  .field .hint{font-size:10.5px; color:var(--ink-400); font-weight:500}
+  select{
+    width:100%; padding:11px 12px; border-radius:9px; font-family:inherit;
+    background:#fff; color:var(--ink-900); border:1px solid var(--border);
+    font-size:13.5px; font-weight:600; cursor:pointer; outline:none;
+  }
+  select:focus{border-color:var(--blue-600); box-shadow:0 0 0 3px rgba(48,118,220,.16)}
+
+  .month-pills{display:flex; gap:7px; flex-wrap:wrap}
+  .mp{
+    padding:9px 16px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:800;
+    background:var(--paper-2); color:var(--ink-500); border:1px solid var(--border);
+    transition:.13s;
+  }
+  .mp:hover{border-color:var(--blue-500); color:var(--blue-700)}
+  .mp.active{background:linear-gradient(135deg,var(--blue-600),var(--blue-700)); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(48,118,220,.3)}
+
+  .mode-toggle{display:inline-flex; background:var(--paper-2); border:1px solid var(--border); border-radius:10px; padding:3px; gap:3px}
+  .mode-toggle button{
+    border:none; background:transparent; cursor:pointer; font-family:inherit;
+    padding:8px 14px; border-radius:8px; font-size:12.5px; font-weight:800; color:var(--ink-500);
+  }
+  .mode-toggle button.on{background:#fff; color:var(--blue-700); box-shadow:0 1px 4px rgba(20,32,54,.12)}
+
+  /* 차트 */
+  .chart-wrap{margin-top:6px; border:1px solid var(--border-soft); border-radius:12px; background:#fff; padding:10px}
+  /* 그래프 형식 토글 */
+  .chart-type-bar{display:flex; align-items:center; gap:10px; margin-top:8px}
+  .ct-label{font-size:12px; font-weight:800; color:var(--ink-500)}
+  .chart-type-toggle{display:inline-flex; background:var(--paper-2); border:1px solid var(--border); border-radius:10px; padding:3px; gap:3px}
+  .chart-type-toggle button{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:12.5px;
+    padding:7px 13px; border-radius:8px; color:var(--ink-500); background:transparent;
+    display:flex; align-items:center; gap:6px; transition:.13s;
+  }
+  .chart-type-toggle button .icon{width:16px; height:16px}
+  .chart-type-toggle button:hover:not(.on){color:var(--blue-700); background:#fff}
+  .chart-type-toggle button.on{background:#fff; color:var(--blue-700); box-shadow:0 1px 4px rgba(20,32,54,.1)}
+  canvas{width:100%; display:block}
+  .chart-foot{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px}
+  .stat{background:var(--paper-2); border:1px solid var(--border-soft); border-radius:10px; padding:11px 13px}
+  .stat span{font-size:11px; color:var(--ink-500); font-weight:600}
+  .stat strong{display:block; font-size:17px; font-weight:800; color:var(--ink-900); margin-top:3px; letter-spacing:-.4px}
+
+  /* 이상신호 박스 */
+  .signal{
+    margin-top:14px; border-radius:12px; padding:16px 18px;
+    display:flex; align-items:flex-start; gap:14px;
+  }
+  .signal.normal{background:var(--good-soft); border:1px solid #B7E3C9}
+  .signal.alert{background:linear-gradient(135deg,#FCE7E9,#FFF1DC); border:1px solid #F4B0B7}
+  .signal .sic{font-size:30px; line-height:1; flex:none}
+  .signal .stext{flex:1}
+  .signal .stitle{font-size:14.5px; font-weight:800}
+  .signal.normal .stitle{color:var(--good)}
+  .signal.alert .stitle{color:var(--bad)}
+  .signal .sbody{font-size:12.8px; color:var(--ink-700); margin-top:4px; line-height:1.5}
+  .signal .sbody b{background:#FFE3A8; color:#5A3A0E; padding:0 5px; border-radius:4px; font-weight:800}
+  .signal .record-btn{
+    margin-top:11px; border:none; cursor:pointer; font-family:inherit;
+    display:inline-flex; align-items:center; gap:6px;
+    background:linear-gradient(135deg,var(--warn),#D97A0F); color:#fff;
+    padding:10px 16px; border-radius:9px; font-size:13px; font-weight:800;
+    box-shadow:0 4px 12px rgba(232,144,28,.3);
+  }
+  .signal .record-btn:hover{filter:brightness(1.05)}
+  .signal .record-btn:disabled{background:var(--ink-300); box-shadow:none; cursor:default}
+
+  .btn{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:12.5px;
+    padding:9px 14px; border-radius:9px; transition:.13s;
+  }
+  .btn-ghost{background:var(--paper-2); color:var(--ink-700); border:1px solid var(--border)}
+  .btn-ghost:hover{border-color:var(--blue-500); color:var(--blue-700)}
+  .btn-danger{background:var(--bad); color:#fff}
+  .btn-danger:hover{filter:brightness(1.06)}
+  .btn-block{width:100%}
+
+  .clear-confirm{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 12px; border-radius:10px; background:var(--bad-soft); border:1px solid #F4B0B7;
+    animation:noteIn .2s ease;
+  }
+  .clear-confirm span{font-size:12.5px; font-weight:700; color:#B3270F}
+  .clear-confirm .cc-btns{display:flex; gap:6px; flex:none}
+  .clear-confirm .cc-btns .btn{padding:7px 12px; font-size:12px}
+
+  .empty-chart{padding:48px 16px; text-align:center; color:var(--ink-400)}
+  .empty-chart .ic{font-size:42px}
+  .empty-chart .t{font-weight:700; margin-top:8px; font-size:14px; color:var(--ink-500)}
+
+  .conclusion{
+    margin-top:16px; border-radius:14px; padding:20px;
+    background:linear-gradient(135deg,#1F9D57,#137a42); color:#fff; box-shadow:var(--shadow);
+    animation:noteIn .4s ease;
+  }
+  .conclusion h3{font-size:17px; font-weight:800}
+  .conclusion p{font-size:13.5px; color:rgba(255,255,255,.9); margin-top:8px; line-height:1.6}
+  .conclusion p b{color:#FFE08A}
+
+  .hidden{display:none !important}
+
+  /* ===== 뷰 전환 토글 ===== */
+  .view-toggle{
+    display:inline-flex; gap:3px; padding:3px;
+    background:var(--paper-2); border:1px solid var(--border-soft); border-radius:10px;
+  }
+  .view-toggle button{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:12.5px;
+    padding:7px 14px; border-radius:8px; color:var(--ink-500); background:transparent;
+    transition:.14s; display:flex; align-items:center; gap:7px;
+  }
+  .view-toggle button:hover:not(.on):not(:disabled){color:var(--blue-700); background:#fff}
+  .view-toggle button.on{
+    background:linear-gradient(135deg,var(--blue-600),var(--blue-700)); color:#fff;
+    box-shadow:0 3px 10px rgba(48,118,220,.28);
+  }
+  .view-toggle button:disabled{color:var(--ink-300); cursor:default}
+  .view-toggle button .vt-dot{width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.6}
+  /* 가이드 박스 안 우상단 토글 (어두운 배경용) */
+  .guide-toggle{
+    position:absolute; top:18px; right:20px; z-index:2;
+    background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.18);
+  }
+  .guide-toggle button{color:rgba(255,255,255,.7)}
+  .guide-toggle button:hover:not(.on):not(:disabled){color:#fff; background:rgba(255,255,255,.12)}
+  .guide-toggle button.on{background:#fff; color:var(--blue-700); box-shadow:0 2px 8px rgba(0,0,0,.18)}
+
+  /* ===== 헤더 우측 ===== */
+  .top-right{display:flex; align-items:center; gap:12px; z-index:1}
+  .top-btn{
+    border:1px solid rgba(255,255,255,.28); background:rgba(255,255,255,.12); color:#fff;
+    cursor:pointer; font-family:inherit; font-weight:800; font-size:12.5px;
+    padding:8px 14px; border-radius:999px; transition:.15s;
+  }
+  .top-btn:hover{background:rgba(255,255,255,.22)}
+
+  /* ===== 튜토리얼 스포트라이트 ===== */
+  .tut-overlay{position:fixed; inset:0; z-index:90;}
+  .tut-overlay.full-dim{background:rgba(10,20,40,.74)}
+  .tut-hole{
+    position:absolute; border-radius:14px; pointer-events:none;
+    box-shadow:0 0 0 9999px rgba(10,20,40,.74);
+    transition:all .32s cubic-bezier(.4,0,.2,1);
+    outline:2.5px solid rgba(255,214,107,.9); outline-offset:0;
+  }
+  .tut-overlay.full-dim .tut-hole{display:none}
+  .tut-bubble{
+    position:absolute; width:340px; max-width:calc(100vw - 32px);
+    background:#fff; border-radius:16px; padding:20px;
+    box-shadow:0 24px 70px rgba(10,20,40,.5);
+    transition:all .32s cubic-bezier(.4,0,.2,1);
+  }
+  .tut-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    font-family:Consolas,monospace; font-weight:900; font-size:12px;
+    color:#fff; background:linear-gradient(135deg,var(--blue-600),var(--blue-700));
+    padding:4px 11px; border-radius:999px;
+  }
+  .tut-badge .tb-sep{opacity:.5}
+  .tut-title{font-size:17px; font-weight:800; color:var(--ink-900); margin-top:12px; letter-spacing:-.3px}
+  .tut-body{font-size:13.8px; color:var(--ink-700); margin-top:9px; line-height:1.65}
+  .tut-body b{color:var(--blue-700); font-weight:800}
+  .tut-body .k{background:var(--blue-50); color:var(--blue-700); padding:1px 7px; border-radius:6px; font-weight:800; font-size:12.5px}
+  .tut-ctrl{display:flex; align-items:center; justify-content:space-between; margin-top:18px; gap:10px}
+  .tut-skip{border:none; background:transparent; cursor:pointer; font-family:inherit; color:var(--ink-400); font-size:12.5px; font-weight:700}
+  .tut-skip:hover{color:var(--ink-700)}
+  .tut-nav{display:flex; gap:7px}
+  .tut-nav button{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:12.5px;
+    padding:9px 15px; border-radius:9px; transition:.13s;
+  }
+  .tut-prev{background:var(--paper-2); color:var(--ink-700); border:1px solid var(--border) !important}
+  .tut-prev:hover{border-color:var(--blue-500); color:var(--blue-700)}
+  .tut-prev:disabled{opacity:.4; cursor:default}
+  .tut-next{background:linear-gradient(135deg,var(--blue-600),var(--blue-700)); color:#fff}
+  .tut-next:hover{filter:brightness(1.06)}
+
+  /* ===== 아이콘 ===== */
+  .icon{display:inline-block; vertical-align:middle; flex:none}
+  .ic-blue{color:var(--blue-600)} .ic-warn{color:var(--warn)} .ic-bad{color:var(--bad)}
+  .ic-good{color:var(--good)} .ic-white{color:#fff} .ic-ink{color:var(--ink-500)}
+
+  /* ===== 힌트 ===== */
+  .hint-fab{
+    position:fixed; right:24px; bottom:24px; z-index:50;
+    display:flex; align-items:center; gap:8px;
+    padding:13px 18px; border:none; cursor:pointer; font-family:inherit;
+    background:linear-gradient(135deg,var(--warn),#D97A0F); color:#fff;
+    border-radius:999px; font-size:14px; font-weight:800;
+    box-shadow:0 10px 28px rgba(232,144,28,.4);
+    transition:.15s;
+  }
+  .hint-fab:hover{transform:translateY(-2px); box-shadow:0 14px 34px rgba(232,144,28,.5)}
+  .hint-fab .lamp{font-size:18px}
+
+  .modal-back{
+    position:fixed; inset:0; z-index:200; display:grid; place-items:center;
+    background:rgba(20,32,54,.55); backdrop-filter:blur(3px);
+    padding:20px; animation:fadeIn .2s ease;
+  }
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{
+    width:100%; max-width:440px; background:#fff; border-radius:18px;
+    box-shadow:0 30px 80px rgba(20,32,54,.4); overflow:hidden;
+    animation:popIn .25s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes popIn{from{opacity:0; transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+  .modal-top{
+    background:linear-gradient(135deg,#142036,#1F58AC); color:#fff;
+    padding:22px 24px; position:relative;
+  }
+  .modal-top h3{font-size:18px; font-weight:800; display:flex; align-items:center; gap:9px}
+  .modal-top p{font-size:12.5px; color:rgba(255,255,255,.78); margin-top:5px}
+  .modal-close{
+    position:absolute; right:16px; top:16px; width:30px; height:30px; border-radius:8px;
+    border:none; background:rgba(255,255,255,.15); color:#fff; cursor:pointer; font-size:17px; line-height:1;
+  }
+  .modal-close:hover{background:rgba(255,255,255,.28)}
+  .modal-body{padding:22px 24px}
+
+  .pw-input{
+    width:100%; padding:16px; text-align:center; letter-spacing:.5em;
+    font-size:30px; font-weight:900; font-family:Consolas,monospace;
+    border:2px solid var(--border); border-radius:12px; outline:none; color:var(--ink-900);
+    background:var(--paper-2);
+  }
+  .pw-input:focus{border-color:var(--blue-600); background:#fff; box-shadow:0 0 0 4px rgba(48,118,220,.14)}
+  .pw-input.err{border-color:var(--bad); background:var(--bad-soft); animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .pw-err{margin-top:10px; text-align:center; color:var(--bad); font-size:12.5px; font-weight:700}
+  .pw-submit{
+    width:100%; margin-top:16px; padding:13px; border:none; cursor:pointer; font-family:inherit;
+    background:linear-gradient(135deg,var(--blue-600),var(--blue-700)); color:#fff;
+    border-radius:11px; font-size:14px; font-weight:800;
+  }
+  .pw-submit:hover{filter:brightness(1.05)}
+  .pw-tip{margin-top:13px; text-align:center; font-size:11.5px; color:var(--ink-400)}
+
+  .hint-step{
+    border:1px solid var(--border-soft); border-left:4px solid var(--blue-600);
+    background:var(--paper-2); border-radius:10px; padding:13px 15px; margin-bottom:10px;
+    animation:noteIn .3s ease;
+  }
+  .hint-step .hs-head{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:800; color:var(--blue-700)}
+  .hint-step .hs-num{
+    width:22px; height:22px; border-radius:50%; background:var(--blue-600); color:#fff;
+    display:grid; place-items:center; font-size:12px; font-weight:900;
+  }
+  .hint-step .hs-body{font-size:13px; color:var(--ink-700); margin-top:7px; line-height:1.55}
+  .hint-next{
+    width:100%; margin-top:4px; padding:11px; border:1px dashed var(--blue-500); cursor:pointer; font-family:inherit;
+    background:var(--blue-50); color:var(--blue-700); border-radius:10px; font-size:13px; font-weight:800;
+  }
+  .hint-next:hover{background:#DDEBFD}
+
+  /* ===== DOROLAND CLASSIFIED ARCHIVE — 기밀 기록실 무드 ===== */
+  .vault-btn{
+    background:linear-gradient(135deg,#10141F 0%,#20283A 58%,#7A1E2B 100%);
+    border:1px solid rgba(255,214,107,.45);
+    box-shadow:0 8px 22px rgba(8,11,20,.28), inset 0 0 0 1px rgba(255,255,255,.05);
+    letter-spacing:-.1px;
+  }
+  .vault-btn:hover{filter:none; transform:translateY(-1px); box-shadow:0 12px 28px rgba(8,11,20,.34)}
+  .vault-count{background:rgba(255,214,107,.18); color:#FFD466; border:1px solid rgba(255,214,107,.35)}
+
+  .modal.modal-vault{
+    background:#10141F; color:#D7DEEC;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 32px 90px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .modal.modal-vault::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.22;
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px),
+      radial-gradient(600px 240px at 85% 0%, rgba(229,64,77,.18), transparent 60%);
+    background-size:26px 26px,26px 26px,auto;
+  }
+  .vault-head{
+    background:linear-gradient(135deg,#10141F 0%,#20283A 62%,#531620 100%);
+    border-bottom:1px solid rgba(255,214,107,.22);
+    padding:24px 28px 18px;
+  }
+  .vault-head::after{
+    content:"TOP SECRET"; position:absolute; right:72px; top:22px;
+    color:rgba(229,64,77,.26); border:3px solid rgba(229,64,77,.28);
+    padding:6px 14px; border-radius:6px; font-weight:900; letter-spacing:3px;
+    transform:rotate(-9deg); font-size:18px; pointer-events:none;
+  }
+  .vault-tag{color:#E5707C; letter-spacing:3.2px}
+  .vault-head h3{color:#fff; font-size:22px; letter-spacing:-.2px}
+  .vault-head p{color:#AEB8CD}.vault-head p b{color:#FFD466}
+  .vault-tabs{background:#10141F; border-bottom:1px solid rgba(255,255,255,.08); padding:12px 28px 0}
+  .vault-tab{background:rgba(255,255,255,.05); color:#8E9AB1; border:1px solid rgba(255,255,255,.07); border-bottom:none}
+  .vault-tab.on{background:#161C2B; color:#FFD466; box-shadow:0 -2px 0 #E5404D inset, 0 0 22px rgba(229,64,77,.12)}
+  .vault-body{background:#161C2B; color:#D7DEEC; position:relative}
+
+  .vault-locked-note{
+    position:relative; overflow:hidden; max-width:680px; margin:0 auto;
+    padding:36px 32px 32px; text-align:center;
+    background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+    border:1px solid rgba(255,255,255,.10); border-left:4px solid #E5404D;
+    border-radius:16px; color:#AEB8CD;
+    box-shadow:0 18px 40px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .vault-locked-note::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.16;
+    background:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 8px);
+  }
+  .vault-locked-note > *{position:relative; z-index:1}
+  .vl-sec-tag{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:5px 12px; margin-bottom:16px; border-radius:999px;
+    background:rgba(229,64,77,.12); border:1px solid rgba(229,64,77,.38);
+    color:#FF8A8A; font-family:Consolas,monospace; font-size:11px; font-weight:900; letter-spacing:1.6px;
+  }
+  .vault-locked-note .vl-ic svg rect,
+  .vault-locked-note .vl-ic svg path,
+  .vault-locked-note .vl-ic svg circle{stroke:#FFD466; fill:#FFD466; opacity:.9}
+  .vl-title{color:#fff; font-size:21px; letter-spacing:-.3px; margin-top:4px}
+  .vl-desc{color:#B8C3D8; font-size:14.5px}.vl-desc b{color:#FFD466}
+  .vl-dossier{
+    display:inline-block; margin:0 0 18px; padding:8px 14px; border-radius:8px;
+    background:rgba(0,0,0,.26); border:1px solid rgba(255,255,255,.10);
+    color:#8E9AB1; font-size:12px; font-weight:800; letter-spacing:.4px;
+  }
+  .vl-dossier b{color:#E5707C; font-family:Consolas,monospace; letter-spacing:1px}
+  .vl-form input{
+    width:190px; background:#0D111B; color:#FFD466; border:1.7px solid rgba(255,214,107,.42);
+    font-family:Consolas,monospace; font-weight:900; text-transform:uppercase; letter-spacing:3.4px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .vl-form input::placeholder{color:rgba(255,214,107,.30)}
+  .vl-form input:focus{border-color:#FFD466; box-shadow:0 0 0 4px rgba(255,214,107,.12), inset 0 0 0 1px rgba(255,255,255,.04)}
+  .vl-form button{background:linear-gradient(135deg,#E5404D,#A62A35); box-shadow:0 8px 18px rgba(229,64,77,.26)}
+  .vl-err{color:#FF8A8A}.vl-hint{color:#7F8AA0}
+
+  .badge-card{background:linear-gradient(160deg,#20283A,#151B29); border-color:rgba(255,255,255,.10); color:#D7DEEC}
+  .bc-name{color:#fff}.bc-en{color:#AEB8CD}.bc-title{color:#D7DEEC}.bc-kbadge{background:rgba(255,214,107,.10); color:#FFD466; border:1px solid rgba(255,214,107,.18)}
+  .bc-access{color:#FF8A8A; border-top:1px dashed rgba(255,255,255,.12)}
+  .vault-tip{background:rgba(255,214,107,.08); border:1px solid rgba(255,214,107,.18); color:#C4CDDF}.vault-tip b{color:#FFD466}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"><svg class="icon ic-white" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="currentColor" opacity=".18"/><circle cx="12" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12 3v16M4 11h16M6.34 5.34l11.32 11.32M17.66 5.34 6.34 16.66" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="11" r="1.7" fill="currentColor"/><circle cx="12" cy="3" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/><circle cx="4" cy="11" r="1.5" fill="currentColor"/><circle cx="20" cy="11" r="1.5" fill="currentColor"/><circle cx="6.34" cy="5.34" r="1.3" fill="currentColor"/><circle cx="17.66" cy="5.34" r="1.3" fill="currentColor"/><circle cx="6.34" cy="16.66" r="1.3" fill="currentColor"/><circle cx="17.66" cy="16.66" r="1.3" fill="currentColor"/><path d="M7.5 19.5h9L15 22H9z" fill="currentColor"/></svg></div>
+      <div>
+        <h1>도로랜드 데이터 분석기</h1>
+        <p>도로랜드 자료 속 수상한 데이터를 찾아라 — 수사 모드</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <button class="top-btn hidden" id="resetBtn" type="button">처음부터</button>
+      <button class="top-btn" id="tutBtn" type="button">사용법 보기</button>
+      <button class="vault-btn" id="vaultBtn" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7a2 2 0 0 1 2-2h5l2 2h5a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" fill="currentColor" opacity=".25"/><path d="M4 7a2 2 0 0 1 2-2h5l2 2h5a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        기밀 기록실 <span class="vault-count" id="vaultCount">0/2</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ===== 좌측 사이드바 ===== -->
+    <aside>
+      <!-- 자료 업로드 (구역별 3칸) -->
+      <section class="card" id="uploadCard">
+        <div class="card-head">
+          <div class="ttl"><span class="dot"></span> 구역별 수사 자료</div>
+          <div class="tag" id="srcCount">0 / 3</div>
+        </div>
+        <div class="card-body">
+          <p class="zone-guide">세 구역을 돌며 얻은 자료를 각 칸에 올리세요. 세 자료가 모두 모이면 수사가 시작돼요.</p>
+          <div class="zone-slots" id="zoneSlots"></div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ===== 우측 메인 ===== -->
+    <main>
+      <!-- 초기 가이드 -->
+      <div class="guide" id="guide">
+        <div class="view-toggle guide-toggle hidden" id="viewToggleGuide">
+          <button data-view="guide" class="on" type="button">활동 안내</button>
+          <button data-view="analyzer" type="button">데이터 분석</button>
+        </div>
+        <h2><svg class="icon ic-white" width="26" height="26" viewBox="0 0 24 24" fill="none" style="margin-right:9px" aria-hidden="true"><circle cx="11" cy="11" r="6.4" fill="currentColor" opacity=".22"/><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.8 15.8 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>도로랜드 자료를 분석해 주세요</h2>
+        <p class="lead">세 구역에서만 얻을 수 있는 특별한 정보를 바탕으로, 도로랜드 안에서 벌어지고 있는 <b>이상한 현상</b>에 대해 탐구해 보세요.</p>
+        <ol>
+          <li><div class="g-step"><b>자료를 올려요</b><span>각 구역에서 담당자를 도와주고 얻은 자료를 업로드해요.</span></div></li>
+          <li><div class="g-step"><b>달을 바꿔가며 비교해요</b><span>3월·6월·8월·11월의 데이터가 서로 어떻게 다른지 살펴봐요.</span></div></li>
+          <li><div class="g-step"><b>튀는 데이터를 찾아요</b><span>막대 하나만 유독 다르면 눈여겨볼 신호예요.</span></div></li>
+          <li><div class="g-step"><b>수사 결론을 내려요</b><span>의심 인물·장소·시간대·달·주기를 골라 사건을 해결해요.</span></div></li>
+        </ol>
+      </div>
+
+      <!-- 분석 패널 -->
+      <div class="card hidden" id="analyzer">
+        <div class="card-head">
+          <div class="ttl"><span class="dot"></span> <span id="curSrcName">데이터 분석</span></div>
+          <div class="view-toggle" id="viewToggle">
+            <button data-view="guide" type="button">활동 안내</button>
+            <button data-view="analyzer" class="on" type="button">데이터 분석</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="filterbar">
+            <!-- 달 -->
+            <div class="field">
+              <label><svg class="icon ic-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="currentColor" opacity=".22"/><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 9.6h17" stroke="currentColor" stroke-width="1.5"/><path d="M8 3.4v3.2M16 3.4v3.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg> <span id="monthLabel">어느 달을 볼까요?</span></label>
+              <div class="month-pills" id="monthPills"></div>
+            </div>
+
+            <div class="fb-row">
+              <!-- 보기 모드 -->
+              <div class="field">
+                <label><svg class="icon ic-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12Z" fill="currentColor" opacity=".2"/><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.9" fill="currentColor"/></svg> 보는 방법</label>
+                <div class="mode-toggle" id="modeToggle">
+                  <button data-mode="byEntity" class="on">항목별 비교</button>
+                  <button data-mode="byItem">한 명(곳) 펼쳐보기</button>
+                </div>
+                <span class="hint" id="modeHint">예: 어느 구역/사람이 가장 튀나 한눈에</span>
+              </div>
+
+              <!-- 컬럼 선택 (byEntity 모드) -->
+              <div class="field" id="colField">
+                <label id="colLabel"><svg class="icon ic-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.4" fill="currentColor" opacity=".16"/><rect x="6.4" y="12" width="2.5" height="5" rx=".7" fill="currentColor"/><rect x="10.75" y="9" width="2.5" height="8" rx=".7" fill="currentColor"/><rect x="15.1" y="6.5" width="2.5" height="10.5" rx=".7" fill="currentColor"/></svg> 어떤 값으로 비교?</label>
+                <select id="colSelect"></select>
+                <span class="hint" id="colHint">막대 높이로 보여줄 값</span>
+              </div>
+
+              <!-- 항목 선택 (byItem 모드) -->
+              <div class="field hidden" id="itemField">
+                <label id="itemLabel"><svg class="icon ic-blue" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor" opacity=".2"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg> 누구(어디)를 자세히 볼까?</label>
+                <select id="itemSelect"></select>
+                <span class="hint">고른 항목의 모든 값을 펼쳐서 보여줘요</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 차트 형식 선택 -->
+          <div class="chart-type-bar">
+            <span class="ct-label">그래프 모양</span>
+            <div class="chart-type-toggle" id="chartTypeToggle">
+              <button data-type="bar" class="on" type="button">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="11" width="3.6" height="9" rx="1" fill="currentColor"/><rect x="10.2" y="6" width="3.6" height="14" rx="1" fill="currentColor"/><rect x="16.4" y="14" width="3.6" height="6" rx="1" fill="currentColor"/></svg> 막대
+              </button>
+              <button data-type="line" type="button">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 16l5-5 4 3 7-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="16" r="1.6" fill="currentColor"/><circle cx="9" cy="11" r="1.6" fill="currentColor"/><circle cx="13" cy="14" r="1.6" fill="currentColor"/><circle cx="20" cy="6" r="1.6" fill="currentColor"/></svg> 꺾은선
+              </button>
+              <button data-type="donut" type="button">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="3.2" opacity=".3"/><path d="M12 4a8 8 0 0 1 7 4.2" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg> 도넛
+              </button>
+            </div>
+          </div>
+
+          <!-- 차트 -->
+          <div class="chart-wrap">
+            <canvas id="chart" width="900" height="300"></canvas>
+          </div>
+          <div class="chart-foot">
+            <div class="stat"><span>가장 큰 값</span><strong id="statMaxLabel">—</strong></div>
+            <div class="stat"><span>그 값</span><strong id="statMaxVal">—</strong></div>
+            <div class="stat"><span>평균의</span><strong id="statRatio">—</strong></div>
+          </div>
+
+          <!-- 이상신호 -->
+          <div class="signal normal" id="signal">
+            <div class="sic" id="sigIcon"></div>
+            <div class="stext">
+              <div class="stitle" id="sigTitle">평범한 데이터예요</div>
+              <div class="sbody" id="sigBody">달과 값을 바꿔가며 유독 튀는 막대를 찾아보세요.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 하단 고정: 수사 결론 배너 -->
+<div class="verdict-bar hidden" id="verdictBar">
+  <div class="vb-inner">
+    <div class="vb-top">
+      <div class="vb-head">
+        <span class="vb-icon"><svg class="icon ic-white" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor" opacity=".2"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/></svg></span>
+        <div>
+          <div class="vb-title" id="vbTitle">사건 해결하기</div>
+          <div class="vb-sub">분석으로 찾은 의심 인물·장소·시간대·달·주기를 골라 확정하세요</div>
+        </div>
+      </div>
+      <button class="verdict-btn" id="verdictBtn" type="button" disabled>의심 확정하기 <span id="verdictCount">0/5</span></button>
+    </div>
+    <div class="vb-fields">
+      <div class="vb-field">
+        <label>의심 인물 <span class="vf-tag" id="vPersonTag">잠김</span></label>
+        <select id="vPerson" disabled><option value="">— 회전목마 자료 필요 —</option></select>
+      </div>
+      <div class="vb-field">
+        <label>의심 장소 <span class="vf-tag" id="vPlaceTag">잠김</span></label>
+        <select id="vPlace" disabled><option value="">— 사파리 자료 필요 —</option></select>
+      </div>
+      <div class="vb-field">
+        <label>의심 시간대 <span class="vf-tag" id="vTimeTag">잠김</span></label>
+        <select id="vTime" disabled><option value="">— 하모니아 자료 필요 —</option></select>
+      </div>
+      <div class="vb-field">
+        <label>의심 달 <span class="vf-tag" id="vMonthTag">잠김</span></label>
+        <select id="vMonth" disabled><option value="">— 사파리 자료 필요 —</option></select>
+      </div>
+      <div class="vb-field">
+        <label>의심 주기 <span class="vf-tag" id="vCycleTag">잠김</span></label>
+        <select id="vCycle" disabled><option value="">— 하모니아 자료 필요 —</option></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 자료가 다 모이기 전 잠금 오버레이 -->
+  <div class="vb-lock" id="vbLock">
+    <div class="vb-lock-inner">
+      <span class="vb-lock-ic"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="currentColor" opacity=".25"/><rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.8 10V8a4.2 4.2 0 0 1 8.4 0v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <span id="vbLockMsg">세 구역의 자료를 모두 모으면 사건을 해결할 수 있어요</span>
+      <span class="vb-lock-count" id="vbLockCount">0 / 3</span>
+    </div>
+  </div>
+</div>
+
+<!-- 결론 결과 모달 -->
+<div class="modal-back hidden" id="verdictModal">
+  <div class="modal modal-file">
+    <div class="verdict-result" id="verdictResult"></div>
+  </div>
+</div>
+
+<!-- 기밀 기록 열람실 모달 -->
+<div class="modal-back hidden" id="vaultModal">
+  <div class="modal modal-vault">
+    <div class="vault-head">
+      <div>
+        <div class="vault-tag">DOROLAND · CLASSIFIED ACCESS</div>
+        <h3>기밀 기록 열람실</h3>
+        <p>키트 LCD에 표시된 인증코드로 봉인 자료를 열람하세요. <b id="vaultProgress">0 / 2</b>건 인가</p>
+      </div>
+      <button class="modal-close" id="vaultClose" type="button" aria-label="닫기">✕</button>
+    </div>
+    <div class="vault-tabs">
+      <button class="vault-tab on" data-tab="badges" type="button">출입증 대조 파일</button>
+      <button class="vault-tab" data-tab="calendar" type="button">직원 휴가 캘린더</button>
+    </div>
+    <div class="vault-body" id="vaultBody"></div>
+  </div>
+</div>
+
+<!-- 힌트 플로팅 버튼 -->
+<button class="hint-fab" id="hintFab" type="button">
+  <span class="lamp"><svg class="icon ic-white" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a6 6 0 0 0-3.7 10.7c.6.5 1 1.2 1.1 1.9l.2 1.4h4.8l.2-1.4c.1-.7.5-1.4 1.1-1.9A6 6 0 0 0 12 3Z" fill="currentColor" opacity=".3"/><path d="M12 3a6 6 0 0 0-3.7 10.7c.6.5 1 1.2 1.1 1.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9.6 18.6h4.8M10.2 21h3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> 힌트 보기
+</button>
+
+<!-- 힌트 모달 -->
+<div class="modal-back hidden" id="hintModal">
+  <div class="modal">
+    <div class="modal-top">
+      <button class="modal-close" id="hintClose" type="button">×</button>
+      <h3><svg class="icon ic-white" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="currentColor" opacity=".3"/><rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.8 10V8a4.2 4.2 0 0 1 8.4 0v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="14.8" r="1.6" fill="currentColor"/><path d="M12 15.6v2.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> 힌트 잠금</h3>
+      <p>힌트는 비밀번호가 필요해요. 운영진에게 받은 번호를 입력하세요.</p>
+    </div>
+    <div class="modal-body">
+      <!-- 비밀번호 화면 -->
+      <div id="pwScreen">
+        <input type="text" inputmode="numeric" maxlength="4" class="pw-input" id="pwInput" placeholder="••••" autocomplete="off" />
+        <div class="pw-err hidden" id="pwErr">❌ 비밀번호가 틀렸어요. 다시 확인해 주세요.</div>
+        <button class="pw-submit" id="pwSubmit" type="button">잠금 풀기</button>
+        <div class="pw-tip">힌트는 정답이 아니라, 어떻게 찾는지 알려줘요.</div>
+      </div>
+      <!-- 힌트 화면 -->
+      <div id="hintScreen" class="hidden">
+        <div id="hintSteps"></div>
+        <button class="hint-next" id="hintNext" type="button">다음 힌트 보기 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 튜토리얼 스포트라이트 -->
+<div class="tut-overlay hidden" id="tutOverlay">
+  <div class="tut-hole" id="tutHole"></div>
+  <div class="tut-bubble" id="tutBubble">
+    <div class="tut-badge"><span id="tutStep">1</span> <span class="tb-sep">/</span> <span id="tutTotal">4</span></div>
+    <h4 class="tut-title" id="tutTitle"></h4>
+    <div class="tut-body" id="tutBody"></div>
+    <div class="tut-ctrl">
+      <button class="tut-skip" id="tutSkip" type="button">건너뛰기</button>
+      <div class="tut-nav">
+        <button class="tut-prev" id="tutPrev" type="button">← 이전</button>
+        <button class="tut-next" id="tutNext" type="button">다음 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+
+/* ============================================================
+   듀오톤 아이콘 세트
+============================================================ */
+const ICONS = {
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h3.2a2 2 0 0 1 1.4.6L11 7h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" fill="currentColor" opacity=".25"/><path d="M3 10h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8Z" fill="currentColor"/>',
+  building:'<path d="M4 11h16v8H4z" fill="currentColor" opacity=".25"/><path d="M12 3l9 5.5V10H3V8.5L12 3Z" fill="currentColor"/><rect x="6.4" y="12" width="2.1" height="5" rx=".5" fill="currentColor"/><rect x="10.9" y="12" width="2.1" height="5" rx=".5" fill="currentColor"/><rect x="15.4" y="12" width="2.1" height="5" rx=".5" fill="currentColor"/><rect x="3.4" y="19" width="17.2" height="2" rx="1" fill="currentColor"/>',
+  clock:'<circle cx="12" cy="12" r="9" fill="currentColor" opacity=".22"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.2v5.1l3.4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+  person:'<circle cx="12" cy="7.5" r="3.4" fill="currentColor"/><path d="M5 20.5a7 7 0 0 1 14 0 1 1 0 0 1-1 1H6a1 1 0 0 1-1-1Z" fill="currentColor" opacity=".25"/><path d="M5.4 20a6.6 6.6 0 0 1 13.2 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  bulb:'<path d="M12 3a6 6 0 0 0-3.7 10.7c.6.5 1 1.2 1.1 1.9l.2 1.4h4.8l.2-1.4c.1-.7.5-1.4 1.1-1.9A6 6 0 0 0 12 3Z" fill="currentColor" opacity=".25"/><path d="M12 3a6 6 0 0 0-3.7 10.7c.6.5 1 1.2 1.1 1.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9.6 18.6h4.8M10.2 21h3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  search:'<circle cx="11" cy="11" r="6.4" fill="currentColor" opacity=".22"/><circle cx="11" cy="11" r="6.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.8 15.8 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>',
+  warning:'<path d="M12 3.6l8.8 15.2H3.2L12 3.6Z" fill="currentColor" opacity=".25"/><path d="M12 3.6l8.8 15.2H3.2L12 3.6Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.4v4.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.1" fill="currentColor"/>',
+  target:'<circle cx="12" cy="12" r="9" fill="currentColor" opacity=".2"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/>',
+  chart:'<rect x="3" y="4" width="18" height="16" rx="2.4" fill="currentColor" opacity=".16"/><rect x="6.4" y="12" width="2.5" height="5" rx=".7" fill="currentColor"/><rect x="10.75" y="9" width="2.5" height="8" rx=".7" fill="currentColor"/><rect x="15.1" y="6.5" width="2.5" height="10.5" rx=".7" fill="currentColor"/>',
+  calendar:'<rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="currentColor" opacity=".22"/><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 9.6h17" stroke="currentColor" stroke-width="1.5"/><path d="M8 3.4v3.2M16 3.4v3.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>',
+  eye:'<path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12Z" fill="currentColor" opacity=".2"/><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.9" fill="currentColor"/>',
+  lock:'<rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="currentColor" opacity=".25"/><rect x="4.5" y="10" width="15" height="10.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.8 10V8a4.2 4.2 0 0 1 8.4 0v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="14.8" r="1.6" fill="currentColor"/><path d="M12 15.6v2.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  sparkle:'<path d="M12 3l2.1 5.4L19.5 10l-5.4 1.6L12 17l-2.1-5.4L4.5 10l5.4-1.6L12 3Z" fill="currentColor" opacity=".3"/><path d="M12 3l2.1 5.4L19.5 10l-5.4 1.6L12 17l-2.1-5.4L4.5 10l5.4-1.6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="18.6" cy="17.6" r="1.5" fill="currentColor"/><circle cx="5.6" cy="18.4" r="1" fill="currentColor" opacity=".6"/>',
+  check:'<circle cx="12" cy="12" r="9" fill="currentColor" opacity=".2"/><path d="M7.8 12.2 10.6 15 16.2 9.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  wheel:'<circle cx="12" cy="11" r="8" fill="currentColor" opacity=".18"/><circle cx="12" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12 3v16M4 11h16M6.34 5.34l11.32 11.32M17.66 5.34 6.34 16.66" stroke="currentColor" stroke-width="1"/><circle cx="12" cy="11" r="1.7" fill="currentColor"/><circle cx="12" cy="3" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/><circle cx="4" cy="11" r="1.5" fill="currentColor"/><circle cx="20" cy="11" r="1.5" fill="currentColor"/><circle cx="6.34" cy="5.34" r="1.3" fill="currentColor"/><circle cx="17.66" cy="5.34" r="1.3" fill="currentColor"/><circle cx="6.34" cy="16.66" r="1.3" fill="currentColor"/><circle cx="17.66" cy="16.66" r="1.3" fill="currentColor"/><path d="M7.5 19.5h9L15 22H9z" fill="currentColor"/>',
+  safari:'<ellipse cx="12" cy="15.8" rx="4.6" ry="3.7" fill="currentColor" opacity=".3"/><ellipse cx="12" cy="15.8" rx="4.6" ry="3.7" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="6.4" cy="10.2" r="1.9" fill="currentColor"/><circle cx="10" cy="7.4" r="2" fill="currentColor"/><circle cx="14" cy="7.4" r="2" fill="currentColor"/><circle cx="17.6" cy="10.2" r="1.9" fill="currentColor"/>',
+  harmonia:'<ellipse cx="7.5" cy="17" rx="3" ry="2.3" fill="currentColor" opacity=".3"/><ellipse cx="7.5" cy="17" rx="3" ry="2.3" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="16.5" cy="15" rx="3" ry="2.3" fill="currentColor"/><path d="M10.4 17V6.4l9-2v10.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
+  carousel:'<path d="M4 9.5c0-3.4 3.6-5.5 8-5.5s8 2.1 8 5.5H4z" fill="currentColor" opacity=".3"/><path d="M4 9.5c0-3.4 3.6-5.5 8-5.5s8 2.1 8 5.5H4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 1.8v2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2" r="1.1" fill="currentColor"/><path d="M6.6 9.5v9M12 9.5v9M17.4 9.5v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4.4 18.6h15.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+};
+function svgIcon(name, size=20, cls=''){
+  return `<svg class="icon ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" aria-hidden="true">${ICONS[name]||''}</svg>`;
+}
+
+/* ============================================================
+   상태
+============================================================ */
+let sources = [];          // {id, name, type, typeLabel, headers, entityCol, entityIdx, monthIdx, valueCols, rows, zone}
+let currentSrcId = null;
+let currentMonth = null;
+let attempts = 0;          // 의심 확정 시도 횟수
+let solved = false;        // 정답 여부
+let viewMode = 'byEntity';  // 'byEntity' | 'byItem'
+let chartType = 'bar';      // 'bar' | 'line' | 'donut'
+
+// 항목별 고유 색상 팔레트 (알록달록, 이상치는 별도 빨강 강조)
+const PALETTE = ['#3076DC','#2BA6A0','#7C5CD6','#E8901C','#D4537E','#5CA632','#0FA3B1','#C0681C','#8E7CC3','#3D9970','#E05B8A','#5B8DEF'];
+function paletteColor(i){ return PALETTE[i % PALETTE.length]; }
+function hexA(hex, a){ // hex → rgba
+  const n=parseInt(hex.slice(1),16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+/* ============================================================
+   CSV 파싱 + 자동 인식
+============================================================ */
+function parseCSV(text){
+  const lines = text.replace(/^\uFEFF/,'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return {headers:[], rows:[]};
+  const split = l => l.split(',').map(c=>c.trim().replace(/^"|"$/g,''));
+  return { headers: split(lines[0]), rows: lines.slice(1).map(split) };
+}
+
+// 컬럼 구성으로 자료 종류를 알아봄
+function detectType(headers){
+  const h = headers.map(x=>x.trim());
+  const monthIdx = h.findIndex(x => x === '달' || x === '월' || x === '연도');
+  // 항목 컬럼 = 달 다음 컬럼
+  const entityIdx = monthIdx >= 0 ? monthIdx+1 : 0;
+  const entityCol = h[entityIdx] || h[0];
+  const valueCols = h.map((name,i)=>({name,i})).filter(c => c.i!==monthIdx && c.i!==entityIdx);
+  const isTimeCols = valueCols.some(c => /낮|오후|저녁|야간|새벽|시/.test(c.name));
+
+  let type, typeLabel, icon;
+  if(entityCol.includes('구역')){
+    type='zone'; typeLabel='구역별 출입기록'; icon='building';
+  } else if(isTimeCols){
+    type='person_time'; typeLabel='시간대별 인물활동'; icon='clock';
+  } else {
+    type='person_zone'; typeLabel='인물별 구역방문'; icon='person';
+  }
+  return {type, typeLabel, icon, monthIdx, entityIdx, entityCol, valueCols};
+}
+
+function ingestFile(name, text){
+  const {headers, rows} = parseCSV(text);
+  if(!headers.length) return null;
+  const meta = detectType(headers);
+  return {
+    id: 'src_'+Math.random().toString(36).slice(2,8),
+    name, headers, rows,
+    type: meta.type, typeLabel: meta.typeLabel, icon: meta.icon,
+    monthIdx: meta.monthIdx, entityIdx: meta.entityIdx,
+    entityCol: meta.entityCol, valueCols: meta.valueCols,
+  };
+}
+
+/* ============================================================
+   구역 정의 (구역 = 자료 종류 1:1)
+============================================================ */
+const ZONES = [
+  {key:'safari',   icon:'safari',   img:'사파리.png',   name:'사파리 구역',   type:'zone',        want:'구역별 출입기록'},
+  {key:'harmonia', icon:'harmonia', img:'하모니아.png', name:'하모니아 구역', type:'person_time', want:'시간대별 인물활동'},
+  {key:'carousel', icon:'carousel', img:'회전목마.png', name:'회전목마 구역', type:'person_zone', want:'인물별 구역방문'},
+];
+function zoneByType(type){ return ZONES.find(z=>z.type===type); }
+function zoneByKey(key){ return ZONES.find(z=>z.key===key); }
+
+/* ============================================================
+   업로드 처리 (구역 슬롯별)
+============================================================ */
+// 한 구역 슬롯에 파일을 받음 (종류 검증 없이 무엇이든 받음)
+function fileKey(name){ return String(name||'').trim().toLowerCase(); }
+function isDuplicateFileName(file, zoneKey){
+  const key = fileKey(file && file.name);
+  return key && sources.some(s => s.zone !== zoneKey && fileKey(s.name) === key);
+}
+async function handleZoneFile(zoneKey, file){
+  if(sources.some(s => s.zone === zoneKey)){
+    flashMismatch(zoneKey, '이미 자료가 등록된 구역입니다. 다른 자료를 올리려면 처음부터를 눌러 주세요.');
+    return;
+  }
+  if(isDuplicateFileName(file, zoneKey)){
+    flashMismatch(zoneKey, '이미 다른 구역에 올린 파일입니다. 서로 다른 3개의 CSV를 올려 주세요.');
+    return;
+  }
+  const text = await file.text();
+  const src = ingestFile(file.name, text);
+  if(!src){ flashMismatch(zoneKey, '읽을 수 없는 파일이에요. CSV 파일인지 확인해 주세요.'); return; }
+  src.zone = zoneKey;
+  const wasEmpty = sources.length===0;
+  sources.push(src);
+  afterSourcesChanged();
+  if(wasEmpty || mainView==='analyzer') setMainView('analyzer');
+  selectSource(src.id);
+}
+function removeZone(zoneKey){
+  sources = sources.filter(s => s.zone !== zoneKey);
+  if(!sources.find(s=>s.id===currentSrcId)){
+    currentSrcId = sources.length ? sources[0].id : null;
+    if(currentSrcId) selectSource(currentSrcId);
+  }
+  afterSourcesChanged();
+}
+let mainView = 'guide';   // 'guide' | 'analyzer'
+function setMainView(v){
+  if(v==='analyzer' && sources.length===0) v='guide'; // 자료 없으면 분석 불가
+  mainView = v;
+  $('guide').classList.toggle('hidden', v!=='guide');
+  $('analyzer').classList.toggle('hidden', v!=='analyzer');
+  // 가이드 화면일 때만 가이드 토글 표시 (분석 화면은 헤더에 토글 있음)
+  $('viewToggleGuide').classList.toggle('hidden', v!=='guide' || sources.length===0);
+  // 양쪽 토글 버튼 활성 상태 동기화
+  document.querySelectorAll('#viewToggle button, #viewToggleGuide button')
+    .forEach(b=>b.classList.toggle('on', b.dataset.view===v));
+  // 분석 화면으로 전환되면 차트 폭 재계산하여 다시 그림
+  if(v==='analyzer' && currentSrcId){ requestAnimationFrame(()=>{ const x=getView(); if(x) drawChart(x); }); }
+}
+['viewToggle','viewToggleGuide'].forEach(tid=>{
+  $(tid).addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b || b.disabled) return;
+    setMainView(b.dataset.view);
+  });
+});
+
+function afterSourcesChanged(){
+  const has = sources.length>0;
+  // 가이드 토글: 자료가 있고 가이드 화면일 때만
+  $('viewToggleGuide').classList.toggle('hidden', !has || mainView!=='guide');
+  // 하단 결론 배너: 자료가 하나라도 있으면 표시
+  $('verdictBar').classList.toggle('hidden', !has);
+  document.body.classList.toggle('with-bar', has);
+  renderZoneSlots();
+  renderVerdict();
+  if(!has){ currentSrcId=null; setMainView('guide'); }
+  saveProgress();
+  updateResetBtn();
+  if(typeof updateVaultCount==='function') updateVaultCount();
+  if(typeof renderVaultBody==='function' && !$('vaultModal').classList.contains('hidden')) renderVaultBody();
+}
+
+/* ===== 진행 상태 저장 / 복원 / 재설정 ===== */
+const SAVE_KEY = 'doroland_progress_v1';
+function saveProgress(){ /* session-only: no cached CSV/progress state */ }
+function restoreProgress(){ return false; }
+function resetAll(){
+  sources = []; currentSrcId=null; currentMonth=null; attempts=0; solved=false;
+  unlocked = { badges:false, calendar:false };
+  try{
+    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem('doroland_unlock_v1');
+    localStorage.removeItem('doroland_tut_seen_v2');
+  }catch(e){}
+  VFIELDS.forEach(id=>{ if($(id)) $(id).value=''; });
+  afterSourcesChanged();
+  updateVaultCount();
+  if(typeof renderVaultBody==='function' && !$('vaultModal').classList.contains('hidden')) renderVaultBody();
+  setMainView('guide');
+}
+function updateResetBtn(){
+  const btn=$('resetBtn'); if(!btn) return;
+  btn.classList.toggle('hidden', sources.length===0);
+}
+
+let mismatchTimer = null;
+function flashMismatch(zoneKey, msg){
+  renderZoneSlots();
+  const slot = document.querySelector(`.zone-slot[data-zone="${zoneKey}"]`);
+  if(!slot) return;
+  slot.classList.add('mismatch');
+  slot.querySelector('.zone-mismatch').textContent = '⚠ '+msg;
+  clearTimeout(mismatchTimer);
+  mismatchTimer = setTimeout(()=>slot.classList.remove('mismatch'), 4000);
+}
+
+/* ============================================================
+   구역 슬롯 렌더
+============================================================ */
+function renderZoneSlots(){
+  const filledCount = ZONES.filter(z=>sources.some(s=>s.zone===z.key)).length;
+  $('srcCount').textContent = `${filledCount} / 3`;
+  $('zoneSlots').innerHTML = ZONES.map(z=>{
+    const src = sources.find(s=>s.zone===z.key);
+    const filled = !!src;
+    const viewing = filled && src.id===currentSrcId;
+    const status = filled
+      ? `<span class="zs-status">${svgIcon('check',16,'ic-white')}</span>`
+      : `<span class="zs-status">+</span>`;
+    const fileRow = filled ? `
+      <div class="zs-file">
+        <span class="zs-fname">${esc(src.name)}</span>
+        <span class="zs-view" data-view="${z.key}">${viewing?'현재 분석 중':'클릭해서 분석 보기'}</span>
+      </div>` : '';
+    const tag = filled ? 'div' : 'label';
+    return `
+      <${tag} class="zone-slot ${filled?'filled':''} ${viewing?'viewing':''}" data-zone="${z.key}" ${filled?'role="button" tabindex="0"':''}>
+        <input type="file" accept=".csv,.txt" data-input="${z.key}" ${filled?'disabled':''} />
+        <div class="zs-top">
+          <div class="zs-emoji"><img class="zs-img" src="${esc(z.img)}" alt="${esc(z.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/><span class="zs-fallback" style="display:none">${svgIcon(z.icon,24)}</span></div>
+          <div class="zs-info">
+            <div class="zs-zone">${esc(z.name)}</div>
+            <div class="zs-want">${filled? '자료 등록 완료 · 블록을 눌러 분석 보기' : esc(z.name.replace(' 구역',''))+'에서 담당자를 도와주고 얻은 자료를 올려요'}</div>
+          </div>
+          ${status}
+        </div>
+        ${fileRow}
+        <div class="zone-mismatch"></div>
+      </${tag}>`;
+  }).join('');
+
+  // 이벤트 연결
+  $('zoneSlots').querySelectorAll('input[data-input]').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const f = e.target.files && e.target.files[0];
+      if(f) handleZoneFile(inp.dataset.input, f);
+      e.target.value='';
+    });
+    inp.addEventListener('click', e=>e.stopPropagation());
+  });
+  // 채워진 블록은 전체 클릭으로 해당 자료 보기
+  $('zoneSlots').querySelectorAll('.zone-slot.filled').forEach(slot=>{
+    const openSrc = ()=>{
+      const src = sources.find(s=>s.zone===slot.dataset.zone);
+      if(src){ setMainView('analyzer'); selectSource(src.id); }
+    };
+    slot.addEventListener('click', e=>{ e.preventDefault(); openSrc(); });
+    slot.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openSrc(); }
+    });
+  });
+  // 드래그 앤 드롭
+  $('zoneSlots').querySelectorAll('.zone-slot').forEach(slot=>{
+    const key = slot.dataset.zone;
+    ['dragenter','dragover'].forEach(ev=>slot.addEventListener(ev,e=>{e.preventDefault();slot.classList.add('drag')}));
+    ['dragleave','dragend'].forEach(ev=>slot.addEventListener(ev,e=>{e.preventDefault();slot.classList.remove('drag')}));
+    slot.addEventListener('drop', e=>{
+      e.preventDefault(); slot.classList.remove('drag');
+      const f = e.dataTransfer?.files && e.dataTransfer.files[0];
+      if(!f) return;
+      if(sources.some(s=>s.zone===key)){
+        flashMismatch(key, '이미 자료가 등록된 구역입니다. 다른 자료를 올리려면 처음부터를 눌러 주세요.');
+        return;
+      }
+      handleZoneFile(key, f);
+    });
+  });
+}
+
+function selectSource(id){
+  currentSrcId = id;
+  const src = sources.find(s=>s.id===id);
+  if(!src) return;
+  // 달/연도 목록 갱신
+  const months = src.monthIdx>=0 ? [...new Set(src.rows.map(r=>String(r[src.monthIdx])))] : ['(전체)'];
+  if(!months.includes(currentMonth)) currentMonth = months[0];
+  // 필터 라벨: 연도 자료면 '해', 아니면 '달'
+  const isYear = src.monthIdx>=0 && /연도/.test(src.headers[src.monthIdx]);
+  $('monthLabel').textContent = isYear ? '어느 해를 볼까요?' : '어느 달을 볼까요?';
+  // 모드 기본값: 인물별 구역방문이면 '한 명 펼쳐보기'가 직관적
+  viewMode = (src.type==='person_zone') ? 'byItem' : 'byEntity';
+  renderZoneSlots();
+  renderAnalyzerHead(src);
+  renderMonthPills(months);
+  renderModeToggle();
+  renderControls(src);
+  render();
+  // 패널이 막 보여진 직후 폭이 0일 수 있어, 레이아웃 안정 후 한 번 더 그림
+  requestAnimationFrame(()=>{ const v=getView(); if(v) drawChart(v); });
+}
+
+/* ============================================================
+   분석 패널 헤더
+============================================================ */
+function renderAnalyzerHead(src){
+  $('curSrcName').innerHTML = `<span class="ic-blue" style="display:inline-flex;vertical-align:middle;margin-right:6px">${svgIcon(src.icon,18)}</span>${esc(src.typeLabel)}`;
+}
+
+/* 달 필터 */
+function renderMonthPills(months){
+  $('monthPills').innerHTML = months.map(m=>
+    `<div class="mp ${m===currentMonth?'active':''}" data-m="${esc(m)}">${esc(m)}</div>`).join('');
+  $('monthPills').querySelectorAll('.mp').forEach(el=>{
+    el.addEventListener('click', ()=>{ currentMonth = el.dataset.m;
+      $('monthPills').querySelectorAll('.mp').forEach(x=>x.classList.toggle('active',x.dataset.m===currentMonth));
+      render();
+    });
+  });
+}
+
+/* 보기 모드 토글 */
+function renderModeToggle(){
+  $('modeToggle').querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.mode===viewMode);
+  });
+  const byItem = viewMode==='byItem';
+  $('colField').classList.toggle('hidden', byItem);
+  $('itemField').classList.toggle('hidden', !byItem);
+  $('modeHint').textContent = byItem
+    ? '한 항목을 골라 그 항목의 모든 값을 펼쳐 봐요'
+    : '어느 항목이 가장 튀는지 한눈에 비교해요';
+}
+$('modeToggle').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  viewMode = b.dataset.mode;
+  renderModeToggle(); render();
+});
+
+// 그래프 형식 토글 (막대/꺾은선/도넛)
+$('chartTypeToggle').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  chartType = b.dataset.type;
+  $('chartTypeToggle').querySelectorAll('button').forEach(x=>x.classList.toggle('on', x.dataset.type===chartType));
+  const v=getView(); if(v) drawChart(v);
+});
+
+/* 컬럼/항목 셀렉트 */
+function renderControls(src){
+  // 컬럼 선택 (byEntity)
+  $('colSelect').innerHTML = src.valueCols.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  // 항목 선택 (byItem)
+  const ents = [...new Set(src.rows.map(r=>r[src.entityIdx]))];
+  $('itemSelect').innerHTML = ents.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+  const targetIcon = svgIcon('target',16,'ic-blue');
+  const chartIcon = svgIcon('chart',16,'ic-blue');
+  $('itemLabel').innerHTML = targetIcon + ' ' + (src.type==='zone' ? '어느 구역을 자세히?' : '누구를 자세히 볼까?');
+  $('colLabel').innerHTML = chartIcon + ' 어떤 값으로 비교?';
+}
+$('colSelect').addEventListener('change', render);
+$('itemSelect').addEventListener('change', render);
+
+/* ============================================================
+   데이터 추출 + 이상 탐지
+============================================================ */
+function getView(){
+  const src = sources.find(s=>s.id===currentSrcId);
+  if(!src) return null;
+  const monthRows = src.monthIdx>=0 ? src.rows.filter(r=>r[src.monthIdx]===currentMonth) : src.rows;
+
+  let labels, values, colName, axisName;
+  if(viewMode==='byItem'){
+    // 한 항목의 모든 값 컬럼을 펼침
+    const ent = $('itemSelect').value;
+    const row = monthRows.find(r=>r[src.entityIdx]===ent);
+    labels = src.valueCols.map(c=>c.name);
+    values = src.valueCols.map(c=> row ? toNum(row[c.i]) : 0);
+    colName = ent;
+    axisName = src.entityCol+' = '+ent+' 의 값들';
+  } else {
+    // 항목별로 한 컬럼 비교
+    colName = $('colSelect').value;
+    const col = src.valueCols.find(c=>c.name===colName) || src.valueCols[0];
+    labels = monthRows.map(r=>r[src.entityIdx]);
+    values = monthRows.map(r=>toNum(r[col.i]));
+    axisName = src.entityCol;
+  }
+  const stat = detectAnomaly(labels, values);
+  return {src, labels, values, colName, axisName, stat, title: buildChartTitle(src)};
+}
+
+// 그래프 제목을 자연어로 조립: "[기간] [시간대], [무엇]별 [무슨 기록]"
+function buildChartTitle(src){
+  // 기간 (달 또는 연도)
+  const isYear = src.monthIdx>=0 && /연도/.test(src.headers[src.monthIdx]);
+  const period = src.monthIdx>=0 ? (isYear ? `${currentMonth}년` : currentMonth) : '';
+  // 항목 이름 (구역/출입증/인물 등) — entityCol 사용
+  const entity = src.entityCol || '항목';
+  // 자료별 "무슨 기록"인지
+  const recordWord = (src.type==='zone') ? '출입 기록'
+                   : (src.type==='person_time') ? '활동 기록'
+                   : (src.type==='person_zone') ? '방문 기록' : '기록';
+
+  if(viewMode==='byItem'){
+    // 한 항목 펼쳐보기: "[기간], [항목값]의 [무엇]별 [기록]"
+    const ent = $('itemSelect').value || '';
+    if(src.type==='person_zone'){
+      // 인물별 구역방문: "8월, 자일로(X404)의 구역별 방문 기록"
+      return `${period ? period+', ' : ''}${ent}의 구역별 방문 기록`;
+    }
+    // 그 외 펼쳐보기: 시간대별
+    return `${period ? period+', ' : ''}${ent}의 시간대별 ${recordWord}`;
+  } else {
+    // 항목별 비교: "[기간] [시간대], [항목]별 [기록]"
+    const time = $('colSelect').value || '';
+    if(src.type==='person_zone'){
+      // 회전목마 항목별: "8월, 관람차 방문이 많은 출입증" 식
+      return `${period ? period+', ' : ''}${time} 방문이 많은 ${entity}`;
+    }
+    return `${period ? period+' ' : ''}${time}, ${entity}별 ${recordWord}`;
+  }
+}
+
+function detectAnomaly(labels, values){
+  const n = values.length || 1;
+  const mean = values.reduce((s,v)=>s+v,0)/n;
+  const sd = Math.sqrt(values.reduce((s,v)=>s+(v-mean)*(v-mean),0)/n) || 1e-9;
+  const zs = values.map(v=>(v-mean)/sd);
+  let maxIdx=0; zs.forEach((z,i)=>{if(z>zs[maxIdx])maxIdx=i;});
+  const sorted=[...zs].sort((a,b)=>b-a);
+  const dom = (sorted[1]>0)? sorted[0]/sorted[1] : 99;
+  const ratio = mean? values[maxIdx]/mean : 0;
+  const isAnom = zs[maxIdx]>=1.8 && ratio>=2.0 && values[maxIdx]>2;
+  return {mean, maxIdx, maxLabel:labels[maxIdx], maxVal:values[maxIdx], ratio, dom, isAnom};
+}
+
+/* ============================================================
+   렌더
+============================================================ */
+function render(){
+  const v = getView();
+  if(!v){ return; }
+  drawChart(v);
+  // 통계
+  $('statMaxLabel').textContent = v.stat.maxLabel ?? '—';
+  $('statMaxVal').textContent = fmt(v.stat.maxVal);
+  $('statRatio').textContent = v.stat.mean ? (v.stat.ratio.toFixed(1)+'배') : '—';
+  // 이상신호
+  renderSignal(v);
+}
+
+function renderSignal(v){
+  const sig = $('signal');
+  const s = v.stat;
+  if(s.isAnom){
+    sig.className = 'signal alert';
+    $('sigIcon').className = 'sic ic-bad';
+    $('sigIcon').innerHTML = svgIcon('warning',30);
+    $('sigTitle').textContent = '수상한 데이터를 찾았어요!';
+    const where = (viewMode==='byItem')
+      ? `<b>${esc(currentMonth)}</b>의 <b>${esc(v.colName)}</b>는 <b>${esc(s.maxLabel)}</b>에 가장 많아요`
+      : `<b>${esc(currentMonth)}</b>의 <b>${esc(v.colName)}</b> 값이 <b>${esc(s.maxLabel)}</b>에서 유독 높아요`;
+    $('sigBody').innerHTML = `${where} — 평균의 <b>${s.ratio.toFixed(1)}배</b>. 다른 항목들과 너무 달라요. 기억해 뒀다가 <b>수사 결론</b>에 골라 보세요!`;
+  } else {
+    sig.className = 'signal normal';
+    $('sigIcon').className = 'sic ic-good';
+    $('sigIcon').innerHTML = svgIcon('search',30);
+    $('sigTitle').textContent = '평범한 데이터예요';
+    $('sigBody').textContent = '여기선 특별히 튀는 게 없네요. 달이나 값을 바꿔서 다시 살펴보세요.';
+  }
+}
+
+/* ============================================================
+   수사 결론 (인물/장소/시간대/달/주기 5종 선택)
+============================================================ */
+// 정답은 평문 대신 해시로 보관 (소스 보기로 답을 바로 못 찾게)
+// hashStr('자일로'+SALT) 등으로 생성한 값. 비교 시 입력값을 같은 방식으로 해시해 대조.
+const _SALT = 'doroland::v3::secret';
+function hashStr(s){ let h=5381; for(let i=0;i<s.length;i++){ h=((h<<5)+h)+s.charCodeAt(i); h|=0; } return (h>>>0).toString(36); }
+function ansHash(v){ return hashStr(v+'|'+_SALT); }
+const ANSWER_HASH = {
+  person: ansHash('자일로'),
+  place:  ansHash('관람차'), // 의심 장소 정답: 실제 장소명 '관람차'
+  time:   ansHash('야간(23~08)'),
+  month:  ansHash('8월'),
+  cycle:  ansHash('3년'),
+};
+function isCorrect(key, val){ return val!=null && ansHash(val)===ANSWER_HASH[key]; }
+
+// 결과 모달용 SVG 아이콘 (윈도우 이모지 대신)
+const IC_KEY = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="8.5" cy="8.5" r="4.4" fill="none" stroke="#FFD466" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.5" fill="#FFD466"/><path d="M11.7 11.7 19 19m-2.6-2.6 2-2m-4-1.4 1.6 1.6" stroke="#FFD466" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const IC_GLASS = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="#FF8A8A" stroke-width="1.8"/><path d="M15 15l5 5" stroke="#FF8A8A" stroke-width="1.9" stroke-linecap="round"/></svg>`;
+const IC_CHECK = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="rgba(31,157,99,.18)"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#5FD49B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const IC_CROSS = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="rgba(229,90,90,.2)"/><path d="M8.5 8.5l7 7m0-7l-7 7" stroke="#FF8A8A" stroke-width="2" stroke-linecap="round"/></svg>`;
+const IC_BULB = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 17.5h6M9.5 20h5" stroke="#FFD466" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1 1 1.6h5c.1-.6.4-1.1 1-1.6A6 6 0 0 0 12 3z" fill="rgba(255,212,102,.18)" stroke="#FFD466" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+// 빨간 실 장식 (대각선으로 가로지르는 느낌)
+const THREAD_SVG = `<svg width="100%" height="100%" viewBox="0 0 500 420" preserveAspectRatio="none" fill="none"><path d="M-10 60 L520 250 M40 410 L470 30" stroke="#E5404D" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/><circle cx="40" cy="410" r="4" fill="#E5404D"/><circle cx="470" cy="30" r="4" fill="#E5404D"/></svg>`;
+const IC_LOCK = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="#9AA6BD" opacity=".25"/><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="#9AA6BD" stroke-width="1.6"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#9AA6BD" stroke-width="1.6"/><circle cx="12" cy="15" r="1.4" fill="#9AA6BD"/></svg>`;
+const IC_PERSON_BIG = `<svg width="46" height="46" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#EAF1FB"/><circle cx="12" cy="9.5" r="3.4" fill="#3076DC"/><path d="M5.5 19c.7-3.4 3.3-5 6.5-5s5.8 1.6 6.5 5" fill="#3076DC"/></svg>`;
+
+// 인물 후보 (출입증 카드 힌트로 X404=자일로 등을 알아내야 함)
+const PERSON_OPTIONS = ['자일로','제로','리코','루미아','코어','나나','미모','하루','가온','에코'];
+// 출입증 ↔ 인물 매핑 (앞 글자 초성으로 연결) — 힌트 카드/추리에 사용
+const BADGE_PEOPLE = [
+  {badge:'X-404', en:'Xylo',  ko:'자일로', areaKo:'총책임자',        titleEn:'GENERAL MANAGER', access:'FULL ACCESS',  accessShort:'FUL'},
+  {badge:'Z-088', en:'Zero',  ko:'제로',   areaKo:'중앙관리실',      titleEn:'CONTROL ROOM',    access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'R-022', en:'Rico',  ko:'리코',   areaKo:'중앙관리실',      titleEn:'CONTROL ROOM',    access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'L-153', en:'Lumia', ko:'루미아', areaKo:'사파리 구역',     titleEn:'SAFARI ZONE',     access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'C-318', en:'Core',  ko:'코어',   areaKo:'범퍼카',          titleEn:'BUMPER CARS',     access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'N-117', en:'Nana',  ko:'나나',   areaKo:'관람차',          titleEn:'FERRIS WHEEL',    access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'M-240', en:'Mimo',  ko:'미모',   areaKo:'회전목마관리실',   titleEn:'CAROUSEL',        access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'H-076', en:'Haru',  ko:'하루',   areaKo:'하모니아 관리실',  titleEn:'HARMONIA HALL',   access:'ZONE ACCESS',  accessShort:'ZON'},
+  {badge:'G-052', en:'Gaon',  ko:'가온',   areaKo:'야간 경비',       titleEn:'NIGHT SECURITY',  access:'NIGHT ACCESS', accessShort:'NGT'},
+  {badge:'E-210', en:'Echo',  ko:'에코',   areaKo:'음향실',          titleEn:'SOUND ROOM',      access:'ZONE ACCESS',  accessShort:'ZON'},
+];
+// 주기 후보
+const CYCLE_OPTIONS = ['2년','3년','4년','5년'];
+// 최종 사건 해결하기에서는 장소 코드를 실제 장소명으로 보여줌
+const PLACE_CODE_MAP = {
+  // 구역 코드형 힌트. 최종 사건 해결하기에는 코드가 아니라 실제 장소명만 표시됩니다.
+  'P-01':'사파리 구역', 'P01':'사파리 구역',
+  'P-02':'하모니아 구역', 'P02':'하모니아 구역',
+  'P-03':'회전목마', 'P03':'회전목마',
+  'P-04':'관람차', 'P04':'관람차',
+  'P-05':'범퍼카', 'P05':'범퍼카',
+  'P-06':'음향실', 'P06':'음향실',
+  'P-07':'중앙관리실', 'P07':'중앙관리실',
+  'P-08':'야간 경비실', 'P08':'야간 경비실',
+
+  // CSV에 들어오는 DL 코드형 힌트.
+  // 현재 사파리 자료의 핵심 장소 코드는 DL-08이며, 실제 장소명은 관람차입니다.
+  'DL-01':'사파리 구역', 'DL01':'사파리 구역',
+  'DL-02':'하모니아 구역', 'DL02':'하모니아 구역',
+  'DL-03':'회전목마', 'DL03':'회전목마',
+  'DL-04':'범퍼카', 'DL04':'범퍼카',
+  'DL-05':'음향실', 'DL05':'음향실',
+  'DL-06':'중앙관리실', 'DL06':'중앙관리실',
+  'DL-07':'야간 경비실', 'DL07':'야간 경비실',
+  'DL-08':'관람차', 'DL08':'관람차'
+};
+function normalizePlaceCode(v){
+  const raw = String(v||'').toUpperCase();
+  const m = raw.match(/\b(P|DL)\s*-?\s*(\d{1,2})\b/);
+  return m ? `${m[1]}-${m[2].padStart(2,'0')}` : null;
+}
+function placeDisplayName(v){
+  const raw = String(v||'').trim();
+  if(!raw) return raw;
+  const code = normalizePlaceCode(raw);
+  if(code && PLACE_CODE_MAP[code]) return PLACE_CODE_MAP[code];
+  const compact = code ? code.replace('-', '') : raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(PLACE_CODE_MAP[compact]) return PLACE_CODE_MAP[compact];
+  // 'P-04 관람차', 'DL-08_관람차'처럼 코드 뒤에 이름이 붙은 경우 실제 장소명만 사용
+  const named = raw.match(/^(?:P|DL)\s*-?\s*\d{1,3}[\s:_\/\-]+(.+)$/i);
+  if(named && named[1]) return named[1].trim();
+  return PLACE_CODE_MAP[raw] || raw;
+}
+
+// 올린 자료로부터 각 선택지의 후보를 모음
+function getVerdictOptions(){
+  // 기본은 CSV 컬럼으로 판정한 자료 종류를 우선 사용하고,
+  // 파일 형식이 조금 달라도 각 구역 슬롯에 올라간 자료를 보조 후보로 사용합니다.
+  const sourceByTypeOrZone = (type, zoneKey) => sources.find(s=>s.type===type) || sources.find(s=>s.zone===zoneKey) || null;
+  const carouselSrc = sourceByTypeOrZone('person_zone', 'carousel');   // 회전목마 → 의심 인물
+  const safariSrc   = sourceByTypeOrZone('zone', 'safari');            // 사파리 → 의심 장소/달
+  const harmoniaSrc = sourceByTypeOrZone('person_time', 'harmonia');   // 하모니아 → 시간대/주기
+
+  const uniq = arr => [...new Set(arr)];
+  // 인물: 회전목마 자료가 있으면 인물 선택 해금 (이름 목록은 고정 후보 + 셔플 X, 정렬)
+  const persons = carouselSrc ? PERSON_OPTIONS.slice() : null;
+  const places = safariSrc ? uniq(safariSrc.rows.map(r=>placeDisplayName(r[safariSrc.entityIdx]))) : null;
+  const months = (safariSrc && safariSrc.monthIdx>=0 && /달|월/.test(safariSrc.headers[safariSrc.monthIdx]))
+               ? uniq(safariSrc.rows.map(r=>r[safariSrc.monthIdx])) : null;
+  const timeSrc = harmoniaSrc || safariSrc;
+  const times  = timeSrc ? timeSrc.valueCols.map(c=>c.name) : null;
+  // 주기: 하모니아 자료가 있으면 형식이 '연도'가 아니어도 최종 선택을 열어둡니다.
+  // 3년 주기는 실물/기밀 힌트와 데이터 해석으로 고르게 하는 항목입니다.
+  const cycles = harmoniaSrc ? CYCLE_OPTIONS.slice() : null;
+  return {persons, places, times, months, cycles};
+}
+
+function fillVerdictSelect(sel, tag, options, lockMsg){
+  const cur = sel.value;
+  if(options){
+    sel.innerHTML = `<option value="">— 선택 —</option>` + options.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+    sel.disabled = false;
+    tag.textContent = '선택 가능'; tag.classList.add('open');
+    if(options.includes(cur)) sel.value = cur;
+  } else {
+    sel.innerHTML = `<option value="">— ${esc(lockMsg)} —</option>`;
+    sel.disabled = true;
+    tag.textContent = '잠김'; tag.classList.remove('open');
+  }
+}
+
+function renderVerdict(){
+  const {persons, places, times, months, cycles} = getVerdictOptions();
+  fillVerdictSelect($('vPerson'), $('vPersonTag'), persons, '회전목마 자료 필요');
+  fillVerdictSelect($('vPlace'),  $('vPlaceTag'),  places,  '사파리 자료 필요');
+  fillVerdictSelect($('vMonth'),  $('vMonthTag'),  months,  '사파리 자료 필요');
+  fillVerdictSelect($('vTime'),   $('vTimeTag'),   times,   '하모니아 자료 필요');
+  fillVerdictSelect($('vCycle'),  $('vCycleTag'),  cycles,  '하모니아 자료 필요');
+  updateVerdictLock();
+  updateVerdictCount();
+}
+
+// 세 자료(구역 3칸)가 모두 모여야 잠금 해제
+function isVerdictUnlocked(){
+  return ZONES.every(z=>sources.some(s=>s.zone===z.key));
+}
+function updateVerdictLock(){
+  const unlocked = isVerdictUnlocked();
+  $('verdictBar').classList.toggle('unlocked', unlocked);
+  const got = ZONES.filter(z=>sources.some(s=>s.zone===z.key)).length;
+  $('vbLockCount').textContent = `${got} / 3`;
+}
+
+const VFIELDS = ['vPerson','vPlace','vTime','vMonth','vCycle'];
+function updateVerdictCount(){
+  const unlocked = isVerdictUnlocked();
+  const picked = VFIELDS.map(id=>$(id).value).filter(Boolean).length;
+  $('verdictCount').textContent = `${picked}/5`;
+  const btn = $('verdictBtn');
+  btn.disabled = !unlocked || picked < 5;
+  btn.title = !unlocked ? '세 구역 자료를 모두 올려야 합니다.' : (picked < 5 ? '다섯 단서를 모두 선택해야 합니다.' : '의심을 확정할 수 있습니다.');
+}
+VFIELDS.forEach(id=>{
+  $(id).addEventListener('change', ()=>{ updateVerdictCount(); saveProgress(); });
+});
+
+function openVerdictModal(html){
+  $('verdictResult').innerHTML = html;
+  $('verdictModal').classList.remove('hidden');
+}
+function closeVerdictModal(){ $('verdictModal').classList.add('hidden'); }
+$('verdictModal').addEventListener('click', e=>{ if(e.target===$('verdictModal')) closeVerdictModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('verdictModal').classList.contains('hidden')) closeVerdictModal(); });
+
+$('verdictBtn').addEventListener('click', ()=>{
+  const picked = {
+    person:$('vPerson').value, place:$('vPlace').value, time:$('vTime').value,
+    month:$('vMonth').value, cycle:$('vCycle').value
+  };
+  if(!picked.person||!picked.place||!picked.time||!picked.month||!picked.cycle) return;
+
+  // 항목 정의 (라벨, 고른 값, 정답 여부, 틀렸을 때 간접 힌트)
+  const FIELDS = [
+    {key:'person', label:'의심 인물',
+     hint:'출입증 번호만으론 누가 누군지 알 수 없어요. <b>출입증 카드</b>를 다시 살펴 번호와 이름을 맞춰 보고, 그 번호가 <b>회전목마(인물별 방문)</b> 자료에서 어떻게 움직였는지 확인해 보세요.'},
+    {key:'place',  label:'의심 장소',
+     hint:'<b>사파리(구역별 출입)</b> 자료에서 <b>야간</b>만 따로 떼어 구역을 비교해 보세요. 여러 구역 중 유독 한 곳이 솟아 있을 거예요. 다른 달과도 비교하면 더 또렷해져요.'},
+    {key:'time',   label:'의심 시간대',
+     hint:'같은 자료라도 <b>시간대(낮·오후·저녁·야간)</b>를 바꿔가며 보세요. 환할 때가 아니라 <b>어두운 시간</b>에 답이 숨어 있을지도 몰라요.'},
+    {key:'month',  label:'의심 달',
+     hint:'<b>사파리</b> 자료에서 한 구역을 골라 <b>달별로</b> 비교해 보세요. 평소엔 비슷하다가 어느 달에 갑자기 튀어 오르는 게 보이나요?'},
+    {key:'cycle',  label:'의심 주기',
+     hint:'<b>하모니아(연도별)</b> 자료를 <b>꺾은선</b>으로 바꿔 보세요. 값이 튀는 해들이 보이면, 그 해들 <b>사이 간격</b>을 세어 보세요. 그 간격이 곧 되풀이되는 주기예요.'},
+  ];
+  const correctCount = FIELDS.filter(f=>isCorrect(f.key, picked[f.key])).length;
+  const ok = correctCount===FIELDS.length;
+  attempts++;  // 의심 확정 시도 횟수
+  if(ok) solved = true;
+  saveProgress();
+
+  // 성과 문구: 시도 횟수에 따라
+  const attemptBadge = attempts===1
+    ? '단 한 번에 진실을 꿰뚫었어요! 🔎'
+    : `${attempts}번의 조사 끝에 진실에 닿았어요.`;
+
+  if(ok){
+    // ── 정답: 도로랜드 기밀 — 비밀 확정 (가로 2단) ──
+    openVerdictModal(`<div class="vfile ok">
+      <div class="vfile-thread">${THREAD_SVG}</div>
+      <div class="vr-stamp" id="vrStamp"><span class="s-big">기밀</span><span class="s-small">CONFIRMED</span></div>
+      <div class="vf-left">
+        <div class="vfile-tag">DOROLAND · CLASSIFIED</div>
+        <div class="vr-title"><span class="vt-ic">${IC_KEY}</span>도로랜드의 비밀을 밝혀냈어요</div>
+        <p class="vr-detective"><b>제로</b>와 <b>리코</b>가 흩어진 단서를 모아, 숨겨져 있던 진실을 확정했어요.</p>
+        <div class="vr-score">${attemptBadge}</div>
+        <button class="vr-close" id="vrClose" type="button">기밀 파일 닫기</button>
+      </div>
+      <div class="vf-right">
+        <div class="vr-secret">
+          <p>총책임자 <b>${esc(picked.person)}</b>가 <b>${esc(picked.month)}</b>, <b>${esc(picked.time)}</b>에 <b>${esc(picked.place)}</b>를 드나들었어요.
+          게다가 이건 <b>${esc(picked.cycle)}마다</b> 되풀이되던 일 — 여느 때엔 잠잠하다가 일정한 주기로 똑같은 일이 벌어졌고, <b>하필 올해가 바로 그 해</b>였죠.</p>
+          <p>그런데 휴가표를 보면 이 시기는 <b>${esc(picked.person)}의 휴가 기간</b>. 휴가라면서 남몰래 관람차를 드나든 기록이라니… 도로랜드를 이루는 그 <b>알 수 없는 물체</b>의 비밀에 한 발짝 다가선 걸지도 몰라요.</p>
+        </div>
+      </div></div>`);
+    requestAnimationFrame(()=>{ const s=$('vrStamp'); if(s){ s.classList.add('go'); } });
+  } else {
+    // ── 오답: 개수 + 틀린 항목 간접 힌트 (가로 2단) ──
+    const wrong = FIELDS.filter(f=>!isCorrect(f.key, picked[f.key]));
+    const shown = wrong.slice(0,2);
+    const hintCards = shown.map(f=>`<div class="vr-hintcard">
+        <span class="vh-ic">${IC_BULB}</span>
+        <span class="vh-text">${f.hint}</span>
+      </div>`).join('');
+    const moreNote = wrong.length>2
+      ? `<p class="vr-more">살펴볼 단서가 더 남아 있어요. 위 힌트부터 하나씩 확인해 봐요.</p>` : '';
+    openVerdictModal(`<div class="vfile no">
+      <div class="vf-left">
+        <div class="vfile-tag">DOROLAND · 수사 진행 중</div>
+        <div class="vr-title"><span class="vt-ic">${IC_GLASS}</span>아직 단서가 부족해요</div>
+        <p class="vr-count">다섯 단서 중 <b>${correctCount}개</b>가 들어맞았어요.<br>나머지는 어디가 어긋났을까요? 자료를 다시 들여다볼 단서를 남겨둘게요.</p>
+        <button class="vr-close" id="vrClose" type="button">다시 조사하기</button>
+      </div>
+      <div class="vf-right">
+        <div class="vr-hints">${hintCards}</div>
+        ${moreNote}
+      </div></div>`);
+  }
+  $('vrClose').addEventListener('click', closeVerdictModal);
+});
+
+/* ============================================================
+   캔버스 막대 차트
+============================================================ */
+const canvas = $('chart'), ctx = canvas.getContext('2d');
+function fitCanvas(){
+  // 컨테이너 실제 폭 (숨겨져 있으면 0이 나올 수 있음)
+  const wrap = canvas.parentElement;
+  const avail = wrap.clientWidth || wrap.getBoundingClientRect().width || 0;
+  const w = Math.max(320, avail - 22);
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = w * ratio;
+  canvas.height = 300 * ratio;
+  canvas.style.width = '100%';
+  canvas.style.height = '300px';
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  return {W:w, H:300};
+}
+
+// 컨테이너 폭이 0→실제폭으로 바뀌면(숨김 해제·창 크기 변화) 자동 재렌더
+let _chartRO = null;
+function setupChartResize(){
+  if(_chartRO || !window.ResizeObserver) return;
+  let lastW = 0;
+  _chartRO = new ResizeObserver(entries=>{
+    const w = entries[0]?.contentRect?.width || 0;
+    if(currentSrcId && Math.abs(w-lastW) > 1){
+      lastW = w;
+      const v = getView(); if(v) drawChart(v);
+    }
+  });
+  _chartRO.observe(canvas.parentElement);
+}
+window.addEventListener('resize', ()=>{ if(currentSrcId){ const v=getView(); if(v) drawChart(v); } });
+
+function drawChart(v){
+  if(!v){ return; }
+  const {W,H} = fitCanvas();
+  ctx.clearRect(0,0,W,H);
+  const labels=v.labels, values=v.values;
+  if(!values.length){ return; }
+  if(chartType==='donut'){ drawDonut(v,W,H); return; }
+
+  const padT=40, padB=70, padL=64, padR=20;
+  const innerW=W-padL-padR, innerH=H-padT-padB;
+  const maxV=Math.max(...values,1);
+  const N=values.length;
+
+  // y 그리드 + 눈금
+  ctx.strokeStyle='#EBF1FA'; ctx.lineWidth=1;
+  ctx.fillStyle='#8C97AC'; ctx.font="11px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.textAlign='right';
+  for(let g=0; g<=4; g++){
+    const y=padT+g*(innerH/4);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    const tv=maxV*(1-g/4);
+    ctx.fillText(Math.round(tv), padL-7, y+4);
+  }
+  // 축선
+  ctx.strokeStyle='#CBD6E8';
+  ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+innerH); ctx.lineTo(W-padR,padT+innerH); ctx.stroke();
+
+  // y축 제목
+  ctx.save(); ctx.translate(15,padT+innerH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#3076DC'; ctx.font="bold 12px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.textAlign='center';
+  ctx.fillText('↕ '+(viewMode==='byItem'? '값' : v.colName).slice(0,18), 0, 0); ctx.restore();
+  // x축 제목
+  ctx.fillStyle='#3076DC'; ctx.font="bold 12px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.textAlign='center';
+  ctx.fillText('↔ '+v.axisName.slice(0,40), padL+innerW/2, H-10);
+  drawChartTitle(v, padL);
+
+  const slotW=innerW/N;
+
+  if(chartType==='line'){
+    // 꺾은선
+    const px = i => padL + i*slotW + slotW/2;
+    const py = i => padT + innerH - (values[i]/maxV)*(innerH-18);
+    // 선
+    ctx.strokeStyle='#3076DC'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+    ctx.beginPath();
+    for(let i=0;i<N;i++){ const x=px(i),y=py(i); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.stroke();
+    // 영역 살짝
+    ctx.lineTo(px(N-1), padT+innerH); ctx.lineTo(px(0), padT+innerH); ctx.closePath();
+    ctx.fillStyle=hexA('#3076DC',0.07); ctx.fill();
+    // 점 + 값 + 라벨
+    for(let i=0;i<N;i++){
+      const x=px(i), y=py(i);
+      const isSus = i===v.stat.maxIdx && v.stat.isAnom;
+      ctx.beginPath(); ctx.arc(x,y,isSus?6:4,0,Math.PI*2);
+      ctx.fillStyle=isSus?'#E63946':'#3076DC'; ctx.fill();
+      if(isSus){ ctx.lineWidth=3; ctx.strokeStyle=hexA('#E63946',0.25); ctx.stroke(); }
+      ctx.fillStyle=isSus?'#B3270F':'#1F58AC';
+      ctx.font=isSus?"bold 13px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif":"600 12px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.textAlign='center';
+      ctx.fillText(fmt(values[i]), x, y-10);
+      ctx.fillStyle=isSus?'#E63946':'#647088';
+      ctx.font=isSus?"bold 11.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif":"11.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif";
+      const lab=String(labels[i]);
+      ctx.fillText(lab.length>6?lab.slice(0,6)+'…':lab, x, padT+innerH+18);
+    }
+    return;
+  }
+
+  // 막대 (항목별 고유색 + 이상치 강조)
+  const barW=Math.min(64, Math.max(14, slotW*0.6));
+  for(let i=0;i<N;i++){
+    const h=Math.round((values[i]/maxV)*(innerH-18));
+    const x=padL+i*slotW+(slotW-barW)/2;
+    const y=padT+innerH-h;
+    const isSus = i===v.stat.maxIdx && v.stat.isAnom;
+    const base = paletteColor(i);
+    const g=ctx.createLinearGradient(0,y,0,padT+innerH);
+    if(isSus){ g.addColorStop(0,'#E63946'); g.addColorStop(1,'#E8901C'); }
+    else     { g.addColorStop(0,base); g.addColorStop(1,hexA(base,0.72)); }
+    ctx.fillStyle=g;
+    roundRect(x,y,barW,h,5); ctx.fill();
+    if(isSus){ // 이상치 테두리 강조
+      ctx.lineWidth=2; ctx.strokeStyle=hexA('#E63946',0.5);
+      roundRect(x,y,barW,h,5); ctx.stroke();
+    }
+    ctx.fillStyle=isSus?'#B3270F':'#1F58AC';
+    ctx.font=isSus?"bold 13px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif":"600 12px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.textAlign='center';
+    if(h>16 || values[i]>0) ctx.fillText(fmt(values[i]), x+barW/2, y-6);
+    ctx.fillStyle=isSus?'#E63946':'#647088';
+    ctx.font=isSus?"bold 11.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif":"11.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif";
+    const lab=String(labels[i]);
+    ctx.fillText(lab.length>6?lab.slice(0,6)+'…':lab, x+barW/2, padT+innerH+18);
+  }
+}
+
+// 제목 + 막대 글리프
+function drawChartTitle(v, tx){
+  const ty=22;
+  ctx.fillStyle='#3076DC';
+  ctx.fillRect(tx, ty-2, 3, -6); ctx.fillRect(tx+4.5, ty-2, 3, -10); ctx.fillRect(tx+9, ty-2, 3, -4);
+  ctx.textAlign='left'; ctx.fillStyle='#142036'; ctx.font="bold 14px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif";
+  ctx.fillText(v.title || `${currentMonth} · ${v.colName}`, tx+18, ty);
+}
+
+// 도넛 차트
+function drawDonut(v,W,H){
+  const labels=v.labels, values=v.values;
+  drawChartTitle(v, 30);
+  const total=values.reduce((a,b)=>a+b,0) || 1;
+  const cx=W*0.32, cy=H*0.55, R=Math.min(W*0.22, (H-90)*0.5), r=R*0.58;
+  let a0=-Math.PI/2;
+  for(let i=0;i<values.length;i++){
+    const frac=values[i]/total, a1=a0+frac*Math.PI*2;
+    const isSus = i===v.stat.maxIdx && v.stat.isAnom;
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,a0,a1); ctx.arc(cx,cy,r,a1,a0,true); ctx.closePath();
+    ctx.fillStyle = isSus ? '#E63946' : paletteColor(i);
+    ctx.fill();
+    if(isSus){ ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.stroke(); }
+    a0=a1;
+  }
+  // 가운데 합계
+  ctx.fillStyle='#142036'; ctx.textAlign='center'; ctx.font="bold 20px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif";
+  ctx.fillText(fmt(total), cx, cy+2);
+  ctx.fillStyle='#8C97AC'; ctx.font="11px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif"; ctx.fillText('합계', cx, cy+18);
+  // 범례 (오른쪽)
+  const lx=W*0.58, lyTop=cy-values.length*11;
+  ctx.textAlign='left';
+  for(let i=0;i<values.length;i++){
+    const isSus = i===v.stat.maxIdx && v.stat.isAnom;
+    const ly=lyTop+i*22;
+    ctx.fillStyle=isSus?'#E63946':paletteColor(i);
+    roundRect(lx,ly-9,13,13,3); ctx.fill();
+    ctx.fillStyle=isSus?'#B3270F':'#3D4759';
+    ctx.font=isSus?"bold 12.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif":"12.5px Pretendard, Apple SD Gothic Neo, Malgun Gothic, sans-serif";
+    const pct=Math.round(values[i]/total*100);
+    const lab=String(labels[i]); const shortLab=lab.length>8?lab.slice(0,8)+'…':lab;
+    ctx.fillText(`${shortLab}  ${fmt(values[i])} (${pct}%)`, lx+20, ly+2);
+  }
+}
+function roundRect(x,y,w,h,r){
+  r=Math.min(r,w/2,h||0); ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h); ctx.lineTo(x,y+h); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+/* ============================================================
+   유틸
+============================================================ */
+function toNum(v){ const n=Number(v); return Number.isFinite(n)?n:0; }
+function fmt(n){ return Number.isInteger(n)? n.toLocaleString() : (+n).toFixed(1); }
+function esc(s){ return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+/* ============================================================
+   힌트 (비밀번호 0000)
+============================================================ */
+const HINT_PASSWORD = '0000';
+const HINTS = [
+  { title:'먼저 달끼리 비교해 보세요', body:'같은 자료라도 달마다 값이 달라요. 3월·6월·8월·11월을 차례로 보면, <b>유독 한 달만</b> 값이 크게 튀는 자료가 있을 거예요. 그 달을 기억해 두세요.' },
+  { title:'어떤 값(컬럼)이 튀는지 보세요', body:'그 달 안에서도 모든 값이 큰 건 아니에요. <b>특정 컬럼 하나만</b> 평소보다 훨씬 큰 항목을 찾아보세요. 「항목별 비교」로 보면 막대 하나가 우뚝 솟아요.' },
+  { title:'한 항목을 골라 펼쳐보세요', body:'수상한 인물(출입증)을 찾았다면, <b>「인물별 구역방문」</b> 자료로 바꾼 뒤 「한 명 펼쳐보기」에서 그 인물을 골라보세요. 그 사람이 어디를 가장 많이 갔는지 한눈에 보여요.' },
+  { title:'세 자료를 연결하면?', body:'세 자료에서 찾은 <b>달·인물·구역</b>이 서로 맞아떨어지면 수사 노트가 자동으로 결론을 정리해줘요. 마지막으로 <b>휴가표</b>와 겹쳐보면 무엇이 이상한지 알 수 있어요.' },
+];
+let hintUnlocked = false;
+let hintShown = 0;
+
+const hintModal=$('hintModal'), pwInput=$('pwInput'), pwErr=$('pwErr');
+function openHint(){
+  hintModal.classList.remove('hidden');
+  if(hintUnlocked){ showHintScreen(); }
+  else { $('pwScreen').classList.remove('hidden'); $('hintScreen').classList.add('hidden'); setTimeout(()=>pwInput.focus(),50); }
+}
+function closeHint(){ hintModal.classList.add('hidden'); pwErr.classList.add('hidden'); pwInput.classList.remove('err'); }
+$('hintFab').addEventListener('click', openHint);
+$('hintClose').addEventListener('click', closeHint);
+hintModal.addEventListener('click', e=>{ if(e.target===hintModal) closeHint(); });
+
+function trySubmitPw(){
+  if(pwInput.value === HINT_PASSWORD){
+    hintUnlocked = true;
+    showHintScreen();
+  } else {
+    pwErr.classList.remove('hidden');
+    pwInput.classList.add('err');
+    pwInput.value='';
+    setTimeout(()=>pwInput.classList.remove('err'), 400);
+  }
+}
+$('pwSubmit').addEventListener('click', trySubmitPw);
+pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') trySubmitPw(); });
+
+function showHintScreen(){
+  $('pwScreen').classList.add('hidden');
+  $('hintScreen').classList.remove('hidden');
+  if(hintShown===0) hintShown=1;
+  renderHints();
+}
+function renderHints(){
+  $('hintSteps').innerHTML = HINTS.slice(0,hintShown).map((h,i)=>`
+    <div class="hint-step">
+      <div class="hs-head"><span class="hs-num">${i+1}</span> ${esc(h.title)}</div>
+      <div class="hs-body">${h.body}</div>
+    </div>`).join('');
+  $('hintNext').classList.toggle('hidden', hintShown>=HINTS.length);
+  $('hintNext').textContent = `다음 힌트 보기 (${hintShown}/${HINTS.length}) →`;
+}
+$('hintNext').addEventListener('click', ()=>{ if(hintShown<HINTS.length){ hintShown++; renderHints(); } });
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !hintModal.classList.contains('hidden')) closeHint(); });
+
+/* ============================================================
+   튜토리얼 (스포트라이트)
+============================================================ */
+const TUT_STEPS = [
+  {
+    sel:'#uploadCard',
+    title:'① 자료를 올려요',
+    body:'왼쪽 <b>구역별 수사 자료</b> 칸이에요. 사파리·하모니아·회전목마 — 각 구역에서 담당자를 도와주고 얻은 자료를 각 칸에 올려요.<br><br>칸을 <span class="k">클릭</span>해서 파일을 고르거나, 파일을 칸 위로 <span class="k">끌어다 놓아도</span> 돼요. 자료를 넣으면 칸에 색이 채워지고 ✓ 표시가 떠요. <b>세 칸이 모두 채워지면</b> 분석이 시작돼요.',
+    pad:10, place:'right'
+  },
+  {
+    sel:'#monthPills', fallbackSel:'#uploadCard',
+    title:'② 달을 바꿔가며 비교해요',
+    body:'<b>달</b>을 골라 그 달의 데이터만 볼 수 있어요. <span class="k">3월</span> <span class="k">6월</span> <span class="k">8월</span> <span class="k">11월</span> 을 번갈아 누르며, <b>어느 달이 평소와 다른지</b> 비교해 보세요.<br><br>대부분의 달은 비슷한데, 한 달만 유독 다르다면 그게 단서예요.',
+    pad:10, place:'bottom'
+  },
+  {
+    sel:'.chart-wrap', fallbackSel:'#uploadCard',
+    title:'③ 튀는 데이터를 찾아요',
+    body:'고른 값이 <b>막대그래프</b>로 나타나요. 다른 막대들과 비슷한데 <b>하나만 유독 높이 솟으면</b> 그게 눈여겨볼 신호예요.<br><br>그래프 아래에 <b>“수상한 데이터를 찾았어요”</b> 안내가 함께 떠요. 보는 값(컬럼)이나 보는 방법을 바꿔가며 살펴보세요.',
+    pad:8, place:'top'
+  },
+  {
+    sel:'#verdictBtn', fallbackSel:'#uploadCard',
+    title:'④ 수사 결론을 내려요',
+    body:'분석으로 찾아낸 <b>의심 인물·장소·시간대·달·주기</b>를 하나씩 골라요. 자료를 올릴수록 항목이 하나씩 열려요. 누구인지는 <b>출입증 카드</b>로 알아내야 해요.<br><br>다섯 가지를 모두 고르고 <b>“결론 확인하기”</b>를 누르면, 도로랜드에서 무슨 일이 있었는지 <b>진실이 드러나요.</b>',
+    pad:10, place:'right'
+  },
+];
+let tutIdx = 0, tutActive = false;
+const TUT_KEY = 'doroland_tut_seen_v2';
+
+function openTutorial(start=0){
+  tutActive = true; tutIdx = start;
+  $('tutOverlay').classList.remove('hidden');
+  $('tutTotal').textContent = TUT_STEPS.length;
+  renderTutStep();
+}
+function closeTutorial(){
+  tutActive = false;
+  $('tutOverlay').classList.add('hidden');
+  /* tutorial state is not cached */
+}
+function getTutTarget(step){
+  let el = document.querySelector(step.sel);
+  if(el && isVisible(el)) return el;
+  if(step.fallbackSel){ el = document.querySelector(step.fallbackSel); if(el && isVisible(el)) return el; }
+  return null;
+}
+function isVisible(el){
+  const r = el.getBoundingClientRect();
+  return r.width>4 && r.height>4 && el.offsetParent !== null;
+}
+function renderTutStep(){
+  const step = TUT_STEPS[tutIdx];
+  $('tutStep').textContent = tutIdx+1;
+  $('tutTitle').innerHTML = step.title;
+  $('tutBody').innerHTML = step.body;
+  $('tutPrev').disabled = tutIdx===0;
+  $('tutNext').textContent = (tutIdx===TUT_STEPS.length-1) ? '시작하기 ✓' : '다음 →';
+
+  const target = getTutTarget(step);
+  const overlay = $('tutOverlay'), hole = $('tutHole'), bubble = $('tutBubble');
+  if(!target){
+    // 대상이 안 보이면 전체 어둡게 + 버블 중앙
+    overlay.classList.add('full-dim');
+    bubble.style.left = '50%'; bubble.style.top = '50%';
+    bubble.style.transform = 'translate(-50%,-50%)';
+    return;
+  }
+  overlay.classList.remove('full-dim');
+  // 대상이 화면에 보이도록 스크롤
+  target.scrollIntoView({block:'nearest', behavior:'smooth'});
+  // 살짝 기다렸다가 위치 계산(스크롤 반영)
+  setTimeout(()=>positionSpotlight(target, step), 60);
+}
+function positionSpotlight(target, step){
+  const r = target.getBoundingClientRect();
+  const pad = step.pad ?? 8;
+  const hole = $('tutHole'), bubble = $('tutBubble');
+  const x = r.left - pad, y = r.top - pad, w = r.width + pad*2, h = r.height + pad*2;
+  hole.style.left = x+'px'; hole.style.top = y+'px';
+  hole.style.width = w+'px'; hole.style.height = h+'px';
+  hole.style.display = 'block';
+
+  // 버블 위치 결정
+  const bw = 340, gap = 16;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  bubble.style.transform = 'none';
+  let bx, by, place = step.place || 'right';
+  // 공간 부족하면 자동 전환
+  if(place==='right' && x+w+gap+bw > vw) place='left';
+  if(place==='left' && x-gap-bw < 0) place='bottom';
+  if(place==='bottom' && y+h+gap+220 > vh) place='top';
+  if(place==='top' && y-gap-220 < 0) place='bottom';
+
+  if(place==='right'){ bx = x+w+gap; by = y; }
+  else if(place==='left'){ bx = x-gap-bw; by = y; }
+  else if(place==='bottom'){ bx = x; by = y+h+gap; }
+  else { bx = x; by = y-gap-(bubble.offsetHeight||230); }
+
+  // 화면 밖으로 안 나가게 보정
+  bx = Math.max(16, Math.min(bx, vw-bw-16));
+  by = Math.max(16, Math.min(by, vh-(bubble.offsetHeight||230)-16));
+  bubble.style.left = bx+'px'; bubble.style.top = by+'px';
+}
+$('tutBtn').addEventListener('click', ()=>openTutorial(0));
+$('tutSkip').addEventListener('click', closeTutorial);
+$('tutPrev').addEventListener('click', ()=>{ if(tutIdx>0){ tutIdx--; renderTutStep(); } });
+$('tutNext').addEventListener('click', ()=>{
+  if(tutIdx < TUT_STEPS.length-1){ tutIdx++; renderTutStep(); }
+  else closeTutorial();
+});
+window.addEventListener('resize', ()=>{ if(tutActive) renderTutStep(); });
+document.addEventListener('keydown', e=>{
+  if(!tutActive) return;
+  if(e.key==='Escape') closeTutorial();
+  else if(e.key==='ArrowRight') $('tutNext').click();
+  else if(e.key==='ArrowLeft') $('tutPrev').click();
+});
+
+/* 재설정 버튼: 확인 후 처음부터 */
+$('resetBtn').addEventListener('click', ()=>{
+  if(confirm('지금까지 올린 자료와 고른 단서가 모두 사라지고 처음부터 다시 시작해요. 계속할까요?')){
+    resetAll();
+  }
+});
+
+/* ============================================================
+   기밀 기록 열람실  (키트 LCD 인증코드로 해금)
+============================================================ */
+// 해금 상태 — 키트 LCD에 표시된 인증코드를 HTML에 직접 입력해서 기밀 자료 열람
+let unlocked = { badges:false, calendar:false };
+function saveUnlock(){ /* session-only: no cached unlock state */ }
+
+// PC 연결형 NFC 리더를 나중에 붙일 경우를 대비한 코드 → 해금 대상 매핑
+// 현재 운영안은 독립형 키트 LCD에 표시된 인증코드를 학생이 직접 입력
+const NFC_CODES = {
+  'DRL-CARDS': 'badges',     // 출입증 대조 파일
+  'DRL-CAL':   'calendar',   // 직원 휴가 캘린더
+  'DRL-ALL':   'all',        // 전부
+};
+const VAULT_UNLOCK_CODES = {
+  badges: '0000',   // EVIDENCE A: 출입증 대조 파일 인증코드
+  calendar: '0000', // EVIDENCE B: 직원 휴가 캘린더 인증코드
+  all: '0000',      // 운영자 비상용: 전부 해금
+};
+
+function unlockHint(target, label){
+  let changed=false;
+  if(target==='all'){
+    if(!unlocked.badges){unlocked.badges=true;changed=true;}
+    if(!unlocked.calendar){unlocked.calendar=true;changed=true;}
+  } else if(unlocked[target]===false){
+    unlocked[target]=true; changed=true;
+  }
+  if(changed){
+    saveUnlock(); updateVaultCount();
+    const names={badges:'출입증 대조 파일', calendar:'직원 휴가 캘린더', all:'기밀 자료 전체'};
+    showVaultToast(`${names[target]||label||'기밀 자료'} 열람 권한이 승인되었습니다.`);
+    // 보관함이 열려 있으면 갱신, 닫혀 있으면 자동으로 열어 보여줌
+    if($('vaultModal').classList.contains('hidden')){
+      vaultTab = (target==='calendar')?'calendar':'badges';
+      document.querySelectorAll('.vault-tab').forEach(x=>x.classList.toggle('on', x.dataset.tab===vaultTab));
+      openVault();
+    } else { renderVaultBody(); }
+  } else {
+    showVaultToast('이미 인가된 기밀 자료입니다.');
+  }
+}
+
+// 획득 토스트
+let toastTimer=null;
+function showVaultToast(msg){
+  let t=$('vaultToast');
+  if(!t){ t=document.createElement('div'); t.id='vaultToast'; t.className='vault-toast'; document.body.appendChild(t); }
+  t.innerHTML = `<span class="vt-spark">✦</span> ${msg}`;
+  t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+// NFC 키트(키보드 입력식) 감지 — 짧은 시간에 들어온 키를 모아 코드로 판정
+let nfcBuf=''; let nfcTimer=null;
+document.addEventListener('keydown', e=>{
+  // 입력창에 포커스 중이면 무시 (비번 입력 등)
+  const tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='input'||tag==='select'||tag==='textarea') return;
+  if(e.key==='Enter'){
+    const code=nfcBuf.trim().toUpperCase(); nfcBuf='';
+    if(NFC_CODES[code]) unlockHint(NFC_CODES[code]);
+    return;
+  }
+  if(e.key.length===1){ nfcBuf+=e.key; clearTimeout(nfcTimer); nfcTimer=setTimeout(()=>nfcBuf='', 800); }
+});
+
+function badgesUnlocked(){ return unlocked.badges; }
+function calendarUnlocked(){ return unlocked.calendar; }
+function vaultTotalGot(){
+  // 기밀 기록실은 '출입증 대조 파일'과 '직원 휴가 캘린더' 2개 단서 단위로 계산
+  return (badgesUnlocked()? 1 : 0) + (calendarUnlocked()? 1 : 0);
+}
+const VAULT_TOTAL = 2; // 출입증 대조 파일 + 직원 휴가 캘린더
+function updateVaultCount(){
+  const got = vaultTotalGot();
+  $('vaultCount').textContent = `${got}/${VAULT_TOTAL}`;
+  const pe=$('vaultProgress'); if(pe) pe.textContent = `${got} / ${VAULT_TOTAL}`;
+}
+
+let vaultTab = 'badges';
+// 잠금 화면 (NFC 안내 + 비밀번호 입력)
+function lockedNote(target, title, desc){
+  const evidence = target === 'calendar' ? 'EVIDENCE B' : 'EVIDENCE A';
+  const dossier = target === 'calendar' ? 'STAFF-SCHEDULE-08' : 'ACCESS-X404';
+  return `<div class="vault-locked-note">
+    <div class="vl-sec-tag">${evidence} · SEALED DOSSIER</div>
+    <div class="vl-ic">${IC_LOCK}</div>
+    <p class="vl-title">보안 인가 대기</p>
+    <p class="vl-desc"><b>${evidence}</b> NFC 카드를 키트에 태그하세요.<br>LCD에 표시되는 <b>AUTH CODE</b>를 입력하면 봉인된 ${desc}를 열람할 수 있습니다.</p>
+    <div class="vl-dossier">열람 대상 <b>${dossier}</b></div>
+    <div class="vl-form">
+      <input type="text" id="vlPw" placeholder="AUTH CODE" maxlength="8" inputmode="text" autocomplete="off" />
+      <button id="vlBtn" type="button">인가 확인</button>
+    </div>
+    <p class="vl-err hidden" id="vlErr">인증코드가 일치하지 않습니다. LCD 화면을 다시 확인하세요.</p>
+    <p class="vl-hint">※ LCD 인증코드는 정답이 아니라 기밀 자료 열람 권한입니다.</p>
+  </div>`;
+}
+function wireLockForm(target){
+  const pw=$('vlPw'), btn=$('vlBtn'), err=$('vlErr');
+  if(!pw||!btn) return;
+  const submit=()=>{
+    const code = (pw.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    // 같은 테스트 코드(0000)를 쓰는 동안에는 현재 열어둔 자료부터 해금합니다.
+    if(code === VAULT_UNLOCK_CODES[target]){ unlockHint(target); return; }
+    if(code === VAULT_UNLOCK_CODES.all){ unlockHint('all'); return; }
+    err.classList.remove('hidden'); pw.value=''; pw.focus();
+  };
+  btn.addEventListener('click', submit);
+  pw.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+  setTimeout(()=>pw.focus(), 100);
+}
+function renderVaultBody(){
+  const body = $('vaultBody'); if(!body) return;
+  if(vaultTab==='badges'){
+    const open = badgesUnlocked();
+    if(!open){
+      body.innerHTML = lockedNote('badges', '출입증 대조 파일', '출입증 대조 파일');
+      wireLockForm('badges');
+      return;
+    }
+    body.innerHTML = `<div class="badge-grid">` + BADGE_PEOPLE.map(p=>`
+      <div class="badge-card">
+        <div class="bc-strip">${p.badge} · ${p.accessShort}</div>
+        <div class="bc-photo">${IC_PERSON_BIG}</div>
+        <div class="bc-name">${p.ko}<span class="bc-en">${p.en}</span></div>
+        <div class="bc-kbadge">${p.areaKo}</div>
+        <div class="bc-title">${p.titleEn}</div>
+        <div class="bc-access">${p.access}</div>
+      </div>`).join('') + `</div>`;
+  } else {
+    const open = calendarUnlocked();
+    if(!open){
+      body.innerHTML = lockedNote('calendar', '직원 휴가 캘린더', '직원 휴가 캘린더');
+      wireLockForm('calendar');
+      return;
+    }
+    body.innerHTML = calendarHTML();
+  }
+}
+function openVault(){
+  renderVaultBody();
+  updateVaultCount();
+  $('vaultModal').classList.remove('hidden');
+}
+function closeVault(){ $('vaultModal').classList.add('hidden'); }
+$('vaultBtn').addEventListener('click', openVault);
+$('vaultClose').addEventListener('click', closeVault);
+$('vaultModal').addEventListener('click', e=>{ if(e.target===$('vaultModal')) closeVault(); });
+document.querySelectorAll('.vault-tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    vaultTab = t.dataset.tab;
+    document.querySelectorAll('.vault-tab').forEach(x=>x.classList.toggle('on', x===t));
+    renderVaultBody();
+  });
+});
+// 캘린더 월 전환 (보관함 본문 내 동적 버튼 → 위임)
+$('vaultBody').addEventListener('click', e=>{
+  const mt = e.target.closest('.cal-mtab'); if(!mt) return;
+  calMonth = mt.dataset.cmonth;
+  renderVaultBody();
+});
+
+// 도로랜드 휴가 캘린더 — 4개월(3·6·8·11월) 2025, PPT 재현
+let calMonth = '8월';  // 보관함에서 보는 달
+// 2025년 각 달 1일의 요일 (0=일) + 일수
+const CAL_MONTHS = {
+  '3월':  {num:'03', en:'MARCH',    ko:'삼월',   firstDow:6, days:31,
+    marks:{4:{label:'미모 반차',cls:'c-mimo'},
+           9:{label:'제로 휴가',cls:'c-zero'},10:{cls:'c-zero'},11:{cls:'c-zero'},12:{cls:'c-zero'},13:{cls:'c-zero'},
+           16:{label:'가온 휴가',cls:'c-gaon'},17:{cls:'c-gaon'},18:{cls:'c-gaon'},19:{cls:'c-gaon'},20:{cls:'c-gaon'},21:{cls:'c-gaon'},
+           22:{cls:'c-gaon'},23:{cls:'c-gaon'},24:{cls:'c-gaon'},25:{cls:'c-gaon'},26:{cls:'c-gaon'},27:{cls:'c-gaon'},
+           30:{label:'나나 반차',cls:'c-nana'}},
+    up:[{d:'4',w:'WED',t:'미모 반차',s:'3/4(수) · 오전'},
+        {d:'9',w:'MON',t:'제로 휴가',s:'3/9(월) ~ 3/13(금) · 5일'},
+        {d:'16',w:'MON',t:'가온 휴가',s:'3/16(월) ~ 3/27(금) · 12일'},
+        {d:'30',w:'MON',t:'나나 반차',s:'3/30(월) · 오후'}]},
+  '6월':  {num:'06', en:'JUNE',     ko:'유월',   firstDow:0, days:30,
+    marks:{5:{label:'루미아 연차',cls:'c-lumia'},
+           8:{label:'리코 휴가',cls:'c-rico'},9:{cls:'c-rico'},10:{cls:'c-rico'},11:{cls:'c-rico'},12:{cls:'c-rico'},13:{cls:'c-rico'},
+           14:{cls:'c-rico'},15:{cls:'c-rico'},16:{cls:'c-rico'},17:{cls:'c-rico'},18:{cls:'c-rico'},19:{cls:'c-rico'},
+           22:{label:'하루 반차',cls:'c-haru'},
+           26:{label:'코어 반차',cls:'c-core'},29:{label:'에코 연차',cls:'c-echo'}},
+    up:[{d:'5',w:'FRI',t:'루미아 연차',s:'6/5(금) · 1일'},
+        {d:'8',w:'MON',t:'리코 휴가',s:'6/8(월) ~ 6/19(금) · 12일'},
+        {d:'22',w:'MON',t:'하루 반차',s:'6/22(월) · 오전'},
+        {d:'26',w:'FRI',t:'코어 반차',s:'6/26(금) · 오후'},
+        {d:'29',w:'MON',t:'에코 연차',s:'6/29(월) · 1일'}]},
+  '8월':  {num:'08', en:'AUGUST',   ko:'팔월',   firstDow:5, days:31,
+    marks:{3:{label:'가온 연차',cls:'c-gaon'},
+           7:{label:'에코 반차',cls:'c-echo'},
+           10:{label:'자일로 휴가',cls:'c-xylo'},11:{cls:'c-xylo'},12:{cls:'c-xylo'},13:{cls:'c-xylo'},14:{cls:'c-xylo'},15:{cls:'c-xylo'},
+           16:{cls:'c-xylo'},17:{cls:'c-xylo'},18:{cls:'c-xylo'},19:{cls:'c-xylo'},20:{cls:'c-xylo'},21:{cls:'c-xylo'},
+           24:{label:'미모 휴가',cls:'c-mimo'},25:{cls:'c-mimo'},26:{cls:'c-mimo'},27:{cls:'c-mimo'},28:{cls:'c-mimo'},29:{cls:'c-mimo'},
+           30:{cls:'c-mimo'},31:{cls:'c-mimo'}},
+    up:[{d:'3',w:'MON',t:'가온 연차',s:'8/3(월) · 1일'},
+        {d:'7',w:'FRI',t:'에코 반차',s:'8/7(금) · 오후'},
+        {d:'10',w:'MON',t:'자일로 휴가',s:'8/10(월) ~ 8/21(금) · 12일'},
+        {d:'24',w:'MON',t:'미모 휴가',s:'8/24(월) ~ 9/4(금) · 12일'}]},
+  '11월': {num:'11', en:'NOVEMBER', ko:'십일월', firstDow:6, days:30,
+    marks:{2:{label:'에코 반차',cls:'c-echo'},
+           9:{label:'루미아 휴가',cls:'c-lumia'},10:{cls:'c-lumia'},11:{cls:'c-lumia'},12:{cls:'c-lumia'},13:{cls:'c-lumia'},14:{cls:'c-lumia'},
+           15:{cls:'c-lumia'},16:{cls:'c-lumia'},17:{cls:'c-lumia'},18:{cls:'c-lumia'},19:{cls:'c-lumia'},20:{cls:'c-lumia'},
+           23:{label:'하루 반차',cls:'c-haru'},
+           27:{label:'제로 반차',cls:'c-zero'}},
+    up:[{d:'2',w:'MON',t:'에코 반차',s:'11/2(월) · 오후'},
+        {d:'9',w:'MON',t:'루미아 휴가',s:'11/9(월) ~ 11/20(금) · 12일'},
+        {d:'23',w:'MON',t:'하루 반차',s:'11/23(월) · 오전'},
+        {d:'27',w:'FRI',t:'제로 반차',s:'11/27(금) · 오후'}]},
+};
+function calendarHTML(){
+  const M = CAL_MONTHS[calMonth] || CAL_MONTHS['8월'];
+  let cells = '';
+  for(let i=0;i<M.firstDow;i++) cells += `<div class="cal-cell empty"></div>`;
+  for(let d=1; d<=M.days; d++){
+    const m = M.marks[d];
+    cells += `<div class="cal-cell${m?' has-mark':''}">
+      <span class="cal-num">${d}</span>
+      ${m? `<span class="cal-mark"><span class="cal-bar ${m.cls}"></span>${m.label? `<span class="cal-label ${m.cls}">${m.label}</span>`:''}</span>`:''}
+    </div>`;
+  }
+  const tabs = Object.keys(CAL_MONTHS).map(mk=>
+    `<button class="cal-mtab${mk===calMonth?' on':''}" data-cmonth="${mk}" type="button">${mk}</button>`
+  ).join('');
+  const ups = M.up.map(u=>`<div class="cal-up-item">
+      <div class="cui-date">${u.d}<small>${u.w}</small></div>
+      <div class="cui-info"><b>${u.t}</b><span>${u.s}</span></div>
+    </div>`).join('');
+  return `<div class="cal-monthtabs">${tabs}</div>
+  <div class="cal-wrap">
+    <div class="cal-top">
+      <div class="cal-logo"><img src="DOROLAND_LOGO.png" alt="DOROLAND" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/><span style="display:none;font-weight:900;letter-spacing:1px;color:#C0392B">DOROLAND</span></div>
+      <div class="cal-title-line"><b>DOROLAND</b> · 도로랜드 직원 휴가 캘린더</div>
+    </div>
+    <div class="cal-main">
+      <div class="cal-left">
+        <div class="cal-month"><span class="cm-num">${M.num}</span><span class="cm-en">${M.en}<small>${M.ko} · 2025</small></span></div>
+        <div class="cal-grid">
+          <div class="cal-dow s">S</div><div class="cal-dow">M</div><div class="cal-dow">T</div><div class="cal-dow">W</div><div class="cal-dow">T</div><div class="cal-dow">F</div><div class="cal-dow s">S</div>
+          ${cells}
+        </div>
+      </div>
+      <div class="cal-right">
+        <div class="cal-up-tag">UPCOMING</div>
+        <div class="cal-up-title">휴가 일정</div>
+        ${ups}
+      </div>
+    </div>
+    <div class="cal-foot">doroland.com · Crafted with care</div>
+  </div>`;
+}
+
+/* 초기화 */
+renderZoneSlots();
+renderVerdict();
+setupChartResize();
+// 이전 버전에서 남은 캐시 데이터 제거
+try{
+  localStorage.removeItem('doroland_progress_v1');
+  localStorage.removeItem('doroland_unlock_v1');
+  localStorage.removeItem('doroland_tut_seen_v2');
+}catch(e){}
+// 저장된 진행 상태는 복원하지 않음
+const _restored = restoreProgress();
+updateResetBtn();
+updateVaultCount();
+// 처음 방문이면 튜토리얼 자동 시작 (복원된 게 없을 때만)
+if(!_restored) setTimeout(()=>openTutorial(0), 500);
+</script>
+</body>
+</html>
