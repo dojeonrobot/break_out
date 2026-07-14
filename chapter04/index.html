@@ -121,9 +121,24 @@
     box-shadow:0 3px 10px rgba(20,32,54,.06);
     display:flex; align-items:center; justify-content:center;
   }
-  .bc-img{display:block; width:100%; height:auto; object-fit:contain; cursor:zoom-in}
-  .badge-card:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(20,32,54,.16)}
-  .badge-card{transition:transform .18s ease, box-shadow .18s ease}
+  .bc-img{display:block; width:100%; height:auto; object-fit:contain; cursor:zoom-in;
+    transition:transform .25s ease, filter .25s ease}
+  .badge-card{transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; cursor:zoom-in}
+  /* 커서를 올리면 카드가 떠오르고 살짝 확대 + "크게 보기" 배지가 나타난다 */
+  .badge-card:hover{transform:translateY(-6px); box-shadow:0 16px 34px rgba(20,32,54,.28); border-color:#4C8DFF}
+  .badge-card:hover .bc-img{transform:scale(1.06); filter:brightness(1.04)}
+  .badge-card::after{
+    content:'🔍 크게 보기';
+    position:absolute; left:50%; bottom:12px; transform:translate(-50%, 10px);
+    padding:6px 12px; border-radius:999px; white-space:nowrap;
+    font-size:12px; font-weight:800; letter-spacing:.3px;
+    color:#fff; background:rgba(18,26,42,.86); border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 6px 16px rgba(0,0,0,.28);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+  }
+  .badge-card:hover::after{opacity:1; transform:translate(-50%, 0)}
+  .badge-card:active{transform:translateY(-2px) scale(.98)}
+  @media (hover:none){ .badge-card::after{opacity:1; transform:translate(-50%,0)} }
   .lightbox{
     position:fixed; inset:0; z-index:300; display:grid; place-items:center;
     background:rgba(10,16,28,.82); backdrop-filter:blur(4px);
