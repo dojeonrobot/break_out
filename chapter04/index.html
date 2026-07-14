@@ -121,7 +121,24 @@
     box-shadow:0 3px 10px rgba(20,32,54,.06);
     display:flex; align-items:center; justify-content:center;
   }
-  .bc-img{display:block; width:100%; height:auto; object-fit:contain}
+  .bc-img{display:block; width:100%; height:auto; object-fit:contain; cursor:zoom-in}
+  .badge-card:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(20,32,54,.16)}
+  .badge-card{transition:transform .18s ease, box-shadow .18s ease}
+  .lightbox{
+    position:fixed; inset:0; z-index:300; display:grid; place-items:center;
+    background:rgba(10,16,28,.82); backdrop-filter:blur(4px);
+    padding:32px; cursor:zoom-out; animation:fadeIn .18s ease;
+  }
+  .lightbox img{
+    width:auto; height:auto; max-width:min(92vw, 620px); max-height:88vh;
+    border-radius:18px; box-shadow:0 24px 60px rgba(0,0,0,.5);
+  }
+  .lb-close{
+    position:absolute; top:18px; right:22px; width:42px; height:42px;
+    border-radius:50%; border:1px solid rgba(255,255,255,.25); cursor:pointer;
+    background:rgba(255,255,255,.12); color:#fff; font-size:18px; font-weight:900; line-height:1;
+  }
+  .lb-close:hover{background:rgba(255,255,255,.22)}
   .bc-strip{
     position:absolute; left:0; top:0; bottom:0; width:42px;
     display:flex; align-items:center; justify-content:center;
@@ -1069,6 +1086,12 @@
     </div>
     <div class="vault-body" id="vaultBody"></div>
   </div>
+</div>
+
+<!-- 사원증 확대 보기 -->
+<div class="lightbox hidden" id="lightbox">
+  <button class="lb-close" id="lbClose" type="button" aria-label="닫기">✕</button>
+  <img id="lbImg" src="" alt="" />
 </div>
 
 <!-- 힌트 플로팅 버튼 -->
@@ -2354,6 +2377,21 @@ function closeVault(){ $('vaultModal').classList.add('hidden'); }
 $('vaultBtn').addEventListener('click', openVault);
 $('vaultClose').addEventListener('click', closeVault);
 $('vaultModal').addEventListener('click', e=>{ if(e.target===$('vaultModal')) closeVault(); });
+
+// 사원증 확대 보기 — 카드는 렌더될 때마다 새로 그려지므로 위임으로 처리
+const lightbox=$('lightbox'), lbImg=$('lbImg');
+function openLightbox(src, alt){
+  lbImg.src = src; lbImg.alt = alt || '';
+  lightbox.classList.remove('hidden');
+}
+function closeLightbox(){ lightbox.classList.add('hidden'); lbImg.src=''; }
+$('vaultBody').addEventListener('click', e=>{
+  const img = e.target.closest('.bc-img');
+  // 확대할 때만 고해상도 파일(chars/large/)을 받는다. 카드용은 작은 파일 유지.
+  if(img) openLightbox(img.src.replace('/chars/', '/chars/large/'), img.alt);
+});
+lightbox.addEventListener('click', closeLightbox);   // 배경·이미지·닫기 버튼 어디를 눌러도 닫힘
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !lightbox.classList.contains('hidden')) closeLightbox(); });
 document.querySelectorAll('.vault-tab').forEach(t=>{
   t.addEventListener('click', ()=>{
     vaultTab = t.dataset.tab;
