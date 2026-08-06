@@ -701,6 +701,21 @@
     outline:2.5px solid rgba(255,214,107,.9); outline-offset:0;
   }
   .tut-overlay.full-dim .tut-hole{display:none}
+  /* 아직 생기지 않은 요소의 자리를 미리 보여주는 점선 틀 */
+  .tut-ghost{
+    position:absolute; display:none; z-index:2; pointer-events:none;
+    border:2.5px dashed rgba(255,214,107,.85); border-radius:14px;
+    background:rgba(255,214,107,.07);
+    align-items:center; justify-content:center;
+    transition:all .32s cubic-bezier(.4,0,.2,1);
+  }
+  .tut-ghost.on{display:flex}
+  .tut-ghost .tg-label{
+    padding:8px 15px; border-radius:999px;
+    background:rgba(255,255,255,.96); color:var(--ink-800);
+    font-size:12.5px; font-weight:800; letter-spacing:-.2px;
+    box-shadow:0 8px 22px rgba(10,20,40,.35);
+  }
   /* 아직 나타나지 않은 단계에 붙는 안내 */
   .tut-later{
     margin-top:14px; padding-top:11px; border-top:1px dashed var(--line);
@@ -1113,6 +1128,8 @@
 <!-- 튜토리얼 스포트라이트 -->
 <div class="tut-overlay hidden" id="tutOverlay">
   <div class="tut-hole" id="tutHole"></div>
+  <!-- 아직 생기지 않은 요소의 자리를 미리 보여주는 점선 틀 -->
+  <div class="tut-ghost" id="tutGhost"><span class="tg-label" id="tutGhostLabel"></span></div>
   <div class="tut-bubble" id="tutBubble">
     <div class="tut-badge"><span id="tutStep">1</span> <span class="tb-sep">/</span> <span id="tutTotal">4</span></div>
     <h4 class="tut-title" id="tutTitle"></h4>
@@ -2044,20 +2061,26 @@ const TUT_STEPS = [
     pad:10, place:'right'
   },
   {
-    // 자료를 올리기 전에는 대상이 없다. 엉뚱한 곳을 비추지 않도록 fallback 을 두지 않는다.
+    // 자료를 올리기 전에는 대상이 없다. 엉뚱한 곳을 비추는 대신,
+    // 나중에 그 요소가 생길 자리를 ghost(점선 틀)로 미리 보여준다.
     sel:'#monthPills',
+    // 오프셋은 자료를 올린 뒤 실제 요소 위치를 재서 맞춘 값이다 (패널 좌상단 기준)
+    ghost: r => ({ x:r.left+17, y:r.top+100, w:r.width-34, h:48, label:'여기에 달·연도 고르는 칸이 생겨요' }),
     title:'② 달을 바꿔가며 비교해요',
     body:'<b>달</b>을 골라 그 달의 데이터만 볼 수 있어요. <span class="k">3월</span> <span class="k">6월</span> <span class="k">8월</span> <span class="k">11월</span> 을 번갈아 누르며, <b>어느 달이 평소와 다른지</b> 비교해 보세요.<br><br>대부분의 달은 비슷한데, 한 달만 유독 다르다면 그게 단서예요.',
     pad:10, place:'bottom'
   },
   {
     sel:'.chart-wrap',
+    ghost: r => ({ x:r.left+17, y:r.top+294, w:r.width-34, h:322, label:'여기에 막대그래프가 그려져요' }),
     title:'③ 튀는 데이터를 찾아요',
     body:'고른 값이 <b>막대그래프</b>로 나타나요. 다른 막대들과 비슷한데 <b>하나만 유독 높이 솟으면</b> 그게 눈여겨볼 신호예요.<br><br>그래프 아래에 <b>“수상한 데이터를 찾았어요”</b> 안내가 함께 떠요. 보는 값(컬럼)이나 보는 방법을 바꿔가며 살펴보세요.',
     pad:8, place:'top'
   },
   {
     sel:'#verdictBtn',
+    // 사건 해결 칸은 화면 맨 아래에 고정으로 생기므로 화면 기준으로 자리를 잡는다
+    ghost: () => ({ x:20, y:window.innerHeight-134, w:window.innerWidth-40, h:114, label:'화면 맨 아래에 사건 해결 칸이 생겨요' }),
     title:'④ 수사 결론을 내려요',
     body:'분석으로 찾아낸 <b>의심 인물·장소·시간대·달·주기</b>를 하나씩 골라요. 자료를 올릴수록 항목이 하나씩 열려요. 누구인지는 <b>출입증 카드</b>로 알아내야 해요.<br><br>다섯 가지를 모두 고르고 <b>“결론 확인하기”</b>를 누르면, 도로랜드에서 무슨 일이 있었는지 <b>진실이 드러나요.</b>',
     pad:10, place:'right'
@@ -2096,28 +2119,52 @@ function renderTutStep(){
   $('tutNext').textContent = (tutIdx===TUT_STEPS.length-1) ? '시작하기 ✓' : '다음 →';
 
   const target = getTutTarget(step);
-  const overlay = $('tutOverlay'), hole = $('tutHole'), bubble = $('tutBubble');
+  const overlay = $('tutOverlay'), hole = $('tutHole'), bubble = $('tutBubble'), ghost = $('tutGhost');
+
   if(!target){
-    // 아직 화면에 없는 단계(자료 업로드 전의 ②③④). 엉뚱한 곳을 비추지 말고
-    // 전체를 어둡게 한 뒤 버블만 가운데 띄우고, 언제 나타나는지 알려준다.
-    overlay.classList.add('full-dim');
-    // 앞 단계에서 인라인으로 켜둔 구멍을 반드시 끈다 (인라인 스타일이 CSS 규칙을 이기므로)
-    hole.style.display = 'none';
+    // 아직 화면에 없는 단계(자료 업로드 전의 ②③④).
+    // 엉뚱한 곳을 비추지 말고, 그 요소가 생길 자리를 점선 틀로 미리 보여준다.
+    const rect = step.ghost ? step.ghost(mainAreaRect()) : null;
     $('tutBody').innerHTML = step.body +
-      '<div class="tut-later">자료 3개를 모두 올리면 이 화면이 나타나요.</div>';
+      '<div class="tut-later">자료 3개를 모두 올리면 점선 자리에 실제로 나타나요.</div>';
+
+    if(rect){
+      overlay.classList.remove('full-dim');
+      ghost.classList.add('on');
+      ghost.style.left = rect.x+'px'; ghost.style.top = rect.y+'px';
+      ghost.style.width = rect.w+'px'; ghost.style.height = rect.h+'px';
+      $('tutGhostLabel').textContent = rect.label;
+      // 점선 자리만 밝게 남기고 나머지는 어둡게
+      positionSpotlight({left:rect.x, top:rect.y, width:rect.w, height:rect.h}, step, 4);
+      return;
+    }
+
+    // 자리를 잡을 수 없으면 전체를 어둡게 하고 버블만 가운데
+    overlay.classList.add('full-dim');
+    ghost.classList.remove('on');
+    hole.style.display = 'none';   // 인라인 스타일이 CSS 규칙을 이기므로 반드시 끈다
     bubble.style.left = '50%'; bubble.style.top = '50%';
     bubble.style.transform = 'translate(-50%,-50%)';
     return;
   }
+
   overlay.classList.remove('full-dim');
+  ghost.classList.remove('on');
   // 대상이 화면에 보이도록 스크롤
   target.scrollIntoView({block:'nearest', behavior:'smooth'});
   // 살짝 기다렸다가 위치 계산(스크롤 반영)
-  setTimeout(()=>positionSpotlight(target, step), 60);
+  setTimeout(()=>positionSpotlight(target.getBoundingClientRect(), step), 60);
 }
-function positionSpotlight(target, step){
-  const r = target.getBoundingClientRect();
-  const pad = step.pad ?? 8;
+
+// 분석 화면이 들어설 우측 영역 (지금은 활동 안내가 들어 있는 자리)
+function mainAreaRect(){
+  const el = document.querySelector('#guide') || document.querySelector('main');
+  return el ? el.getBoundingClientRect()
+            : {left:16, top:120, width:window.innerWidth-32, height:window.innerHeight-200};
+}
+
+function positionSpotlight(r, step, padOverride){
+  const pad = padOverride ?? step.pad ?? 8;
   const hole = $('tutHole'), bubble = $('tutBubble');
   const x = r.left - pad, y = r.top - pad, w = r.width + pad*2, h = r.height + pad*2;
   hole.style.left = x+'px'; hole.style.top = y+'px';
