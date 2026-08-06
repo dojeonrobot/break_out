@@ -314,12 +314,12 @@
             <label class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-white/70 hover:text-white text-sm font-bold cursor-pointer transition-colors">
               <i data-lucide="image-plus" class="w-4 h-4"></i>
               사진 첨부
-              <input type="file" accept="image/*" id="settings-new-img" class="hidden" onchange="onNewImagePick(event)">
+              <input type="file" accept="image/*,.heic,.heif,.HEIC,.HEIF" id="settings-new-img" class="hidden" onchange="onNewImagePick(event)">
             </label>
             <img id="settings-new-img-preview" class="hidden h-14 w-14 object-cover rounded-lg border border-white/20" alt="첨부 사진 미리보기">
             <button type="button" id="settings-new-img-clear" onclick="clearNewImage()"
               class="hidden text-white/40 hover:text-rose-400 transition-colors text-xs font-bold">사진 빼기</button>
-            <span class="text-white/30 text-xs">미션이 뽑히면 설명 옆에 크게 뜹니다</span>
+            <span class="text-white/30 text-xs">미션이 뽑히면 설명 옆에 크게 뜹니다 · 아이폰 HEIC 사진도 됩니다</span>
           </div>
         </div>
 
@@ -397,6 +397,12 @@
       <p id="alert-message" class="text-white text-lg font-bold mb-8 break-keep"></p>
       <button onclick="closeAlert()" class="w-full py-3.5 bg-white/10 hover:bg-white/20 text-white font-black rounded-xl transition-colors">확인</button>
     </div>
+  </div>
+
+  <!-- 사진 변환/압축 진행 표시 (HEIC 는 몇 초 걸릴 수 있음) -->
+  <div id="img-busy" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] px-5 py-3 bg-[#0B1528] border border-white/20 rounded-2xl shadow-2xl text-white text-sm font-bold items-center gap-3">
+    <span class="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin inline-block shrink-0"></span>
+    <span id="img-busy-text">사진을 불러오는 중…</span>
   </div>
 
   <!-- 사운드 토글 -->
@@ -573,6 +579,9 @@
       resultImg: document.getElementById('result-img'),
       resultCloseBtn: document.getElementById('result-close-btn'),
       resultHalo: document.getElementById('result-halo'),
+
+      imgBusy: document.getElementById('img-busy'),
+      imgBusyText: document.getElementById('img-busy-text'),
 
       alertModal: document.getElementById('alert-modal'),
       alertMessage: document.getElementById('alert-message')
@@ -1028,7 +1037,7 @@
             <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/15 rounded-lg text-white/50 hover:text-white/90 text-[11px] font-bold cursor-pointer transition-colors">
               <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
               ${item.img ? '사진 변경' : '사진 첨부'}
-              <input type="file" accept="image/*" class="hidden" onchange="onItemImagePick(event, ${index})">
+              <input type="file" accept="image/*,.heic,.heif,.HEIC,.HEIF" class="hidden" onchange="onItemImagePick(event, ${index})">
             </label>
             ${item.img ? `<button type="button" onclick="clearItemImage(${index})" class="text-white/30 hover:text-rose-400 transition-colors text-[11px] font-bold">삭제</button>` : ''}
           </div>`;
@@ -1042,10 +1051,61 @@
     const IMG_MAX_SIDE = 900;
     const IMG_QUALITY = 0.75;
 
-    function fileToCompressedDataURL(file) {
-      return new Promise((resolve, reject) => {
-        if (!file.type.startsWith('image/')) return reject(new Error('이미지 파일이 아닙니다.'));
+    const IMG_EXT_RE = /\.(jpe?g|png|gif|webp|bmp|avif|heic|heif)$/i;
+    const HEIC_RE = /\.(heic|heif)$/i;
 
+    // 윈도우에서 고른 .heic 는 file.type 이 빈 문자열로 오는 경우가 많아 확장자도 함께 본다
+    function isHeic(file) {
+      return HEIC_RE.test(file.name || '') || /image\/(heic|heif)/i.test(file.type || '');
+    }
+    function looksLikeImage(file) {
+      return (file.type || '').startsWith('image/') || IMG_EXT_RE.test(file.name || '');
+    }
+
+    // 아이폰 사진(HEIC)은 크롬·엣지가 그대로 디코딩하지 못한다.
+    // 평소엔 부담이 없도록, HEIC 를 실제로 올렸을 때만 변환 라이브러리를 내려받는다.
+    let heicLibPromise = null;
+    function loadHeicLib() {
+      if (window.heic2any) return Promise.resolve(window.heic2any);
+      if (!heicLibPromise) {
+        heicLibPromise = new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+          s.onload = () => resolve(window.heic2any);
+          s.onerror = () => {
+            heicLibPromise = null;   // 다음에 다시 시도할 수 있게 초기화
+            reject(new Error('HEIC 사진을 변환할 도구를 내려받지 못했습니다.\n인터넷 연결을 확인하거나, 사진을 JPG로 바꿔서 올려주세요.'));
+          };
+          document.head.appendChild(s);
+        });
+      }
+      return heicLibPromise;
+    }
+
+    // 브라우저가 바로 읽을 수 있는 형식으로 만들어 준다 (HEIC 만 JPEG 로 변환, 나머지는 그대로)
+    async function toDecodableBlob(file) {
+      if (!isHeic(file)) return file;
+      const heic2any = await loadHeicLib();
+
+      try {
+        const out = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+        return Array.isArray(out) ? out[0] : out;   // 연사 HEIC 는 여러 장으로 나오므로 첫 장만 쓴다
+      } catch (err) {
+        // 확장자만 .heic 이고 실제로는 JPG/PNG 인 경우가 있다. 그때는 원본을 그대로 쓰면 된다.
+        const msg = String((err && (err.message || err.code)) || '');
+        if (/already browser readable/i.test(msg)) return file;
+        throw new Error('HEIC 사진을 변환하지 못했습니다.\n사진을 JPG로 바꿔서 올려주세요.');
+      }
+    }
+
+    async function fileToCompressedDataURL(file) {
+      if (!looksLikeImage(file)) throw new Error('이미지 파일이 아닙니다.');
+      const blob = await toDecodableBlob(file);
+      return blobToCompressedDataURL(blob);
+    }
+
+    function blobToCompressedDataURL(blob) {
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onerror = () => reject(new Error('파일을 읽지 못했습니다.'));
         reader.onload = () => {
@@ -1063,8 +1123,19 @@
           };
           img.src = reader.result;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(blob);
       });
+    }
+
+    // 변환·압축이 몇 초 걸릴 수 있어 진행 중임을 알린다
+    function setImgBusy(on, text) {
+      els.imgBusy.classList.toggle('hidden', !on);
+      els.imgBusy.classList.toggle('flex', on);
+      if (text) els.imgBusyText.textContent = text;
+    }
+
+    function busyLabel(file) {
+      return isHeic(file) ? 'HEIC 사진을 변환하는 중…' : '사진을 불러오는 중…';
     }
 
     // 새로 추가할 미션에 붙일 사진 (아직 목록에 들어가기 전이라 따로 들고 있는다)
@@ -1075,6 +1146,7 @@
       e.target.value = '';                       // 같은 파일을 다시 골라도 change 가 발생하도록
       if (!file) return;
 
+      setImgBusy(true, busyLabel(file));
       try {
         pendingImg = await fileToCompressedDataURL(file);
         els.sNewImgPreview.src = pendingImg;
@@ -1082,6 +1154,8 @@
         els.sNewImgClear.classList.remove('hidden');
       } catch (err) {
         showAlert(err.message || '사진을 불러오지 못했습니다.');
+      } finally {
+        setImgBusy(false);
       }
     }
 
@@ -1100,12 +1174,15 @@
       const item = state.data[state.settingsLevel].items[index];
       if (!item) return;
 
+      setImgBusy(true, busyLabel(file));
       try {
         item.img = await fileToCompressedDataURL(file);
         saveData();
         renderSettingsItems();
       } catch (err) {
         showAlert(err.message || '사진을 불러오지 못했습니다.');
+      } finally {
+        setImgBusy(false);
       }
     }
 
