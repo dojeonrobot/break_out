@@ -398,11 +398,11 @@
        ========================================================================== */
     const MISSION_VERSION = 2;
 
-    // 화면에 깔 카드의 최소 장수.
-    // 미션 수가 이보다 적으면 같은 미션을 여러 장 복제해 채운다.
-    //   미션 1개 -> 6장 / 2개 -> 3장씩 6장 / 3개 -> 2장씩 6장 / 4개 -> 2장씩 8장 / 6개 이상 -> 1장씩
-    // 12로 바꾸면 1개->12장, 2개->6장씩, 3개->4장씩이 된다.
-    const MIN_CARDS = 6;
+    // 화면에 깔 카드 장수. 미션이 몇 개든 항상 이 장수로 채운다.
+    //   1개 -> 12장 / 2개 -> 6장씩 / 3개 -> 4장씩 / 4개 -> 3장씩 / 6개 -> 2장씩 / 12개 -> 1장씩
+    // 12로 딱 나뉘지 않으면(예: 5개, 7개) 몇몇 미션이 한 장 더 갖고, 그 미션은 덱을 새로 깔 때마다 바뀐다.
+    // 미션이 12개보다 많으면 전부 한 장씩 깔린다.
+    const DECK_SIZE = 12;
 
     // name = 크게 뜨는 미션 제목, desc = 그 아래 작게 뜨는 설명.
     // 설명이 필요 없으면 문자열만 적어도 된다 ('미션 2' 처럼).
@@ -635,15 +635,24 @@
       return a;
     }
 
-    // 남은 미션이 MIN_CARDS 보다 적으면 같은 미션을 같은 횟수만큼 복제해 덱을 채운다.
+    // 남은 미션을 복제해 항상 DECK_SIZE 장짜리 덱을 만든다.
     // (미션이 하나뿐이어도 카드가 한 장만 덩그러니 놓이지 않게 하려는 것)
     function buildDeck() {
       const pool = getPool();
       if (pool.length === 0) return [];
+      if (pool.length >= DECK_SIZE) return shuffle(pool);   // 미션이 더 많으면 전부 한 장씩
 
-      const copies = Math.max(1, Math.ceil(MIN_CARDS / pool.length));
+      const base = Math.floor(DECK_SIZE / pool.length);
+      const extra = DECK_SIZE % pool.length;
+
+      // 딱 나뉘지 않고 남는 장수는 매번 다른 미션에 얹어, 특정 미션이 계속 유리해지지 않게 한다
+      const bonus = new Set(shuffle(pool.map((_, i) => i)).slice(0, extra));
+
       const expanded = [];
-      for (let c = 0; c < copies; c++) expanded.push(...pool);
+      pool.forEach((item, i) => {
+        const count = base + (bonus.has(i) ? 1 : 0);
+        for (let c = 0; c < count; c++) expanded.push(item);
+      });
       return shuffle(expanded);
     }
 
