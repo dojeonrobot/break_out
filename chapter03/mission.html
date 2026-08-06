@@ -299,14 +299,19 @@
           다른 노트북에서 열어도 바로 사용할 수 있습니다.
         </p>
 
-        <!-- 추가 폼 -->
-        <div class="flex flex-col sm:flex-row gap-3 mb-6 bg-white/5 p-4 rounded-2xl border border-white/10">
-          <input type="text" id="settings-new-item" onkeypress="handleInputKey(event)" maxlength="40"
-            class="flex-1 bg-[#040813]/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 transition-colors min-w-0"
-            placeholder="미션 이름 (예: 신호 3개 해독하기)">
-          <button onclick="addItem()" id="s-add-btn" class="text-[#040814] px-6 py-3 rounded-xl font-black transition-colors shadow-lg flex items-center justify-center shrink-0">
-            <i data-lucide="plus" class="w-5 h-5 mr-1"></i> 추가
-          </button>
+        <!-- 추가 폼 : 제목 + 설명 -->
+        <div class="flex flex-col gap-3 mb-6 bg-white/5 p-4 rounded-2xl border border-white/10">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="settings-new-item" onkeypress="handleInputKey(event)" maxlength="40"
+              class="flex-1 bg-[#040813]/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 transition-colors min-w-0"
+              placeholder="미션 제목 (크게 표시됩니다)">
+            <button onclick="addItem()" id="s-add-btn" class="text-[#040814] px-6 py-3 rounded-xl font-black transition-colors shadow-lg flex items-center justify-center shrink-0">
+              <i data-lucide="plus" class="w-5 h-5 mr-1"></i> 추가
+            </button>
+          </div>
+          <textarea id="settings-new-desc" rows="2" maxlength="200"
+            class="w-full bg-[#040813]/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 transition-colors resize-y text-sm"
+            placeholder="미션 설명 (선택 · 제목 아래 작은 글씨로 표시됩니다)"></textarea>
         </div>
 
         <div class="flex justify-between items-center mb-4 px-1 text-sm font-bold border-b border-white/10 pb-2">
@@ -356,7 +361,9 @@
       <div id="result-badge" class="inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8"></div>
 
       <p id="result-label" class="pop-in text-white/40 text-lg font-bold tracking-widest mb-4" style="animation-delay:.1s">MISSION</p>
-      <p id="result-mission" class="text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-12"></p>
+      <p id="result-mission" class="text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-6"></p>
+      <!-- 미션 설명 (없으면 통째로 숨김) -->
+      <p id="result-desc" class="hidden text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mx-auto mb-12"></p>
 
       <button onclick="closeResult()" id="result-close-btn" class="px-16 py-5 text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5">
         확인
@@ -389,12 +396,39 @@
        저장된 값이 없으면 항상 아래 목록이 뜨므로 다른 노트북에서도 바로 쓸 수 있다.
        아래 목록을 고친 뒤에는 MISSION_VERSION 을 1 올려야 이미 저장된 기기에도 반영된다.
        ========================================================================== */
-    const MISSION_VERSION = 1;
+    const MISSION_VERSION = 2;
 
+    // 화면에 깔 카드의 최소 장수.
+    // 미션 수가 이보다 적으면 같은 미션을 여러 장 복제해 채운다.
+    //   미션 1개 -> 6장 / 2개 -> 3장씩 6장 / 3개 -> 2장씩 6장 / 4개 -> 2장씩 8장 / 6개 이상 -> 1장씩
+    // 12로 바꾸면 1개->12장, 2개->6장씩, 3개->4장씩이 된다.
+    const MIN_CARDS = 6;
+
+    // name = 크게 뜨는 미션 제목, desc = 그 아래 작게 뜨는 설명.
+    // 설명이 필요 없으면 문자열만 적어도 된다 ('미션 2' 처럼).
+    // 설명 안에서 줄을 바꾸고 싶으면 \n 을 넣으면 된다.
     const DEFAULT_MISSIONS = {
-      easy:   ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6'],
-      normal: ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6'],
-      hard:   ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6']
+      easy: [
+        { name: '색상 스도쿠 만들기', desc: '' },
+        { name: '조원과 함께 찰칵', desc: '조원 모두 서로 다른 하트 포즈를 취하고 사진 촬영하기' },
+        { name: '그림 그리기', desc: '화이트보드에 멘토 선생님 얼굴 그려오기' }
+      ],
+      normal: [
+        { name: '미션 1', desc: '' },
+        { name: '미션 2', desc: '' },
+        { name: '미션 3', desc: '' },
+        { name: '미션 4', desc: '' },
+        { name: '미션 5', desc: '' },
+        { name: '미션 6', desc: '' }
+      ],
+      hard: [
+        { name: '미션 1', desc: '' },
+        { name: '미션 2', desc: '' },
+        { name: '미션 3', desc: '' },
+        { name: '미션 4', desc: '' },
+        { name: '미션 5', desc: '' },
+        { name: '미션 6', desc: '' }
+      ]
     };
     /* ▲▲▲ 여기까지 ▲▲▲ */
 
@@ -434,9 +468,21 @@
       data: null
     };
 
+    // 미션 한 건을 {name, desc} 형태로 통일한다.
+    // 설명 기능이 없던 시절 저장분(문자열 배열)도 여기서 그대로 흡수되므로 기존 목록이 날아가지 않는다.
+    function normalizeItem(x) {
+      if (typeof x === 'string') return { name: x, desc: '' };
+      if (x && typeof x === 'object') return { name: String(x.name || ''), desc: String(x.desc || '') };
+      return null;
+    }
+
+    function normalizeItems(arr) {
+      return arr.map(normalizeItem).filter(it => it && it.name);
+    }
+
     function freshData() {
       const d = {};
-      LEVELS.forEach(lv => { d[lv] = { items: DEFAULT_MISSIONS[lv].slice(), drawn: [] }; });
+      LEVELS.forEach(lv => { d[lv] = { items: normalizeItems(DEFAULT_MISSIONS[lv]), drawn: [] }; });
       return d;
     }
 
@@ -449,7 +495,7 @@
         if (parsed.version !== MISSION_VERSION) return freshData();
         const merged = freshData();
         LEVELS.forEach(lv => {
-          if (parsed[lv] && Array.isArray(parsed[lv].items)) merged[lv].items = parsed[lv].items;
+          if (parsed[lv] && Array.isArray(parsed[lv].items)) merged[lv].items = normalizeItems(parsed[lv].items);
           if (parsed[lv] && Array.isArray(parsed[lv].drawn)) merged[lv].drawn = parsed[lv].drawn;
         });
         return merged;
@@ -483,6 +529,7 @@
 
       sItemList: document.getElementById('settings-item-list'),
       sItemInput: document.getElementById('settings-new-item'),
+      sDescInput: document.getElementById('settings-new-desc'),
       sItemCount: document.getElementById('s-item-count'),
       sAddBtn: document.getElementById('s-add-btn'),
 
@@ -491,6 +538,7 @@
       resultBadge: document.getElementById('result-badge'),
       resultLabel: document.getElementById('result-label'),
       resultMission: document.getElementById('result-mission'),
+      resultDesc: document.getElementById('result-desc'),
       resultCloseBtn: document.getElementById('result-close-btn'),
       resultHalo: document.getElementById('result-halo'),
 
@@ -571,10 +619,11 @@
     // ==================== 카드 덱 ====================
     // 남은 미션을 섞어 카드에 배정한다. 카드 위치와 미션은 매 덱마다 새로 섞이므로
     // 아이가 위치를 기억해 특정 미션을 노릴 수 없다.
+    // drawn 에는 미션 이름만 저장한다 (설명을 고쳐도 뽑은 기록이 어긋나지 않도록)
     function getPool() {
       const d = state.data[state.level];
       if (!state.noRepeat) return d.items.slice();
-      return d.items.filter(name => !d.drawn.includes(name));
+      return d.items.filter(it => !d.drawn.includes(it.name));
     }
 
     function shuffle(arr) {
@@ -586,8 +635,20 @@
       return a;
     }
 
+    // 남은 미션이 MIN_CARDS 보다 적으면 같은 미션을 같은 횟수만큼 복제해 덱을 채운다.
+    // (미션이 하나뿐이어도 카드가 한 장만 덩그러니 놓이지 않게 하려는 것)
+    function buildDeck() {
+      const pool = getPool();
+      if (pool.length === 0) return [];
+
+      const copies = Math.max(1, Math.ceil(MIN_CARDS / pool.length));
+      const expanded = [];
+      for (let c = 0; c < copies; c++) expanded.push(...pool);
+      return shuffle(expanded);
+    }
+
     function reshuffle() {
-      state.deck = shuffle(getPool());
+      state.deck = buildDeck();
       renderDeck();
       renderStatus();
     }
@@ -638,7 +699,8 @@
                 <!-- 앞면 (뒤집으면 나오는 면) -->
                 <div class="card-face face-reveal bg-white border-2 ${theme.border} shadow-2xl flex flex-col items-center justify-center p-4 text-center">
                   <div class="${theme.text} text-xs font-black tracking-widest mb-3">${theme.short} · MISSION</div>
-                  <div class="text-slate-800 text-lg sm:text-xl font-black leading-tight break-keep">${escapeHtml(mission)}</div>
+                  <div class="text-slate-800 text-lg sm:text-xl font-black leading-tight break-keep">${escapeHtml(mission.name)}</div>
+                  ${mission.desc ? `<div class="text-slate-500 text-[11px] sm:text-xs font-medium leading-snug break-keep mt-2 line-clamp-4 whitespace-pre-line">${escapeHtml(mission.desc)}</div>` : ''}
                 </div>
               </div>
             </div>
@@ -731,7 +793,7 @@
       // 카드가 다 뒤집힌 뒤(0.8s) 잠깐 보여주고 전체화면 결과로 넘어간다
       setTimeout(() => {
         const d = state.data[state.level];
-        if (!d.drawn.includes(mission)) d.drawn.push(mission);
+        if (!d.drawn.includes(mission.name)) d.drawn.push(mission.name);
         saveData();
         showResult(mission);
         state.isRevealing = false;
@@ -749,18 +811,32 @@
 
       els.resultBadge.textContent = theme.label;
       els.resultBadge.className = `pop-in inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8 ${theme.text} ${theme.border}`;
-      els.resultMission.textContent = mission;
-      els.resultMission.className = `pop-in text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-12 ${theme.text}`;
+      const hasDesc = !!(mission.desc && mission.desc.trim());
+
+      els.resultMission.textContent = mission.name;
+      // 설명이 있으면 제목 아래 여백을 줄여 두 줄이 한 덩어리로 보이게 한다
+      els.resultMission.className = `pop-in text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] ${hasDesc ? 'mb-6' : 'mb-12'} ${theme.text}`;
       els.resultMission.style.animationDelay = '.2s';
+
+      els.resultDesc.textContent = hasDesc ? mission.desc : '';
+      els.resultDesc.classList.toggle('hidden', !hasDesc);
+
       els.resultCloseBtn.className = `pop-in px-16 py-5 ${theme.bg} ${theme.hoverBg} text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5`;
-      els.resultCloseBtn.style.animationDelay = '.4s';
+      els.resultCloseBtn.style.animationDelay = '.45s';
       els.resultHalo.style.backgroundColor = theme.glow;
 
       els.resultOverlay.classList.remove('hidden');
       els.resultOverlay.classList.add('flex');
 
+      if (hasDesc) {
+        els.resultDesc.className = 'pop-in text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mx-auto mb-12';
+        els.resultDesc.style.animationDelay = '.32s';
+      }
+
       // 오버레이를 다시 열 때도 등장 애니메이션이 처음부터 재생되도록 리플로우로 초기화
-      [els.resultPanel, els.resultBadge, els.resultLabel, els.resultMission, els.resultCloseBtn].forEach(el => {
+      const seq = [els.resultPanel, els.resultBadge, els.resultLabel, els.resultMission, els.resultCloseBtn];
+      if (hasDesc) seq.push(els.resultDesc);
+      seq.forEach(el => {
         const cls = el === els.resultPanel ? 'result-in' : 'pop-in';
         el.classList.remove(cls);
         void el.offsetWidth;
@@ -848,18 +924,26 @@
         return;
       }
 
-      d.items.forEach((name, index) => {
-        const drawnMark = d.drawn.includes(name)
-          ? '<span class="absolute bottom-2 right-3 text-[10px] font-black text-white/30">뽑음</span>' : '';
+      // 제목·설명을 칸 안에서 바로 고칠 수 있게 한다 (지웠다 다시 넣을 필요 없음)
+      d.items.forEach((item, index) => {
+        const drawnMark = d.drawn.includes(item.name)
+          ? '<span class="absolute top-3 right-11 text-[10px] font-black text-white/30">뽑음</span>' : '';
         const li = document.createElement('li');
-        li.className = 'flex flex-col bg-white/5 p-3 pb-5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors relative w-[calc(50%-0.5rem)] sm:w-[calc(33.33%-0.75rem)] shrink-0 min-w-[150px]';
+        li.className = 'flex flex-col bg-white/5 p-3 rounded-2xl border border-white/10 transition-colors relative w-full sm:w-[calc(50%-0.5rem)] shrink-0';
         li.innerHTML = `
           <button onclick="deleteItem(${index})" class="absolute top-2 right-2 text-white/20 hover:text-rose-400 transition-colors bg-black/20 p-1.5 rounded-lg hover:bg-rose-400/20" title="삭제">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
-          <div class="text-white/30 text-[10px] font-black mb-1">${index + 1}</div>
-          <div class="text-white font-bold text-sm pr-6 break-keep">${escapeHtml(name)}</div>
-          ${drawnMark}`;
+          ${drawnMark}
+          <div class="text-white/30 text-[10px] font-black mb-1.5">${index + 1}</div>
+          <input type="text" value="${escapeHtml(item.name)}" maxlength="40"
+            onchange="editItem(${index}, 'name', this.value)"
+            class="w-full bg-transparent border border-transparent hover:border-white/15 focus:border-white/30 rounded-lg px-2 py-1.5 -ml-2 text-white font-bold text-sm focus:outline-none focus:bg-black/20 transition-colors pr-8"
+            placeholder="미션 제목">
+          <textarea rows="2" maxlength="200"
+            onchange="editItem(${index}, 'desc', this.value)"
+            class="w-full bg-transparent border border-transparent hover:border-white/15 focus:border-white/30 rounded-lg px-2 py-1.5 -ml-2 mt-1 text-white/60 text-xs leading-snug focus:outline-none focus:bg-black/20 transition-colors resize-y"
+            placeholder="설명 (선택)">${escapeHtml(item.desc)}</textarea>`;
         els.sItemList.appendChild(li);
       });
       lucide.createIcons();
@@ -867,32 +951,58 @@
 
     function addItem() {
       const name = els.sItemInput.value.trim();
+      const desc = els.sDescInput.value.trim();
       const d = state.data[state.settingsLevel];
 
-      if (!name) return showAlert('미션 이름을 입력해주세요.');
+      if (!name) return showAlert('미션 제목을 입력해주세요.');
       if (d.items.length >= MAX_ITEMS) return showAlert(`미션은 최대 ${MAX_ITEMS}개까지 등록할 수 있습니다.`);
-      if (d.items.includes(name)) return showAlert('이미 등록된 미션입니다.');
+      if (d.items.some(it => it.name === name)) return showAlert('이미 등록된 미션 제목입니다.');
 
-      d.items.push(name);
+      d.items.push({ name, desc });
       els.sItemInput.value = '';
+      els.sDescInput.value = '';
       saveData();
       renderSettingsItems();
     }
 
     function handleInputKey(e) { if (e.key === 'Enter') addItem(); }
 
+    // 칸 안에서 제목/설명을 고쳤을 때
+    function editItem(index, field, value) {
+      const d = state.data[state.settingsLevel];
+      const item = d.items[index];
+      if (!item) return;
+
+      if (field === 'name') {
+        const name = value.trim();
+        if (!name) return renderSettingsItems();                       // 빈 제목은 되돌린다
+        if (d.items.some((it, i) => i !== index && it.name === name)) {
+          showAlert('이미 등록된 미션 제목입니다.');
+          return renderSettingsItems();
+        }
+        // 뽑은 기록도 새 제목으로 따라가게 한다
+        d.drawn = d.drawn.map(n => (n === item.name ? name : n));
+        item.name = name;
+      } else {
+        item.desc = value;
+      }
+
+      saveData();
+      renderSettingsItems();
+    }
+
     function deleteItem(index) {
       const d = state.data[state.settingsLevel];
       const [removed] = d.items.splice(index, 1);
       // 목록에서 지운 미션은 뽑은 기록에서도 빼서 상태가 어긋나지 않게 한다
-      d.drawn = d.drawn.filter(n => n !== removed);
+      if (removed) d.drawn = d.drawn.filter(n => n !== removed.name);
       saveData();
       renderSettingsItems();
     }
 
     function restoreDefaults() {
       const lv = state.settingsLevel;
-      state.data[lv].items = DEFAULT_MISSIONS[lv].slice();
+      state.data[lv].items = normalizeItems(DEFAULT_MISSIONS[lv]);
       state.data[lv].drawn = [];
       saveData();
       renderSettingsItems();
@@ -918,8 +1028,8 @@
 
     // ==================== 단축키 ====================
     document.addEventListener('keydown', (e) => {
-      // 미션 이름 입력 중에는 단축키가 글자를 가로채지 않도록 한다
-      if (e.target.tagName === 'INPUT') return;
+      // 미션 제목·설명을 입력하는 중에는 단축키가 글자를 가로채지 않도록 한다
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.key === 'Escape') {
         if (!els.alertModal.classList.contains('hidden')) return closeAlert();
