@@ -37,5 +37,5 @@ b = p.chromium.launch(channel="chrome", headless=True)
 - 게임 본 흐름: 좌측 3개 슬롯(`input[data-input="safari|harmonia|carousel"]`)에 CSV 3개 업로드 → 3/3 되면 차트·수사노트 활성.
   테스트용 CSV는 `docs/chapter04-kit/data/` 에 있다 (배포 제외 자료).
 - 힌트 모달: `#hintFab` → `#pwInput` 에 `0101`.
-- 기밀 기록실: `#vaultBtn` → 탭 `.vault-tab[data-tab="badges"|"calendar"]` → `#vlPw` 에 `0101`.
+- 기밀 기록실: `#vaultBtn` → 탭 `.vault-tab[data-tab="badges"|"calendar"]` → `#vlPw` 에 **탭별로 다른 코드** (badges=`PQUDJ`, calendar=`CAFLY`). 입력창이 자동으로 대문자로 바꾸고 영숫자 외 문자는 지운다. 코드는 `index.html` 의 `VAULT_UNLOCK_CODES` 에 있다.
 - 슬롯은 파일이 채워지면 `disabled` 되므로, 한 슬롯에 두 번 올리려면 페이지를 새로 로드해야 한다.
