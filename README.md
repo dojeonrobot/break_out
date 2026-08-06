@@ -30,11 +30,17 @@ BREAK-OUT/
 │   ├── images/
 │   └── audio/
 │
-└── chapter03/              ← 회전목마 구역: 머지큐브 속 비밀
-    ├── index.html
-    ├── styles.css
-    ├── images/             ← diary, cubes, patterns, missions, icons, qr
-    └── audio/              ← BGM + 음계 사운드
+├── chapter03/              ← 회전목마 구역: 머지큐브 속 비밀
+│   ├── index.html
+│   ├── styles.css
+│   ├── images/             ← diary, cubes, patterns, missions, icons, qr
+│   └── audio/              ← BGM + 음계 사운드
+│
+└── chapter04/              ← 중앙관리실 구역: 트레이스 브레이크
+    ├── index.html          ← 데이터 분석기 (CSS 인라인)
+    ├── images/             ← logo, chars(사원증), chars/large
+    ├── data/               ← 출입/방문/활동 CSV 원본
+    └── bak/                ← 인쇄 소품·고해상도 원본 (git·배포 제외)
 ```
 
 ## 챕터 소개
@@ -44,6 +50,7 @@ BREAK-OUT/
 | Chapter 01 | 사파리 | 도트매트릭스 패턴을 분석하여 마스터 키 해독 |
 | Chapter 02 | 하모니아 | Teachable Machine AI + Arduino 연동 이상감지 |
 | Chapter 03 | 회전목마 | 머지큐브, 일기장, 슬라이드 퍼즐로 문양 수집 |
+| Chapter 04 | 중앙관리실 | 출입기록 데이터를 분석해 진범 추적 (트레이스 브레이크) |
 
 ## 기술 스택
 

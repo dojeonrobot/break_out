@@ -22,6 +22,7 @@ DOROLAND Break Out Adventure — 교육용 방탈출 웹 애플리케이션. 빌
 - `chapter01/` — 도트매트릭스 암호 해독. 로직은 `js/app.js`에 분리되어 있고, 미션/힌트 데이터(비밀번호, 이미지 경로)가 파일 상단 `missions` 배열에 정의됨.
 - `chapter02/` — AI 이상감지 (진범찾기). TensorFlow.js + Teachable Machine 웹캠 분류, Web Serial API로 Arduino 연동 — Chrome/Edge 필요. AI 모델 교체 시 `index.html` 내 Teachable Machine 모델 URL 변경.
 - `chapter03/` — 머지큐브 속 비밀 (단일 대형 `index.html`, ~2100줄). 퍼즐 정답·일기장 비밀번호 등이 `index.html` 상단 데이터 영역에, 색상·레이아웃 변수는 `styles.css` 상단에 있음.
+- `chapter04/` — 트레이스 브레이크 / 도로랜드 데이터 분석기 (단일 대형 `index.html`, CSS·데이터 모두 인라인). 진입 비밀번호 `0101`, 출입증 코드(예: `J-088`)와 출입기록 표 데이터가 `index.html` 스크립트 상단에 정의됨. 캐릭터 사원증은 `images/chars/<영문명>.png`(썸네일)과 `images/chars/large/`(확대 라이트박스용) 두 벌을 파일명으로 매칭하므로 교체 시 두 곳 모두 같은 이름으로 넣을 것. `data/`의 CSV는 출제 원본 참고용이며 앱이 런타임에 읽지는 않음 — 수치를 고치려면 `index.html` 내장 데이터를 함께 수정해야 한다. `chapter04/bak/`에는 인쇄 소품(`print/`), 고해상도 캐릭터 원본(`src/`), 구버전 HTML·분리 CSS(`html/`)가 있고 git·배포 모두에서 제외된다 (원본 출처: 공유 드라이브 `DOROLAND\Chpt4. 구름 너머의 진실\Trace Break`).
 - 주의: `docs/guide.md`는 chapter02와 chapter03의 내용이 서로 뒤바뀌어 기술되어 있음 (실제: ch02=AI 이상감지, ch03=머지큐브). 챕터 내용은 코드를 기준으로 판단할 것.
 - `bak/` — 원본 백업 (gitignore됨, 수정 금지, 잘못 고쳤을 때 복구용).
 
