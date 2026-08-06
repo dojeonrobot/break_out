@@ -701,6 +701,11 @@
     outline:2.5px solid rgba(255,214,107,.9); outline-offset:0;
   }
   .tut-overlay.full-dim .tut-hole{display:none}
+  /* 아직 나타나지 않은 단계에 붙는 안내 */
+  .tut-later{
+    margin-top:14px; padding-top:11px; border-top:1px dashed var(--line);
+    font-size:12.5px; font-weight:700; color:var(--ink-500);
+  }
   .tut-bubble{
     position:absolute; width:340px; max-width:calc(100vw - 32px);
     background:#fff; border-radius:16px; padding:20px;
@@ -2039,19 +2044,20 @@ const TUT_STEPS = [
     pad:10, place:'right'
   },
   {
-    sel:'#monthPills', fallbackSel:'#uploadCard',
+    // 자료를 올리기 전에는 대상이 없다. 엉뚱한 곳을 비추지 않도록 fallback 을 두지 않는다.
+    sel:'#monthPills',
     title:'② 달을 바꿔가며 비교해요',
     body:'<b>달</b>을 골라 그 달의 데이터만 볼 수 있어요. <span class="k">3월</span> <span class="k">6월</span> <span class="k">8월</span> <span class="k">11월</span> 을 번갈아 누르며, <b>어느 달이 평소와 다른지</b> 비교해 보세요.<br><br>대부분의 달은 비슷한데, 한 달만 유독 다르다면 그게 단서예요.',
     pad:10, place:'bottom'
   },
   {
-    sel:'.chart-wrap', fallbackSel:'#uploadCard',
+    sel:'.chart-wrap',
     title:'③ 튀는 데이터를 찾아요',
     body:'고른 값이 <b>막대그래프</b>로 나타나요. 다른 막대들과 비슷한데 <b>하나만 유독 높이 솟으면</b> 그게 눈여겨볼 신호예요.<br><br>그래프 아래에 <b>“수상한 데이터를 찾았어요”</b> 안내가 함께 떠요. 보는 값(컬럼)이나 보는 방법을 바꿔가며 살펴보세요.',
     pad:8, place:'top'
   },
   {
-    sel:'#verdictBtn', fallbackSel:'#uploadCard',
+    sel:'#verdictBtn',
     title:'④ 수사 결론을 내려요',
     body:'분석으로 찾아낸 <b>의심 인물·장소·시간대·달·주기</b>를 하나씩 골라요. 자료를 올릴수록 항목이 하나씩 열려요. 누구인지는 <b>출입증 카드</b>로 알아내야 해요.<br><br>다섯 가지를 모두 고르고 <b>“결론 확인하기”</b>를 누르면, 도로랜드에서 무슨 일이 있었는지 <b>진실이 드러나요.</b>',
     pad:10, place:'right'
@@ -2092,8 +2098,13 @@ function renderTutStep(){
   const target = getTutTarget(step);
   const overlay = $('tutOverlay'), hole = $('tutHole'), bubble = $('tutBubble');
   if(!target){
-    // 대상이 안 보이면 전체 어둡게 + 버블 중앙
+    // 아직 화면에 없는 단계(자료 업로드 전의 ②③④). 엉뚱한 곳을 비추지 말고
+    // 전체를 어둡게 한 뒤 버블만 가운데 띄우고, 언제 나타나는지 알려준다.
     overlay.classList.add('full-dim');
+    // 앞 단계에서 인라인으로 켜둔 구멍을 반드시 끈다 (인라인 스타일이 CSS 규칙을 이기므로)
+    hole.style.display = 'none';
+    $('tutBody').innerHTML = step.body +
+      '<div class="tut-later">자료 3개를 모두 올리면 이 화면이 나타나요.</div>';
     bubble.style.left = '50%'; bubble.style.top = '50%';
     bubble.style.transform = 'translate(-50%,-50%)';
     return;
