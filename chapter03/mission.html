@@ -308,6 +308,19 @@
           <textarea id="settings-new-desc" rows="2" maxlength="200"
             class="w-full bg-[#040813]/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 transition-colors resize-y text-sm"
             placeholder="미션 설명 (선택 · 제목 아래 작은 글씨로 표시됩니다)"></textarea>
+
+          <!-- 사진 첨부 (선택) -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <label class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/20 rounded-xl text-white/70 hover:text-white text-sm font-bold cursor-pointer transition-colors">
+              <i data-lucide="image-plus" class="w-4 h-4"></i>
+              사진 첨부
+              <input type="file" accept="image/*" id="settings-new-img" class="hidden" onchange="onNewImagePick(event)">
+            </label>
+            <img id="settings-new-img-preview" class="hidden h-14 w-14 object-cover rounded-lg border border-white/20" alt="첨부 사진 미리보기">
+            <button type="button" id="settings-new-img-clear" onclick="clearNewImage()"
+              class="hidden text-white/40 hover:text-rose-400 transition-colors text-xs font-bold">사진 빼기</button>
+            <span class="text-white/30 text-xs">미션이 뽑히면 설명 옆에 크게 뜹니다</span>
+          </div>
         </div>
 
         <div class="flex justify-between items-center mb-4 px-1 text-sm font-bold border-b border-white/10 pb-2">
@@ -353,18 +366,26 @@
     <!-- 난이도 색으로 물드는 중앙 광원 -->
     <div id="result-halo" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vmin] h-[80vmin] rounded-full blur-[120px] pointer-events-none opacity-40"></div>
 
-    <div id="result-panel" class="relative z-10 w-full max-w-4xl text-center result-in">
-      <div id="result-badge" class="inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8"></div>
+    <div id="result-panel" class="relative z-10 w-full max-w-6xl result-in">
+      <!-- 사진이 붙은 미션이면 가로로, 아니면 지금처럼 가운데 한 덩어리로 배치한다 -->
+      <div id="result-body" class="flex flex-col items-center justify-center gap-8 lg:gap-14">
 
-      <p id="result-label" class="pop-in text-white/40 text-lg font-bold tracking-widest mb-4" style="animation-delay:.1s">MISSION</p>
-      <p id="result-mission" class="text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-6"></p>
-      <!-- 미션 설명 (없으면 통째로 숨김) -->
-      <p id="result-desc" class="hidden text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mx-auto mb-12"></p>
+        <img id="result-img" class="hidden pop-in rounded-3xl border-4 object-contain shadow-[0_20px_60px_rgba(0,0,0,0.6)] max-h-[42vh] lg:max-h-[72vh] w-auto max-w-full" alt="미션 사진">
 
-      <button onclick="closeResult()" id="result-close-btn" class="px-16 py-5 text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5">
-        확인
-      </button>
-      <p class="text-white/25 text-sm mt-6">아무 곳이나 클릭하거나 <kbd class="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> 를 눌러도 닫힙니다</p>
+        <div id="result-text" class="text-center min-w-0">
+          <div id="result-badge" class="inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8"></div>
+
+          <p id="result-label" class="pop-in text-white/40 text-lg font-bold tracking-widest mb-4" style="animation-delay:.1s">MISSION</p>
+          <p id="result-mission" class="text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-6"></p>
+          <!-- 미션 설명 (없으면 통째로 숨김) -->
+          <p id="result-desc" class="hidden text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mx-auto mb-12"></p>
+
+          <button onclick="closeResult()" id="result-close-btn" class="px-16 py-5 text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5">
+            확인
+          </button>
+          <p class="text-white/25 text-sm mt-6">아무 곳이나 클릭하거나 <kbd class="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> 를 눌러도 닫힙니다</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -392,7 +413,7 @@
        저장된 값이 없으면 항상 아래 목록이 뜨므로 다른 노트북에서도 바로 쓸 수 있다.
        아래 목록을 고친 뒤에는 MISSION_VERSION 을 1 올려야 이미 저장된 기기에도 반영된다.
        ========================================================================== */
-    const MISSION_VERSION = 3;
+    const MISSION_VERSION = 4;
 
     // 화면에 깔 카드 장수. 미션이 몇 개든 항상 이 장수로 채운다.
     //   1개 -> 12장 / 2개 -> 6장씩 / 3개 -> 4장씩 / 4개 -> 3장씩 / 6개 -> 2장씩 / 12개 -> 1장씩
@@ -404,9 +425,13 @@
     // 설명이 필요 없으면 문자열만 적어도 된다 ('미션 2' 처럼).
     // 설명 안에서 줄을 바꾸고 싶으면 \n 을 넣으면 된다.
     // 제목이 같은 미션을 여러 개 둬도 된다 (내부적으로 각자 다른 id 로 구분한다).
+    // img 를 주면 미션이 뽑혔을 때 설명 옆에 사진이 함께 뜬다 ("이 장소에서 사진 찍기" 같은 미션용).
+    //   - 현장에서는 설정 화면의 '사진 첨부' 버튼으로 올리면 된다 (자동으로 줄여서 저장).
+    //   - 여기 코드에 박으려면 이미지 파일을 chapter03/images/missions/ 에 넣고
+    //     img: 'images/missions/파일명.jpg' 처럼 경로를 적으면 모든 기기에서 보인다.
     const DEFAULT_MISSIONS = {
       easy: [
-        { name: '색상 스도쿠 만들기', desc: '' },
+        { name: '색상 스도쿠 완성하기', desc: '' },
         { name: '조원과 함께 찰칵', desc: '조원 모두 서로 다른 하트 포즈를 취하고 사진 촬영하기' },
         { name: '그림 그리기', desc: '화이트보드에 멘토 선생님 얼굴 그려오기' }
       ],
@@ -463,9 +488,14 @@
     function newId() { return `m${Date.now().toString(36)}_${idSeq++}`; }
 
     function normalizeItem(x) {
-      if (typeof x === 'string') return { id: newId(), name: x, desc: '' };
+      if (typeof x === 'string') return { id: newId(), name: x, desc: '', img: '' };
       if (x && typeof x === 'object') {
-        return { id: x.id || newId(), name: String(x.name || ''), desc: String(x.desc || '') };
+        return {
+          id: x.id || newId(),
+          name: String(x.name || ''),
+          desc: String(x.desc || ''),
+          img: String(x.img || '')
+        };
       }
       return null;
     }
@@ -501,8 +531,11 @@
     function saveData() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: MISSION_VERSION, ...state.data }));
+        return true;
       } catch (e) {
-        // 시크릿 모드 등에서 저장이 막혀도 진행에는 지장 없음
+        // 사진을 여러 장 넣으면 브라우저 저장 한도(보통 5MB)에 걸릴 수 있어 그때만 알린다
+        showAlert('저장 공간이 부족합니다. 사진이 붙은 미션을 줄이거나 일부 사진을 삭제해주세요.\n(방금 변경한 내용은 화면에는 남지만 새로고침하면 사라집니다)');
+        return false;
       }
     }
 
@@ -524,6 +557,8 @@
       sItemList: document.getElementById('settings-item-list'),
       sItemInput: document.getElementById('settings-new-item'),
       sDescInput: document.getElementById('settings-new-desc'),
+      sNewImgPreview: document.getElementById('settings-new-img-preview'),
+      sNewImgClear: document.getElementById('settings-new-img-clear'),
       sItemCount: document.getElementById('s-item-count'),
       sAddBtn: document.getElementById('s-add-btn'),
 
@@ -533,6 +568,9 @@
       resultLabel: document.getElementById('result-label'),
       resultMission: document.getElementById('result-mission'),
       resultDesc: document.getElementById('result-desc'),
+      resultBody: document.getElementById('result-body'),
+      resultText: document.getElementById('result-text'),
+      resultImg: document.getElementById('result-img'),
       resultCloseBtn: document.getElementById('result-close-btn'),
       resultHalo: document.getElementById('result-halo'),
 
@@ -711,9 +749,10 @@
                 </div>
                 <!-- 앞면 (뒤집으면 나오는 면) -->
                 <div class="card-face face-reveal bg-white border-2 ${theme.border} shadow-2xl flex flex-col items-center justify-center p-4 text-center">
-                  <div class="${theme.text} text-xs font-black tracking-widest mb-3">${theme.short} · MISSION</div>
+                  <div class="${theme.text} text-xs font-black tracking-widest mb-2">${theme.short} · MISSION</div>
+                  ${mission.img ? `<img src="${escapeHtml(mission.img)}" class="w-full h-[38%] object-cover rounded-lg mb-2.5 border border-slate-200" alt="">` : ''}
                   <div class="text-slate-800 text-lg sm:text-xl font-black leading-tight break-keep">${escapeHtml(mission.name)}</div>
-                  ${mission.desc ? `<div class="text-slate-500 text-[11px] sm:text-xs font-medium leading-snug break-keep mt-2 line-clamp-4 whitespace-pre-line">${escapeHtml(mission.desc)}</div>` : ''}
+                  ${mission.desc ? `<div class="text-slate-500 text-[11px] sm:text-xs font-medium leading-snug break-keep mt-2 ${mission.img ? 'line-clamp-2' : 'line-clamp-4'} whitespace-pre-line">${escapeHtml(mission.desc)}</div>` : ''}
                 </div>
               </div>
             </div>
@@ -829,10 +868,32 @@
       els.resultBadge.textContent = theme.label;
       els.resultBadge.className = `pop-in inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8 ${theme.text} ${theme.border}`;
       const hasDesc = !!(mission.desc && mission.desc.trim());
+      const hasImg = !!(mission.img && mission.img.trim());
+
+      // 사진이 있으면 가로 2단으로 바꾸고, 글자 크기를 한 단계 줄여 옆자리에 맞춘다
+      els.resultBody.className = hasImg
+        ? 'flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14'
+        : 'flex flex-col items-center justify-center gap-8 lg:gap-14';
+      els.resultText.className = hasImg
+        ? 'text-center lg:text-left min-w-0 lg:flex-1'
+        : 'text-center min-w-0';
+
+      if (hasImg) {
+        els.resultImg.src = mission.img;
+        els.resultImg.className = `pop-in rounded-3xl border-4 ${theme.border} object-contain shadow-[0_20px_60px_rgba(0,0,0,0.6)] max-h-[42vh] lg:max-h-[72vh] w-auto max-w-full lg:max-w-[46%]`;
+        els.resultImg.style.animationDelay = '.15s';
+      } else {
+        els.resultImg.removeAttribute('src');
+        els.resultImg.className = 'hidden';
+      }
+
+      const missionSize = hasImg
+        ? 'text-[2.25rem] sm:text-[3.25rem] lg:text-[4rem]'
+        : 'text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem]';
 
       els.resultMission.textContent = mission.name;
       // 설명이 있으면 제목 아래 여백을 줄여 두 줄이 한 덩어리로 보이게 한다
-      els.resultMission.className = `pop-in text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] ${hasDesc ? 'mb-6' : 'mb-12'} ${theme.text}`;
+      els.resultMission.className = `pop-in ${missionSize} leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] ${hasDesc ? 'mb-6' : 'mb-12'} ${theme.text}`;
       els.resultMission.style.animationDelay = '.2s';
 
       els.resultDesc.textContent = hasDesc ? mission.desc : '';
@@ -846,13 +907,14 @@
       els.resultOverlay.classList.add('flex');
 
       if (hasDesc) {
-        els.resultDesc.className = 'pop-in text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mx-auto mb-12';
+        els.resultDesc.className = `pop-in text-lg sm:text-2xl lg:text-[1.7rem] leading-relaxed font-medium text-white/75 break-keep whitespace-pre-line max-w-3xl mb-12 ${hasImg ? 'lg:mx-0 mx-auto' : 'mx-auto'}`;
         els.resultDesc.style.animationDelay = '.32s';
       }
 
       // 오버레이를 다시 열 때도 등장 애니메이션이 처음부터 재생되도록 리플로우로 초기화
       const seq = [els.resultPanel, els.resultBadge, els.resultLabel, els.resultMission, els.resultCloseBtn];
       if (hasDesc) seq.push(els.resultDesc);
+      if (hasImg) seq.push(els.resultImg);
       seq.forEach(el => {
         const cls = el === els.resultPanel ? 'result-in' : 'pop-in';
         el.classList.remove(cls);
@@ -960,12 +1022,102 @@
           <textarea rows="2" maxlength="200"
             onchange="editItem(${index}, 'desc', this.value)"
             class="w-full bg-transparent border border-transparent hover:border-white/15 focus:border-white/30 rounded-lg px-2 py-1.5 -ml-2 mt-1 text-white/60 text-xs leading-snug focus:outline-none focus:bg-black/20 transition-colors resize-y"
-            placeholder="설명 (선택)">${escapeHtml(item.desc)}</textarea>`;
+            placeholder="설명 (선택)">${escapeHtml(item.desc)}</textarea>
+          <div class="flex items-center gap-2 mt-2 pt-2 border-t border-white/5">
+            ${item.img ? `<img src="${escapeHtml(item.img)}" class="h-12 w-12 object-cover rounded-md border border-white/20 shrink-0" alt="">` : ''}
+            <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/15 rounded-lg text-white/50 hover:text-white/90 text-[11px] font-bold cursor-pointer transition-colors">
+              <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
+              ${item.img ? '사진 변경' : '사진 첨부'}
+              <input type="file" accept="image/*" class="hidden" onchange="onItemImagePick(event, ${index})">
+            </label>
+            ${item.img ? `<button type="button" onclick="clearItemImage(${index})" class="text-white/30 hover:text-rose-400 transition-colors text-[11px] font-bold">삭제</button>` : ''}
+          </div>`;
         els.sItemList.appendChild(li);
       });
       lucide.createIcons();
     }
 
+    // ==================== 사진 첨부 ====================
+    // 원본 사진은 수 MB라 브라우저 저장 한도를 금방 넘긴다. 긴 변 900px, JPEG 품질 0.75로 줄여 담는다.
+    const IMG_MAX_SIDE = 900;
+    const IMG_QUALITY = 0.75;
+
+    function fileToCompressedDataURL(file) {
+      return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) return reject(new Error('이미지 파일이 아닙니다.'));
+
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('파일을 읽지 못했습니다.'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('사진을 열지 못했습니다.'));
+          img.onload = () => {
+            const scale = Math.min(1, IMG_MAX_SIDE / Math.max(img.width, img.height));
+            const w = Math.max(1, Math.round(img.width * scale));
+            const h = Math.max(1, Math.round(img.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', IMG_QUALITY));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 새로 추가할 미션에 붙일 사진 (아직 목록에 들어가기 전이라 따로 들고 있는다)
+    let pendingImg = '';
+
+    async function onNewImagePick(e) {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';                       // 같은 파일을 다시 골라도 change 가 발생하도록
+      if (!file) return;
+
+      try {
+        pendingImg = await fileToCompressedDataURL(file);
+        els.sNewImgPreview.src = pendingImg;
+        els.sNewImgPreview.classList.remove('hidden');
+        els.sNewImgClear.classList.remove('hidden');
+      } catch (err) {
+        showAlert(err.message || '사진을 불러오지 못했습니다.');
+      }
+    }
+
+    function clearNewImage() {
+      pendingImg = '';
+      els.sNewImgPreview.src = '';
+      els.sNewImgPreview.classList.add('hidden');
+      els.sNewImgClear.classList.add('hidden');
+    }
+
+    async function onItemImagePick(e, index) {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+
+      const item = state.data[state.settingsLevel].items[index];
+      if (!item) return;
+
+      try {
+        item.img = await fileToCompressedDataURL(file);
+        saveData();
+        renderSettingsItems();
+      } catch (err) {
+        showAlert(err.message || '사진을 불러오지 못했습니다.');
+      }
+    }
+
+    function clearItemImage(index) {
+      const item = state.data[state.settingsLevel].items[index];
+      if (!item) return;
+      item.img = '';
+      saveData();
+      renderSettingsItems();
+    }
+
+    // ==================== 미션 추가/삭제 ====================
     function addItem() {
       const name = els.sItemInput.value.trim();
       const desc = els.sDescInput.value.trim();
@@ -975,9 +1127,10 @@
       if (d.items.length >= MAX_ITEMS) return showAlert(`미션은 최대 ${MAX_ITEMS}개까지 등록할 수 있습니다.`);
 
       // 제목이 같은 미션도 허용한다 (설명만 다른 미션을 여러 개 두는 경우가 있음)
-      d.items.push({ id: newId(), name, desc });
+      d.items.push({ id: newId(), name, desc, img: pendingImg });
       els.sItemInput.value = '';
       els.sDescInput.value = '';
+      clearNewImage();
       saveData();
       renderSettingsItems();
     }
