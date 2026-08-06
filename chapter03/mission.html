@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOROLAND - Signal Break 미션 뽑기</title>
+
+  <!-- Google Fonts: Hahmlet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Hahmlet', 'sans-serif'] } } }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* ==========================================================================
+       카드 구조 — 효과가 서로 transform 을 뺏지 않도록 레이어를 나눠 둔다.
+         .card       그리드 칸 (변형 없음, 뒤쪽 광원의 기준)
+         .card-anim  등장(딜) + 상시 부유 애니메이션
+         .card-lift  마우스 호버 시 들어올림 + 3D 원근의 기준
+         .card-inner 실제 뒤집기(rotateY)
+       ========================================================================== */
+    .card { position: relative; }
+
+    .card-anim {
+      width: 100%; height: 100%;
+      animation:
+        card-deal 0.55s cubic-bezier(0.2, 0.9, 0.25, 1) backwards,
+        card-float 5.5s ease-in-out infinite;
+      animation-delay: var(--d, 0ms), calc(var(--d, 0ms) + 0.55s);
+    }
+
+    .card-lift {
+      width: 100%; height: 100%;
+      perspective: 1200px;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.35s ease;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    .face-reveal { transform: rotateY(180deg); }
+
+    /* 덱이 깔릴 때: 아래에서 부채꼴로 퍼지며 자리를 잡는다 */
+    @keyframes card-deal {
+      0%   { opacity: 0; transform: translate(var(--dx, 0px), 70px) rotate(var(--rot, 0deg)) scale(0.8); }
+      60%  { opacity: 1; }
+      100% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    /* 자리를 잡은 뒤에는 아주 느리게 떠 있게 해서 화면이 죽어 보이지 않게 한다 */
+    @keyframes card-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-7px); }
+    }
+
+    /* 카드가 놓이는 순간 반짝 하고 터지는 빛 */
+    .card-glint {
+      position: absolute; inset: 0; z-index: 5;
+      pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.9), transparent 45%);
+      animation: card-glint 0.6s ease-out var(--d, 0ms) backwards;
+    }
+    @keyframes card-glint {
+      0%   { opacity: 0; transform: scale(0.4); }
+      35%  { opacity: 0.85; }
+      100% { opacity: 0; transform: scale(1.7); }
+    }
+
+    /* 카드 뒤에 깔리는 광원 — 평소엔 꺼져 있고 호버/선택 때 켜진다 */
+    .card-glow {
+      position: absolute; inset: -14%;
+      border-radius: 50%; z-index: -1;
+      background: radial-gradient(circle, var(--glow, rgba(255,255,255,0.5)), transparent 68%);
+      filter: blur(22px);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    /* 카드 뒷면 문양 */
+    .card-pattern {
+      background-image:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.07) 0 6px, transparent 6px 12px),
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,0.18), transparent 60%);
+    }
+
+    /* 홀로그램 빛줄기 — 카드마다 시간차를 둬서 덱 위를 물결처럼 훑고 지나간다 */
+    .card-sheen { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .card-sheen::before {
+      content: '';
+      position: absolute; top: -60%; left: -130%;
+      width: 55%; height: 220%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+      transform: rotate(18deg);
+      opacity: 0;
+      animation: card-sheen 7s linear var(--sd, 0ms) infinite;
+    }
+    @keyframes card-sheen {
+      0%  { left: -130%; opacity: 0; }
+      2%  { opacity: 1; }
+      11% { left: 150%; opacity: 0; }
+      100%{ left: 150%; opacity: 0; }
+    }
+
+    /* 아직 안 고른 카드: 호버하면 들리고 뒤쪽 광원이 켜진다 */
+    .card:not(.flipped):not(.locked) { cursor: pointer; }
+    .card:not(.flipped):not(.locked):hover .card-lift { transform: translateY(-16px) scale(1.045); }
+    .card:not(.flipped):not(.locked):hover .card-glow { opacity: 0.9; }
+
+    /* 고른 카드: 부유를 멈추고 살짝 커지며 광원이 맥동한다 */
+    .card.flipped .card-anim { animation: none; }
+    .card.flipped .card-lift { transform: scale(1.07); }
+    .card.flipped .card-glow { opacity: 1; animation: glow-pulse 1.5s ease-in-out infinite; }
+    @keyframes glow-pulse {
+      0%, 100% { transform: scale(1);    opacity: 0.75; }
+      50%      { transform: scale(1.14); opacity: 1; }
+    }
+
+    /* 안 고른 카드: 흐려지고 물러나서 고른 카드에 시선이 모이게 한다 */
+    .card.locked { pointer-events: none; }
+    .card.locked .card-anim { animation: none; }
+    .card.locked .card-lift { transform: scale(0.92); filter: blur(3px) saturate(0.45) brightness(0.7); }
+    .card.locked .card-sheen::before { animation: none; }
+
+    /* 움직임에 민감한 사용자를 위해 상시 애니메이션은 끈다 */
+    @media (prefers-reduced-motion: reduce) {
+      .card-anim { animation: card-deal 0.3s ease-out backwards; }
+      .card-sheen::before, .card-glint { animation: none; }
+      .card.flipped .card-glow { animation: none; }
+    }
+
+    /* 결과 화면 뒤에서 도는 빛줄기 */
+    .result-rays {
+      position: absolute; left: 50%; top: 50%;
+      width: 200vmax; height: 200vmax;
+      transform: translate(-50%, -50%);
+      background: repeating-conic-gradient(from 0deg,
+        rgba(255,255,255,0.06) 0deg 3deg, transparent 3deg 13deg);
+      -webkit-mask-image: radial-gradient(circle, #000 8%, transparent 62%);
+      mask-image: radial-gradient(circle, #000 8%, transparent 62%);
+      animation: rays-spin 44s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes rays-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    /* 결과 요소가 순서대로 튀어나오게 */
+    @keyframes pop-in {
+      0%   { opacity: 0; transform: scale(0.86) translateY(16px); filter: blur(10px); }
+      100% { opacity: 1; transform: none; filter: blur(0); }
+    }
+    .pop-in { animation: pop-in 0.55s cubic-bezier(0.2, 1, 0.3, 1) backwards; }
+
+    /* 선택된 난이도 탭이 은은하게 숨쉬듯 */
+    @keyframes tab-breathe {
+      0%, 100% { filter: brightness(1); }
+      50%      { filter: brightness(1.18); }
+    }
+    .tab-active { animation: tab-breathe 3.2s ease-in-out infinite; }
+
+    /* 결과 오버레이 */
+    @keyframes result-in {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .result-in { animation: result-in 0.45s cubic-bezier(0.2, 1, 0.3, 1) forwards; }
+
+    .fade-enter { opacity: 0; transform: translateY(10px); animation: fadeIn 0.4s forwards ease-out; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 font-sans relative overflow-x-hidden">
+
+  <!-- Tailwind JIT 강제 로드 (동적으로 조립되는 클래스가 누락되지 않도록) -->
+  <div class="hidden
+    bg-emerald-500 hover:bg-emerald-400 text-emerald-400 text-emerald-300 border-emerald-400 border-emerald-500/80 bg-emerald-500/20 border-emerald-500/50 from-emerald-500 to-teal-400 shadow-emerald-500/30
+    bg-amber-500 hover:bg-amber-400 text-amber-400 text-amber-300 border-amber-400 border-amber-500/80 bg-amber-500/20 border-amber-500/50 from-amber-500 to-yellow-400 shadow-amber-500/30
+    bg-rose-500 hover:bg-rose-400 text-rose-400 text-rose-300 border-rose-400 border-rose-500/80 bg-rose-500/20 border-rose-500/50 from-rose-500 to-pink-400 shadow-rose-500/30
+  "></div>
+
+  <!-- 배경 레이어 (메인 대시보드와 동일 구성) -->
+  <div class="fixed inset-0 z-[-10] bg-[url('../images/bg.png')] bg-cover bg-center bg-no-repeat bg-fixed">
+    <div class="absolute inset-0 bg-[#040814]/70 transition-colors duration-700" id="bg-overlay"></div>
+  </div>
+  <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/10 rounded-full blur-[120px] z-[-5] pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px] z-[-5] pointer-events-none"></div>
+  <div class="fixed bottom-0 left-0 w-full h-[30vh] bg-gradient-to-t from-[#02050D] to-transparent z-0 pointer-events-none"></div>
+
+  <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16 flex flex-col relative z-20 min-h-screen">
+
+    <!-- ==================== 상단 바 : 로고 / 난이도 탭 / 설정 ==================== -->
+    <header class="w-full flex items-center justify-between gap-4 mb-5 relative z-30 flex-wrap">
+      <img src="../images/logo.png" alt="도로랜드 공식 로고" class="h-12 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]" />
+
+      <!-- 난이도 탭 : 현장에서 이 탭만 눌러 전환 -->
+      <div id="level-tabs" class="flex gap-1.5 bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-lg order-3 sm:order-none w-full sm:w-auto justify-center">
+        <button data-level="easy"   onclick="setLevel('easy')"   class="level-tab px-6 sm:px-8 py-2.5 rounded-xl font-black text-lg transition-all"></button>
+        <button data-level="normal" onclick="setLevel('normal')" class="level-tab px-6 sm:px-8 py-2.5 rounded-xl font-black text-lg transition-all"></button>
+        <button data-level="hard"   onclick="setLevel('hard')"   class="level-tab px-6 sm:px-8 py-2.5 rounded-xl font-black text-lg transition-all"></button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="../index.html" class="flex items-center text-white/50 hover:text-white transition-colors text-sm font-bold px-3 py-2 rounded-xl hover:bg-white/10" title="메인 대시보드">
+          <i data-lucide="home" class="w-5 h-5"></i>
+        </a>
+        <button onclick="openSettings()" class="flex items-center text-white/50 hover:text-white transition-colors text-sm font-bold px-3 py-2 rounded-xl hover:bg-white/10 border border-white/10" title="미션 설정 (행사 전 1회)">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== 뽑기 화면 ==================== -->
+    <div id="draw-view" class="w-full flex flex-col flex-grow">
+
+      <!-- 안내 + 운영 컨트롤 (카드에 세로 공간을 최대한 내주려고 한 줄로 합침) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex items-baseline gap-3 flex-wrap">
+          <h2 id="draw-title" class="text-xl sm:text-2xl font-black text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)] tracking-tight">카드를 한 장 고르세요</h2>
+          <p class="text-white/45 text-sm">
+            남은 <span id="remain-count" class="font-bold text-white/80">0</span>
+            · 뽑음 <span id="drawn-count" class="font-bold text-white/80">0</span>
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <label class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 cursor-pointer hover:bg-white/10 transition-colors text-white/70 text-sm font-bold">
+            <input type="checkbox" id="no-repeat-toggle" onchange="toggleNoRepeat()" checked class="w-4 h-4 accent-teal-400 cursor-pointer">
+            중복 없이
+          </label>
+          <button onclick="reshuffle()" class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-white/70 hover:text-white hover:bg-white/10 transition-colors text-sm font-bold">
+            <i data-lucide="shuffle" class="w-4 h-4"></i> 다시 섞기
+          </button>
+          <button onclick="undoDraw()" class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-white/70 hover:text-white hover:bg-white/10 transition-colors text-sm font-bold">
+            <i data-lucide="undo-2" class="w-4 h-4"></i> 되돌리기
+          </button>
+        </div>
+      </div>
+
+      <!-- 카드 덱 (열 개수와 카드 크기는 layoutDeck()이 화면 크기에 맞춰 계산) -->
+      <div id="card-grid" class="grid gap-4 sm:gap-5 mx-auto w-full"></div>
+
+      <!-- 비어 있을 때 -->
+      <div id="empty-state" class="hidden flex-col items-center justify-center text-center py-20 text-white/40">
+        <i data-lucide="check-circle-2" class="w-14 h-14 mb-4"></i>
+        <p class="text-lg font-bold text-white/60">이 난이도의 미션을 모두 뽑았습니다.</p>
+        <p class="text-sm mt-2">‘되돌리기’로 마지막 뽑기를 취소하거나, ‘중복 없이’를 꺼서 다시 뽑을 수 있습니다.</p>
+      </div>
+
+    </div>
+
+    <!-- ==================== 설정 화면 (행사 전 1회) ==================== -->
+    <div id="settings-view" class="hidden w-full max-w-4xl mx-auto flex-col fade-enter">
+      <div class="flex items-center justify-between mb-6 bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 shadow-lg">
+        <button onclick="closeSettings()" class="flex items-center text-white/70 hover:text-white transition-colors">
+          <i data-lucide="chevron-left" class="w-5 h-5 mr-1"></i>
+          <span class="font-bold">뽑기 화면으로</span>
+        </button>
+        <h2 class="text-xl font-black text-white tracking-wide">미션 목록 설정</h2>
+        <div class="w-32"></div>
+      </div>
+
+      <div class="bg-[#0B1528]/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl">
+        <!-- 설정할 난이도 선택 -->
+        <div class="flex gap-1.5 bg-white/5 p-1.5 rounded-2xl border border-white/10 mb-6">
+          <button data-slevel="easy"   onclick="setSettingsLevel('easy')"   class="settings-tab flex-1 px-4 py-2.5 rounded-xl font-black transition-all"></button>
+          <button data-slevel="normal" onclick="setSettingsLevel('normal')" class="settings-tab flex-1 px-4 py-2.5 rounded-xl font-black transition-all"></button>
+          <button data-slevel="hard"   onclick="setSettingsLevel('hard')"   class="settings-tab flex-1 px-4 py-2.5 rounded-xl font-black transition-all"></button>
+        </div>
+
+        <p class="text-white/50 text-sm mb-5 break-keep">
+          여기서 고친 목록은 이 브라우저에 저장됩니다.
+          <strong class="text-teal-400">저장된 값이 없으면 코드에 들어 있는 기본 목록</strong>이 그대로 뜨므로,
+          다른 노트북에서 열어도 바로 사용할 수 있습니다.
+        </p>
+
+        <!-- 추가 폼 -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-6 bg-white/5 p-4 rounded-2xl border border-white/10">
+          <input type="text" id="settings-new-item" onkeypress="handleInputKey(event)" maxlength="40"
+            class="flex-1 bg-[#040813]/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:bg-white/10 transition-colors min-w-0"
+            placeholder="미션 이름 (예: 신호 3개 해독하기)">
+          <button onclick="addItem()" id="s-add-btn" class="text-[#040814] px-6 py-3 rounded-xl font-black transition-colors shadow-lg flex items-center justify-center shrink-0">
+            <i data-lucide="plus" class="w-5 h-5 mr-1"></i> 추가
+          </button>
+        </div>
+
+        <div class="flex justify-between items-center mb-4 px-1 text-sm font-bold border-b border-white/10 pb-2">
+          <span class="text-white/50">미션 목록 (<span id="s-item-count">0</span> / 20)</span>
+          <div class="flex items-center gap-4">
+            <button onclick="restoreDefaults()" class="text-white/40 hover:text-teal-300 transition-colors flex items-center text-xs">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1"></i> 기본값으로 되돌리기
+            </button>
+            <button onclick="clearDrawn()" class="text-white/40 hover:text-amber-300 transition-colors flex items-center text-xs">
+              <i data-lucide="eraser" class="w-3.5 h-3.5 mr-1"></i> 뽑은 기록 지우기
+            </button>
+          </div>
+        </div>
+
+        <ul id="settings-item-list" class="flex flex-wrap gap-3 bg-black/20 rounded-xl p-4 min-h-[120px]"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 하단 슬림 바 : 뽑은 기록 + 단축키 ==================== -->
+  <!-- 흐름에서 빼내 고정 배치해야 카드 덱이 세로 공간을 최대로 쓸 수 있다 -->
+  <div id="bottom-bar" class="fixed bottom-0 left-0 w-full z-30 bg-[#02050D]/80 backdrop-blur-md border-t border-white/10">
+    <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 h-[52px] flex items-center gap-4">
+      <div class="flex items-center gap-2 shrink-0">
+        <i data-lucide="history" class="w-4 h-4 text-white/35"></i>
+        <span class="text-white/35 text-xs font-bold hidden sm:inline">뽑은 기록</span>
+      </div>
+      <ul id="drawn-list" class="flex gap-2 overflow-x-auto custom-scrollbar flex-1 min-w-0 py-1"></ul>
+      <p class="text-white/20 text-[11px] shrink-0 hidden lg:block">
+        <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd><kbd class="px-1.5 py-0.5 bg-white/10 rounded ml-0.5">2</kbd><kbd class="px-1.5 py-0.5 bg-white/10 rounded ml-0.5">3</kbd> 난이도
+        &nbsp;<kbd class="px-1.5 py-0.5 bg-white/10 rounded">Space</kbd> 자동
+        &nbsp;<kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> 섞기
+        &nbsp;<kbd class="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> 닫기
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== 결과 전체화면 ==================== -->
+  <div id="result-overlay" class="fixed inset-0 z-[100] hidden items-center justify-center p-6">
+    <div class="absolute inset-0 bg-[#02050D]/95 backdrop-blur-lg" onclick="closeResult()"></div>
+    <!-- 결과 뒤에서 천천히 도는 빛줄기 -->
+    <div class="result-rays"></div>
+    <!-- 난이도 색으로 물드는 중앙 광원 -->
+    <div id="result-halo" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vmin] h-[80vmin] rounded-full blur-[120px] pointer-events-none opacity-40"></div>
+
+    <div id="result-panel" class="relative z-10 w-full max-w-4xl text-center result-in">
+      <div id="result-badge" class="inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8"></div>
+
+      <p id="result-label" class="pop-in text-white/40 text-lg font-bold tracking-widest mb-4" style="animation-delay:.1s">MISSION</p>
+      <p id="result-mission" class="text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-12"></p>
+
+      <button onclick="closeResult()" id="result-close-btn" class="px-16 py-5 text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5">
+        확인
+      </button>
+      <p class="text-white/25 text-sm mt-6">아무 곳이나 클릭하거나 <kbd class="px-1.5 py-0.5 bg-white/10 rounded">Esc</kbd> 를 눌러도 닫힙니다</p>
+    </div>
+  </div>
+
+  <!-- 알림 모달 -->
+  <div id="alert-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeAlert()"></div>
+    <div class="bg-[#0B1528] border-2 border-white/20 p-8 rounded-[2rem] shadow-2xl relative z-10 text-center max-w-md">
+      <i data-lucide="alert-circle" class="w-12 h-12 text-amber-400 mx-auto mb-5"></i>
+      <p id="alert-message" class="text-white text-lg font-bold mb-8 break-keep"></p>
+      <button onclick="closeAlert()" class="w-full py-3.5 bg-white/10 hover:bg-white/20 text-white font-black rounded-xl transition-colors">확인</button>
+    </div>
+  </div>
+
+  <!-- 사운드 토글 -->
+  <button id="sound-toggle-btn" onclick="toggleSound()" class="fixed bottom-6 right-6 z-40 w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 hover:scale-105 active:scale-95 transition-all shadow-lg" title="사운드 켜기/끄기">
+    <i data-lucide="volume-2" class="w-5 h-5"></i>
+  </button>
+
+  <script>
+    lucide.createIcons();
+
+    /* ==========================================================================
+       ▼▼▼ 미션 목록 — 실제 미션은 여기만 고치면 됩니다 ▼▼▼
+       여기 적힌 값이 "기본 목록"이다. 설정 화면에서 고치면 그 브라우저에만 저장되고,
+       저장된 값이 없으면 항상 아래 목록이 뜨므로 다른 노트북에서도 바로 쓸 수 있다.
+       아래 목록을 고친 뒤에는 MISSION_VERSION 을 1 올려야 이미 저장된 기기에도 반영된다.
+       ========================================================================== */
+    const MISSION_VERSION = 1;
+
+    const DEFAULT_MISSIONS = {
+      easy:   ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6'],
+      normal: ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6'],
+      hard:   ['미션 1', '미션 2', '미션 3', '미션 4', '미션 5', '미션 6']
+    };
+    /* ▲▲▲ 여기까지 ▲▲▲ */
+
+    const LEVELS = ['easy', 'normal', 'hard'];
+    const MAX_ITEMS = 20;
+    const STORAGE_KEY = 'doroland-signalbreak-missions-v2';
+
+    // 난이도 테마 (Tailwind JIT 누락 방지를 위해 클래스명을 문자열로 명시)
+    const THEMES = {
+      easy: {
+        short: '하', label: '하 (쉬움)', hex: '#10b981', overlay: 'rgba(16, 185, 129, 0.16)',
+        glow: 'rgba(16, 185, 129, 0.75)',
+        bg: 'bg-emerald-500', hoverBg: 'hover:bg-emerald-400', text: 'text-emerald-400',
+        border: 'border-emerald-400', gradient: 'from-emerald-500 to-teal-400'
+      },
+      normal: {
+        short: '중', label: '중 (보통)', hex: '#f59e0b', overlay: 'rgba(245, 158, 11, 0.16)',
+        glow: 'rgba(245, 158, 11, 0.75)',
+        bg: 'bg-amber-500', hoverBg: 'hover:bg-amber-400', text: 'text-amber-400',
+        border: 'border-amber-400', gradient: 'from-amber-500 to-yellow-400'
+      },
+      hard: {
+        short: '상', label: '상 (어려움)', hex: '#f43f5e', overlay: 'rgba(244, 63, 94, 0.16)',
+        glow: 'rgba(244, 63, 94, 0.75)',
+        bg: 'bg-rose-500', hoverBg: 'hover:bg-rose-400', text: 'text-rose-400',
+        border: 'border-rose-400', gradient: 'from-rose-500 to-pink-400'
+      }
+    };
+
+    // ==================== 상태 ====================
+    const state = {
+      level: 'easy',        // 현재 뽑기 화면의 난이도
+      settingsLevel: 'easy',// 설정 화면에서 편집 중인 난이도
+      noRepeat: true,
+      isRevealing: false,   // 카드 뒤집는 중에는 다른 카드 클릭 차단
+      deck: [],             // 화면에 깔린 카드 순서 (셔플된 미션명 배열)
+      data: null
+    };
+
+    function freshData() {
+      const d = {};
+      LEVELS.forEach(lv => { d[lv] = { items: DEFAULT_MISSIONS[lv].slice(), drawn: [] }; });
+      return d;
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return freshData();
+        const parsed = JSON.parse(raw);
+        // 코드의 기본 목록이 바뀌면(버전 상승) 저장본을 버리고 새 기본값을 쓴다
+        if (parsed.version !== MISSION_VERSION) return freshData();
+        const merged = freshData();
+        LEVELS.forEach(lv => {
+          if (parsed[lv] && Array.isArray(parsed[lv].items)) merged[lv].items = parsed[lv].items;
+          if (parsed[lv] && Array.isArray(parsed[lv].drawn)) merged[lv].drawn = parsed[lv].drawn;
+        });
+        return merged;
+      } catch (e) {
+        return freshData();
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: MISSION_VERSION, ...state.data }));
+      } catch (e) {
+        // 시크릿 모드 등에서 저장이 막혀도 진행에는 지장 없음
+      }
+    }
+
+    state.data = loadData();
+
+    const els = {
+      drawView: document.getElementById('draw-view'),
+      settingsView: document.getElementById('settings-view'),
+      drawTitle: document.getElementById('draw-title'),
+      cardGrid: document.getElementById('card-grid'),
+      emptyState: document.getElementById('empty-state'),
+      remainCount: document.getElementById('remain-count'),
+      drawnCount: document.getElementById('drawn-count'),
+      drawnList: document.getElementById('drawn-list'),
+      noRepeatToggle: document.getElementById('no-repeat-toggle'),
+      bgOverlay: document.getElementById('bg-overlay'),
+      bottomBar: document.getElementById('bottom-bar'),
+
+      sItemList: document.getElementById('settings-item-list'),
+      sItemInput: document.getElementById('settings-new-item'),
+      sItemCount: document.getElementById('s-item-count'),
+      sAddBtn: document.getElementById('s-add-btn'),
+
+      resultOverlay: document.getElementById('result-overlay'),
+      resultPanel: document.getElementById('result-panel'),
+      resultBadge: document.getElementById('result-badge'),
+      resultLabel: document.getElementById('result-label'),
+      resultMission: document.getElementById('result-mission'),
+      resultCloseBtn: document.getElementById('result-close-btn'),
+      resultHalo: document.getElementById('result-halo'),
+
+      alertModal: document.getElementById('alert-modal'),
+      alertMessage: document.getElementById('alert-message')
+    };
+
+    // ==================== 사운드 (합성 효과음) ====================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, type, duration, peakGain, freqEnd, delay) {
+      if (!soundEnabled) return;
+      const ctx = getAudioContext();
+      const now = ctx.currentTime + (delay || 0);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, now + duration);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(peakGain, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    }
+
+    function playFlipSound()  { playTone(320, 'triangle', 0.18, 0.16, 720); }
+    function playDealSound()  { playTone(700, 'square', 0.03, 0.07); }
+    function playRevealSound() {
+      [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => playTone(f, 'sine', 0.3, 0.22, null, i * 0.1));
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('sound-toggle-btn');
+      btn.innerHTML = soundEnabled
+        ? '<i data-lucide="volume-2" class="w-5 h-5"></i>'
+        : '<i data-lucide="volume-x" class="w-5 h-5"></i>';
+      lucide.createIcons();
+    }
+
+    // ==================== 난이도 전환 ====================
+    function setLevel(level) {
+      if (state.isRevealing) return;
+      state.level = level;
+      applyTheme();
+      renderTabs();
+      reshuffle();
+    }
+
+    function applyTheme() {
+      const theme = THEMES[state.level];
+      els.drawTitle.textContent = `${theme.label} — 카드를 한 장 고르세요`;
+      els.bgOverlay.style.backgroundColor = theme.overlay;
+    }
+
+    function renderTabs() {
+      document.querySelectorAll('.level-tab').forEach(btn => {
+        const lv = btn.dataset.level;
+        const theme = THEMES[lv];
+        const active = lv === state.level;
+        btn.textContent = theme.short;
+        btn.className = active
+          ? `level-tab tab-active px-6 sm:px-8 py-2.5 rounded-xl font-black text-lg transition-all text-white bg-gradient-to-r ${theme.gradient} shadow-lg scale-105`
+          : 'level-tab px-6 sm:px-8 py-2.5 rounded-xl font-black text-lg transition-all text-white/40 hover:text-white/80 hover:bg-white/5';
+      });
+    }
+
+    // ==================== 카드 덱 ====================
+    // 남은 미션을 섞어 카드에 배정한다. 카드 위치와 미션은 매 덱마다 새로 섞이므로
+    // 아이가 위치를 기억해 특정 미션을 노릴 수 없다.
+    function getPool() {
+      const d = state.data[state.level];
+      if (!state.noRepeat) return d.items.slice();
+      return d.items.filter(name => !d.drawn.includes(name));
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function reshuffle() {
+      state.deck = shuffle(getPool());
+      renderDeck();
+      renderStatus();
+    }
+
+    function renderDeck() {
+      const theme = THEMES[state.level];
+      els.cardGrid.innerHTML = '';
+
+      if (state.deck.length === 0) {
+        els.cardGrid.classList.add('hidden');
+        els.emptyState.classList.remove('hidden');
+        els.emptyState.classList.add('flex');
+        lucide.createIcons();
+        return;
+      }
+
+      els.cardGrid.classList.remove('hidden');
+      els.emptyState.classList.add('hidden');
+      els.emptyState.classList.remove('flex');
+
+      const mid = (state.deck.length - 1) / 2;
+
+      state.deck.forEach((mission, i) => {
+        const card = document.createElement('div');
+        card.className = 'card aspect-[3/4]';
+        card.dataset.index = i;
+        card.onclick = () => pickCard(i);
+
+        // 가운데에서 바깥으로 퍼지듯 놓이도록 카드마다 시작 위치·각도를 다르게 준다
+        card.style.setProperty('--d', `${i * 55}ms`);
+        card.style.setProperty('--sd', `${i * 260}ms`);
+        card.style.setProperty('--dx', `${Math.round((mid - i) * 22)}px`);
+        card.style.setProperty('--rot', `${((i - mid) * 3).toFixed(1)}deg`);
+        card.style.setProperty('--glow', theme.glow);
+
+        card.innerHTML = `
+          <div class="card-glow"></div>
+          <div class="card-anim">
+            <div class="card-lift">
+              <div class="card-inner">
+                <!-- 뒷면 (처음 보이는 면) -->
+                <div class="card-face card-pattern bg-gradient-to-br ${theme.gradient} border-2 border-white/25 shadow-xl flex flex-col items-center justify-center">
+                  <div class="text-white/90 text-5xl sm:text-6xl font-black drop-shadow-md">◈</div>
+                  <div class="text-white/75 text-sm sm:text-base font-black tracking-[0.25em] mt-3">SIGNAL</div>
+                  <div class="text-white/55 text-xs font-bold tracking-widest mt-1">BREAK</div>
+                  <div class="card-sheen"></div>
+                </div>
+                <!-- 앞면 (뒤집으면 나오는 면) -->
+                <div class="card-face face-reveal bg-white border-2 ${theme.border} shadow-2xl flex flex-col items-center justify-center p-4 text-center">
+                  <div class="${theme.text} text-xs font-black tracking-widest mb-3">${theme.short} · MISSION</div>
+                  <div class="text-slate-800 text-lg sm:text-xl font-black leading-tight break-keep">${escapeHtml(mission)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-glint"></div>
+        `;
+        els.cardGrid.appendChild(card);
+      });
+
+      layoutDeck();
+      playDealSound();
+    }
+
+    // 카드를 화면 안에서 최대한 크게 만든다.
+    // 열 수를 바꿔가며 "가로로 들어가는 폭"과 "세로로 들어가는 폭" 중 작은 쪽을 그 배치의 카드 크기로 보고,
+    // 그 값이 가장 큰 배치를 고른다. 한 줄만 쓰면 가로에 막혀 작아지므로 여러 줄 배치가 유리할 때가 많다.
+    const CARD_RATIO = 4 / 3;   // 높이 / 너비
+    const CARD_MAX_W = 340;     // 카드가 몇 장 없을 때 지나치게 커지지 않도록
+
+    function layoutDeck() {
+      const n = state.deck.length;
+      if (!n) return;
+
+      const gap = window.innerWidth < 640 ? 16 : 20;
+      const gridW = els.cardGrid.clientWidth;
+      if (!gridW) return;
+
+      // 덱 위쪽 끝부터 컨테이너 하단 여백(pb-16 = 64px) 직전까지가 카드가 쓸 수 있는 세로 공간.
+      // 이 여백이 하단 고정 바(52px)보다 커서 카드가 바에 가려지지 않는다.
+      const top = els.cardGrid.getBoundingClientRect().top;
+      const availH = Math.max(200, window.innerHeight - top - 72);
+
+      let best = { cols: Math.min(n, 8), w: 0 };
+
+      for (let cols = 1; cols <= Math.min(n, 8); cols++) {
+        const rows = Math.ceil(n / cols);
+        const wByWidth = (gridW - gap * (cols - 1)) / cols;
+        const wByHeight = ((availH - gap * (rows - 1)) / rows) / CARD_RATIO;
+        const w = Math.min(wByWidth, wByHeight, CARD_MAX_W);
+        if (w <= 0) continue;
+
+        // 크기가 같으면 마지막 줄이 덜 비는(정렬이 깔끔한) 배치를 고른다
+        const balanced = n % cols === 0;
+        if (w > best.w + 0.5 || (Math.abs(w - best.w) <= 0.5 && balanced && n % best.cols !== 0)) {
+          best = { cols, w };
+        }
+      }
+
+      els.cardGrid.style.gridTemplateColumns = `repeat(${best.cols}, ${Math.floor(best.w)}px)`;
+      els.cardGrid.style.justifyContent = 'center';
+    }
+
+    // 창 크기가 바뀌면 카드 크기를 다시 계산
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(layoutDeck, 120);
+    });
+
+    function renderStatus() {
+      const d = state.data[state.level];
+      els.remainCount.textContent = getPool().length;
+      els.drawnCount.textContent = d.drawn.length;
+
+      els.drawnList.innerHTML = '';
+      d.drawn.forEach((name, i) => {
+        const li = document.createElement('li');
+        li.className = 'px-3 py-1.5 bg-white/10 border border-white/10 rounded-lg text-white/70 text-xs font-bold shrink-0 whitespace-nowrap';
+        li.innerHTML = `<span class="text-white/40 mr-1">${i + 1}.</span>${escapeHtml(name)}`;
+        els.drawnList.appendChild(li);
+      });
+    }
+
+    // ==================== 뽑기 ====================
+    function pickCard(index) {
+      if (state.isRevealing) return;
+      const mission = state.deck[index];
+      if (mission === undefined) return;
+
+      state.isRevealing = true;
+
+      const cards = els.cardGrid.querySelectorAll('.card');
+      cards.forEach((c, i) => {
+        if (i === index) c.classList.add('flipped');
+        else c.classList.add('locked');
+      });
+
+      playFlipSound();
+
+      // 카드가 다 뒤집힌 뒤(0.8s) 잠깐 보여주고 전체화면 결과로 넘어간다
+      setTimeout(() => {
+        const d = state.data[state.level];
+        if (!d.drawn.includes(mission)) d.drawn.push(mission);
+        saveData();
+        showResult(mission);
+        state.isRevealing = false;
+      }, 1150);
+    }
+
+    // 운영자가 대신 뽑을 때 (Space)
+    function autoPick() {
+      if (state.isRevealing || state.deck.length === 0) return;
+      pickCard(Math.floor(Math.random() * state.deck.length));
+    }
+
+    function showResult(mission) {
+      const theme = THEMES[state.level];
+
+      els.resultBadge.textContent = theme.label;
+      els.resultBadge.className = `pop-in inline-block px-5 py-2 rounded-full text-sm font-black tracking-[0.2em] uppercase border-2 mb-8 ${theme.text} ${theme.border}`;
+      els.resultMission.textContent = mission;
+      els.resultMission.className = `pop-in text-[2.75rem] sm:text-[4.5rem] lg:text-[5.5rem] leading-[1.15] font-black break-keep drop-shadow-[0_6px_24px_rgba(0,0,0,0.7)] mb-12 ${theme.text}`;
+      els.resultMission.style.animationDelay = '.2s';
+      els.resultCloseBtn.className = `pop-in px-16 py-5 ${theme.bg} ${theme.hoverBg} text-[#040814] text-2xl font-black rounded-2xl transition-transform shadow-2xl active:scale-95 hover:-translate-y-0.5`;
+      els.resultCloseBtn.style.animationDelay = '.4s';
+      els.resultHalo.style.backgroundColor = theme.glow;
+
+      els.resultOverlay.classList.remove('hidden');
+      els.resultOverlay.classList.add('flex');
+
+      // 오버레이를 다시 열 때도 등장 애니메이션이 처음부터 재생되도록 리플로우로 초기화
+      [els.resultPanel, els.resultBadge, els.resultLabel, els.resultMission, els.resultCloseBtn].forEach(el => {
+        const cls = el === els.resultPanel ? 'result-in' : 'pop-in';
+        el.classList.remove(cls);
+        void el.offsetWidth;
+        el.classList.add(cls);
+      });
+
+      if (soundEnabled) getAudioContext();
+      playRevealSound();
+    }
+
+    // 결과를 닫으면 곧바로 다음 아이용 덱이 새로 깔린다 (별도 조작 불필요)
+    function closeResult() {
+      els.resultOverlay.classList.add('hidden');
+      els.resultOverlay.classList.remove('flex');
+      reshuffle();
+    }
+
+    function toggleNoRepeat() {
+      state.noRepeat = els.noRepeatToggle.checked;
+      reshuffle();
+    }
+
+    function undoDraw() {
+      if (state.isRevealing) return;
+      const d = state.data[state.level];
+      if (d.drawn.length === 0) return;
+      d.drawn.pop();
+      saveData();
+      reshuffle();
+    }
+
+    // ==================== 설정 ====================
+    function openSettings() {
+      if (state.isRevealing) return;
+      state.settingsLevel = state.level;
+      els.drawView.classList.add('hidden');
+      els.bottomBar.classList.add('hidden');
+      els.settingsView.classList.remove('hidden');
+      els.settingsView.classList.add('flex');
+      renderSettingsTabs();
+      renderSettingsItems();
+      lucide.createIcons();
+    }
+
+    function closeSettings() {
+      els.settingsView.classList.add('hidden');
+      els.settingsView.classList.remove('flex');
+      els.drawView.classList.remove('hidden');
+      els.bottomBar.classList.remove('hidden');
+      reshuffle();
+    }
+
+    function setSettingsLevel(level) {
+      state.settingsLevel = level;
+      renderSettingsTabs();
+      renderSettingsItems();
+    }
+
+    function renderSettingsTabs() {
+      const theme = THEMES[state.settingsLevel];
+      document.querySelectorAll('.settings-tab').forEach(btn => {
+        const lv = btn.dataset.slevel;
+        const t = THEMES[lv];
+        const active = lv === state.settingsLevel;
+        btn.textContent = t.label;
+        btn.className = active
+          ? `settings-tab flex-1 px-4 py-2.5 rounded-xl font-black transition-all text-white bg-gradient-to-r ${t.gradient} shadow-lg`
+          : 'settings-tab flex-1 px-4 py-2.5 rounded-xl font-black transition-all text-white/40 hover:text-white/80 hover:bg-white/5';
+      });
+      els.sAddBtn.className = `${theme.bg} ${theme.hoverBg} text-[#040814] px-6 py-3 rounded-xl font-black transition-colors shadow-lg flex items-center justify-center shrink-0`;
+    }
+
+    function renderSettingsItems() {
+      const d = state.data[state.settingsLevel];
+      els.sItemCount.textContent = d.items.length;
+      els.sItemList.innerHTML = '';
+
+      if (d.items.length === 0) {
+        els.sItemList.innerHTML = `
+          <div class="flex flex-col items-center justify-center w-full text-white/30 py-8">
+            <i data-lucide="inbox" class="w-8 h-8 mb-2"></i>
+            <p class="text-sm">등록된 미션이 없습니다.</p>
+          </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      d.items.forEach((name, index) => {
+        const drawnMark = d.drawn.includes(name)
+          ? '<span class="absolute bottom-2 right-3 text-[10px] font-black text-white/30">뽑음</span>' : '';
+        const li = document.createElement('li');
+        li.className = 'flex flex-col bg-white/5 p-3 pb-5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors relative w-[calc(50%-0.5rem)] sm:w-[calc(33.33%-0.75rem)] shrink-0 min-w-[150px]';
+        li.innerHTML = `
+          <button onclick="deleteItem(${index})" class="absolute top-2 right-2 text-white/20 hover:text-rose-400 transition-colors bg-black/20 p-1.5 rounded-lg hover:bg-rose-400/20" title="삭제">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+          <div class="text-white/30 text-[10px] font-black mb-1">${index + 1}</div>
+          <div class="text-white font-bold text-sm pr-6 break-keep">${escapeHtml(name)}</div>
+          ${drawnMark}`;
+        els.sItemList.appendChild(li);
+      });
+      lucide.createIcons();
+    }
+
+    function addItem() {
+      const name = els.sItemInput.value.trim();
+      const d = state.data[state.settingsLevel];
+
+      if (!name) return showAlert('미션 이름을 입력해주세요.');
+      if (d.items.length >= MAX_ITEMS) return showAlert(`미션은 최대 ${MAX_ITEMS}개까지 등록할 수 있습니다.`);
+      if (d.items.includes(name)) return showAlert('이미 등록된 미션입니다.');
+
+      d.items.push(name);
+      els.sItemInput.value = '';
+      saveData();
+      renderSettingsItems();
+    }
+
+    function handleInputKey(e) { if (e.key === 'Enter') addItem(); }
+
+    function deleteItem(index) {
+      const d = state.data[state.settingsLevel];
+      const [removed] = d.items.splice(index, 1);
+      // 목록에서 지운 미션은 뽑은 기록에서도 빼서 상태가 어긋나지 않게 한다
+      d.drawn = d.drawn.filter(n => n !== removed);
+      saveData();
+      renderSettingsItems();
+    }
+
+    function restoreDefaults() {
+      const lv = state.settingsLevel;
+      state.data[lv].items = DEFAULT_MISSIONS[lv].slice();
+      state.data[lv].drawn = [];
+      saveData();
+      renderSettingsItems();
+    }
+
+    function clearDrawn() {
+      state.data[state.settingsLevel].drawn = [];
+      saveData();
+      renderSettingsItems();
+    }
+
+    // ==================== 알림 ====================
+    function showAlert(msg) {
+      els.alertMessage.textContent = msg;
+      els.alertModal.classList.remove('hidden');
+      els.alertModal.classList.add('flex');
+      lucide.createIcons();
+    }
+    function closeAlert() {
+      els.alertModal.classList.add('hidden');
+      els.alertModal.classList.remove('flex');
+    }
+
+    // ==================== 단축키 ====================
+    document.addEventListener('keydown', (e) => {
+      // 미션 이름 입력 중에는 단축키가 글자를 가로채지 않도록 한다
+      if (e.target.tagName === 'INPUT') return;
+
+      if (e.key === 'Escape') {
+        if (!els.alertModal.classList.contains('hidden')) return closeAlert();
+        if (!els.resultOverlay.classList.contains('hidden')) return closeResult();
+        if (!els.settingsView.classList.contains('hidden')) return closeSettings();
+        return;
+      }
+
+      // 결과/설정이 떠 있을 때는 뽑기 단축키가 동작하지 않게 한다
+      if (!els.resultOverlay.classList.contains('hidden')) return;
+      if (!els.settingsView.classList.contains('hidden')) return;
+
+      if (e.key === '1') setLevel('easy');
+      else if (e.key === '2') setLevel('normal');
+      else if (e.key === '3') setLevel('hard');
+      else if (e.key === 'r' || e.key === 'R') reshuffle();
+      else if (e.code === 'Space') { e.preventDefault(); autoPick(); }
+    });
+
+    // 미션 이름은 사용자가 입력하므로 innerHTML 삽입 전 이스케이프
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // ==================== 초기화 ====================
+    applyTheme();
+    renderTabs();
+    reshuffle();
+    lucide.createIcons();
+  </script>
+</body>
+</html>

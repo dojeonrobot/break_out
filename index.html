@@ -223,10 +223,17 @@
             </p>
           </div>
 
-          <div class="mt-auto">
-            <div class="w-full py-3.5 flex items-center justify-center space-x-2 font-bold text-white rounded-xl transition-all duration-300 bg-gradient-to-r from-rose-500 to-pink-400 hover:from-rose-400 hover:to-pink-300 shadow-md shadow-rose-500/20 group-hover:shadow-rose-500/40 transform group-hover:-translate-y-0.5">
-              <span>입장하기</span>
-              <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+          <!-- 챕터 3만 진입로가 둘이라 버튼을 반반으로 나눔 (카드 높이는 기존과 동일) -->
+          <div class="mt-auto flex gap-2.5">
+            <!-- 시그널 브레이크: 카드 클릭과 동일 동작이라 별도 핸들러 없이 버블링에 맡김 -->
+            <div class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-white text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-gradient-to-r from-rose-500 to-pink-400 hover:from-rose-400 hover:to-pink-300 shadow-md shadow-rose-500/20 group-hover:shadow-rose-500/40 transform group-hover:-translate-y-0.5">
+              <span>시그널 브레이크</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 shrink-0 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+            <div onclick="event.stopPropagation(); handleEnterChapter('3-mission', 'active', this)"
+                 class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-rose-600 text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-white border-2 border-rose-200 hover:bg-rose-50 hover:border-rose-300 shadow-md shadow-rose-500/10 transform group-hover:-translate-y-0.5">
+              <i data-lucide="dices" class="w-4 h-4 shrink-0"></i>
+              <span>미션 뽑기</span>
             </div>
           </div>
         </div>
@@ -357,7 +364,9 @@
       1: { url: './chapter01/index.html', name: 'Chapter 01 : 사파리 구역' },
       2: { url: './chapter02/index.html', name: 'Chapter 02 : 하모니아 구역' },
       3: { url: './chapter03/index.html', name: 'Chapter 03 : 회전목마 구역' },
-      4: { url: './chapter04/index.html', name: 'Chapter 04 : 중앙관리실 구역' }
+      4: { url: './chapter04/index.html', name: 'Chapter 04 : 중앙관리실 구역' },
+      // 챕터 3의 두 번째 진입로 (미션 뽑기). 잠금 방식은 챕터와 동일하게 유지.
+      '3-mission': { url: './chapter03/mission.html', name: 'Chapter 03 : 미션 뽑기' }
     };
 
     // 현재 선택된 챕터 ID 저장 변수

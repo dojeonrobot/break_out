@@ -32,6 +32,7 @@ BREAK-OUT/
 │
 ├── chapter03/              ← 회전목마 구역: 머지큐브 속 비밀
 │   ├── index.html
+│   ├── mission.html        ← 시그널 브레이크 미션 뽑기 (상/중/하 카드 뽑기)
 │   ├── styles.css
 │   ├── images/             ← diary, cubes, patterns, missions, icons, qr
 │   └── audio/              ← BGM + 음계 사운드
