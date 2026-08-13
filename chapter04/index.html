@@ -522,6 +522,82 @@
   .vfile.no .vr-close:hover{background:rgba(255,255,255,.14)}
   .vfile.ok .vr-close:hover{filter:brightness(1.08)}
 
+  /* 정답일 때 하단 버튼 묶음: 엔딩 영상(주 버튼) + 파일 닫기(보조) */
+  .vr-actions{position:relative; z-index:2; margin-top:auto; display:flex; flex-direction:column; gap:9px}
+  .vr-actions .vr-close{margin-top:0}
+  .vr-ending{
+    position:relative; z-index:2; width:100%; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    font-family:inherit; font-weight:900; font-size:16.5px; padding:16px; border-radius:12px;
+    color:#241A05; letter-spacing:.3px;
+    background:linear-gradient(135deg,#FFD466,#E8A62C);
+    box-shadow:0 8px 22px rgba(232,166,44,.34);
+    animation:endingPulse 1.9s ease-in-out infinite;
+  }
+  .vr-ending:hover{filter:brightness(1.06); animation-play-state:paused}
+  .vr-ending svg{width:20px; height:20px}
+  @keyframes endingPulse{
+    0%,100%{box-shadow:0 8px 22px rgba(232,166,44,.34)}
+    50%{box-shadow:0 8px 30px rgba(255,212,102,.62)}
+  }
+  .vfile.ok .vr-actions .vr-close{
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+    color:#AEB8CD; font-size:14px; padding:12px; box-shadow:none;
+  }
+  .vfile.ok .vr-actions .vr-close:hover{background:rgba(255,255,255,.14); filter:none}
+
+  /* ===== 엔딩 영상 — 극장 모드 ===== */
+  #endingStage{
+    position:fixed; inset:0; z-index:400;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    background:#05070C; animation:fadeIn .45s ease;
+  }
+  #endingStage.hidden{display:none}
+  .es-frame{
+    /* 138.6vh = 78vh × 16/9 — 높이가 78vh를 넘지 않으면서 16:9를 정확히 유지 */
+    position:relative; width:min(1280px, 94vw, 138.6vh); aspect-ratio:16/9;
+    border-radius:14px; overflow:hidden; background:#000;
+    box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 40px 110px rgba(0,0,0,.85);
+  }
+  .es-frame video{width:100%; height:100%; display:block; object-fit:contain; background:#000}
+  .es-tag{
+    font-size:12px; font-weight:800; letter-spacing:3px; color:#6E7C96; text-transform:uppercase;
+  }
+  .es-exit{
+    position:absolute; right:18px; top:18px; z-index:410;
+    width:42px; height:42px; border-radius:11px; cursor:pointer; font-size:19px; line-height:1;
+    border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.08); color:#fff;
+    backdrop-filter:blur(4px);
+  }
+  .es-exit:hover{background:rgba(255,255,255,.2)}
+  /* 재생이 끝나면 뜨는 THE END 카드 */
+  .es-end{
+    position:absolute; inset:0; z-index:405; display:none;
+    flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center;
+    background:radial-gradient(90% 70% at 50% 45%, rgba(20,32,54,.86), rgba(5,7,12,.97));
+    animation:fadeIn .8s ease;
+  }
+  .es-end.show{display:flex}
+  .es-end .ee-big{
+    font-size:clamp(30px,6vw,58px); font-weight:900; letter-spacing:10px; color:#fff;
+    text-shadow:0 0 28px rgba(255,212,102,.35);
+  }
+  .es-end .ee-sub{font-size:15px; color:#9AA6BD; line-height:1.7; letter-spacing:.5px}
+  .es-end .ee-sub b{color:#FFD466}
+  .es-end .ee-btns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px}
+  .es-end button{
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:14.5px;
+    padding:13px 22px; border-radius:11px; color:#fff;
+  }
+  .es-end .ee-replay{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#CBD4E6}
+  .es-end .ee-replay:hover{background:rgba(255,255,255,.18)}
+  .es-end .ee-done{background:linear-gradient(135deg,#FFD466,#E8A62C); color:#241A05}
+  .es-end .ee-done:hover{filter:brightness(1.06)}
+  @media (max-width:720px){
+    .es-frame{width:96vw; border-radius:10px}
+    .es-exit{right:10px; top:10px; width:38px; height:38px}
+  }
+
 
   /* ===== 메인 ===== */
   .guide{
@@ -1035,6 +1111,26 @@
 <div class="modal-back hidden" id="verdictModal">
   <div class="modal modal-file">
     <div class="verdict-result" id="verdictResult"></div>
+  </div>
+</div>
+
+<!-- 엔딩 영상 — 다섯 단서를 모두 맞혀 기밀에 접근했을 때만 열린다 -->
+<div id="endingStage" class="hidden">
+  <button class="es-exit" id="esExit" type="button" aria-label="엔딩 닫기">✕</button>
+  <div class="es-tag">DOROLAND · TRACE BREAK · FINAL</div>
+  <div class="es-frame">
+    <video id="endingVideo" playsinline preload="none" controls controlsList="nodownload">
+      <source src="ending.mp4" type="video/mp4" />
+      이 브라우저에서는 영상을 재생할 수 없어요.
+    </video>
+    <div class="es-end" id="esEndCard">
+      <div class="ee-big">THE END</div>
+      <p class="ee-sub">도로랜드의 비밀을 끝까지 추적했어요.<br><b>트레이스 브레이크</b> 수사 완료 🔎</p>
+      <div class="ee-btns">
+        <button class="ee-replay" id="esReplay" type="button">다시 보기</button>
+        <button class="ee-done" id="esDone" type="button">기밀 파일로 돌아가기</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1565,6 +1661,7 @@ const IC_CROSS = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><c
 const IC_BULB = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 17.5h6M9.5 20h5" stroke="#FFD466" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1 1 1.6h5c.1-.6.4-1.1 1-1.6A6 6 0 0 0 12 3z" fill="rgba(255,212,102,.18)" stroke="#FFD466" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 // 빨간 실 장식 (대각선으로 가로지르는 느낌)
 const THREAD_SVG = `<svg width="100%" height="100%" viewBox="0 0 500 420" preserveAspectRatio="none" fill="none"><path d="M-10 60 L520 250 M40 410 L470 30" stroke="#E5404D" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/><circle cx="40" cy="410" r="4" fill="#E5404D"/><circle cx="470" cy="30" r="4" fill="#E5404D"/></svg>`;
+const IC_PLAY = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="rgba(36,26,5,.16)"/><path d="M10 8.2l6 3.8-6 3.8z" fill="#241A05"/></svg>`;
 const IC_LOCK = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="#9AA6BD" opacity=".25"/><rect x="5" y="10.5" width="14" height="9.5" rx="2" fill="none" stroke="#9AA6BD" stroke-width="1.6"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#9AA6BD" stroke-width="1.6"/><circle cx="12" cy="15" r="1.4" fill="#9AA6BD"/></svg>`;
 const IC_PERSON_BIG = `<svg width="46" height="46" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#EAF1FB"/><circle cx="12" cy="9.5" r="3.4" fill="#3076DC"/><path d="M5.5 19c.7-3.4 3.3-5 6.5-5s5.8 1.6 6.5 5" fill="#3076DC"/></svg>`;
 
@@ -1704,7 +1801,12 @@ function openVerdictModal(html){
 }
 function closeVerdictModal(){ $('verdictModal').classList.add('hidden'); }
 $('verdictModal').addEventListener('click', e=>{ if(e.target===$('verdictModal')) closeVerdictModal(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('verdictModal').classList.contains('hidden')) closeVerdictModal(); });
+document.addEventListener('keydown', e=>{
+  if(e.key!=='Escape') return;
+  // 엔딩 영상이 떠 있으면 그것부터 닫고, 기밀 파일은 뒤에 남겨둔다.
+  if(isEndingOpen()){ closeEndingStage(); return; }
+  if(!$('verdictModal').classList.contains('hidden')) closeVerdictModal();
+});
 
 $('verdictBtn').addEventListener('click', ()=>{
   const picked = {
@@ -1747,7 +1849,10 @@ $('verdictBtn').addEventListener('click', ()=>{
         <div class="vr-title"><span class="vt-ic">${IC_KEY}</span>도로랜드의 비밀을 밝혀냈어요</div>
         <p class="vr-detective"><b>제로</b>와 <b>리코</b>가 흩어진 단서를 모아, 숨겨져 있던 진실을 확정했어요.</p>
         <div class="vr-score">${attemptBadge}</div>
-        <button class="vr-close" id="vrClose" type="button">기밀 파일 닫기</button>
+        <div class="vr-actions">
+          <button class="vr-ending" id="vrEnding" type="button">${IC_PLAY}엔딩 영상 보기</button>
+          <button class="vr-close" id="vrClose" type="button">기밀 파일 닫기</button>
+        </div>
       </div>
       <div class="vf-right">
         <div class="vr-secret">
@@ -1780,6 +1885,50 @@ $('verdictBtn').addEventListener('click', ()=>{
       </div></div>`);
   }
   $('vrClose').addEventListener('click', closeVerdictModal);
+  const endBtn = $('vrEnding');
+  if(endBtn) endBtn.addEventListener('click', openEndingStage);
+});
+
+/* ============================================================
+   엔딩 영상 — 다섯 단서를 모두 맞힌 뒤에만 열린다.
+   기밀 파일 모달 위(z-index 400)에 깔리므로, 닫으면 파일로 돌아온다.
+============================================================ */
+function isEndingOpen(){ return !$('endingStage').classList.contains('hidden'); }
+
+function openEndingStage(){
+  if(!solved) return;               // 안전장치: 미해결 상태에선 열리지 않음
+  const stage = $('endingStage'), vid = $('endingVideo');
+  $('esEndCard').classList.remove('show');
+  vid.setAttribute('controls','');
+  stage.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  vid.currentTime = 0;
+  // 버튼 클릭(사용자 제스처)에서 호출되므로 소리와 함께 자동재생이 허용된다.
+  const p = vid.play();
+  if(p && p.catch) p.catch(()=>{ /* 차단되면 컨트롤로 직접 재생 */ });
+}
+
+function closeEndingStage(){
+  const stage = $('endingStage'), vid = $('endingVideo');
+  vid.pause();
+  stage.classList.add('hidden');
+  $('esEndCard').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+$('endingVideo').addEventListener('ended', ()=>{
+  // 네이티브 컨트롤바가 THE END 카드 위로 겹쳐 그려지므로 잠시 감춘다.
+  $('endingVideo').removeAttribute('controls');
+  $('esEndCard').classList.add('show');
+});
+$('esExit').addEventListener('click', closeEndingStage);
+$('esDone').addEventListener('click', closeEndingStage);
+$('esReplay').addEventListener('click', ()=>{
+  const vid = $('endingVideo');
+  $('esEndCard').classList.remove('show');
+  vid.setAttribute('controls','');
+  vid.currentTime = 0;
+  vid.play();
 });
 
 /* ============================================================
