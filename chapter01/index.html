@@ -77,6 +77,12 @@
                         크게 보기
                     </button>
 
+                    <!-- 정답 보기 버튼 (강사용 · 비밀번호 잠금) -->
+                    <button id="answer-btn" onclick="event.stopPropagation(); openAnswerModal();" class="absolute top-[4.5rem] right-5 bg-gray-900/60 hover:bg-[#b45309] text-white px-4 py-2 rounded-xl text-base font-bold flex items-center gap-2 transition-colors z-10 shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        정답 보기
+                    </button>
+
                     <img id="mission-image" src="" alt="문제 이미지" class="max-w-full max-h-full object-contain hidden transition-transform duration-300 group-hover:scale-[1.02]" onerror="imageError()">
                     
                     <div id="image-placeholder" class="text-center p-8 text-gray-400">
@@ -121,6 +127,31 @@
             <svg class="w-16 h-16 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <img id="modal-image" src="" alt="크게 보기" class="w-full h-full max-w-[95vw] max-h-[95vh] object-contain drop-shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- 정답 보기 모달 (강사용) -->
+    <div id="answer-modal" class="fixed inset-0 z-[110] bg-black/75 hidden flex justify-center items-center p-4 backdrop-blur-sm" onclick="closeAnswerModal()">
+        <div class="bg-white rounded-2xl w-full max-w-3xl px-9 py-8 relative shadow-2xl border-[6px] border-[#84b589] max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+
+            <button class="absolute top-5 right-5 text-gray-400 hover:text-red-500 transition-colors" onclick="closeAnswerModal()">
+                <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- 잠금 화면 -->
+            <div id="answer-lock" class="flex flex-col items-center text-center py-6">
+                <div class="text-5xl mb-4">🔐</div>
+                <h2 class="text-3xl font-black text-gray-900 mb-2">강사용 정답 보기</h2>
+                <p class="text-gray-500 font-bold text-base mb-8">사전 연수용 화면입니다. 비밀번호를 입력해주세요.</p>
+                <div class="flex gap-3 w-full max-w-sm">
+                    <input type="password" id="answer-pwd" placeholder="비밀번호" inputmode="numeric" autocomplete="off" class="flex-1 w-full bg-gray-50 border-2 border-gray-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-[#4ade80] font-bold tracking-[0.4em] text-center transition-colors shadow-inner">
+                    <button onclick="submitAnswerPwd()" class="bg-gray-800 text-white text-base font-bold px-7 py-3 rounded-xl hover:bg-[#22c55e] transition-colors whitespace-nowrap shadow-md">확인</button>
+                </div>
+                <p id="answer-pwd-error" class="hidden text-red-500 font-bold text-base mt-4">비밀번호가 일치하지 않습니다.</p>
+            </div>
+
+            <!-- 정답 화면 -->
+            <div id="answer-body" class="hidden"></div>
+        </div>
     </div>
 
     <!-- 도트매트릭스 시뮬레이터 모달 -->
@@ -221,6 +252,82 @@
                 ]
             }
         ];
+
+        // ─────────────────────────────────────────────────────────────
+        // 강사용 정답 데이터 (사전 연수용 · '정답 보기' 버튼에서 사용)
+        // 비밀번호와 문구는 이 블록만 고치면 된다.
+        // ─────────────────────────────────────────────────────────────
+        const ANSWER_PASSWORD = '4848';
+
+        const FINAL_ANSWER = {
+            slots: ['4', '+', '10', '14'],
+            note: '<span class="nb">1번 Y→4</span>, <span class="nb">2번 +</span>, <span class="nb">3번 ㅁ→10</span>, 그리고 <span class="nb">4 + 10 = 14</span>'
+        };
+
+        const ANSWERS = {
+            1: {
+                label: 'Dot.01 · 전광판',
+                value: 'Y',
+                sub: '시계 바늘 3개가 그리는 모양',
+                notes: [
+                    '힌트 ① 악보 «시계» — 전광판 오른쪽 아래에 있는 <b>바늘 없는 시계</b>를 채우라는 신호',
+                    '힌트 ② <span class="nb">Hour=시</span> / <span class="nb">Minute=분</span> / <span class="nb">Second=초</span> — 전광판에 노랗게 강조된 글자 <b class="nb">h(hPa) · M(MM) · S(DISASTER)</b>가 시·분·초를 가리킨다',
+                    '노란색으로 강조된 숫자 <b class="nb">10.0 · 30 · 2.0</b>을 시·분·초로 읽으면 → <b class="nb">10시 30분 2초</b>',
+                    '시계에 바늘 3개를 그린다 — <span class="nb">시침은 <b>10</b></span>, <span class="nb">분침은 30분 자리인 <b>6</b></span>, <span class="nb">초침은 <b>2</b></span>를 가리킨다',
+                    '세 바늘이 함께 그리는 모양이 알파벳 <b>Y</b> <span class="nb">(↖ + ↗ + ↓)</span>',
+                    '이 Y를 4번 «문자 변환표»로 넘기면 <span class="nb">Y = four = <b>4</b></span> → 마스터 키 <b class="nb">첫 번째 칸</b>'
+                ]
+            },
+            2: {
+                label: 'Dot.02 · 기호',
+                value: '+',
+                notes: [
+                    '숫자 = 그 기호에서 <b>선과 선이 만나는(교차하는) 지점의 개수</b>',
+                    '문제에 주어진 보기 — <span class="nb">0 → ÷ (한 번도 만나지 않음)</span> / <span class="nb">2 → &amp; (두 번 만남)</span> / <span class="nb">3 → $ (세 번 만남)</span>',
+                    '힌트 카드도 같은 규칙 — <span class="nb">✱은 한 번</span>, <span class="nb">#은 네 번</span>, <span class="nb">÷은 만나지 않는다</span>',
+                    '따라서 <span class="nb">1 = 교차점이 <b>한 개</b>인 기호</span> → <b>+</b> → 마스터 키 <b class="nb">두 번째 칸</b>'
+                ]
+            },
+            3: {
+                label: 'Dot.03 · 데칼코마니',
+                value: 'ㅁ',
+                sub: '네모 모양 = □',
+                notes: [
+                    '힌트 ① 세종대왕 → 한글 <b>자음</b>으로 읽으라는 뜻 / 힌트 ② 거울 → <b class="nb">데칼코마니(좌우 대칭)</b>',
+                    '각 칸은 자음을 거울에 비춰 좌우로 붙인 모양이고, 나오는 순서는 <b class="nb">ㄱ → ㄴ → ㄷ → ㄹ</b>',
+                    '<span class="nb">1칸 ㄱ을 대칭 → ㅜ 모양</span> / <span class="nb">2칸 ㄴ을 대칭 → 凵 모양</span> / <span class="nb">4칸 ㄹ을 대칭 → 마지막 칸 모양</span>',
+                    '빈칸은 <b>ㄷ</b> 차례 — ㄷ을 거울에 비춰 붙이면 열린 쪽이 닫히면서 네모, 즉 <b>ㅁ</b>',
+                    '이 ㅁ(□)을 5번 «기호 변환표»로 넘기면 <span class="nb">□ = ten = <b>10</b></span> → 마스터 키 <b class="nb">세 번째 칸</b>'
+                ]
+            },
+            4: {
+                label: '문자 변환표',
+                value: '4',
+                notes: [
+                    '규칙: 숫자를 <b>영어 단어</b>로 바꾼 뒤 <b>앞에서 N글자를 지운다</b>',
+                    '예) <span class="nb"><b>6 - 2 = x</b> → six에서 앞 2글자(s,i)</span> / <span class="nb"><b>4 - 1 = our</b> → four에서 앞 1글자(f)</span> / <span class="nb"><b>14 - 4 = teen</b> → fourteen에서 앞 4글자(f,o,u,r)</span>',
+                    '표 아래쪽은 숫자 대신 글자로 적혀 있다. 우리가 봐야 할 글자는 1번에서 얻은 <b>Y</b>',
+                    '<b class="nb">Y - 2 = ur</b> → 앞 2글자를 지웠을 때 ur이 남는 단어는 <b class="nb">fo|ur</b> = four',
+                    '그래서 <b class="nb">Y = 4</b> → 마스터 키 <b class="nb">첫 번째 칸</b>',
+                    '같은 방법으로 나머지도 풀린다 — <span class="nb">Z=1(o|ne)</span>, <span class="nb">P=2(tw|o)</span>, <span class="nb">O=3(thr|ee)</span>, <span class="nb">D=5(f|ive)</span>, <span class="nb">V=7(se|ven)</span>, <span class="nb">M=8(eig|ht)</span>, <span class="nb">B=9(nin|e)</span>'
+                ]
+            },
+            5: {
+                label: '기호 변환표',
+                value: '10',
+                notes: [
+                    '화살표를 방향 이름으로 바꾼다 — <span class="nb">↑ UP</span> / <span class="nb">↓ DOWN</span> / <span class="nb">← LEFT</span> / <span class="nb">→ RIGHT</span>',
+                    '빨간 체크(∨)가 한 묶음의 끝. <b>묶음에 든 화살표 개수 = 그 방향 이름의 몇 번째 글자</b>인지를 뜻한다',
+                    '<b class="nb">♥ = ←←← / ↓↓ / ↑ / →</b> → <span class="nb">LEFT의 3번째 <b>F</b></span>, <span class="nb">DOWN의 2번째 <b>O</b></span>, <span class="nb">UP의 1번째 <b>U</b></span>, <span class="nb">RIGHT의 1번째 <b>R</b></span> → <b class="nb">FOUR = 4</b>',
+                    '<b class="nb">△ = ↓↓↓↓ / →→ / ↓↓↓↓ / ←←</b> → <span class="nb">DOWN 4번째 <b>N</b></span>, <span class="nb">RIGHT 2번째 <b>I</b></span>, <span class="nb">DOWN 4번째 <b>N</b></span>, <span class="nb">LEFT 2번째 <b>E</b></span> → <b class="nb">NINE = 9</b>',
+                    '<b class="nb">□ = →→→→→ / ←← / ↓↓↓↓</b> → <span class="nb">RIGHT 5번째 <b>T</b></span>, <span class="nb">LEFT 2번째 <b>E</b></span>, <span class="nb">DOWN 4번째 <b>N</b></span> → <b class="nb">TEN = 10</b>',
+                    '<b class="nb">○ = ←←←← / ↓↓↓ / ↓↓</b> → <span class="nb">LEFT 4번째 <b>T</b></span>, <span class="nb">DOWN 3번째 <b>W</b></span>, <span class="nb">DOWN 2번째 <b>O</b></span> → <b class="nb">TWO = 2</b>',
+                    '3번에서 얻은 모양이 <span class="nb">ㅁ(□)</span>이므로 → <b>10</b> → 마스터 키 <b class="nb">세 번째 칸</b>'
+                ]
+            }
+        };
+
+        let answerUnlocked = false;
 
         let currentMissionId = 1;
         let currentMode = 'mission';
@@ -527,6 +634,88 @@
         function closeModal() {
             document.getElementById('image-modal').classList.add('hidden');
         }
+
+        // ── 강사용 정답 보기 ──────────────────────────────────────────
+        function openAnswerModal() {
+            document.getElementById('answer-modal').classList.remove('hidden');
+
+            if (answerUnlocked) {
+                renderAnswer();
+                return;
+            }
+
+            document.getElementById('answer-lock').classList.remove('hidden');
+            document.getElementById('answer-body').classList.add('hidden');
+            document.getElementById('answer-pwd-error').classList.add('hidden');
+
+            const input = document.getElementById('answer-pwd');
+            input.value = '';
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function closeAnswerModal() {
+            document.getElementById('answer-modal').classList.add('hidden');
+        }
+
+        function submitAnswerPwd() {
+            const input = document.getElementById('answer-pwd');
+
+            if (input.value.trim() === ANSWER_PASSWORD) {
+                answerUnlocked = true;
+                renderAnswer();
+            } else {
+                document.getElementById('answer-pwd-error').classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function renderAnswer() {
+            const data = ANSWERS[currentMissionId];
+            const mission = missions.find(m => m.id === currentMissionId);
+
+            document.getElementById('answer-lock').classList.add('hidden');
+
+            const body = document.getElementById('answer-body');
+            body.classList.remove('hidden');
+            body.innerHTML = `
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="bg-amber-100 text-[#b45309] font-black text-base px-4 py-1.5 rounded-lg">ANSWER</span>
+                    <span class="text-gray-400 font-bold text-base">강사용 · 학생에게 노출 주의</span>
+                </div>
+                <h2 class="text-3xl font-black text-gray-900 mt-4">${mission.title} <span class="text-gray-400 font-bold text-xl ml-1">${data.label}</span></h2>
+
+                <div class="mt-4 bg-[#f0fdf4] border-2 border-[#bbf7d0] rounded-2xl py-6 text-center">
+                    <div class="text-base font-black text-[#166534] mb-2">${data.caption || '정답'}</div>
+                    <div class="${data.value.length > 4 ? 'text-5xl' : 'text-6xl'} font-black text-gray-900 tracking-tight leading-none py-1">${data.value}</div>
+                    ${data.sub ? `<div class="text-base font-bold text-[#166534] mt-3 opacity-80">${data.sub}</div>` : ''}
+                </div>
+
+                <ul class="mt-5 flex flex-col gap-2.5">
+                    ${data.notes.map(n => `
+                        <li class="flex gap-3 items-start text-base text-gray-700 font-bold leading-relaxed">
+                            <span class="text-[#4ade80] mt-0.5">▸</span><span>${n}</span>
+                        </li>`).join('')}
+                </ul>
+
+                <div class="mt-6 pt-5 border-t-2 border-dashed border-gray-200">
+                    <div class="text-base font-black text-gray-400 mb-3">FINAL MASTER KEY</div>
+                    <div class="bg-gray-800 text-white rounded-2xl px-7 py-5 flex flex-col gap-1.5">
+                        <div class="flex gap-3">
+                            ${FINAL_ANSWER.slots.map(v => `<span class="min-w-[72px] h-16 px-4 flex items-center justify-center bg-gray-900 border-2 border-[#4ade80] rounded-xl text-3xl font-black text-[#4ade80]">${v}</span>`).join('')}
+                        </div>
+                        <span class="text-base font-bold text-gray-300 mt-1">${FINAL_ANSWER.note}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeAnswerModal();
+            if (e.key === 'Enter' && document.activeElement === document.getElementById('answer-pwd')) {
+                submitAnswerPwd();
+            }
+        });
 
         function openDotModal() {
             document.getElementById('dot-modal').classList.remove('hidden');

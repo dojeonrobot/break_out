@@ -80,3 +80,15 @@ body {
     80% { text-shadow: 1.5px 0 #22c55e, -1.5px 0 #3b82f6; }
     100% { text-shadow: -1.5px 0 #22c55e, 1.5px 0 #3b82f6; }
 }
+
+/* 정답 보기 모달 — 한글이 글자 단위로 끊기지 않고 단어(어절) 단위로 줄바꿈되게 */
+#answer-modal {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+#answer-modal li,
+#answer-modal p {
+    text-wrap: pretty;
+}
+/* 수식·기호 묶음처럼 한 덩어리로 읽어야 하는 조각 */
+.nb { white-space: nowrap; }
