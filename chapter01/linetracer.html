@@ -24,6 +24,8 @@
   <style>
     html { scroll-behavior: smooth; scroll-padding-top: 88px; }
     .mono { font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+    main { word-break: keep-all; }
+    main p, main li { text-wrap: pretty; }
 
     /* 섹션 등장 */
     @media (prefers-reduced-motion: no-preference) {
@@ -77,7 +79,7 @@
       '011': { action: '우회전',   icon: 'arrow-up-right',   turn: 25,  left: 200,  right: 60,  why: '선이 오른쪽으로 조금 치우쳐 있습니다.' },
       '001': { action: '우회전 더', icon: 'arrow-right',      turn: 55,  left: 200,  right: 40,  why: '선이 오른쪽으로 많이 치우쳐 있습니다.' },
       '111': { action: '정지',     icon: 'octagon-pause',    turn: 0,   left: 0,    right: 0,   why: '종료선(가로선)을 감지했습니다.' },
-      '000': { action: '후진',     icon: 'arrow-down',       turn: 0,   left: -200, right: -200, why: '선을 놓쳤습니다. 후진하여 선을 다시 찾습니다.' },
+      '000': { action: '후진',     icon: 'arrow-down',       turn: 0,   left: -200, right: -200, why: '선을 놓쳤습니다.\n후진하여 선을 다시 찾습니다.' },
       '101': { action: '후진',     icon: 'arrow-down',       turn: 0,   left: -200, right: -200, why: '정의되지 않은 패턴이므로 후진합니다.' }
     };
   </script>
@@ -125,7 +127,7 @@
             <span class="text-emerald-500">SAFARI</span><br><span class="text-slate-800 whitespace-nowrap">LINE TRACER</span>
           </h1>
           <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-[44ch] break-keep mb-7">
-            로봇 Wi-Fi에 접속하여 센서 값을 확인하고, 모터 속도를 조정하여 트랙을 완주하세요.
+            로봇 Wi-&#8288;Fi에 접속하여 센서 값을 확인하고,<br>모터 속도를 조정하여 트랙을 완주하세요.
           </p>
           <div class="flex flex-wrap gap-3">
             <a id="btn-dashboard" target="_blank" rel="noopener"
@@ -144,13 +146,13 @@
           <div class="rounded-2xl bg-slate-800 text-white p-6 shadow-xl shadow-slate-900/20 relative overflow-hidden">
             <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-emerald-400/15"></div>
             <div class="flex items-center gap-2 mb-5 text-emerald-300 font-bold text-sm">
-              <i data-lucide="wifi" class="w-4 h-4"></i>로봇 Wi-Fi 접속 정보
+              <i data-lucide="wifi" class="w-4 h-4"></i>로봇 Wi-&#8288;Fi 접속 정보
             </div>
             <dl class="space-y-4">
               <div>
-                <dt class="text-xs text-slate-400 mb-1">Wi-Fi 이름</dt>
+                <dt class="text-xs text-slate-400 mb-1">Wi-&#8288;Fi 이름</dt>
                 <dd class="flex items-center justify-between gap-3">
-                  <span class="mono text-base sm:text-lg font-bold tracking-tight break-all" data-bind="ssid"></span>
+                  <span class="mono text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap" data-bind="ssid"></span>
                   <button type="button" data-copy="ssid" class="copy-btn shrink-0 inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>복사</span>
                   </button>
@@ -183,7 +185,7 @@
           아두이노 코드 업로드
         </h2>
         <p class="text-slate-600 leading-relaxed max-w-[62ch] break-keep">
-          보드에서 Wi-Fi를 잡기 위해 <b class="mono text-slate-800">safari_linetracer.ino</b> 파일을 USB로 업로드해 주세요. 파일 업로드가 완료되었다면 2번으로 넘어가세요.
+          보드에서 Wi-&#8288;Fi를 잡기 위해 <b class="mono text-slate-800">safari_linetracer.ino</b> 파일을 USB로 업로드해 주세요.<br>파일 업로드가 완료되었다면 2번으로 넘어가세요.
         </p>
       </div>
       <ol class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 sm:p-10">
@@ -191,21 +193,21 @@
           <i data-lucide="download" class="w-6 h-6 text-emerald-500 mb-3"></i>
           <h3 class="font-bold mb-1.5">코드 다운로드</h3>
           <p class="text-sm text-slate-600 leading-relaxed break-keep">
-            상단의 <b>코드 다운로드</b> 버튼으로 파일을 받아 압축을 풀고, <b class="mono text-slate-800">safari_linetracer.ino</b>를 Arduino IDE로 여세요. 폴더 안의 파일 6개는 삭제하지 마세요.
+            상단 <b>코드 다운로드</b> 버튼을 누르세요.<br>압축을 풀고 .ino 파일을 여세요.<br>폴더 안 파일은 삭제하지 마세요.
           </p>
         </li>
         <li class="rounded-2xl bg-slate-50 border border-slate-100 p-5">
           <i data-lucide="cpu" class="w-6 h-6 text-emerald-500 mb-3"></i>
           <h3 class="font-bold mb-1.5">보드 및 포트 선택</h3>
           <p class="text-sm text-slate-600 leading-relaxed break-keep">
-            보드 매니저에서 <b>esp32</b> 보드 패키지를 설치하세요. 로봇을 USB로 연결한 뒤 [툴] 메뉴에서 ESP32 보드와 COM 포트를 선택하세요.
+            <b>esp32</b> 보드 패키지를 설치하세요.<br>로봇을 USB로 연결하세요.<br>[툴]에서 보드와 포트를 선택하세요.
           </p>
         </li>
         <li class="rounded-2xl bg-slate-50 border border-slate-100 p-5">
           <i data-lucide="upload" class="w-6 h-6 text-emerald-500 mb-3"></i>
           <h3 class="font-bold mb-1.5">업로드 실행</h3>
           <p class="text-sm text-slate-600 leading-relaxed break-keep">
-            [업로드] 버튼을 누르세요. 업로드가 완료되면 USB를 분리하세요. 이후에는 로봇 전원을 켤 때마다 로봇 Wi-Fi가 생성됩니다.
+            [업로드] 버튼을 누르세요.<br>완료되면 USB를 분리하세요.<br>이제 전원을 켜면 Wi-&#8288;Fi가 생성됩니다.
           </p>
         </li>
       </ol>
@@ -216,34 +218,34 @@
       <div class="px-6 sm:px-10 pt-8 pb-2">
         <h2 class="flex items-center gap-3 text-2xl sm:text-3xl font-extrabold tracking-tight">
           <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-black">2</span>
-          로봇 Wi-Fi 접속
+          로봇 Wi-&#8288;Fi 접속
         </h2>
       </div>
       <ol class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 sm:px-10 sm:pb-10">
         <li class="rounded-2xl bg-slate-50 border border-slate-100 p-5">
           <i data-lucide="power" class="w-6 h-6 text-emerald-500 mb-3"></i>
           <h3 class="font-bold mb-1.5">전원 켜기</h3>
-          <p class="text-sm text-slate-600 leading-relaxed break-keep">코드가 업로드된 로봇은 전원을 켜면 자체 Wi-Fi를 생성합니다. 공유기나 인터넷 연결은 필요하지 않습니다.</p>
+          <p class="text-sm text-slate-600 leading-relaxed break-keep">로봇 전원을 켜면 Wi-&#8288;Fi가 생성됩니다.<br>인터넷 연결은 필요하지 않습니다.</p>
         </li>
         <li class="rounded-2xl bg-slate-50 border border-slate-100 p-5">
           <i data-lucide="wifi" class="w-6 h-6 text-emerald-500 mb-3"></i>
-          <h3 class="font-bold mb-1.5">Wi-Fi 연결</h3>
+          <h3 class="font-bold mb-1.5">Wi-&#8288;Fi 연결</h3>
           <p class="text-sm text-slate-600 leading-relaxed break-keep">
-            <b class="mono text-slate-800" data-bind="ssid"></b>을 선택하고 비밀번호 <b class="mono text-slate-800" data-bind="password"></b>을 입력하세요.
+            <b class="mono text-slate-800" data-bind="ssid"></b>을 선택하세요.<br>비밀번호 <b class="mono text-slate-800" data-bind="password"></b>을 입력하세요.
           </p>
         </li>
         <li class="rounded-2xl bg-slate-50 border border-slate-100 p-5">
           <i data-lucide="gauge" class="w-6 h-6 text-emerald-500 mb-3"></i>
           <h3 class="font-bold mb-1.5">대시보드 접속</h3>
           <p class="text-sm text-slate-600 leading-relaxed break-keep">
-            상단의 <b>대시보드 접속</b> 버튼을 누르거나, 주소창에 <b class="mono text-slate-800">http://<span data-bind="ip"></span></b>을 입력하세요.
+            상단 <b>대시보드 접속</b> 버튼을 누르세요.<br>또는 주소창에 아래 주소를 입력하세요.<br><b class="mono text-slate-800">http://<span data-bind="ip"></span></b>
           </p>
         </li>
       </ol>
       <div class="mx-6 sm:mx-10 mb-8 rounded-2xl bg-amber-50 border border-amber-200 p-5 flex gap-3">
         <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
         <div class="text-sm text-amber-900 leading-relaxed break-keep space-y-1">
-          <p><b>이 페이지를 먼저 열어 둔 뒤</b> 로봇 Wi-Fi로 전환하세요. 로봇 Wi-Fi는 인터넷이 연결되지 않아 이 페이지를 새로 열 수 없습니다.</p>
+          <p><b>이 페이지를 먼저 열어 둔 뒤</b> 로봇 Wi-&#8288;Fi로 전환하세요.<br>로봇 Wi-&#8288;Fi는 인터넷이 연결되지 않아 이 페이지를 새로 열 수 없습니다.</p>
           <p>"인터넷에 연결되어 있지 않음" 알림이 표시되면 <b>연결 유지</b>를 선택하세요.</p>
         </div>
       </div>
@@ -257,7 +259,7 @@
           센서 동작 원리
         </h2>
         <p class="text-slate-600 leading-relaxed max-w-[60ch] break-keep">
-          바닥의 센서 3개(왼쪽 L, 가운데 C, 오른쪽 R)는 <b>검은 선 위에서 1</b>, 흰 바닥에서 0으로 인식합니다.
+          바닥의 센서 3개(왼쪽 L, 가운데 C, 오른쪽 R)는 <b>검은 선 위에서 1</b>, 흰 바닥에서 0으로 인식합니다.<br>
           아래 센서 버튼을 눌러 패턴별 로봇 동작을 확인하세요.
         </p>
       </div>
@@ -295,7 +297,7 @@
             <i id="out-icon" data-lucide="arrow-up" class="w-8 h-8 text-emerald-300"></i>
             <span id="out-action" class="text-3xl font-black">직진</span>
           </div>
-          <p id="out-why" class="text-sm text-slate-300 mb-6 break-keep">선이 가운데에 있습니다.</p>
+          <p id="out-why" class="text-sm text-slate-300 mb-6 break-keep whitespace-pre-line">선이 가운데에 있습니다.</p>
           <div class="grid grid-cols-2 gap-3 mb-5">
             <div class="rounded-xl bg-white/5 border border-white/10 p-4">
               <div class="text-xs text-slate-400 mb-1">왼쪽 모터</div>
@@ -318,7 +320,7 @@
           <i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400"></i>
         </summary>
         <div class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep space-y-3">
-          <p>센서 값의 범위는 0~4095이며, <b>기준값 500보다 크면 선</b>으로 판단합니다. 대시보드의 LEFT / CENTER / RIGHT 값을 흰 바닥과 검은 선 위에서 각각 확인한 뒤, 두 값의 중간값으로 변경하세요.</p>
+          <p>센서 값의 범위는 0~4095이며, <b>기준값 500보다 크면 선</b>으로 판단합니다.<br>대시보드의 LEFT / CENTER / RIGHT 값을 흰 바닥과 검은 선 위에서 각각 확인한 뒤,<br>두 값의 중간값으로 변경하세요.</p>
           <pre class="mono text-[13px] bg-slate-800 text-slate-100 rounded-xl p-4 overflow-x-auto"><span class="text-slate-400">// safari_linetracer.ino 28~30번째 줄</span>
 int TH_L = <span class="text-emerald-300">500</span>;
 int TH_C = <span class="text-emerald-300">500</span>;
@@ -337,34 +339,34 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
         </h2>
         <p class="text-slate-600 leading-relaxed max-w-[62ch] break-keep">
           <code class="mono text-slate-800">safari_linetracer.ino</code> 143~158번째 줄의
-          <code class="mono text-emerald-700 font-bold">setMotorSpeed(왼쪽, 오른쪽)</code> 값을 수정하세요.
-          입력 범위는 -255~255이며, 음수는 역회전입니다. 왼쪽으로 회전하려면 왼쪽 바퀴 속도를 낮추세요.
+          <code class="mono text-emerald-700 font-bold">setMotorSpeed(왼쪽, 오른쪽)</code> 값을 수정하세요.<br>
+          입력 범위는 -255~255이며, 음수는 역회전입니다.<br>왼쪽으로 회전하려면 왼쪽 바퀴 속도를 낮추세요.
         </p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6 sm:p-10">
         <div class="rounded-2xl border border-slate-200 p-5">
           <div class="text-sm font-bold text-slate-500 mb-2">직진 속도가 느린 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">직진(010) 두 값을 <span class="text-emerald-600">220~240</span>으로 올리세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">직진(010) 두 값을<br><span class="text-emerald-600">220~240</span>으로 올리세요</p>
         </div>
         <div class="rounded-2xl border border-slate-200 p-5">
           <div class="text-sm font-bold text-slate-500 mb-2">직진 시 차체가 흔들리는 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">직진(010) 두 값을 <span class="text-emerald-600">180</span>으로 낮추세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">직진(010) 두 값을<br><span class="text-emerald-600">180</span>으로 낮추세요</p>
         </div>
         <div class="rounded-2xl border border-slate-200 p-5">
           <div class="text-sm font-bold text-slate-500 mb-2">완만한 커브에서 과하게 꺾이는 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">느린 쪽 바퀴 60을 <span class="text-emerald-600">80~100</span>으로 올리세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">느린 쪽 바퀴 60을<br><span class="text-emerald-600">80~100</span>으로 올리세요</p>
         </div>
         <div class="rounded-2xl border border-slate-200 p-5">
           <div class="text-sm font-bold text-slate-500 mb-2">완만한 커브에서 덜 꺾이는 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">느린 쪽 바퀴 60을 <span class="text-emerald-600">40</span>으로 낮추세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">느린 쪽 바퀴 60을<br><span class="text-emerald-600">40</span>으로 낮추세요</p>
         </div>
         <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50/60 p-5">
           <div class="text-sm font-bold text-emerald-700 mb-2">급커브에서 이탈하는 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">급커브(100, 001)의 느린 쪽 바퀴를 <span class="text-emerald-600">0</span>(정지) 또는 <span class="text-emerald-600">-60</span>(역회전)으로 변경하세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">느린 쪽 바퀴를 <span class="text-emerald-600">0</span>(정지) 또는<br><span class="text-emerald-600">-60</span>(역회전)으로 낮추세요</p>
         </div>
         <div class="rounded-2xl border border-slate-200 p-5">
           <div class="text-sm font-bold text-slate-500 mb-2">선을 놓친 뒤 복귀하지 못하는 경우</div>
-          <p class="text-slate-800 font-bold leading-snug break-keep">후진(000)에서 <span class="text-emerald-600">한쪽 바퀴만</span> 역회전하도록 변경하세요</p>
+          <p class="text-slate-800 font-bold leading-snug break-keep">후진(000)에서<br><span class="text-emerald-600">한쪽 바퀴만</span> 역회전하도록 변경하세요</p>
         </div>
       </div>
     </section>
@@ -376,7 +378,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
           <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-black">5</span>
           무선 업로드 (OTA)
         </h2>
-        <p class="text-slate-600 leading-relaxed max-w-[60ch] break-keep">두 번째 업로드부터는 USB 없이 Wi-Fi로 업로드할 수 있습니다. 완료한 단계에 체크하세요.</p>
+        <p class="text-slate-600 leading-relaxed max-w-[60ch] break-keep">두 번째 업로드부터는 USB 없이 Wi-&#8288;Fi로 업로드할 수 있습니다.<br>완료한 단계에 체크하세요.</p>
       </div>
       <div class="p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6">
         <ul class="lg:col-span-7 space-y-3">
@@ -384,7 +386,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
             <label class="flex gap-4 rounded-2xl border border-slate-200 p-5 cursor-pointer hover:border-emerald-300">
               <input type="checkbox" class="step-check mt-1 w-5 h-5 accent-emerald-500 shrink-0">
               <div class="step-body transition-opacity">
-                <div class="step-title font-bold mb-1">로봇 Wi-Fi 연결</div>
+                <div class="step-title font-bold mb-1">로봇 Wi-&#8288;Fi 연결</div>
                 <p class="text-sm text-slate-600 break-keep"><span class="mono" data-bind="ssid"></span>에 노트북을 연결하세요.</p>
               </div>
             </label>
@@ -394,7 +396,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
               <input type="checkbox" class="step-check mt-1 w-5 h-5 accent-emerald-500 shrink-0">
               <div class="step-body transition-opacity">
                 <div class="step-title font-bold mb-1">네트워크 포트 선택</div>
-                <p class="text-sm text-slate-600 break-keep">[툴] → [포트] → 네트워크 포트에서 <span class="mono text-slate-800"><span data-bind="ssid"></span> at <span data-bind="ip"></span></span>을 선택하세요.</p>
+                <p class="text-sm text-slate-600 break-keep">[툴] → [포트] → 네트워크 포트에서<br><span class="mono text-slate-800"><span data-bind="ssid"></span> at <span data-bind="ip"></span></span>을 선택하세요.</p>
               </div>
             </label>
           </li>
@@ -403,7 +405,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
               <input type="checkbox" class="step-check mt-1 w-5 h-5 accent-emerald-500 shrink-0">
               <div class="step-body transition-opacity">
                 <div class="step-title font-bold mb-1">업로드 실행</div>
-                <p class="text-sm text-slate-600 break-keep">[업로드] 버튼을 누르세요. 약 20초가 소요되며, 업로드 중에는 모터가 정지합니다. 완료되면 로봇이 자동으로 재시작됩니다.</p>
+                <p class="text-sm text-slate-600 break-keep">[업로드] 버튼을 누르세요.<br>약 20초가 소요되며, 업로드 중에는 모터가 정지합니다.<br>완료되면 로봇이 자동으로 재시작됩니다.</p>
               </div>
             </label>
           </li>
@@ -412,7 +414,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
           <i data-lucide="triangle-alert" class="w-6 h-6 text-amber-300 shrink-0"></i>
           <div class="text-sm leading-relaxed break-keep">
             <p class="font-bold text-base mb-1.5">파일 삭제 금지</p>
-            <p class="text-slate-300">무선 업로드와 대시보드 기능은 코드에 함께 포함되어 있습니다. <span class="mono">ota_ap.h</span> 등의 파일을 삭제하고 업로드하면 이후에는 USB로만 업로드할 수 있습니다.</p>
+            <p class="text-slate-300">무선 업로드 기능은 코드 안에 있습니다.<br><span class="mono">ota_ap.h</span> 등의 파일을 삭제하면<br>이후에는 USB로만 업로드할 수 있습니다.</p>
           </div>
         </div>
       </div>
@@ -428,44 +430,44 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
       </div>
       <div class="p-6 sm:px-10 sm:pb-10 space-y-3">
         <details class="rounded-2xl border border-slate-200">
-          <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">Wi-Fi 목록에 로봇이 보이지 않는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
-          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">먼저 코드가 업로드되었는지 확인하세요(1번). 업로드되어 있다면 전원과 배터리를 확인한 뒤 로봇을 재부팅하세요.</p>
+          <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">Wi-&#8288;Fi 목록에 로봇이 보이지 않는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
+          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">먼저 코드가 업로드되었는지 확인하세요(1번).<br>업로드되어 있다면 전원과 배터리를 확인한 뒤 로봇을 재부팅하세요.</p>
         </details>
         <details class="rounded-2xl border border-slate-200">
           <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">비밀번호 오류가 표시되는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
-          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">비밀번호는 <b class="mono text-slate-800" data-bind="password"></b>입니다. 영문 소문자와 숫자 0을 정확히 입력했는지 확인하세요.</p>
+          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">비밀번호는 <b class="mono text-slate-800" data-bind="password"></b>입니다.<br>영문 소문자와 숫자 0을 정확히 입력했는지 확인하세요.</p>
         </details>
         <details class="rounded-2xl border border-slate-200">
           <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">대시보드에 접속되지 않는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
           <ul class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep list-disc pl-10 space-y-1">
-            <li>현재 로봇 Wi-Fi에 연결되어 있는지 확인하세요.</li>
-            <li>주소를 <b class="mono text-slate-800">http://<span data-bind="ip"></span></b>과 같이 http://까지 입력하세요. https로 접속하면 열리지 않습니다.</li>
+            <li>현재 로봇 Wi-&#8288;Fi에 연결되어 있는지 확인하세요.</li>
+            <li>주소를 <b class="mono text-slate-800">http://<span data-bind="ip"></span></b>과 같이 http://까지 입력하세요.<br>https로 접속하면 열리지 않습니다.</li>
             <li>휴대폰이나 태블릿은 모바일 데이터를 끈 뒤 다시 시도하세요.</li>
           </ul>
         </details>
         <details class="rounded-2xl border border-slate-200">
           <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">대시보드 연결이 끊기는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
-          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">로봇 1대당 대시보드는 최대 4개 창까지 연결됩니다. 다른 기기에서 열어 둔 창을 닫으세요.</p>
+          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">로봇 1대당 대시보드는 최대 4개 창까지 연결됩니다.<br>다른 기기에서 열어 둔 창을 닫으세요.</p>
         </details>
         <details class="rounded-2xl border border-slate-200">
           <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">USB 연결 후 COM 포트가 보이지 않는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
-          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">데이터 전송용 USB 케이블인지 확인하고 다른 USB 포트에 연결해 보세요. 그래도 보이지 않으면 보드의 USB 드라이버를 설치하세요.</p>
+          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">데이터 전송용 USB 케이블인지 확인하고 다른 USB 포트에 연결해 보세요.<br>그래도 보이지 않으면 보드의 USB 드라이버를 설치하세요.</p>
         </details>
         <details class="rounded-2xl border border-slate-200">
           <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold">Arduino IDE에 네트워크 포트가 보이지 않는 경우<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
-          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">노트북이 로봇 Wi-Fi에 연결되어 있는지 확인한 뒤 Arduino IDE를 재시작하세요.</p>
+          <p class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep">노트북이 로봇 Wi-&#8288;Fi에 연결되어 있는지 확인한 뒤 Arduino IDE를 재시작하세요.</p>
         </details>
         <details class="rounded-2xl border border-slate-200 bg-slate-50">
-          <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold text-slate-500">강사용: 핀 정보 및 Wi-Fi 이름 변경<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
+          <summary class="flex items-center justify-between gap-3 px-5 py-4 font-bold text-slate-500">강사용: 핀 정보 및 Wi-&#8288;Fi 이름 변경<i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i></summary>
           <div class="px-5 pb-5 text-sm text-slate-600 leading-relaxed break-keep space-y-3">
             <dl class="grid grid-cols-[auto,1fr] gap-x-6 gap-y-1.5">
-              <dt class="text-slate-500">왼쪽 모터</dt><dd class="mono">GPIO 26, 27</dd>
-              <dt class="text-slate-500">오른쪽 모터</dt><dd class="mono">GPIO 4, 18</dd>
-              <dt class="text-slate-500">IR 센서 L / C / R</dt><dd class="mono">GPIO 33 / 39 / 36</dd>
-              <dt class="text-slate-500">대시보드 / 텔넷 / OTA</dt><dd class="mono">80 / 23 / 3232</dd>
-              <dt class="text-slate-500">시리얼 속도</dt><dd class="mono">115200</dd>
+              <dt class="text-slate-500">왼쪽 모터</dt><dd class="mono whitespace-nowrap">GPIO 26, 27</dd>
+              <dt class="text-slate-500">오른쪽 모터</dt><dd class="mono whitespace-nowrap">GPIO 4, 18</dd>
+              <dt class="text-slate-500">IR 센서 L / C / R</dt><dd class="mono whitespace-nowrap">GPIO 33 / 39 / 36</dd>
+              <dt class="text-slate-500">대시보드 / 텔넷 / OTA</dt><dd class="mono whitespace-nowrap">80 / 23 / 3232</dd>
+              <dt class="text-slate-500">시리얼 속도</dt><dd class="mono whitespace-nowrap">115200</dd>
             </dl>
-            <p>로봇이 여러 대인 경우 <code class="mono text-slate-800">ota_ap.h</code> 19~20번째 줄의 <code class="mono text-slate-800">ap_ssid</code> 끝 번호를 로봇마다 다르게 변경하세요. 비밀번호가 8자 미만이면 비밀번호 없는 공개 Wi-Fi로 생성됩니다.</p>
+            <p>로봇이 여러 대인 경우 <code class="mono text-slate-800">ota_ap.h</code> 19~20번째 줄의 <code class="mono text-slate-800">ap_ssid</code> 끝 번호를 로봇마다 다르게 변경하세요.<br>비밀번호가 8자 미만이면 비밀번호 없는 공개 Wi-&#8288;Fi로 생성됩니다.</p>
           </div>
         </details>
       </div>
