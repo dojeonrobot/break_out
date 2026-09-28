@@ -153,9 +153,9 @@
 
           <!-- 챕터 1도 진입로가 둘 (암호 해독 / 라인트레이서) - 챕터 3 카드와 같은 반반 버튼 구성 -->
           <div class="mt-auto flex gap-2.5">
-            <!-- 도트매트릭스: 카드 클릭과 동일 동작이라 별도 핸들러 없이 버블링에 맡김 -->
+            <!-- 브레이크 아웃(도트매트릭스 암호 해독): 카드 클릭과 동일 동작이라 별도 핸들러 없이 버블링에 맡김 -->
             <div class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-white text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 shadow-md shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transform group-hover:-translate-y-0.5">
-              <span>도트매트릭스</span>
+              <span>브레이크 아웃</span>
               <i data-lucide="arrow-right" class="w-4 h-4 shrink-0 transform group-hover:translate-x-1 transition-transform"></i>
             </div>
             <div onclick="event.stopPropagation(); handleEnterChapter('1-linetracer', 'active', this)"
