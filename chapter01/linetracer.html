@@ -311,7 +311,6 @@
           <img src="images/linetracer/dashboard.png" alt="사파리 자동차 대시보드 화면. 번호 1~7이 각 영역을 가리킵니다." width="1350" height="1296"
                class="w-full h-auto rounded-2xl border border-slate-200 shadow-lg shadow-slate-900/10" loading="lazy">
           </a>
-          <figcaption class="text-xs text-slate-500 mt-3 break-keep">최신 코드 기준 화면입니다. 이미지를 누르면 크게 볼 수 있습니다.<br>화면이 다르면 코드를 다시 다운로드해 업로드하세요.</figcaption>
         </figure>
         <ol class="lg:col-span-5 space-y-4">
           <li class="flex gap-3">
@@ -536,7 +535,6 @@ if (!L &amp;&amp; C &amp;&amp; !R) {        <span class="text-slate-500">// 010 
           <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500 px-1">
             <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span>왼쪽 바퀴 속도</span>
             <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-sky-400"></span>오른쪽 바퀴 속도</span>
-            <span>주석(//) 내용은 원본 코드보다 간단히 줄였습니다.</span>
           </div>
           <div class="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex gap-3">
             <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
@@ -703,17 +701,6 @@ if (!L &amp;&amp; C &amp;&amp; !R) {        <span class="text-slate-500">// 010 
       </div>
     </section>
 
-    <!-- 더 자세한 자료 -->
-    <section class="rise" style="--i:8">
-      <a id="link-notion" target="_blank" rel="noopener" class="group flex items-center gap-4 rounded-2xl bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 hover:border-emerald-400/40 backdrop-blur-md p-5 text-white transition-colors">
-        <i data-lucide="notebook-text" class="w-8 h-8 text-emerald-300 shrink-0"></i>
-        <div class="flex-1">
-          <div class="font-bold">노션 매뉴얼</div>
-          <div class="text-sm text-slate-300 break-keep">이 페이지와 동일한 내용의 문서 버전입니다.</div>
-        </div>
-        <i data-lucide="arrow-up-right" class="w-5 h-5 text-slate-400 group-hover:text-white shrink-0"></i>
-      </a>
-    </section>
   </main>
 
   <script>
@@ -721,7 +708,6 @@ if (!L &amp;&amp; C &amp;&amp; !R) {        <span class="text-slate-500">// 010 
     document.querySelectorAll('[data-bind]').forEach(el => { el.textContent = ROBOT[el.dataset.bind]; });
     document.getElementById('btn-dashboard').href = 'http://' + ROBOT.ip;
     document.getElementById('btn-sketch').href = LINKS.sketch;
-    document.getElementById('link-notion').href = LINKS.notion;
 
     // ---------- 복사 버튼 ----------
     function copyText(text) {
