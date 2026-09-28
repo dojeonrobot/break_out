@@ -53,6 +53,8 @@
     .step-check:checked + .step-body .step-title { text-decoration: line-through; text-decoration-color: #10b981; }
     .sw-time { font-variant-numeric: tabular-nums; }
     .sw-running .sw-time { color: #6ee7b7; }
+    .mode-tab { color: #64748b; }
+    .mode-tab[aria-selected="true"] { background: #fff; color: #047857; box-shadow: 0 1px 3px rgba(15, 23, 42, .12); }
     .rank-1 { background: #fef3c7; color: #92400e; }
     .rank-2 { background: #e2e8f0; color: #334155; }
     .rank-3 { background: #fde7d6; color: #9a3412; }
@@ -494,25 +496,34 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 sm:p-10">
         <!-- 스톱워치 + 입력 -->
-        <div class="lg:col-span-5 space-y-4">
-          <div id="sw" class="rounded-2xl bg-slate-800 text-white p-6">
+        <div class="lg:col-span-7 space-y-4">
+          <div class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-slate-100" role="tablist" aria-label="기록 방식">
+            <button type="button" data-mode="stopwatch" role="tab" class="mode-tab inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-bold transition-colors">
+              <i data-lucide="timer" class="w-4 h-4"></i>스톱워치 측정
+            </button>
+            <button type="button" data-mode="manual" role="tab" class="mode-tab inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-bold transition-colors">
+              <i data-lucide="pencil" class="w-4 h-4"></i>직접 입력
+            </button>
+          </div>
+          <div id="sw" class="rounded-2xl bg-slate-800 text-white p-6 sm:p-8">
             <div class="text-xs text-slate-400 mb-2">스톱워치</div>
-            <div class="flex items-baseline gap-2 mb-5">
-              <span id="sw-time" class="sw-time mono text-5xl sm:text-6xl font-bold tracking-tight">0.00</span>
-              <span class="text-lg text-slate-400 font-bold">초</span>
+            <div class="flex items-baseline justify-center gap-3 py-4 sm:py-8 mb-4">
+              <span id="sw-time" class="sw-time mono text-7xl sm:text-8xl lg:text-[132px] leading-none font-bold tracking-tight">0.00</span>
+              <span class="text-2xl sm:text-3xl text-slate-400 font-bold">초</span>
             </div>
             <div class="grid grid-cols-2 gap-3">
-              <button type="button" id="sw-toggle" class="inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold bg-emerald-500 hover:bg-emerald-400 text-emerald-950 active:scale-[0.98] transition-all">
-                <i data-lucide="play" class="w-4 h-4"></i><span>시작</span>
+              <button type="button" id="sw-toggle" class="inline-flex items-center justify-center gap-2 py-4 rounded-xl text-lg font-bold bg-emerald-500 hover:bg-emerald-400 text-emerald-950 active:scale-[0.98] transition-all">
+                <i data-lucide="play" class="w-5 h-5"></i><span>시작</span>
               </button>
-              <button type="button" id="sw-reset" class="inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold bg-white/10 hover:bg-white/20 active:scale-[0.98] transition-all">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>초기화
+              <button type="button" id="sw-reset" class="inline-flex items-center justify-center gap-2 py-4 rounded-xl text-lg font-bold bg-white/10 hover:bg-white/20 active:scale-[0.98] transition-all">
+                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>초기화
               </button>
             </div>
             <p class="text-xs text-slate-400 mt-3">스페이스 바로도 시작과 정지를 할 수 있습니다.</p>
           </div>
 
           <form id="rec-form" class="rounded-2xl border border-slate-200 p-5 space-y-4" novalidate>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-2">
               <label for="rec-team" class="text-sm font-bold text-slate-700">팀 이름</label>
               <input id="rec-team" type="text" maxlength="20" autocomplete="off" list="rec-teams"
@@ -521,9 +532,10 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
             </div>
             <div class="flex flex-col gap-2">
               <label for="rec-time" class="text-sm font-bold text-slate-700">완주 시간 (초)</label>
-              <input id="rec-time" type="number" min="0" step="0.01" inputmode="decimal"
+              <input id="rec-time" type="number" min="0" step="0.01" inputmode="decimal" placeholder="예: 12.34"
                      class="w-full rounded-xl border-2 border-slate-200 px-4 py-2.5 mono text-slate-800 focus:outline-none focus:border-emerald-400">
-              <p class="text-xs text-slate-500">스톱워치를 정지하면 자동으로 입력됩니다.</p>
+              <p id="rec-time-help" class="text-xs text-slate-500">스톱워치를 정지하면 자동으로 입력됩니다.</p>
+            </div>
             </div>
             <p id="rec-error" class="hidden text-sm font-bold text-rose-600"></p>
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-[0.98] transition-all">
@@ -533,7 +545,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
         </div>
 
         <!-- 순위 -->
-        <div class="lg:col-span-7 flex flex-col">
+        <div class="lg:col-span-5 flex flex-col">
           <div class="flex items-center justify-between gap-3 mb-3">
             <h3 class="font-extrabold text-base sm:text-lg whitespace-nowrap">팀별 최고 기록</h3>
             <div class="flex gap-2 shrink-0">
@@ -558,6 +570,15 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
               <span>전체 기록 <span id="rec-count" class="text-slate-400 font-medium"></span></span>
               <i data-lucide="chevron-down" class="chev w-5 h-5 text-slate-400 shrink-0"></i>
             </summary>
+            <div class="mx-5 mb-1 flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2">
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer select-none">
+                <input type="checkbox" id="rec-check-all" class="w-4 h-4 accent-emerald-500">전체 선택
+              </label>
+              <button type="button" id="rec-del-selected" disabled
+                      class="whitespace-nowrap inline-flex items-center gap-1.5 text-sm font-bold px-3 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 disabled:text-slate-300 disabled:hover:bg-transparent disabled:cursor-not-allowed">
+                <i data-lucide="trash-2" class="w-4 h-4"></i><span id="rec-del-label">선택 삭제</span>
+              </button>
+            </div>
             <ul id="rec-history" class="px-5 pb-4 divide-y divide-slate-100"></ul>
           </details>
         </div>
@@ -681,16 +702,17 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
         const d = new Date(r.at);
         const hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
         return `
-        <li class="flex items-center gap-3 py-2.5 text-sm">
-          <span class="mono text-slate-400 shrink-0">${hm}</span>
-          <span class="flex-1 min-w-0 truncate">${esc(r.team)}</span>
-          <span class="mono font-bold shrink-0">${fmt(r.time)}초</span>
-          <button type="button" data-del="${r.id}" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50" aria-label="이 기록 삭제">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
+        <li>
+          <label class="flex items-center gap-3 py-2.5 px-3 text-sm cursor-pointer rounded-lg hover:bg-slate-50 has-[:checked]:bg-rose-50">
+            <input type="checkbox" data-sel="${r.id}" class="w-4 h-4 shrink-0 accent-rose-500">
+            <span class="mono text-slate-400 shrink-0">${hm}</span>
+            <span class="flex-1 min-w-0 truncate">${esc(r.team)}</span>
+            <span class="mono font-bold shrink-0">${fmt(r.time)}초</span>
+          </label>
         </li>`;
       }).join('');
 
+      updateSelection();
       document.getElementById('rec-teams').innerHTML = Object.keys(best).map(t => `<option value="${esc(t)}">`).join('');
       lucide.createIcons();
     }
@@ -707,8 +729,8 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
     }
     function swSetButton(running) {
       swToggle.innerHTML = running
-        ? '<i data-lucide="square" class="w-4 h-4"></i><span>정지</span>'
-        : '<i data-lucide="play" class="w-4 h-4"></i><span>' + (swElapsed > 0 ? '이어서' : '시작') + '</span>';
+        ? '<i data-lucide="square" class="w-5 h-5"></i><span>정지</span>'
+        : '<i data-lucide="play" class="w-5 h-5"></i><span>' + (swElapsed > 0 ? '이어서' : '시작') + '</span>';
       swToggle.classList.toggle('bg-rose-400', running);
       swToggle.classList.toggle('hover:bg-rose-300', running);
       swToggle.classList.toggle('bg-emerald-500', !running);
@@ -739,12 +761,31 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
     swToggle.addEventListener('click', swToggleRun);
     document.getElementById('sw-reset').addEventListener('click', swReset);
     document.addEventListener('keydown', e => {
-      if (e.code !== 'Space') return;
+      if (e.code !== 'Space' || document.getElementById('sw').classList.contains('hidden')) return;
       const tag = (e.target.tagName || '').toLowerCase();
       if (['input', 'textarea', 'button', 'select', 'summary'].includes(tag)) return;
       e.preventDefault();
       swToggleRun();
     });
+
+    // 기록 방식: 스톱워치 측정 / 직접 입력
+    const MODE_KEY = 'doroland-linetracer-record-mode';
+    function setMode(mode) {
+      document.querySelectorAll('.mode-tab').forEach(t => t.setAttribute('aria-selected', t.dataset.mode === mode));
+      const manual = mode === 'manual';
+      document.getElementById('sw').classList.toggle('hidden', manual);
+      document.getElementById('rec-time-help').textContent = manual
+        ? '완주 시간을 초 단위로 입력하세요.'
+        : '스톱워치를 정지하면 자동으로 입력됩니다.';
+      if (manual) swReset();
+      try { localStorage.setItem(MODE_KEY, mode); } catch (e) {}
+    }
+    document.querySelectorAll('.mode-tab').forEach(t => t.addEventListener('click', () => {
+      setMode(t.dataset.mode);
+      if (t.dataset.mode === 'manual') document.getElementById('rec-team').focus();
+    }));
+    let savedMode = 'stopwatch';
+    try { savedMode = localStorage.getItem(MODE_KEY) || 'stopwatch'; } catch (e) {}
 
     // 저장
     const recError = document.getElementById('rec-error');
@@ -763,11 +804,30 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
       renderRecords();
     });
 
-    // 개별 삭제 / 전체 삭제 / CSV
-    document.getElementById('rec-history').addEventListener('click', e => {
-      const btn = e.target.closest('[data-del]');
-      if (!btn) return;
-      records = records.filter(r => r.id !== btn.dataset.del);
+    // 선택 삭제 / 전체 삭제 / CSV
+    const checkAll = document.getElementById('rec-check-all');
+    const delSelected = document.getElementById('rec-del-selected');
+    const selectedIds = () => [...document.querySelectorAll('[data-sel]:checked')].map(c => c.dataset.sel);
+    function updateSelection() {
+      const boxes = document.querySelectorAll('[data-sel]');
+      const n = selectedIds().length;
+      delSelected.disabled = n === 0;
+      document.getElementById('rec-del-label').textContent = n ? '선택 삭제 (' + n + ')' : '선택 삭제';
+      checkAll.checked = boxes.length > 0 && n === boxes.length;
+      checkAll.indeterminate = n > 0 && n < boxes.length;
+    }
+    document.getElementById('rec-history').addEventListener('change', e => {
+      if (e.target.matches('[data-sel]')) updateSelection();
+    });
+    checkAll.addEventListener('change', () => {
+      document.querySelectorAll('[data-sel]').forEach(c => { c.checked = checkAll.checked; });
+      updateSelection();
+    });
+    delSelected.addEventListener('click', () => {
+      const ids = selectedIds();
+      if (!ids.length) return;
+      if (!confirm('선택한 기록 ' + ids.length + '건을 삭제합니다.' + String.fromCharCode(10) + '계속하시겠습니까?')) return;
+      records = records.filter(r => !ids.includes(r.id));
       saveRecords(records);
       renderRecords();
     });
@@ -793,6 +853,7 @@ int TH_R = <span class="text-emerald-300">500</span>;</pre>
     lucide.createIcons();
     renderSensor();
     renderRecords();
+    setMode(savedMode);
   </script>
 </body>
 </html>
