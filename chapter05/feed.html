@@ -541,6 +541,40 @@
     .tile-sub .avatar { width: 16px; height: 16px; font-size: 8px; }
     .feed-split { grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 460px); }
     @media (max-width: 1100px) { .feed-split { grid-template-columns: 1fr; } }
+    .make-notice { margin: 0 0 16px; padding: 12px 16px; border-radius: 10px; background: #fff7e0; color: #6b4e00; font-size: 14px; line-height: 1.6; }
+    @media (prefers-color-scheme: dark) { .make-notice { background: #2e2610; color: #ffd76a; } }
+    .sb-admin { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-top: 2px; border-radius: 8px; font-size: 13px; color: var(--muted); text-decoration: none; }
+    .sb-admin .icon { width: 18px; height: 18px; }
+    .sb-admin:hover { background: var(--surface-2); color: var(--ink); }
+    a.nav-btn { text-decoration: none; }
+    /* 운영자 탭 */
+    .ad-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .ad-card h2 { margin: 0 0 12px; font-size: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .ad-login { max-width: 380px; margin: 40px auto; display: grid; gap: 10px; }
+    .ad-phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 760px) { .ad-phases { grid-template-columns: repeat(2, 1fr); } }
+    .ad-phase { border: 2px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 12px; text-align: left; display: grid; gap: 4px; color: var(--ink); }
+    .ad-phase b { font-size: 15px; }
+    .ad-phase span { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .ad-phase[aria-pressed="true"] { border-color: var(--blue); background: #e8f4fe; }
+    @media (prefers-color-scheme: dark) { .ad-phase[aria-pressed="true"] { background: #0b2a42; } }
+    .ad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 960px) { .ad-grid { grid-template-columns: 1fr; } }
+    .ad-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ad-table th, .ad-table td { padding: 7px 8px; text-align: left; }
+    .ad-table thead th { color: var(--muted); border-bottom: 1px solid var(--line); font-weight: 600; }
+    .ad-table tbody tr + tr td { border-top: 1px solid var(--line); }
+    .ad-table .num { text-align: center; font-family: var(--mono); }
+    .ad-posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 10px; }
+    @media (max-width: 520px) { .ad-posts { grid-template-columns: 1fr; } }
+    .ad-post { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+    .ad-post.hidden { opacity: .5; }
+    .ad-post img, .ad-post .noimg { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; background: var(--surface-2); display: grid; place-items: center; font-size: 11px; color: var(--muted); }
+    .ad-post .t { font-weight: 700; font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ad-post .m { font-size: 12px; color: var(--muted); }
+    .ad-b { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-right: 4px; }
+    .ad-b.seed { background: #dbeafe; color: #1e40af; } .ad-b.team { background: #fef3c7; color: #92400e; }
+    .ad-b.real { background: var(--real-bg); color: var(--real); } .ad-b.fake { background: var(--fake-bg); color: var(--fake); }
   </style>
 </head>
 <body>
@@ -553,6 +587,7 @@
     </nav>
     <div class="sb-phase"><span>지금 단계</span><b id="sbPhase">연결 중</b><p id="sbPhaseDesc"></p></div>
     <button class="sb-team" id="sbTeam" type="button"><span class="team-av" id="sbTeamAv">?</span><span id="sbTeamTxt">조 선택</span></button>
+    <button class="sb-admin" role="tab" data-tab="admin" aria-selected="false"><i data-lucide="settings" class="icon"></i>운영자</button>
   </aside>
   <header class="top">
     <div class="top-in">
@@ -563,6 +598,7 @@
         <button class="nav-btn" role="tab" data-tab="make" aria-selected="false" aria-label="게시물 만들기"><i data-lucide="square-plus" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="score" aria-selected="false" aria-label="점수" hidden><i data-lucide="trophy" class="icon"></i></button>
       </nav>
+      <button class="nav-btn" role="tab" data-tab="admin" aria-selected="false" aria-label="운영자"><i data-lucide="settings" class="icon"></i></button>
       <button class="team-chip" id="teamChip" type="button" aria-label="조 바꾸기"><span id="teamChipTxt">?</span></button>
     </div>
   </header>
@@ -588,6 +624,7 @@
     <!-- 만들기 -->
     <section id="tab-make" hidden>
       <div class="mission" id="missionCard"></div>
+      <div class="make-notice" id="makeNotice" hidden></div>
       <div class="my-posts" id="myPosts"></div>
       <div id="makeClosed" class="empty" hidden></div>
       <div class="make-wrap" id="makeWrap">
@@ -681,6 +718,35 @@
     <section id="tab-score" hidden>
       <table class="scores" id="scoreTable"></table>
       <p class="small muted">맞힌 판별(근거 기준을 고른 것만) 1점, 우리 조 가짜를 다른 조가 진짜라고 할 때마다 1점입니다.</p>
+    </section>
+
+    <!-- 운영자 -->
+    <section id="tab-admin" hidden>
+      <div class="ad-card ad-login" id="adLogin">
+        <h2><i data-lucide="key-round" class="icon"></i>운영자 비밀번호</h2>
+        <p class="small muted">진행 단계를 넘기고 게시물을 관리하는 화면입니다. 사수만 사용합니다.</p>
+        <input class="input" id="adPw" type="password" autocomplete="current-password" aria-label="운영자 비밀번호">
+        <p class="err" id="adPwErr"></p>
+        <button class="btn btn-primary" id="adLoginBtn" type="button">들어가기</button>
+      </div>
+      <div id="adApp" hidden>
+        <div class="ad-card">
+          <h2><i data-lucide="flag" class="icon"></i>진행 단계 <span class="small muted" style="font-weight:400">누르면 모든 노트북 화면이 바로 바뀝니다</span></h2>
+          <div class="ad-phases" id="adPhases"></div>
+        </div>
+        <div class="ad-grid">
+          <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조별 현황</h2>
+            <table class="ad-table"><thead><tr><th>조</th><th>미션</th><th class="num">게시물</th><th class="num">AI 사진</th><th class="num">판별</th></tr></thead><tbody id="adTeams"></tbody></table></div>
+          <div class="ad-card"><h2><i data-lucide="trophy" class="icon"></i>점수 <span class="small muted" style="font-weight:400">아이들에게는 정답 공개 때만 보임</span></h2>
+            <table class="ad-table"><thead><tr><th>순위</th><th>조</th><th class="num">합계</th><th class="num">맞힌 판별</th><th class="num">속인 조</th></tr></thead><tbody id="adScores"></tbody></table></div>
+        </div>
+        <div class="ad-card"><h2><i data-lucide="list" class="icon"></i>게시물 관리 <span class="small muted" style="font-weight:400">문제 있는 게시물은 숨기기 · 판별 분량이 많으면 운영실 자료 일부를 숨기기</span></h2>
+          <div class="ad-posts" id="adPosts"></div></div>
+        <div class="ad-card"><h2><i data-lucide="rotate-ccw" class="icon"></i>새 기수 시작</h2>
+          <p class="small muted">조 게시물, 판별, AI 사용 횟수를 모두 지우고 운영실 자료만 남깁니다. 되돌릴 수 없습니다.</p>
+          <div class="opt-row"><input class="input" id="adResetTxt" placeholder="RESET 이라고 입력" style="max-width:220px" aria-label="초기화 확인 문구"><button class="btn btn-ghost" id="adResetBtn" type="button" style="color:var(--fake)">전부 초기화</button></div>
+          <p class="err" id="adResetErr"></p></div>
+      </div>
     </section>
   </main>
 
@@ -798,14 +864,16 @@ function render() {
   $$('[data-tab="make"]').forEach(b => b.hidden = S.screen);
   $('#sbPhase').textContent = ph.label; $('#sbPhaseDesc').textContent = ph.desc;
   if ((S.tab === 'score' && d.phase !== 'reveal') || (S.tab === 'make' && S.screen)) showTab('feed');
+  if (S.tab === 'admin' && AD.key) adRefresh();
   renderTray(); renderTwist(); renderFeed(); renderMake(); renderScores(); icons();
 }
 
 function showTab(t) {
   S.tab = t;
-  $$('.nav-btn, .sb-btn').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
-  $('main').classList.toggle('wide', t === 'make');
-  ['feed', 'make', 'score'].forEach(x => $('#tab-' + x).hidden = x !== t);
+  $$('.nav-btn[data-tab], .sb-btn, .sb-admin').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('main').classList.toggle('wide', t === 'make' || t === 'admin');
+  ['feed', 'make', 'score', 'admin'].forEach(x => $('#tab-' + x).hidden = x !== t);
+  if (t === 'admin') adShow();
   window.scrollTo({ top: 0 });
 }
 
@@ -1127,12 +1195,13 @@ function renderMake() {
     <dt>규칙</dt><dd>실존 인물은 쓰지 않습니다. 확인 기준 4가지 중 하나로 들킬 수 있는 단서를 하나 꼭 남깁니다.</dd></dl>`;
   const mine = myPosts();
   $('#myPosts').innerHTML = mine.length ? `<div class="flabel">우리 조 게시물 (${mine.length} / ${d.maxPosts})</div>` + mine.map(postHTML).join('') : '';
-  const canMake = d.phase === 'make' && (S.editing || mine.length < d.maxPosts);
+  // 만들기 화면은 언제든 열어서 미리 써 볼 수 있다. 공유(저장)와 AI 사진은 「게시물 만들기」 단계에서만 서버가 받아 준다.
+  const canMake = S.editing || mine.length < d.maxPosts;
   $('#makeWrap').hidden = !canMake;
   $('#makeClosed').hidden = canMake;
-  $('#makeClosed').innerHTML = d.phase !== 'make'
-    ? `<b>지금은 게시물을 만드는 시간이 아닙니다.</b><p class="muted small">멘토가 "게시물 만들기"를 시작하면 여기서 만들 수 있습니다.</p>`
-    : `<b>우리 조 게시물을 모두 올렸습니다.</b><p class="muted small">위 게시물의 "고치기"로 내용을 바꿀 수 있습니다.</p>`;
+  $('#makeClosed').innerHTML = `<b>우리 조 게시물을 모두 올렸습니다.</b><p class="muted small">위 게시물의 "고치기"로 내용을 바꿀 수 있습니다.</p>`;
+  $('#makeNotice').hidden = d.phase === 'make';
+  $('#makeNotice').innerHTML = `<b>지금은 「${esc(C.PHASES[d.phase].label)}」 단계입니다.</b> 미리 써 볼 수는 있지만, <b>공유하기</b>와 AI 사진 만들기는 운영자가 「게시물 만들기」를 시작하면 열립니다.`;
   if (canMake) fillForm();
 }
 
@@ -1159,6 +1228,8 @@ function fillForm() {
   $('#aiQuota').textContent = d.aiEnabled ? `AI 이미지는 조마다 ${d.aiQuota}번까지 만들 수 있습니다. 지금까지 ${d.aiUsed}번 썼습니다. AI로 만든 사진은 서버에 기록이 남고, 정답 공개 때 다른 조에게도 보입니다.` : 'AI 이미지 기능이 꺼져 있습니다. 사진 올리기를 써 주세요.';
   ['btnAiGen', 'btnAiEdit', 'btnPolish'].forEach(id => $('#' + id).disabled = !d.aiEnabled || S.busy);
   $('#btnSubmit').textContent = S.editing ? '수정 완료' : '공유하기';
+  $('#btnSubmit').disabled = d.phase !== 'make';
+  if (d.phase !== 'make') ['btnAiGen', 'btnAiEdit'].forEach(id => $('#' + id).disabled = true);
   $('#igcTitle').textContent = S.editing ? '게시물 수정' : '새 게시물 만들기';
   $('#dropCta').hidden = !!f.imageId;
   $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
@@ -1339,8 +1410,63 @@ $('#tray').addEventListener('click', e => { const b = e.target.closest('[data-st
 $('#svNext').onclick = nextSlide; $('#svPrev').onclick = prevSlide; $('#svX').onclick = closeStory;
 document.addEventListener('keydown', e => { if ($('#sv').hidden) return; if (e.key === 'Escape') closeStory(); if (e.key === 'ArrowRight') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
 
+
+// ---------- 운영자 탭 (같은 화면 안에서 단계 넘기기·현황·게시물 관리) ----------
+const AD = { key: null, data: null };
+async function adApi(path, body) {
+  const res = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json', 'X-Admin-Key': AD.key || '' }, body: body ? JSON.stringify(body) : undefined });
+  const d = await res.json().catch(() => ({ error: '서버 응답을 읽지 못했습니다.' }));
+  if (!res.ok || d.error) throw new Error(d.error || '요청 실패');
+  return d;
+}
+function adShow() {
+  if (!AD.key) { try { AD.key = sessionStorage.getItem('dorogram-admin'); } catch (e) {} }
+  $('#adLogin').hidden = !!AD.key; $('#adApp').hidden = !AD.key;
+  if (AD.key) adRefresh(); else setTimeout(() => $('#adPw').focus(), 50);
+}
+async function adLogin() {
+  AD.key = $('#adPw').value;
+  try { AD.data = await adApi('/admin/state'); try { sessionStorage.setItem('dorogram-admin', AD.key); } catch (e) {} $('#adPwErr').textContent = ''; adShow(); }
+  catch (e) { AD.key = null; $('#adPwErr').textContent = e.message; }
+}
+async function adRefresh() {
+  try { AD.data = await adApi('/admin/state'); adRender(); }
+  catch (e) { AD.key = null; try { sessionStorage.removeItem('dorogram-admin'); } catch (x) {} adShow(); $('#adPwErr').textContent = e.message; }
+}
+function adRender() {
+  const d = AD.data; if (!d) return;
+  $('#adPhases').innerHTML = Object.entries(C.PHASES).map(([k, ph]) => `<button class="ad-phase" data-adphase="${k}" aria-pressed="${d.phase === k}"><b>${ph.label}</b><span>${esc(ph.desc)}</span></button>`).join('');
+  const judgedBy = {};
+  Object.keys(d.judgments).forEach(k => { const t = k.split(':').pop(); judgedBy[t] = (judgedBy[t] || 0) + 1; });
+  const teamPosts = d.posts.filter(p => !p.seed);
+  $('#adTeams').innerHTML = Array.from({ length: C.TEAM_COUNT }, (_, i) => i + 1).map(t => { const m = C.TEAM_MISSIONS[t] || {};
+    return `<tr><td><b>${t}조</b></td><td>${esc(C.FORMATS[m.format]?.label || '')} · ${esc(m.tactic || '')}</td><td class="num">${teamPosts.filter(p => p.team === t).length} / ${d.maxPosts}</td><td class="num">${d.aiUsedAll[t] || 0} / ${d.aiQuota}</td><td class="num">${judgedBy[t] || 0}</td></tr>`; }).join('');
+  $('#adScores').innerHTML = (d.scores || []).map((r, i) => `<tr><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="num"><b>${r.total}</b></td><td class="num">${r.correct}</td><td class="num">${r.fooled}</td></tr>`).join('');
+  const posts = [...d.posts].sort((a, b) => (a.seed === b.seed ? (b.createdAt || 0) - (a.createdAt || 0) : a.seed ? 1 : -1));
+  $('#adPosts').innerHTML = posts.map(p => { const truth = p.seed ? p.answer?.truth : 'fake', c = p.counts || { real: 0, fake: 0, unsure: 0 };
+    return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
+      <div><div>${p.seed ? '<span class="ad-b seed">운영실 자료</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')}</span></div>
+        <div class="t">${esc(p.title || p.body || '')}</div>
+        <div class="m">${p.secret?.clue ? '단서: ' + esc(p.secret.clue) + ' · ' : ''}판별 진짜 ${c.real} · 가짜 ${c.fake}</div></div>
+      <button class="btn btn-ghost" data-adtoggle="${p.id}" data-hidden="${p.status === 'hidden'}">${p.status === 'hidden' ? '보이기' : '숨기기'}</button></div>`; }).join('');
+  icons();
+}
+$('#adLoginBtn').onclick = adLogin;
+$('#adPw').addEventListener('keyup', e => { if (e.key === 'Enter') adLogin(); });
+document.addEventListener('click', async e => {
+  const ph = e.target.closest('[data-adphase]'), tg = e.target.closest('[data-adtoggle]');
+  try {
+    if (ph) await adApi('/admin/phase', { phase: ph.dataset.adphase });
+    if (tg) await adApi('/admin/moderate', { postId: tg.dataset.adtoggle, action: tg.dataset.hidden === 'true' ? 'show' : 'hide' });
+  } catch (x) { toast(x.message); }
+});
+$('#adResetBtn').onclick = async () => {
+  try { await adApi('/admin/reset', { confirm: $('#adResetTxt').value.trim() }); $('#adResetTxt').value = ''; $('#adResetErr').textContent = ''; toast('초기화했습니다.'); }
+  catch (e) { $('#adResetErr').textContent = e.message; }
+};
+
 // ---------- 시작 ----------
-$$('.nav-btn, .sb-btn').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$$('.nav-btn[data-tab], .sb-btn, .sb-admin').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 $('#sbTeam').onclick = () => $('#teamModal').hidden = false;
 $$('[data-filter]').forEach(b => b.onclick = () => { S.filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderFeed(); icons(); });
 renderTray();
