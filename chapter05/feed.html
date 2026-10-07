@@ -6,7 +6,7 @@
   <title>도로그램 - 도로랜드가 사라졌다?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Black+Han+Sans&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   <script src="feed-config.js"></script>
@@ -539,7 +539,7 @@
     .tile-title { font-size: 15px; font-weight: 700; margin-top: 2px; }
     .tile-sub { margin-top: -2px; font-size: 13px; }
     .tile-sub .avatar { width: 16px; height: 16px; font-size: 8px; }
-    .feed-split { grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 460px); }
+    .feed-split { grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 440px); }
     @media (max-width: 1100px) { .feed-split { grid-template-columns: 1fr; } }
     .make-notice { margin: 0 0 16px; padding: 12px 16px; border-radius: 10px; background: #fff7e0; color: #6b4e00; font-size: 14px; line-height: 1.6; }
     @media (prefers-color-scheme: dark) { .make-notice { background: #2e2610; color: #ffd76a; } }
@@ -575,6 +575,74 @@
     .ad-b { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-right: 4px; }
     .ad-b.seed { background: #dbeafe; color: #1e40af; } .ad-b.team { background: #fef3c7; color: #92400e; }
     .ad-b.real { background: var(--real-bg); color: var(--real); } .ad-b.fake { background: var(--fake-bg); color: var(--fake); }
+
+    /* ===== 쇼츠 카드 템플릿 여러 가지 (게시물마다 돌아가며) ===== */
+    .sf.t-full, .sf.t-cam, .sf.t-collage { background: #111; color: #fff; }
+    .sf .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .sf .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35), transparent 30%, transparent 55%, rgba(0,0,0,.65)); }
+    /* 사진 위 큰 제목 */
+    .t-full .big { position: absolute; left: 10px; right: 10px; top: 50%; transform: translateY(-50%); text-align: center; font-family: "Black Han Sans", sans-serif; font-size: 26px; line-height: 1.2; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6); word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-full .big.script { font-family: "Grand Hotel", cursive; font-size: 40px; }
+    .t-full .tag { position: absolute; left: 50%; transform: translateX(-50%); top: calc(50% + 62px); font-size: 10px; letter-spacing: .3em; opacity: .85; white-space: nowrap; }
+    /* 카메라 화면 */
+    .t-cam .cam-top { position: absolute; top: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .t-cam .cam-top .icon, .t-cam .cam-side .icon { width: 15px; height: 15px; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+    .t-cam .rec { font-size: 10px; font-weight: 800; background: #e11d48; padding: 1px 6px; border-radius: 4px; }
+    .t-cam .cam-side { position: absolute; left: 8px; top: 36px; display: grid; gap: 12px; }
+    .t-cam .cam-cap { position: absolute; left: 50%; transform: translateX(-50%); top: 42%; font-family: "Nanum Pen Script", cursive; font-size: 30px; line-height: 1.1; color: #fff; text-align: center; width: 86%; text-shadow: 0 2px 6px rgba(0,0,0,.6); word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-cam .shutter { position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%); width: 40px; height: 40px; border-radius: 50%; border: 3px solid #fff; background: rgba(255,255,255,.85); box-shadow: 0 0 0 3px rgba(0,0,0,.25); }
+    .t-cam .modes { position: absolute; left: 0; right: 0; bottom: 26px; display: flex; justify-content: center; gap: 10px; font-size: 8.5px; letter-spacing: .08em; opacity: .9; }
+    .t-cam .modes b { color: #ffd400; }
+    /* 폴라로이드 */
+    .sf.t-pola { background: #f4efe6; color: #2b2b2b; justify-content: center; padding: 14px; }
+    .t-pola .pola { background: #fff; padding: 8px 8px 0; box-shadow: 0 6px 16px rgba(0,0,0,.15); transform: rotate(-3deg); }
+    .t-pola .pola .ph-wrap { aspect-ratio: 1; overflow: hidden; background: #ddd; position: relative; }
+    .t-pola .pola img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .t-pola .pola .hand { font-family: "Nanum Pen Script", cursive; font-size: 22px; line-height: 1.15; padding: 8px 2px 10px; text-align: center; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-pola .tape { position: absolute; top: 8px; left: 50%; width: 60px; height: 18px; background: rgba(255,214,102,.75); transform: translateX(-50%) rotate(4deg); }
+    .t-pola .pola-date { margin-top: 14px; font-family: "Nanum Pen Script", cursive; font-size: 18px; text-align: center; color: #7a6a55; }
+    /* 콜라주 */
+    .t-collage .cells { position: absolute; inset: 0; display: grid; grid-template-rows: 1.2fr .8fr 1fr; gap: 3px; background: #111; }
+    .t-collage .cells div { background-size: cover; background-repeat: no-repeat; }
+    .t-collage .cells div:nth-child(1) { background-position: center 30%; }
+    .t-collage .cells div:nth-child(2) { background-position: 20% 60%; background-size: 220%; }
+    .t-collage .cells div:nth-child(3) { background-position: 80% 80%; background-size: 180%; }
+    .t-collage .ctitle { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-family: "Grand Hotel", cursive; font-size: 30px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.7); padding: 0 10px; }
+    .t-collage .ctitle small { display: block; font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    /* 검은 띠 자막형 */
+    .sf.t-black { background: #000; color: #fff; }
+    .t-black .bt { padding: 14px 10px 10px; font-weight: 900; font-size: 15px; line-height: 1.35; text-align: center; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex-shrink: 0; }
+    .t-black .bimg { position: relative; flex: 1; min-height: 0; }
+    .t-black .bimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .t-black .sub { position: absolute; left: 8px; right: 8px; bottom: 32px; display: inline-flex; justify-content: center; }
+    .t-black .sub span { background: rgba(0,0,0,.65); padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-black .bb { padding: 10px; font-weight: 900; font-size: 14px; line-height: 1.3; word-break: keep-all; flex-shrink: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: left; }
+    /* 글만 있는 게시물 */
+    .sf.t-text { color: #fff; justify-content: center; padding: 18px 14px; }
+    .t-text .q { font-size: 34px; line-height: 1; opacity: .5; font-family: Georgia, serif; }
+    .t-text .tt { font-size: 18px; font-weight: 800; line-height: 1.45; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-text .tt.pen { font-family: "Nanum Pen Script", cursive; font-size: 28px; font-weight: 400; line-height: 1.2; }
+    .t-text .who { margin-top: 14px; font-size: 12px; opacity: .8; }
+    .sf .sf-stats { z-index: 2; }
+
+    /* 만들기: 썸네일 / 상세 내용 단계 */
+    .igc-steps { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+    .igc-step { border: 0; background: none; padding: 12px 10px; font-size: 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; display: flex; gap: 8px; align-items: center; justify-content: center; }
+    .igc-step b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--ink); font-size: 12px; }
+    .igc-step small { font-weight: 400; font-size: 12px; }
+    .igc-step[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+    .igc-step[aria-selected="true"] b { background: var(--ink); color: var(--surface); }
+    .thumb-prev { display: grid; justify-items: center; gap: 10px; padding: 8px 0; }
+    .thumb-prev .cap { font-size: 13px; color: var(--muted); }
+    .thumb-prev .tile { width: 230px; pointer-events: none; }
+    .thumb-prev .nc { width: 380px; max-width: 100%; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .tpl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tpl-opt { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 4px; font-size: 12px; font-weight: 600; display: grid; justify-items: center; gap: 4px; color: var(--ink); }
+    .tpl-opt .icon { width: 20px; height: 20px; }
+    .tpl-opt[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--surface); }
+    .tpl-opt:disabled { opacity: .35; }
+    .thumb-img-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .thumb-img-row img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -634,6 +702,10 @@
             <h2 id="igcTitle" style="grid-column:2">새 게시물 만들기</h2>
             <button type="submit" class="igc-share" id="btnSubmit">공유하기</button>
           </div>
+          <div class="igc-steps" role="tablist">
+            <button type="button" class="igc-step" data-mstep="thumb" aria-selected="true"><b>1</b>썸네일 <small>목록에 보이는 화면</small></button>
+            <button type="button" class="igc-step" data-mstep="detail" aria-selected="false"><b>2</b>상세 내용 <small>눌렀을 때 화면</small></button>
+          </div>
           <div class="igc-body">
             <div class="igc-media">
               <div class="igc-drop" id="dropZone">
@@ -644,6 +716,7 @@
                   <span class="small muted">사진 없이 글만 올려도 됩니다. 사람 얼굴이 크게 나온 사진은 쓰지 않습니다.</span>
                 </div>
                 <div id="preview" style="margin-top:12px"></div>
+                <div class="thumb-prev" id="thumbPrev" hidden></div>
               </div>
               <input type="file" id="fFile" accept="image/*" hidden>
               <div class="img-tools igc" style="border-radius:8px">
@@ -674,6 +747,21 @@
             <div class="igc-side">
               <div class="igc-acct"><span id="acctAv"></span><span id="acctName">계정 이름</span></div>
               <div class="igc-sec"><div class="flabel">게시 형식</div><div class="opt-row" id="optFormat"></div></div>
+              <div id="thumbFields">
+                <div class="igc-sec"><div class="flabel">썸네일 디자인 <span class="small muted" style="font-weight:400">목록에서 보이는 모양</span></div><div class="tpl-grid" id="optTpl"></div></div>
+                <div class="igc-row"><label class="sr" for="fThumbTitle">썸네일 제목</label><i data-lucide="type" class="icon"></i><input id="fThumbTitle" maxlength="60" placeholder="썸네일에 크게 띄울 문구 (비우면 제목·문구 앞부분)"></div>
+                <div class="igc-sec"><div class="flabel">썸네일 사진</div>
+                  <div class="thumb-img-row">
+                    <button type="button" class="opt" id="thumbUseMain" aria-pressed="true">본문 사진 그대로</button>
+                    <label class="opt" for="fThumbFile" id="thumbUseOther" style="cursor:pointer"><i data-lucide="upload" class="icon"></i>다른 사진 올리기</label>
+                    <input type="file" id="fThumbFile" accept="image/*" hidden>
+                    <img id="thumbOwnImg" alt="썸네일 사진" hidden>
+                  </div>
+                  <p class="small muted" style="margin:0">썸네일은 누르기 전에 보이는 첫인상입니다. 본문과 다른 사진·문구로 눈길을 끌 수도 있어요(낚시성 썸네일도 판별 단서가 됩니다).</p>
+                </div>
+                <div class="igc-sec"><button type="button" class="btn btn-ghost" id="toDetail">다음: 상세 내용 쓰기 <i data-lucide="arrow-right" class="icon"></i></button></div>
+              </div>
+              <div id="detailFields">
               <div class="igc-row" id="titleField"><label class="sr" for="fTitle" id="fTitleLabel">제목</label><i data-lucide="heading" class="icon"></i><input id="fTitle" maxlength="80" placeholder="제목"></div>
               <label class="sr" for="fBody" id="fBodyLabel">문구</label>
               <textarea id="fBody" class="igc-caption" maxlength="1200" placeholder="문구를 입력하세요..."></textarea>
@@ -704,6 +792,7 @@
                   <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
                 </div>
               </details>
+              </div>
               <div class="igc-foot">
                 <p class="err" id="formErr" role="alert"></p>
                 <p class="small muted" style="margin:0">우리 조 게시물은 모두 <b>진짜처럼 보이는 가짜</b>입니다. 공유하면 바로 피드에 들어가고, 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보입니다.</p>
@@ -783,7 +872,7 @@ const SWATCHES = ['#1d4ed8', '#0f766e', '#db2777', '#7c3aed', '#ea580c', '#4b556
 const HEARSAY = /(들었는데|들었어|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|누가 그러는데|라고 함|라고 합니다|라고 해요)/g;
 
 const S = {
-  team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null,
+  team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null, mstep: 'thumb',
   open: {},      // postId -> 열린 확인 기준
   draft: {},     // postId -> {verdict, criterion, reason} 판별 작성 중
   form: null,    // 만들기 폼 값
@@ -1038,25 +1127,52 @@ function tileHTML(p) {
   else if (mine) state = `<span class="tile-state ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
   else if (p.mine) state = `<span class="tile-state ts-mine">우리 조</span>`;
   const text = p.title || p.body || '';
-  // 쇼츠 프레임 템플릿: 색 띠(채널 검색창) → 큰 제목 → 조회수·댓글 줄 → 사진
+  // 쇼츠 카드 템플릿 (게시물마다 돌아가며: 프레임 / 사진 위 큰 제목 / 카메라 화면 / 폴라로이드 / 콜라주 / 검은 띠 자막)
   const BANDS = ['#8b8cf6', '#5fd3ae', '#f794b4', '#bdbdbd', '#ffd166', '#7cc4f8'];
   const band = BANDS[p.order % BANDS.length], awning = p.order % 3 === 0;
-  const head = (p.title || text || '').replace(/\s+/g, ' ');
+  const head = (p.thumbTitle || p.title || text || '').replace(/\s+/g, ' ');
+  const short = head.length > 22 ? head.slice(0, 22) + '…' : head;
   const views = p.views || '';
-  const media = p.imageId
-    ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">`
-    : `<div class="ph" style="background:linear-gradient(160deg, ${esc(a.color || '#4b5563')}, #111)"><span>${esc(p.title ? p.body : '')}</span></div>`;
-  return `<button class="tile" data-open="${p.id}" aria-label="${esc(f.label || '')} 게시물 자세히 보기, ${esc(handle)}">
-    <div class="sf">
+  const timg = p.thumbImageId || p.imageId;
+  const src = timg ? imgSrc(timg) : '';
+  const stats = `<div class="sf-stats">${views ? `<span><i data-lucide="play"></i>${esc(views)}</span>` : ''}${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div>`;
+  const fmt = `<span class="sf-fmt" title="${esc(f.label || '')}"><i data-lucide="${f.icon || 'file-text'}"></i></span>`;
+  const TPL = src ? ['frame', 'full', 'cam', 'pola', 'collage', 'black'] : ['text'];
+  const tpl = (p.thumbTpl && p.thumbTpl !== 'auto' && (src ? p.thumbTpl !== 'text' : p.thumbTpl === 'text')) ? p.thumbTpl : TPL[Math.floor(p.order / 7) % TPL.length];
+  const color = esc(a.color || '#4b5563');
+  let inner;
+  if (tpl === 'full') {
+    const latin = /^[\x00-\x7F]+$/.test(short);
+    inner = `<div class="sf t-full"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div>
+      <div class="big${latin ? ' script' : ''}">${esc(short)}</div><div class="tag">DOROLAND</div>${fmt}${stats}${state}</div>`;
+  } else if (tpl === 'cam') {
+    inner = `<div class="sf t-cam"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div>
+      <div class="cam-top"><span class="rec">● REC</span><i data-lucide="zap-off"></i><i data-lucide="settings"></i></div>
+      <div class="cam-side"><i data-lucide="type"></i><i data-lucide="music-2"></i><i data-lucide="sparkles"></i><i data-lucide="timer"></i></div>
+      <div class="cam-cap">${esc(short)}</div><div class="modes"><span>사진</span><b>동영상</b><span>인물</span></div><div class="shutter"></div>${stats}${state}</div>`;
+  } else if (tpl === 'pola') {
+    inner = `<div class="sf t-pola"><div class="pola"><div class="ph-wrap"><img src="${src}" alt="" loading="lazy"></div><div class="hand">${esc(short)}</div></div>
+      <span class="tape"></span><div class="pola-date">${esc(p.postedAt || '')} · ${esc(p.place || '도로랜드')}</div>${stats.replace('sf-stats', 'sf-stats" style="color:#2b2b2b;text-shadow:none')}${state}</div>`;
+  } else if (tpl === 'collage') {
+    inner = `<div class="sf t-collage"><div class="cells"><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div></div>
+      <div class="ctitle">Moment<small>${esc(short)}</small></div>${fmt}${stats}${state}</div>`;
+  } else if (tpl === 'black') {
+    inner = `<div class="sf t-black"><div class="bt">${esc(short)}</div><div class="bimg"><img src="${src}" alt="" loading="lazy"><div class="sub"><span>${esc((p.body || '').slice(0, 40))}</span></div>${stats}</div>
+      <div class="bb">${esc(p.tags ? p.tags : '#도로랜드')}</div>${state}</div>`;
+  } else if (tpl === 'text') {
+    const pen = p.order % 2 === 0;
+    inner = `<div class="sf t-text" style="background:linear-gradient(160deg, ${color}, #111)"><div class="q">“</div><div class="tt${pen ? ' pen' : ''}">${esc(text)}</div><div class="who">@${esc(handle)}</div>${fmt}${stats}${state}</div>`;
+  } else {
+    inner = `<div class="sf">
       <div class="sf-band${awning ? ' awning' : ''}" style="--c:${band}">${awning ? '' : '<i data-lucide="sliders-horizontal"></i>'}<span class="sf-pill"><i data-lucide="search"></i><span>${esc(a.name || handle)}</span></span>${awning ? '' : '<i data-lucide="more-horizontal"></i><i data-lucide="x"></i>'}</div>
       <div class="sf-title">${esc(head || '(내용 없음)')}</div>
-      <div class="sf-meta"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><b>${esc(handle)}</b>${views ? `<span>| 조회수 ${esc(views)}</span>` : ''}${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
-      <div class="sf-img">${media}<span class="sf-fmt" title="${esc(f.label || '')}"><i data-lucide="${f.icon || 'file-text'}"></i></span>
-        <div class="sf-stats">${views ? `<span><i data-lucide="play"></i>${esc(views)}</span>` : ""}${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div></div>
-      ${state}
-    </div>
+      <div class="sf-meta"><span class="avatar" style="background:${color}">${initials(a.name)}</span><b>${esc(handle)}</b>${views ? `<span>| 조회수 ${esc(views)}</span>` : ''}${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
+      <div class="sf-img"><img src="${src}" alt="" loading="lazy">${fmt}${stats}</div>${state}</div>`;
+  }
+  return `<button class="tile" data-open="${p.id}" aria-label="${esc(f.label || '')} 게시물 자세히 보기, ${esc(handle)}">
+    ${inner}
     <div class="tile-title">${esc(head || '(내용 없음)')}</div>
-    <div class="tile-sub"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><span>${esc(a.name || handle)}</span></div>
+    <div class="tile-sub"><span class="avatar" style="background:${color}">${initials(a.name)}</span><span>${esc(a.name || handle)}</span></div>
   </button>`;
 }
 
@@ -1071,8 +1187,8 @@ function newsItemHTML(p) {
   const tag = p.format === 'notice' ? '<span class="ni-tag ni-notice">공지</span>' : '<span class="ni-tag ni-news">사회</span>';
   // 가로형 기사 카드: 16:9 사진 → 제목 → 언론사·시간
   return `<button class="nc" data-open="${p.id}">
-    <div class="nc-thumb">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)"><i data-lucide="${p.format === 'notice' ? 'megaphone' : 'newspaper'}"></i></span>`}${tag}<span class="nc-outlet">${esc(a.name || '')}</span></div>
-    <div class="ni-title">${esc(p.title || (p.body || '').slice(0, 50))}</div>
+    <div class="nc-thumb">${(p.thumbImageId || p.imageId) ? `<img src="${imgSrc(p.thumbImageId || p.imageId)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)"><i data-lucide="${p.format === 'notice' ? 'megaphone' : 'newspaper'}"></i></span>`}${tag}<span class="nc-outlet">${esc(a.name || '')}</span></div>
+    <div class="ni-title">${esc(p.thumbTitle || p.title || (p.body || '').slice(0, 50))}</div>
     <div class="ni-meta"><span>${esc(a.name || '')}</span>${p.views ? `<span>· 조회 ${esc(p.views)}</span>` : ''}${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div>
   </button>`;
 }
@@ -1181,7 +1297,7 @@ function myPosts() { return (S.data.posts || []).filter(p => p.mine); }
 function resetForm() {
   const m = C.TEAM_MISSIONS[S.team] || { format: 'news', tactic: C.TACTICS[0].id };
   S.form = { format: m.format, tactic: m.tactic, clueCriterion: null, clue: '', name: '', handle: '', joined: '', followers: '',
-    color: SWATCHES[(S.team || 1) % SWATCHES.length], reporter: '', likes: '', views: '', title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
+    color: SWATCHES[(S.team || 1) % SWATCHES.length], reporter: '', likes: '', views: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
   S.editing = null;
 }
 
@@ -1219,7 +1335,7 @@ function fillForm() {
   $('#reporterField').hidden = f.format !== 'news';
   $('#likesField').hidden = !['sns', 'witness'].includes(f.format);
   $('#fLikesLabel').textContent = f.format === 'witness' ? '추천 수' : '좋아요 수';
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
+  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fThumbTitle: 'thumbTitle', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (document.activeElement !== el) el.value = f[k] || ''; });
   $('#thumb').hidden = !f.imageId; $('#thumb').style.display = f.imageId ? 'flex' : 'none'; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
   $$('.img-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.img === S.imgTab));
@@ -1246,6 +1362,7 @@ function renderPreview() {
   $('#acctName').textContent = hd;
   $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
   lucide.createIcons({ attrs: { class: 'icon' } });
+  renderMakeStep();
 }
 
 $('#postForm').addEventListener('click', e => {
@@ -1258,7 +1375,7 @@ $('#postForm').addEventListener('click', e => {
   fillForm();
 });
 $('#postForm').addEventListener('input', e => {
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
+  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fThumbTitle: 'thumbTitle', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   if (map[e.target.id]) { S.form[map[e.target.id]] = e.target.value; renderPreview(); }
 });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
@@ -1321,7 +1438,7 @@ function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {};
   S.form = { format: p.format, tactic: s.tactic || (C.TEAM_MISSIONS[S.team] || {}).tactic, clueCriterion: s.clueCriterion, clue: s.clue || '',
-    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '',
+    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null,
     title: p.title, body: p.body, tags: p.tags, place: p.place, postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId };
   S.editing = id; showTab('make'); render();
   $('#postForm').scrollIntoView({ behavior: 'smooth' });
@@ -1340,6 +1457,7 @@ $('#postForm').addEventListener('submit', async e => {
       author: { name: f.name, handle: f.handle ? '@' + f.handle.replace(/^@/, '') : '', joined: f.joined, followers: f.followers, color: f.color, reporter: f.format === 'news' ? f.reporter : '' },
       likes: ['sns', 'witness'].includes(f.format) ? f.likes : '',
       views: f.views || '',
+      thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
       title: C.FORMATS[f.format].titleLabel ? f.title : '', body: f.body, tags: ['sns', 'story'].includes(f.format) ? f.tags : '', place: f.place,
       postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId,
       secret: { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });
@@ -1464,6 +1582,44 @@ $('#adResetBtn').onclick = async () => {
   try { await adApi('/admin/reset', { confirm: $('#adResetTxt').value.trim() }); $('#adResetTxt').value = ''; $('#adResetErr').textContent = ''; toast('초기화했습니다.'); }
   catch (e) { $('#adResetErr').textContent = e.message; }
 };
+
+
+// ---------- 만들기: ① 썸네일 / ② 상세 내용 ----------
+const TPL_OPTS = [['auto', '자동', 'shuffle'], ['frame', '프레임', 'panel-top'], ['full', '큰 제목', 'heading-1'], ['cam', '카메라', 'camera'],
+  ['pola', '폴라로이드', 'image'], ['collage', '콜라주', 'layout-grid'], ['black', '자막형', 'captions'], ['text', '글만', 'quote']];
+function previewPost() {
+  const f = S.form;
+  return { id: 'preview', order: (S.team || 1) * 7, format: f.format, likes: f.likes, views: f.views, thumbTpl: f.thumbTpl, thumbTitle: f.thumbTitle,
+    thumbImageId: f.thumbImageId, author: { name: f.name, handle: f.handle, color: f.color, reporter: f.reporter }, title: f.title, body: f.body,
+    tags: f.tags, place: f.place, postedAt: f.postedAt, imageId: f.imageId };
+}
+function renderMakeStep() {
+  const thumb = S.mstep === 'thumb', f = S.form, news = ['news', 'notice'].includes(f.format);
+  $$('.igc-step').forEach(b => b.setAttribute('aria-selected', b.dataset.mstep === S.mstep));
+  $('#thumbFields').hidden = !thumb; $('#detailFields').hidden = thumb;
+  $('#preview').hidden = thumb; $('#thumbPrev').hidden = !thumb;
+  const hasImg = !!(f.thumbImageId || f.imageId);
+  $('#optTpl').innerHTML = TPL_OPTS.map(([k, l, ic]) => `<button type="button" class="tpl-opt" data-tpl="${k}" aria-pressed="${(f.thumbTpl || 'auto') === k}" ${news || (k !== 'auto' && (k === 'text' ? hasImg : !hasImg)) ? 'disabled' : ''}><i data-lucide="${ic}"></i>${l}</button>`).join('');
+  $('#thumbUseMain').setAttribute('aria-pressed', !f.thumbImageId);
+  $('#thumbOwnImg').hidden = !f.thumbImageId; if (f.thumbImageId) $('#thumbOwnImg').src = imgSrc(f.thumbImageId);
+  if (thumb) {
+    const p = previewPost();
+    $('#thumbPrev').innerHTML = `<div class="cap">${news ? '기사 목록에 이렇게 보입니다' : '쇼츠 목록에 이렇게 보입니다'}</div>${news ? newsItemHTML(p) : tileHTML(p)}<div class="cap">누르면 "② 상세 내용"이 열립니다</div>`;
+  }
+  icons();
+}
+document.addEventListener('click', e => {
+  const st = e.target.closest('[data-mstep]'); if (st) { S.mstep = st.dataset.mstep; renderMakeStep(); return; }
+  const tp = e.target.closest('[data-tpl]'); if (tp && !tp.disabled) { S.form.thumbTpl = tp.dataset.tpl; renderMakeStep(); return; }
+  if (e.target.closest('#thumbUseMain')) { S.form.thumbImageId = null; renderMakeStep(); return; }
+  if (e.target.closest('#toDetail')) { S.mstep = 'detail'; renderMakeStep(); }
+});
+$('#fThumbFile').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+  try { toast('썸네일 사진을 올리는 중입니다.'); const r = await api('/upload', { team: S.team, dataUrl: await shrink(file) }); S.form.thumbImageId = r.imageId; toast('썸네일 사진을 넣었습니다.'); }
+  catch (err) { toast(err.message); }
+  renderMakeStep();
+});
 
 // ---------- 시작 ----------
 $$('.nav-btn[data-tab], .sb-btn, .sb-admin').forEach(b => b.onclick = () => showTab(b.dataset.tab));

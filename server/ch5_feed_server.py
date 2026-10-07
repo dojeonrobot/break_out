@@ -49,6 +49,7 @@ MAX_UPLOAD = 6 * 1024 * 1024
 PHASES = ['read', 'make', 'judge', 'reveal']
 FORMATS = {'news', 'sns', 'story', 'witness', 'notice'}
 VERDICTS = {'real', 'fake', 'unsure'}
+THUMB_TPLS = {'auto', 'frame', 'full', 'cam', 'pola', 'collage', 'black', 'text'}
 CRITERIA = {'who', 'when', 'witness', 'cross'}
 # 아이들이 입력하는 AI 프롬프트에서 막을 말 (모델 자체 안전 필터와 별도로 한 번 더 거른다)
 BLOCKED_WORDS = ['피가', '피투성', '시체', '죽이', '살인', '총으로', '칼로', '야한', '벗은', '나체', '대통령', '연예인',
@@ -154,7 +155,7 @@ def verdict_counts(pid):
     return c
 
 
-PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'body', 'tags', 'place', 'postedAt', 'photoTakenAt', 'imageId', 'likes', 'views', 'status')
+PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'body', 'tags', 'place', 'postedAt', 'photoTakenAt', 'imageId', 'likes', 'views', 'thumbTpl', 'thumbTitle', 'thumbImageId', 'status')
 
 
 def order_key(pid):
@@ -464,6 +465,9 @@ class Handler(BaseHTTPRequestHandler):
                        'color': clean_text(a.get('color'), 12), 'reporter': clean_text(a.get('reporter'), 20)},
             'likes': clean_text(b.get('likes'), 10),
             'views': clean_text(b.get('views'), 10),
+            'thumbTpl': b.get('thumbTpl') if b.get('thumbTpl') in THUMB_TPLS else 'auto',
+            'thumbTitle': clean_text(b.get('thumbTitle'), 60),
+            'thumbImageId': clean_image_id(b.get('thumbImageId')),
             'title': clean_text(b.get('title'), 80),
             'body': clean_text(b.get('body'), 1200),
             'tags': clean_text(b.get('tags'), 80),
