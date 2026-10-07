@@ -55,6 +55,7 @@
     .team-chip span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--surface); font-weight: 800; font-size: 12px; border: 2px solid var(--surface); box-shadow: 0 0 0 1.5px var(--ink); }
     @media (max-width: 520px) { .brand small, .phase-pill { display: none; } }
 
+
     main { max-width: 630px; margin: 0 auto; padding: 16px 0 80px; }
     main.wide { max-width: 975px; padding: 16px 16px 80px; }
     .muted { color: var(--muted); }
@@ -303,9 +304,105 @@
     @keyframes sk { to { background-position: -200% 0; } }
     @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .btn { transition: none; } }
     body.screen main { max-width: 760px; font-size: 17px; }
+
+    /* 새 게시물 만들기 (인스타 만들기 창) */
+    .make-wrap { display: block; }
+    .igc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .igc-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 46px; padding: 0 14px; border-bottom: 1px solid var(--line); }
+    .igc-head h2 { margin: 0; font-size: 16px; font-weight: 700; text-align: center; }
+    .igc-share { justify-self: end; border: 0; background: none; color: var(--blue); font-weight: 700; font-size: 15px; padding: 6px 2px; }
+    .igc-share:hover { color: var(--link); }
+    .igc-share:disabled { opacity: .4; }
+    .igc-cancel { justify-self: start; border: 0; background: none; font-size: 15px; color: var(--ink); padding: 6px 2px; }
+    .igc-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; min-height: 560px; }
+    @media (max-width: 860px) { .igc-body { grid-template-columns: 1fr; } }
+    .igc-media { background: var(--surface-2); padding: 18px; display: grid; gap: 12px; align-content: start; }
+    .igc-drop { position: relative; border-radius: 8px; }
+    .igc-drop #preview { max-width: 470px; margin: 0 auto; }
+    .igc-drop.drag::after { content: "여기에 놓으면 사진이 들어갑니다"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,149,246,.12); border: 2px dashed var(--blue); border-radius: 8px; color: var(--blue); font-weight: 800; }
+    .drop-cta { max-width: 470px; margin: 0 auto; width: 100%; display: grid; justify-items: center; gap: 10px; padding: 20px; border: 1px dashed var(--line); border-radius: 8px; background: var(--surface); text-align: center; }
+    .drop-cta .big { width: 64px; height: 64px; stroke-width: 1.2; color: var(--ink); }
+    .drop-cta b { font-size: 17px; font-weight: 500; }
+    .img-tools { max-width: 470px; width: 100%; margin: 0 auto; background: var(--surface); }
+    .igc-side { border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
+    @media (max-width: 860px) { .igc-side { border-left: 0; border-top: 1px solid var(--line); } }
+    .igc-acct { display: flex; align-items: center; gap: 10px; padding: 14px 16px 6px; font-weight: 700; font-size: 14px; }
+    .igc-acct .avatar { width: 28px; height: 28px; font-size: 12px; }
+    .igc-caption { border: 0 !important; padding: 6px 16px !important; min-height: 150px; resize: vertical; font-size: 15px; background: transparent; }
+    .igc-caption:focus { outline: none; }
+    .igc-cap-tools { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; border-bottom: 1px solid var(--line); }
+    .igc-count { margin-left: auto; font-size: 12px; color: var(--muted); }
+    .linkbtn { border: 0; background: none; color: var(--blue); font-weight: 700; font-size: 13px; padding: 4px 0; display: inline-flex; gap: 4px; align-items: center; }
+    .linkbtn .icon { width: 16px; height: 16px; }
+    .linkbtn:disabled { color: var(--muted); }
+    .igc-row { display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--line); min-height: 46px; }
+    .igc-row .icon { color: var(--ink); }
+    .igc-row input { border: 0; background: transparent; padding: 12px 0; flex: 1; min-width: 0; }
+    .igc-row input:focus { outline: none; }
+    .igc-sec { padding: 12px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+    .igc-sec > .flabel, .igc-det > summary { font-size: 14px; font-weight: 600; }
+    .igc-det { border-bottom: 1px solid var(--line); }
+    .igc-det > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 13px 16px; }
+    .igc-det > summary::-webkit-details-marker { display: none; }
+    .igc-det > summary .chev { margin-left: auto; transition: transform .2s; }
+    .igc-det[open] > summary .chev { transform: rotate(180deg); }
+    .igc-det .det-in { padding: 0 16px 14px; display: grid; gap: 10px; }
+    .igc-det .input, .igc-det textarea, .igc-det select { font-size: 14px; }
+    .igc-foot { padding: 12px 16px; display: grid; gap: 6px; margin-top: auto; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .opt { font-size: 13px; padding: 6px 10px; }
+    /* 노트북(1024px 이상): 인스타 PC 화면처럼 왼쪽 메뉴 + 게시물 옆에 확인·판별 칸 */
+    .sidebar { display: none; }
+    @media (min-width: 1024px) {
+      .top { display: none; }
+      body { padding-left: 244px; }
+      .sidebar { display: flex; flex-direction: column; gap: 4px; position: fixed; top: 0; bottom: 0; left: 0; width: 244px; padding: 28px 12px 20px; background: var(--surface); border-right: 1px solid var(--line); z-index: 20; }
+      .sb-brand { font-family: "Grand Hotel", cursive; font-size: 32px; line-height: 1; padding: 0 12px 26px; color: var(--ink); }
+      .sb-brand small { display: block; font-family: var(--sans); font-size: 12px; color: var(--muted); margin-top: 4px; }
+      .sb-btn { border: 0; background: none; display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 8px; font-size: 16px; color: var(--ink); text-align: left; }
+      .sb-btn .icon { width: 26px; height: 26px; stroke-width: 1.8; }
+      .sb-btn:hover { background: var(--surface-2); }
+      .sb-btn[aria-selected="true"] { font-weight: 800; }
+      .sb-btn[aria-selected="true"] .icon { stroke-width: 2.6; }
+      .sb-phase { margin-top: auto; padding: 14px 12px; border-radius: 8px; background: var(--surface-2); font-size: 13px; }
+      .sb-phase span { display: block; color: var(--muted); }
+      .sb-phase b { display: block; font-size: 15px; margin: 2px 0 4px; }
+      .sb-phase p { margin: 0; color: var(--muted); line-height: 1.5; }
+      .sb-team { margin-top: 8px; border: 0; background: none; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
+      .sb-team:hover { background: var(--surface-2); }
+      .sb-team .team-av { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 800; box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--ink); }
+      main { max-width: 1000px; padding: 24px 32px 80px; }
+      main.wide { max-width: 1100px; padding: 24px 32px 80px; }
+      .mission-line { display: none; }
+      .tray { padding: 8px 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+      .filters { margin: 0 0 16px; }
+      .feed { padding: 0; gap: 28px; }
+      .post { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: stretch; }
+      .post-media { align-self: start; }
+      .post-side { border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
+      .post-side .status-line { border-top: 0; }
+      .side-h { display: flex; align-items: center; gap: 8px; padding: 14px 14px 4px; font-weight: 800; font-size: 15px; }
+      .side-h .icon { width: 18px; height: 18px; }
+      .post-side .verify { border-top: 0; grid-template-columns: 1fr 1fr; }
+      .post-side .judge { border-top: 1px solid var(--line); }
+      .post-side .row-actions { margin-top: auto; }
+      .twist { margin: 0 0 18px; }
+      .post-media .ig-img, .post-media .ig-textpost { max-height: 540px; }
+      .post-media .story { max-height: 620px; }
+    }
   </style>
 </head>
 <body>
+  <aside class="sidebar" aria-label="메뉴">
+    <div class="sb-brand">Dorogram<small>도로그램 · 도로랜드가 사라졌다?</small></div>
+    <nav role="tablist" aria-label="화면 선택" style="display:grid;gap:4px">
+      <button class="sb-btn" role="tab" data-tab="feed" aria-selected="true"><i data-lucide="house" class="icon"></i>홈</button>
+      <button class="sb-btn" role="tab" data-tab="make" aria-selected="false"><i data-lucide="square-plus" class="icon"></i>만들기</button>
+      <button class="sb-btn" role="tab" data-tab="score" aria-selected="false" hidden><i data-lucide="trophy" class="icon"></i>점수</button>
+    </nav>
+    <div class="sb-phase"><span>지금 단계</span><b id="sbPhase">연결 중</b><p id="sbPhaseDesc"></p></div>
+    <button class="sb-team" id="sbTeam" type="button"><span class="team-av" id="sbTeamAv">?</span><span id="sbTeamTxt">조 선택</span></button>
+  </aside>
   <header class="top">
     <div class="top-in">
       <div class="brand">Dorogram<small>도로그램</small></div>
@@ -343,101 +440,88 @@
       <div class="my-posts" id="myPosts"></div>
       <div id="makeClosed" class="empty" hidden></div>
       <div class="make-wrap" id="makeWrap">
-        <form class="form" id="postForm" novalidate>
-          <div class="step">
-            <div class="step-h"><span class="step-n">1</span>어떤 형식으로 만들까요?</div>
-            <p class="small muted">우리 조가 올리는 게시물은 모두 <b>진짜처럼 보이는 가짜</b>입니다. 다른 조가 진짜라고 믿게 만들수록 점수를 얻습니다.</p>
-            <div class="opt-row" id="optFormat"></div>
+        <form class="igc" id="postForm" novalidate>
+          <div class="igc-head">
+            <button type="button" class="igc-cancel" id="btnCancelEdit" hidden>취소</button>
+            <h2 id="igcTitle" style="grid-column:2">새 게시물 만들기</h2>
+            <button type="submit" class="igc-share" id="btnSubmit">공유하기</button>
           </div>
-
-          <div class="step">
-            <div class="step-h"><span class="step-n">2</span>누가 올렸나요?</div>
-            <div class="grid2">
-              <div class="field"><label for="fName" id="fNameLabel">이름</label><input class="input" id="fName" maxlength="30" placeholder="예: 도로일보"></div>
-              <div class="field"><label for="fHandle">계정 아이디</label><input class="input" id="fHandle" maxlength="29" placeholder="예: doroilbo"></div>
-              <div class="field"><label for="fJoined">가입한 때</label><input class="input" id="fJoined" maxlength="20" placeholder="예: 2019.03 / 2일 전"></div>
-              <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
-              <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
-              <div class="field" id="likesField"><label for="fLikes" id="fLikesLabel">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
-            </div>
-            <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
-          </div>
-
-          <div class="step">
-            <div class="step-h"><span class="step-n">3</span>글 쓰기</div>
-            <div class="field" id="titleField"><label for="fTitle" id="fTitleLabel">제목</label><input class="input" id="fTitle" maxlength="80"></div>
-            <div class="field">
-              <label for="fBody" id="fBodyLabel">본문</label>
-              <textarea id="fBody" maxlength="1200" rows="5"></textarea>
-              <div class="opt-row"><button type="button" class="btn btn-ghost" id="btnPolish"><i data-lucide="wand-sparkles" class="icon"></i>AI로 말투 다듬기</button></div>
-              <p class="small muted">AI는 문장만 다듬습니다. 날짜, 이름 같은 내용은 그대로 둡니다. 다듬은 글도 꼭 읽어 보고 고치세요.</p>
-            </div>
-            <div class="field" id="tagsField"><label for="fTags">해시태그</label><input class="input" id="fTags" maxlength="80" placeholder="#도로랜드"></div>
-            <div class="grid2">
-              <div class="field"><label for="fPlace">장소</label><input class="input" id="fPlace" maxlength="40" placeholder="예: 도로랜드 항구"></div>
-              <div class="field"><label for="fPosted">올린 때</label><input class="input" id="fPosted" maxlength="20" placeholder="예: 1시간 전 / 10월 9일"></div>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-h"><span class="step-n">4</span>사진 넣기 (선택)</div>
-            <div class="img-tools">
-              <div class="img-tabs" role="tablist">
-                <button type="button" class="img-tab" role="tab" data-img="upload" aria-selected="true"><i data-lucide="camera" class="icon"></i>사진 올리기</button>
-                <button type="button" class="img-tab" role="tab" data-img="ai" aria-selected="false"><i data-lucide="sparkles" class="icon"></i>AI로 그리기</button>
-                <button type="button" class="img-tab" role="tab" data-img="edit" aria-selected="false"><i data-lucide="eraser" class="icon"></i>AI로 사진 고치기</button>
+          <div class="igc-body">
+            <div class="igc-media">
+              <div class="igc-drop" id="dropZone">
+                <div class="drop-cta" id="dropCta">
+                  <i data-lucide="images" class="big"></i>
+                  <b>사진을 여기에 끌어다 놓으세요</b>
+                  <label class="btn btn-primary" for="fFile">컴퓨터에서 선택</label>
+                  <span class="small muted">사진 없이 글만 올려도 됩니다. 사람 얼굴이 크게 나온 사진은 쓰지 않습니다.</span>
+                </div>
+                <div id="preview" style="margin-top:12px"></div>
               </div>
-              <div class="img-pane" data-pane="upload">
-                <label class="btn btn-ghost" for="fFile"><i data-lucide="upload" class="icon"></i>사진 고르기 / 찍기</label>
-                <input type="file" id="fFile" accept="image/*" hidden>
-                <p class="small muted">태블릿으로 직접 찍거나 저장된 사진을 고릅니다. 사람 얼굴이 크게 나온 사진은 쓰지 않습니다.</p>
+              <input type="file" id="fFile" accept="image/*" hidden>
+              <div class="img-tools igc" style="border-radius:8px">
+                <div class="img-tabs" role="tablist">
+                  <button type="button" class="img-tab" role="tab" data-img="upload" aria-selected="true"><i data-lucide="image" class="icon"></i>사진</button>
+                  <button type="button" class="img-tab" role="tab" data-img="ai" aria-selected="false"><i data-lucide="sparkles" class="icon"></i>AI로 그리기</button>
+                  <button type="button" class="img-tab" role="tab" data-img="edit" aria-selected="false"><i data-lucide="eraser" class="icon"></i>AI로 사진 고치기</button>
+                </div>
+                <div class="img-pane" data-pane="upload">
+                  <div class="thumb-row" id="thumb" hidden style="display:flex;gap:10px;align-items:center"><img id="thumbImg" alt="넣은 사진" style="width:56px;height:56px;object-fit:cover;border-radius:6px"><span class="small muted" style="flex:1">사진이 들어갔습니다.</span><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
+                  <div class="field"><label for="fTaken">사진 찍은 때</label><input class="input" id="fTaken" maxlength="20" placeholder="예: 3년 전 10월 6일 (비우면 '사진 정보 없음')"></div>
+                </div>
+                <div class="img-pane" data-pane="ai" hidden>
+                  <div class="field"><label for="fAiPrompt">어떤 그림을 만들까요?</label>
+                    <textarea id="fAiPrompt" rows="3" maxlength="300" placeholder="예: 안개 낀 바다 위에 관람차가 반쯤 사라진 섬, 휴대폰으로 찍은 사진 느낌"></textarea></div>
+                  <button type="button" class="btn btn-primary" id="btnAiGen"><i data-lucide="sparkles" class="icon"></i>그림 만들기</button>
+                </div>
+                <div class="img-pane" data-pane="edit" hidden>
+                  <p class="small muted" style="margin:0">먼저 사진을 넣은 뒤 어떻게 고칠지 쓰세요. 예: 융합교육관 사진에서 건물을 지우기</p>
+                  <div class="field"><label for="fAiEdit">어떻게 고칠까요?</label>
+                    <textarea id="fAiEdit" rows="3" maxlength="300" placeholder="예: 뒤에 있는 건물을 지우고 그 자리에 바다만 보이게 해 줘"></textarea></div>
+                  <button type="button" class="btn btn-primary" id="btnAiEdit"><i data-lucide="eraser" class="icon"></i>사진 고치기</button>
+                </div>
+                <p class="ai-note img-pane" id="aiQuota" style="margin:0"></p>
               </div>
-              <div class="img-pane" data-pane="ai" hidden>
-                <div class="field"><label for="fAiPrompt">어떤 그림을 만들까요?</label>
-                  <textarea id="fAiPrompt" rows="3" maxlength="300" placeholder="예: 안개 낀 바다 위에 관람차가 반쯤 사라진 섬, 휴대폰으로 찍은 사진 느낌"></textarea></div>
-                <button type="button" class="btn btn-primary" id="btnAiGen"><i data-lucide="sparkles" class="icon"></i>그림 만들기</button>
-              </div>
-              <div class="img-pane" data-pane="edit" hidden>
-                <p class="small muted">먼저 "사진 올리기"로 사진을 넣은 뒤, 어떻게 고칠지 쓰세요. 예: 융합교육관 사진에서 건물을 지우기</p>
-                <div class="field"><label for="fAiEdit">어떻게 고칠까요?</label>
-                  <textarea id="fAiEdit" rows="3" maxlength="300" placeholder="예: 뒤에 있는 건물을 지우고 그 자리에 바다만 보이게 해 줘"></textarea></div>
-                <button type="button" class="btn btn-primary" id="btnAiEdit"><i data-lucide="eraser" class="icon"></i>사진 고치기</button>
-              </div>
-              <p class="ai-note img-pane" id="aiQuota"></p>
             </div>
-            <div class="thumb" id="thumb" hidden><img id="thumbImg" alt="넣은 사진"><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
-            <div class="field"><label for="fTaken">사진 찍은 때</label><input class="input" id="fTaken" maxlength="20" placeholder="예: 3년 전 10월 6일 (비워 두면 '사진 정보 없음')"></div>
-          </div>
 
-          <div class="secret-box" id="secretBox">
-            <div class="step-h"><span class="step-n">5</span>비밀 칸 (다른 조에게는 정답 공개 때만 보입니다)</div>
-            <div class="field">
-              <label for="fTactic">쓴 수법</label>
-              <select id="fTactic"></select>
-              <p class="small muted" id="tacticDesc"></p>
-            </div>
-            <div class="field">
-              <div class="flabel">들킬 수 있는 단서는 어느 기준으로 찾을 수 있나요?</div>
-              <div class="opt-row" id="optClueCrit"></div>
-            </div>
-            <div class="field">
-              <label for="fClue">숨긴 단서</label>
-              <textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea>
-              <p class="small muted">단서가 없으면 판별이 찍기가 됩니다. 확인 기준 4가지 중 하나로 들킬 수 있는 단서를 꼭 하나 남기세요.</p>
+            <div class="igc-side">
+              <div class="igc-acct"><span id="acctAv"></span><span id="acctName">계정 이름</span></div>
+              <div class="igc-sec"><div class="flabel">게시 형식</div><div class="opt-row" id="optFormat"></div></div>
+              <div class="igc-row" id="titleField"><label class="sr" for="fTitle" id="fTitleLabel">제목</label><i data-lucide="heading" class="icon"></i><input id="fTitle" maxlength="80" placeholder="제목"></div>
+              <label class="sr" for="fBody" id="fBodyLabel">문구</label>
+              <textarea id="fBody" class="igc-caption" maxlength="1200" placeholder="문구를 입력하세요..."></textarea>
+              <div class="igc-cap-tools"><button type="button" class="linkbtn" id="btnPolish"><i data-lucide="wand-sparkles" class="icon"></i>AI로 말투 다듬기</button><span class="igc-count" id="bodyCount">0/1,200</span></div>
+              <div class="igc-row" id="tagsField"><label class="sr" for="fTags">해시태그</label><i data-lucide="hash" class="icon"></i><input id="fTags" maxlength="80" placeholder="해시태그 추가 (#도로랜드)"></div>
+              <div class="igc-row"><label class="sr" for="fPlace">위치</label><i data-lucide="map-pin" class="icon"></i><input id="fPlace" maxlength="40" placeholder="위치 추가"></div>
+              <div class="igc-row"><label class="sr" for="fPosted">게시 시점</label><i data-lucide="clock-3" class="icon"></i><input id="fPosted" maxlength="20" placeholder="게시 시점 (예: 1시간 전, 10월 9일)"></div>
+              <details class="igc-det">
+                <summary><i data-lucide="user-round-pen" class="icon"></i>계정 꾸미기<i data-lucide="chevron-down" class="icon chev"></i></summary>
+                <div class="det-in">
+                  <div class="grid2">
+                    <div class="field"><label for="fName" id="fNameLabel">이름</label><input class="input" id="fName" maxlength="30" placeholder="예: 도로일보"></div>
+                    <div class="field"><label for="fHandle">계정 아이디</label><input class="input" id="fHandle" maxlength="29" placeholder="예: doroilbo"></div>
+                    <div class="field"><label for="fJoined">가입한 때</label><input class="input" id="fJoined" maxlength="20" placeholder="예: 2019.03"></div>
+                    <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
+                    <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
+                    <div class="field" id="likesField"><label for="fLikes" id="fLikesLabel">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
+                  </div>
+                  <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
+                </div>
+              </details>
+              <details class="igc-det" id="secretBox" open>
+                <summary><i data-lucide="lock-keyhole" class="icon"></i>비밀 칸 <span class="small muted">정답 공개 때만 보임</span><i data-lucide="chevron-down" class="icon chev"></i></summary>
+                <div class="det-in">
+                  <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
+                  <div class="field"><div class="flabel">숨긴 단서는 어느 기준으로 찾을 수 있나요?</div><div class="opt-row" id="optClueCrit"></div></div>
+                  <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
+                </div>
+              </details>
+              <div class="igc-foot">
+                <p class="err" id="formErr" role="alert"></p>
+                <p class="small muted" style="margin:0">우리 조 게시물은 모두 <b>진짜처럼 보이는 가짜</b>입니다. 공유하면 바로 피드에 들어가고, 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보입니다.</p>
+              </div>
             </div>
           </div>
-
-          <p class="err" id="formErr" role="alert"></p>
-          <div class="opt-row">
-            <button type="submit" class="btn btn-yellow" id="btnSubmit"><i data-lucide="send" class="icon"></i>올리기</button>
-            <button type="button" class="btn btn-ghost" id="btnCancelEdit" hidden>고치기 취소</button>
-          </div>
-          <p class="small muted">올리면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 그때 운영실 자료와 섞여서 누가 만든 글인지 알 수 없습니다.</p>
         </form>
-        <div class="preview-col">
-          <div class="flabel">미리보기</div>
-          <div id="preview"></div>
-        </div>
       </div>
     </section>
 
@@ -515,6 +599,7 @@ function setTeam(t, silent) {
   store('dorogram-team', String(t));
   document.body.classList.toggle('screen', S.screen);
   $('#teamChipTxt').textContent = S.screen ? '화면' : t;
+  $('#sbTeamAv').textContent = S.screen ? '화면' : t; $('#sbTeamTxt').textContent = S.screen ? '진행 화면' : t + '조';
   $('#teamModal').hidden = true;
   S.open = {}; S.draft = {}; S.editing = null; S.form = null;
   refresh();
@@ -550,15 +635,16 @@ function render() {
   $('#phasePill').textContent = ph.label;
   $('#phaseTitle').textContent = ph.label;
   $('#phaseDesc').textContent = ph.desc;
-  $('[data-tab="score"]').hidden = d.phase !== 'reveal';
-  $('[data-tab="make"]').hidden = S.screen;
+  $$('[data-tab="score"]').forEach(b => b.hidden = d.phase !== 'reveal');
+  $$('[data-tab="make"]').forEach(b => b.hidden = S.screen);
+  $('#sbPhase').textContent = ph.label; $('#sbPhaseDesc').textContent = ph.desc;
   if ((S.tab === 'score' && d.phase !== 'reveal') || (S.tab === 'make' && S.screen)) showTab('feed');
   renderTray(); renderTwist(); renderFeed(); renderMake(); renderScores(); icons();
 }
 
 function showTab(t) {
   S.tab = t;
-  $$('.nav-btn').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $$('.nav-btn, .sb-btn').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
   $('main').classList.toggle('wide', t === 'make');
   ['feed', 'make', 'score'].forEach(x => $('#tab-' + x).hidden = x !== t);
   window.scrollTo({ top: 0 });
@@ -694,12 +780,15 @@ function postHTML(p) {
   const vbar = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="vbtn" data-act="verify" data-id="${p.id}" data-c="${k}" aria-expanded="${open === k}"><i data-lucide="${c.icon}"></i>${c.label}</button>`).join('');
   const own = !!p.mine;
   return `<article class="post" id="post-${p.id}" data-id="${p.id}">
-    <div class="png-target">${cardHTML(p)}</div>
+    <div class="post-media"><div class="png-target">${cardHTML(p)}</div></div>
+    <div class="post-side">
     ${statusHTML(p)}
+    <div class="side-h"><i data-lucide="search-check"></i>확인하기</div>
     <div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
     ${canJudge(p) ? judgeHTML(p) : ''}
     ${answerHTML(p)}
     ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}"><i data-lucide="image-down"></i>이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}"><i data-lucide="pencil"></i>고치기</button>` : ''}</div>` : ''}
+    </div>
   </article>`;
 }
 
@@ -812,13 +901,16 @@ function fillForm() {
   $('#fLikesLabel').textContent = f.format === 'witness' ? '추천 수' : '좋아요 수';
   const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (document.activeElement !== el) el.value = f[k] || ''; });
-  $('#thumb').hidden = !f.imageId; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
+  $('#thumb').hidden = !f.imageId; $('#thumb').style.display = f.imageId ? 'flex' : 'none'; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
   $$('.img-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.img === S.imgTab));
   $$('.img-pane[data-pane]').forEach(p => p.hidden = p.dataset.pane !== S.imgTab);
   const d = S.data;
   $('#aiQuota').textContent = d.aiEnabled ? `AI 이미지는 조마다 ${d.aiQuota}번까지 만들 수 있습니다. 지금까지 ${d.aiUsed}번 썼습니다. AI로 만든 사진은 서버에 기록이 남고, 정답 공개 때 다른 조에게도 보입니다.` : 'AI 이미지 기능이 꺼져 있습니다. 사진 올리기를 써 주세요.';
   ['btnAiGen', 'btnAiEdit', 'btnPolish'].forEach(id => $('#' + id).disabled = !d.aiEnabled || S.busy);
-  $('#btnSubmit').innerHTML = `<i data-lucide="send"></i>${S.editing ? '고친 내용 올리기' : '올리기'}`;
+  $('#btnSubmit').textContent = S.editing ? '수정 완료' : '공유하기';
+  $('#igcTitle').textContent = S.editing ? '게시물 수정' : '새 게시물 만들기';
+  $('#dropCta').hidden = !!f.imageId;
+  $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
   $('#btnCancelEdit').hidden = !S.editing;
   renderPreview(); icons();
 }
@@ -826,7 +918,11 @@ function fillForm() {
 function renderPreview() {
   const f = S.form;
   const p = { format: f.format, likes: f.likes, author: { name: f.name, handle: f.handle, color: f.color, reporter: f.reporter }, title: f.title, body: f.body, tags: f.tags, place: f.place, postedAt: f.postedAt, imageId: f.imageId };
-  $('#preview').innerHTML = `<div class="post">${cardHTML(p)}</div>`;
+  $('#preview').innerHTML = `<div class="post" style="display:block">${cardHTML(p)}</div>`;
+  const hd = f.handle ? f.handle.replace(/^@/, '') : (f.name || '계정 이름');
+  $('#acctAv').innerHTML = `<div class="avatar" style="background:${esc(f.color)};width:28px;height:28px;font-size:12px">${initials(f.name)}</div>`;
+  $('#acctName').textContent = hd;
+  $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
   lucide.createIcons({ attrs: { class: 'icon' } });
 }
 
@@ -846,9 +942,12 @@ $('#postForm').addEventListener('input', e => {
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
 
 // 사진: 긴 변 1280px JPEG로 줄여서 올린다
-$('#fFile').addEventListener('change', async e => {
-  const file = e.target.files[0]; e.target.value = '';
-  if (!file) return;
+$('#fFile').addEventListener('change', e => { const file = e.target.files[0]; e.target.value = ''; if (file) uploadFile(file); });
+const dz = $('#dropZone');
+['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', e => { const file = [...(e.dataTransfer?.files || [])].find(f => f.type.startsWith('image/')); if (file) uploadFile(file); else toast('사진 파일만 넣을 수 있습니다.'); });
+async function uploadFile(file) {
   try {
     S.busy = true; fillForm(); toast('사진을 올리는 중입니다.');
     const dataUrl = await shrink(file);
@@ -856,7 +955,7 @@ $('#fFile').addEventListener('change', async e => {
     S.form.imageId = r.imageId; toast('사진을 넣었습니다.');
   } catch (err) { toast(err.message || '사진을 올리지 못했습니다.'); }
   S.busy = false; fillForm();
-});
+}
 function shrink(file) {
   return new Promise((res, rej) => {
     const url = URL.createObjectURL(file), img = new Image();
@@ -933,7 +1032,7 @@ const STORY_BG = ['linear-gradient(160deg,#962fbf,#d62976)', 'linear-gradient(16
 function storyList() {
   const ph = S.data ? C.PHASES[S.data.phase] : { label: '', desc: '' };
   const crit = Object.entries(C.CRITERIA).map(([k, c], i) => ({
-    key: 'crit-' + k, label: ({ who: '누가 썼나', when: '언제 올렸나', witness: '직접 봤나', cross: '자료 비교' })[k] || c.label, icon: c.icon, bg: STORY_BG[i % STORY_BG.length], sub: '확인 기준 ' + (i + 1),
+    key: 'crit-' + k, label: c.label, icon: c.icon, bg: STORY_BG[i % STORY_BG.length], sub: '확인 기준 ' + (i + 1),
     slides: [{ sticker: '확인 기준 ' + (i + 1), big: c.label, txt: c.hint }]
   }));
   return [
@@ -989,7 +1088,8 @@ $('#svNext').onclick = nextSlide; $('#svPrev').onclick = prevSlide; $('#svX').on
 document.addEventListener('keydown', e => { if ($('#sv').hidden) return; if (e.key === 'Escape') closeStory(); if (e.key === 'ArrowRight') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
 
 // ---------- 시작 ----------
-$$('.nav-btn').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$$('.nav-btn, .sb-btn').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$('#sbTeam').onclick = () => $('#teamModal').hidden = false;
 $$('[data-filter]').forEach(b => b.onclick = () => { S.filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderFeed(); icons(); });
 renderTray();
 icons();

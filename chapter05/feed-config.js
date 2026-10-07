@@ -6,10 +6,10 @@ window.DOROGRAM = {
 
   // 확인 기준 4가지 (미션 1에서 배우고 2일차 스캔 검증에서 다시 씀)
   CRITERIA: {
-    who:     { label: '누가 썼나',       icon: 'user-round-search', hint: '작성자 계정, 가입일, 팔로워를 봅니다. 공식 계정은 @doroland 하나뿐입니다.' },
-    when:    { label: '언제 올렸나',     icon: 'calendar-clock',    hint: '올린 날짜와 사진 찍은 날짜가 맞는지 봅니다.' },
-    witness: { label: '직접 본 사람인가', icon: 'eye',               hint: '"들었는데", "~래요"처럼 건너 들은 말인지 찾아봅니다.' },
-    cross:   { label: '다른 자료와 맞나', icon: 'files',             hint: '사실 카드, 다른 게시물과 내용이 맞는지 비교합니다.' }
+    who:     { label: '작성자',   icon: 'user-round-search', hint: '계정 이름, 가입일, 팔로워 수를 확인합니다. 공식 계정은 @doroland 하나뿐입니다.' },
+    when:    { label: '날짜',     icon: 'calendar-clock',    hint: '게시 날짜와 사진 촬영 날짜가 서로 맞는지 확인합니다.' },
+    witness: { label: '직접 목격', icon: 'eye',               hint: '"들었는데", "~래요"처럼 건너 들은 말인지, 직접 본 내용인지 확인합니다.' },
+    cross:   { label: '자료 대조', icon: 'files',             hint: '사실 카드, 다른 게시물과 내용이 맞는지 대조합니다.' }
   },
 
   // 게시글 형식 4가지
