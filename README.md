@@ -52,6 +52,7 @@ BREAK-OUT/
 | Chapter 02 | 하모니아 | Teachable Machine AI + Arduino 연동 이상감지 |
 | Chapter 03 | 회전목마 | 머지큐브, 일기장, 슬라이드 퍼즐로 문양 수집 |
 | Chapter 04 | 중앙관리실 | 출입기록 데이터를 분석해 진범 추적 (트레이스 브레이크) |
+| Chapter 05 | 코덱스의 선택 | 보이드의 기록(3D 디지털 트윈) + 도로그램(가짜뉴스 피드, `server/` 필요) |
 
 ## 기술 스택
 

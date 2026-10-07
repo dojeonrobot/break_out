@@ -88,6 +88,7 @@ $excludes = @(
     "--exclude=scripts",
     "--exclude=bak",
     "--exclude=docs",
+    "--exclude=server",
     "--exclude=*.tar.gz",
     "--exclude=*.pem",
     "--exclude=CLAUDE.md",

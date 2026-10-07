@@ -282,21 +282,44 @@
         </div>
       </div>
 
-      <!-- Chapter 5 (잠김) -->
-      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 opacity-80" onclick="handleEnterChapter(5, 'locked', this)">
-        <div class="flex-grow flex flex-col items-center justify-center relative bg-slate-100 p-8 text-center min-h-[420px]">
-          <!-- 해치 패턴 -->
-          <div class="absolute inset-0 opacity-[0.04]" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 10px, transparent 10px, transparent 20px);"></div>
-          
-          <div class="bg-white/50 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 relative z-10">
-            <i data-lucide="lock" class="w-10 h-10 text-slate-400" stroke-width="2"></i>
+      <!-- Chapter 5 (코덱스의 선택) - 진입로 둘: 보이드의 기록(3D 디지털 트윈) / 도로그램(가짜뉴스 피드) -->
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-orange-500/30" onclick="handleEnterChapter(5, 'active', this)">
+        <!-- Banner (챕터 4 로고 카드 색만 바꾼 임시본. 공식 배너가 나오면 images/chapter5-logo.png 를 같은 이름으로 덮어쓰기) -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-orange-100 bg-orange-50">
+          <img src="images/chapter5-logo.png" alt="챕터 5 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+5'"/>
+          <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
+        </div>
+        <!-- Content -->
+        <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 bg-orange-50 text-orange-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-orange-100">
+                Chapter 05
+              </span>
+              <span class="text-xs font-bold text-orange-600/70">코덱스의 선택</span>
+            </div>
+            <i data-lucide="lock" class="w-4 h-4 text-orange-500 opacity-60"></i>
           </div>
-          
-          <span class="px-3 py-1 bg-slate-200 text-slate-500 text-[11px] font-black tracking-widest uppercase rounded-md border border-slate-300 mb-4 relative z-10">
-            Chapter 05
-          </span>
-          <h3 class="text-3xl font-black text-slate-300 tracking-widest relative z-10 mb-6">COMING SOON</h3>
-          <div class="w-12 h-1 bg-slate-300 rounded-full relative z-10"></div>
+          <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">보이드의 기록</h3>
+
+          <div class="bg-slate-50 rounded-xl p-4 mb-6 flex-grow flex items-center justify-center border border-slate-100/80 shadow-inner">
+            <p class="text-slate-600 leading-relaxed font-medium text-sm text-center break-keep">
+              사라진 섬의 빈 구역을 직접 스캔해 채우고, 도로그램에 퍼진 소문 속에서 진짜를 가려내세요.
+            </p>
+          </div>
+
+          <div class="mt-auto flex gap-2.5">
+            <!-- 보이드의 기록: 카드 클릭과 동일 동작이라 별도 핸들러 없이 버블링에 맡김 -->
+            <div class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-white text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-400 hover:to-amber-300 shadow-md shadow-orange-500/20 group-hover:shadow-orange-500/40 transform group-hover:-translate-y-0.5">
+              <span>보이드의 기록</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 shrink-0 transform group-hover:translate-x-1 transition-transform"></i>
+            </div>
+            <div onclick="event.stopPropagation(); handleEnterChapter('5-feed', 'active', this)"
+                 class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-orange-600 text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-white border-2 border-orange-200 hover:bg-orange-50 hover:border-orange-300 shadow-md shadow-orange-500/10 transform group-hover:-translate-y-0.5">
+              <i data-lucide="radio-tower" class="w-4 h-4 shrink-0"></i>
+              <span>도로그램</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -372,6 +395,9 @@
       2: { url: './chapter02/index.html', name: 'Chapter 02 : 하모니아 구역' },
       3: { url: './chapter03/index.html', name: 'Chapter 03 : 회전목마 구역' },
       4: { url: './chapter04/index.html', name: 'Chapter 04 : 중앙관리실 구역' },
+      5: { url: './chapter05/index.html', name: 'Chapter 05 : 보이드의 기록' },
+      // 챕터 5의 두 번째 진입로 (도로그램: 가짜뉴스 피드). 서버(server/ch5_feed_server.py)가 떠 있어야 동작.
+      '5-feed': { url: './chapter05/feed.html', name: 'Chapter 05 : 도로그램' },
       // 챕터 3의 두 번째 진입로 (미션 뽑기). 잠금 방식은 챕터와 동일하게 유지.
       '3-mission': { url: './chapter03/mission.html', name: 'Chapter 03 : 미션 뽑기' },
       // 챕터 1의 두 번째 진입로 (라인트레이서 매뉴얼 안내). 잠금 방식은 챕터와 동일.

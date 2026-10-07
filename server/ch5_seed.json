@@ -1,0 +1,339 @@
+[
+  {
+    "id": "seed-6y",
+    "format": "news",
+    "author": {
+      "name": "서해바다신문",
+      "handle": "@seohaenews",
+      "joined": "2011.03",
+      "followers": "4.2만",
+      "color": "#1d4ed8",
+      "reporter": "정해솔"
+    },
+    "title": "바다 위 놀이공원이 사라졌다? 낚싯배 선장의 이상한 목격담",
+    "body": "도로랜드 앞바다에서 조업하던 선장 김모 씨는 \"관람차가 보이던 자리에 갑자기 수평선만 남았다\"고 말했다. 약 20분 뒤 섬은 같은 자리에 다시 보였다고 한다. 도로랜드 운영사는 \"당일 운영에 문제는 없었다\"고 밝혔다.",
+    "tags": "",
+    "place": "도로랜드 앞바다",
+    "postedAt": "6년 전 · 10월 9일",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "다른 기사 2개와 날짜(10월 초)·내용이 맞습니다.",
+      "clueCriterion": "cross"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜 기사였습니다. 3년 전, 며칠 전 기사와 날짜를 나란히 놓아 보세요."
+    },
+    "imagePrompt": "흐린 날 낚싯배 위에서 본 바다 수평선, 멀리 섬과 관람차가 희미하게 보이는 신문 보도 사진 느낌, 약간 바랜 색감",
+    "image": "seed-6y.jpg"
+  },
+  {
+    "id": "seed-3y",
+    "format": "news",
+    "author": {
+      "name": "도로일보",
+      "handle": "@doroilbo",
+      "joined": "2009.07",
+      "followers": "8.7만",
+      "color": "#0f766e",
+      "reporter": "한바다"
+    },
+    "title": "또 사라진 도로랜드… 방문객 \"사진 찍으려는데 화면에 바다만\"",
+    "body": "3년 전 같은 시기에 이어 또다시 도로랜드가 보이지 않았다는 목격담이 나왔다. 항구에서 배를 기다리던 관광객들은 섬이 잠시 흐릿해졌다가 사라졌다고 말했다. 전문가들은 해무(바다 안개) 가능성을 이야기했지만 당일 안개 기록은 없었다.",
+    "tags": "",
+    "place": "도로랜드 항구",
+    "postedAt": "3년 전 · 10월 6일",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "6년 전 기사와 같은 10월 초, 3년 간격입니다.",
+      "clueCriterion": "cross"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜 기사였습니다. 6년 전 기사와 정확히 3년 간격입니다."
+    },
+    "imagePrompt": "항구에서 관광객들이 바다 쪽을 가리키는 뒷모습, 바다 위 섬이 안개처럼 흐릿한 뉴스 사진",
+    "image": "seed-3y.jpg"
+  },
+  {
+    "id": "seed-now",
+    "format": "news",
+    "author": {
+      "name": "도로일보",
+      "handle": "@doroilbo",
+      "joined": "2009.07",
+      "followers": "8.7만",
+      "color": "#0f766e",
+      "reporter": "한바다"
+    },
+    "title": "눈앞에 있던 도로랜드가 사라졌다? 방문객들의 엇갈린 목격담",
+    "body": "바다 위에서 보이던 관람차와 섬이 눈앞에서 통째로 사라졌다는 이야기가 퍼지고 있다. 잠시 뒤 같은 자리에 다시 나타났다는 글도 함께 올라왔다. 3년 전과 6년 전에도 비슷한 목격담이 있었던 것으로 확인됐다.",
+    "tags": "",
+    "place": "도로랜드",
+    "postedAt": "3일 전",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "기사 3개가 모두 10월 초, 3년마다 나왔습니다.",
+      "clueCriterion": "cross"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜 기사였습니다. 3년마다 같은 시기에 같은 일이 일어났습니다. 원인은 아직 모릅니다."
+    },
+    "imagePrompt": "바다 위 놀이공원 섬, 관람차가 반쯤 투명하게 흐려진 모습, 휴대폰으로 찍은 보도 사진",
+    "image": "seed-now.jpg"
+  },
+  {
+    "id": "seed-photo",
+    "format": "sns",
+    "author": {
+      "name": "바다뷰맛집탐방",
+      "handle": "@seaview_hunter99",
+      "joined": "2일 전",
+      "followers": "12",
+      "color": "#db2777"
+    },
+    "title": "",
+    "body": "방금 도로랜드 사라지는 거 직접 찍음!!! 지금 항구 난리남 ㄷㄷ 빨리 퍼뜨려 주세요",
+    "tags": "#도로랜드실종 #실시간",
+    "place": "도로랜드 항구",
+    "postedAt": "1시간 전",
+    "photoTakenAt": "3년 전 · 10월 6일",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "사진 바꿔치기",
+      "clue": "'방금' 찍었다는데 사진 찍은 날짜는 3년 전입니다. 계정도 가입 2일 째.",
+      "clueCriterion": "when"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. '방금' 찍었다는 사진의 찍은 날짜가 3년 전이에요. 옛날 사진을 지금 일인 것처럼 올렸습니다(사진 바꿔치기)."
+    },
+    "imagePrompt": "바다 위 섬이 사라지고 수평선만 보이는 항구 풍경, 휴대폰 사진, 오래된 사진처럼 살짝 바랜 색",
+    "image": "seed-photo.jpg",
+    "likes": "23"
+  },
+  {
+    "id": "seed-closing",
+    "format": "notice",
+    "author": {
+      "name": "도로랜드 공식",
+      "handle": "@doroland_officiall",
+      "joined": "5일 전",
+      "followers": "38",
+      "color": "#7c3aed"
+    },
+    "title": "[긴급] 도로랜드는 오늘부로 영구 폐장합니다",
+    "body": "시설 이상으로 도로랜드는 오늘부로 문을 닫습니다. 환불을 원하시는 분은 아래 링크에 이름과 전화번호를 남겨 주세요.",
+    "tags": "",
+    "place": "",
+    "postedAt": "2시간 전",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "사칭",
+      "clue": "공식 계정은 @doroland 하나뿐인데 l이 하나 더 붙은 계정입니다. 가입 5일 째.",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. 공식 계정은 @doroland 하나뿐인데 이 계정은 @doroland_officiall이에요. 공식 계정인 척하는 사칭이고, 전화번호를 모으려는 글입니다."
+    },
+    "imagePrompt": "",
+    "image": null
+  },
+  {
+    "id": "seed-rumor",
+    "format": "witness",
+    "author": {
+      "name": "궁금한초딩",
+      "handle": "@curious_kid",
+      "joined": "2024.05",
+      "followers": "41",
+      "color": "#ea580c"
+    },
+    "title": "도로랜드 섬 사라지는 진짜 이유 (직원 제보)",
+    "body": "친구 사촌 형이 도로랜드 직원인데요, 관람차 밑 지하에 괴물이 산대요. 그래서 섬이 가끔 사라지는 거래요. 진짜예요!!",
+    "tags": "",
+    "place": "",
+    "postedAt": "어제",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "들은 이야기",
+      "clue": "직접 본 게 아니라 친구 사촌 형에게 '들은' 이야기입니다.",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "믿기 어렵습니다. 글쓴이가 직접 본 게 아니라 '친구 사촌 형'에게 들은 이야기예요. 건너 들은 말은 확인이 필요합니다."
+    },
+    "imagePrompt": "",
+    "image": null,
+    "likes": "4"
+  },
+  {
+    "id": "seed-carousel",
+    "format": "notice",
+    "author": {
+      "name": "도로랜드 운영실",
+      "handle": "@doroland",
+      "joined": "2015.04",
+      "followers": "15.3만",
+      "color": "#0e4a84"
+    },
+    "title": "[안내] 회전목마 임시 점검",
+    "body": "어제 저녁 전원이 꺼진 회전목마가 움직이는 현상이 있어 오늘 오전 점검을 진행합니다. 점검 중에는 회전목마 탑승이 어렵습니다. 이용에 불편을 드려 죄송합니다.",
+    "tags": "",
+    "place": "회전목마",
+    "postedAt": "오늘 오전 8:10",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "공식 계정(@doroland)이고, 사실 카드의 회전목마 내용과 맞습니다.",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 공식 계정 @doroland가 올렸고, 사실 카드에 있는 회전목마 이상 현상과 내용이 맞아요."
+    },
+    "imagePrompt": "점검 중 안내판이 세워진 회전목마, 낮, 안전 테이프",
+    "image": "seed-carousel.jpg"
+  },
+  {
+    "id": "seed-expert",
+    "format": "sns",
+    "author": {
+      "name": "세상의모든비밀",
+      "handle": "@secret_world_tv",
+      "joined": "2025.11",
+      "followers": "2,904",
+      "color": "#4b5563"
+    },
+    "title": "",
+    "body": "[충격] 해양학 박사 \"도로랜드는 3년마다 바다에 잠긴다\" 박사님 말로는 섬 전체가 물에 잠겼다가 다시 떠오르는 거라고 합니다. 소름…",
+    "tags": "#도로랜드 #충격",
+    "place": "",
+    "postedAt": "어제",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "가짜 전문가",
+      "clue": "박사 이름도 소속도 없습니다. 사실 카드에 따르면 섬이 바다에 잠긴 기록은 없습니다.",
+      "clueCriterion": "cross"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. '박사'라고만 하고 이름도 소속도 없어요. 사실 카드에 따르면 섬이 바다에 잠긴 기록은 없습니다(가짜 전문가)."
+    },
+    "imagePrompt": "깊은 바닷속에 잠긴 놀이공원 관람차 상상도, 유튜브 썸네일 느낌",
+    "image": "seed-expert.jpg",
+    "likes": "1.2만"
+  },
+  {
+    "id": "seed-lights",
+    "format": "witness",
+    "author": {
+      "name": "회전목마러버",
+      "handle": "@merrygo_round",
+      "joined": "2021.08",
+      "followers": "318",
+      "color": "#0891b2"
+    },
+    "title": "어제 광장 조명 다 꺼진 거 저만 봤나요?",
+    "body": "어제 저녁 광장에 있었는데 조명이 한꺼번에 탁 꺼졌어요. 10초쯤 지나서 다시 켜졌고요. 저 말고도 다들 놀라서 웅성거렸어요.",
+    "tags": "",
+    "place": "중앙 광장",
+    "postedAt": "어제 밤 9:41",
+    "photoTakenAt": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "직접 본 일이고, 사실 카드의 광장 조명 내용과 맞습니다.",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 직접 겪은 일을 썼고, 사실 카드의 광장 조명 내용과 맞아요."
+    },
+    "imagePrompt": "밤의 놀이공원 광장, 가로등과 조명이 모두 꺼져 어두운 모습, 휴대폰 사진",
+    "image": "seed-lights.jpg",
+    "likes": "87"
+  },
+  {
+    "id": "seed-story-ferry",
+    "format": "story",
+    "author": {
+      "name": "여행하는 다은",
+      "handle": "@daeun_trip",
+      "joined": "2020.06",
+      "followers": "1,204",
+      "color": "#0891b2"
+    },
+    "title": "",
+    "body": "도로랜드 가는 배 안! 관람차 잘 보인다",
+    "tags": "",
+    "place": "도로랜드 가는 배",
+    "postedAt": "오늘 오전 10:03",
+    "photoTakenAt": "오늘 오전 10:01",
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "올린 때와 찍은 때가 맞고, 배 출발 시간(매시 정각)과도 맞습니다.",
+      "clueCriterion": "when"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 사진 찍은 시간(10:01)과 올린 시간(10:03)이 맞고, 10시 정각에 출발한 배라는 것도 사실 카드와 맞아요."
+    },
+    "imagePrompt": "배 위에서 본 바다 위 놀이공원 섬과 관람차, 맑은 날, 세로 휴대폰 사진",
+    "image": "seed-story-ferry.jpg",
+    "imageId": null
+  },
+  {
+    "id": "seed-story-side",
+    "format": "story",
+    "author": {
+      "name": "코덱스지킴이",
+      "handle": "@codex_guard",
+      "joined": "4일 전",
+      "followers": "57",
+      "color": "#7c3aed"
+    },
+    "title": "",
+    "body": "도로랜드 망친 건 직원들이다!! 코덱스 편 모여라 공유 안 하면 너도 같은 편",
+    "tags": "#코덱스편",
+    "place": "",
+    "postedAt": "30분 전",
+    "photoTakenAt": "",
+    "secret": {
+      "truth": "fake",
+      "tactic": "편 가르기",
+      "clue": "근거 없이 편을 나누고 공유를 강요합니다. 가입 4일 째 계정.",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "믿으면 안 되는 글입니다. 근거 없이 사람들을 두 편으로 나누고 공유를 강요해요(편 가르기). 가입한 지 4일 된 계정입니다."
+    },
+    "imagePrompt": "놀이공원 광장에 모인 사람들 실루엣, 보라색과 초록색 조명, 세로 휴대폰 사진",
+    "image": "seed-story-side.jpg",
+    "imageId": null
+  }
+]

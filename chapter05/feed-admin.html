@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>도로그램 운영자 화면</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="feed-config.js"></script>
+  <style>
+    :root { --bg: #eef1f6; --surface: #fff; --surface-2: #f6f7fa; --line: #dde2ea; --ink: #172033; --muted: #5d6879; --navy: #1d2f55; --yellow: #ffd400;
+      --real: #0f8a5f; --real-bg: #e3f5ed; --fake: #c2410c; --fake-bg: #fdeee4; --r: 14px; --sans: "Noto Sans KR", system-ui, sans-serif; --mono: "IBM Plex Mono", monospace; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0e1422; --surface: #161e30; --surface-2: #1c2539; --line: #2b3650; --ink: #e7ebf2; --muted: #9aa5b8; --real: #4ade9f; --real-bg: #12352a; --fake: #fb923c; --fake-bg: #3a2216; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+    .icon { width: 18px; height: 18px; stroke-width: 2; }
+    header { background: var(--navy); color: #fff; }
+    .hin { max-width: 1280px; margin: 0 auto; padding: 12px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .hin h1 { font-size: 19px; margin: 0; font-weight: 900; }
+    .live { margin-left: auto; font-size: 13px; opacity: .85; }
+    main { max-width: 1280px; margin: 0 auto; padding: 18px 16px 60px; display: grid; gap: 18px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+    .card h2 { margin: 0 0 12px; font-size: 17px; display: flex; gap: 8px; align-items: center; }
+    .phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 760px) { .phases { grid-template-columns: repeat(2, 1fr); } }
+    .phase { border: 2px solid var(--line); background: var(--surface-2); border-radius: var(--r); padding: 12px; text-align: left; display: grid; gap: 4px; }
+    .phase b { font-size: 16px; }
+    .phase span { font-size: 13px; color: var(--muted); }
+    .phase[aria-pressed="true"] { border-color: var(--navy); background: var(--yellow); color: var(--navy); }
+    .phase[aria-pressed="true"] span { color: var(--navy); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 960px) { .grid2 { grid-template-columns: 1fr; } }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 8px 10px; text-align: left; vertical-align: top; }
+    thead th { color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--line); }
+    tbody tr + tr td { border-top: 1px solid var(--line); }
+    .num { font-family: var(--mono); text-align: center; }
+    .btn { border: 0; border-radius: 999px; padding: 8px 14px; font-weight: 900; display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
+    .btn-navy { background: var(--navy); color: #fff; }
+    .btn-ghost { background: var(--surface-2); border: 1px solid var(--line); }
+    .btn-danger { background: var(--fake-bg); color: var(--fake); }
+    .badge { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 900; }
+    .b-seed { background: #dbeafe; color: #1e40af; }
+    .b-team { background: #fef3c7; color: #92400e; }
+    .b-real { background: var(--real-bg); color: var(--real); }
+    .b-fake { background: var(--fake-bg); color: var(--fake); }
+    .b-hidden { background: var(--surface-2); color: var(--muted); }
+    .posts { display: grid; gap: 10px; }
+    .prow { display: grid; grid-template-columns: 88px 1fr auto; gap: 12px; align-items: start; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); }
+    .prow img { width: 88px; height: 66px; object-fit: cover; border-radius: 8px; background: var(--surface-2); }
+    .prow .noimg { width: 88px; height: 66px; border-radius: 8px; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); font-size: 12px; }
+    .prow .t { font-weight: 700; }
+    .prow .m { font-size: 13px; color: var(--muted); }
+    .login { max-width: 360px; margin: 12vh auto; }
+    .input { width: 100%; border: 1px solid #b9c2d0; border-radius: 10px; padding: 10px 12px; background: var(--surface); }
+    .err { color: var(--fake); font-weight: 700; font-size: 13px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header><div class="hin"><h1>도로그램 운영자 화면</h1>
+    <a class="btn btn-ghost" href="feed.html?view=screen" target="_blank" style="color:#fff;background:rgba(255,255,255,.12);border:0;text-decoration:none"><i data-lucide="monitor" class="icon"></i>진행 화면 열기</a>
+    <span class="live" id="live">연결 전</span></div></header>
+
+  <div class="card login" id="login">
+    <h2><i data-lucide="key-round" class="icon"></i>운영자 비밀번호</h2>
+    <input class="input" id="pw" type="password" autocomplete="current-password" aria-label="운영자 비밀번호">
+    <p class="err" id="pwErr"></p>
+    <button class="btn btn-navy" id="btnLogin">들어가기</button>
+  </div>
+
+  <main id="app" hidden>
+    <section class="card">
+      <h2><i data-lucide="flag" class="icon"></i>진행 단계</h2>
+      <div class="phases" id="phases"></div>
+      <p class="small muted">단계를 누르면 모든 태블릿 화면이 바로 바뀝니다. 다른 조 게시물은 "판별 시간"부터 보이고, 정답은 "정답 공개"에서만 열립니다.</p>
+    </section>
+
+    <div class="grid2">
+      <section class="card">
+        <h2><i data-lucide="users" class="icon"></i>조별 현황</h2>
+        <table><thead><tr><th>조</th><th>미션</th><th class="num">게시물</th><th class="num">AI 사진</th><th class="num">판별</th></tr></thead><tbody id="teams"></tbody></table>
+      </section>
+      <section class="card">
+        <h2><i data-lucide="trophy" class="icon"></i>점수 (지금 기준)</h2>
+        <table><thead><tr><th>순위</th><th>조</th><th class="num">합계</th><th class="num">맞힌 판별</th><th class="num">속인 조</th></tr></thead><tbody id="scores"></tbody></table>
+        <p class="small muted">아이들 화면에는 "정답 공개" 단계에서만 보입니다.</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2><i data-lucide="list" class="icon"></i>게시물 전체</h2>
+      <div class="row" style="margin-bottom:10px"><span class="small muted">문제가 있는 게시물(실존 인물, 부적절한 사진·말)은 "숨기기"로 바로 내립니다.</span></div>
+      <div class="posts" id="posts"></div>
+    </section>
+
+    <section class="card">
+      <h2><i data-lucide="rotate-ccw" class="icon"></i>새 기수 시작</h2>
+      <p class="small muted">조 게시물, 판별, AI 사용 횟수를 모두 지우고 운영실 자료만 남깁니다. 되돌릴 수 없으니 3일차 발표용 이미지를 먼저 저장해 두세요.</p>
+      <div class="row"><input class="input" id="resetTxt" placeholder="RESET 이라고 입력" style="max-width:220px" aria-label="초기화 확인 문구"><button class="btn btn-danger" id="btnReset">전부 초기화</button></div>
+      <p class="err" id="resetErr"></p>
+    </section>
+  </main>
+
+<script>
+const C = window.DOROGRAM, API = C.API;
+let KEY = null, data = null, version = 0;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const icons = () => lucide.createIcons({ attrs: { class: 'icon' } });
+
+async function api(path, body) {
+  const res = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json', 'X-Admin-Key': KEY }, body: body ? JSON.stringify(body) : undefined });
+  const d = await res.json().catch(() => ({ error: '서버 응답을 읽지 못했습니다.' }));
+  if (!res.ok || d.error) throw new Error(d.error || '요청 실패');
+  return d;
+}
+
+async function login() {
+  KEY = $('#pw').value;
+  try { data = await api('/admin/state'); try { sessionStorage.setItem('dorogram-admin', KEY); } catch (e) {} $('#login').hidden = true; $('#app').hidden = false; render(); connect(); }
+  catch (e) { $('#pwErr').textContent = e.message; }
+}
+$('#btnLogin').onclick = login;
+$('#pw').onkeyup = e => { if (e.key === 'Enter') login(); };
+try { const k = sessionStorage.getItem('dorogram-admin'); if (k) { $('#pw').value = k; login(); } } catch (e) {}
+
+function connect() {
+  const es = new EventSource(API + '/stream');
+  es.onopen = () => $('#live').textContent = '실시간 연결됨';
+  es.onerror = () => $('#live').textContent = '다시 연결 중';
+  es.onmessage = async e => { const m = JSON.parse(e.data); if (m.v !== version) { data = await api('/admin/state'); render(); } };
+}
+
+function render() {
+  version = data.version;
+  $('#phases').innerHTML = Object.entries(C.PHASES).map(([k, p]) => `<button class="phase" data-phase="${k}" aria-pressed="${data.phase === k}"><b>${p.label}</b><span>${esc(p.desc)}</span></button>`).join('');
+  const teamPosts = data.posts.filter(p => !p.seed);
+  const judgedBy = {};
+  Object.keys(data.judgments).forEach(k => { const t = k.split(':').pop(); judgedBy[t] = (judgedBy[t] || 0) + 1; });
+  $('#teams').innerHTML = Array.from({ length: C.TEAM_COUNT }, (_, i) => i + 1).map(t => {
+    const m = C.TEAM_MISSIONS[t] || {};
+    return `<tr><td><b>${t}조</b></td><td class="small">${esc(C.FORMATS[m.format]?.label || '')} · ${esc(m.tactic || '')}</td>
+      <td class="num">${teamPosts.filter(p => p.team === t).length} / ${data.maxPosts}</td><td class="num">${data.aiUsedAll[t] || 0} / ${data.aiQuota}</td><td class="num">${judgedBy[t] || 0}</td></tr>`;
+  }).join('');
+  $('#scores').innerHTML = (data.scores || []).map((r, i) => `<tr><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="num"><b>${r.total}</b></td><td class="num">${r.correct}</td><td class="num">${r.fooled}</td></tr>`).join('');
+  const posts = [...data.posts].sort((a, b) => (a.seed === b.seed ? (b.createdAt || 0) - (a.createdAt || 0) : a.seed ? 1 : -1));
+  $('#posts').innerHTML = posts.map(p => {
+    const truth = p.seed ? p.answer?.truth : 'fake';
+    const c = p.counts || { real: 0, fake: 0, unsure: 0 };
+    return `<div class="prow">${p.imageId ? `<img src="${API}/img/${p.imageId}" alt="">` : '<div class="noimg">사진 없음</div>'}
+      <div><div class="row">${p.seed ? '<span class="badge b-seed">운영실 자료</span>' : `<span class="badge b-team">${p.team}조</span>`}
+        <span class="badge b-${truth}">${truth === 'real' ? '진짜' : '가짜'}</span>${p.status === 'hidden' ? '<span class="badge b-hidden">숨김</span>' : ''}
+        <span class="small muted">${esc(C.FORMATS[p.format]?.label || p.format)} · ${esc(p.author?.name || '')} ${esc(p.author?.handle || '')}</span></div>
+        <div class="t">${esc(p.title || (p.body || '').slice(0, 60))}</div>
+        <div class="m">${p.secret?.tactic ? `수법: ${esc(p.secret.tactic)} · ` : ''}${p.secret?.clue ? `단서: ${esc(p.secret.clue)}` : ''}${p.aiGenerated ? ` · AI 사진: "${esc(p.aiPrompt || '')}"` : ''}</div>
+        <div class="m">판별: 진짜 ${c.real} · 가짜 ${c.fake} · 모르겠음 ${c.unsure}</div></div>
+      <div>${p.status === 'hidden' ? `<button class="btn btn-ghost" data-show="${p.id}">다시 보이기</button>` : `<button class="btn btn-danger" data-hide="${p.id}">숨기기</button>`}</div></div>`;
+  }).join('');
+  icons();
+}
+
+document.addEventListener('click', async e => {
+  const ph = e.target.closest('[data-phase]');
+  try {
+    if (ph) await api('/admin/phase', { phase: ph.dataset.phase });
+    const h = e.target.closest('[data-hide]'), s = e.target.closest('[data-show]');
+    if (h && confirm('이 게시물을 숨길까요? 모든 화면에서 바로 사라집니다.')) await api('/admin/moderate', { postId: h.dataset.hide, action: 'hide' });
+    if (s) await api('/admin/moderate', { postId: s.dataset.show, action: 'show' });
+  } catch (x) { alert(x.message); }
+});
+$('#btnReset').onclick = async () => {
+  try { await api('/admin/reset', { confirm: $('#resetTxt').value.trim() }); $('#resetTxt').value = ''; $('#resetErr').textContent = ''; }
+  catch (e) { $('#resetErr').textContent = e.message; }
+};
+icons();
+</script>
+</body>
+</html>

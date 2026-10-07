@@ -33,3 +33,7 @@ breakout-deploy.tar.gz
 
 # Dist (if build step added later)
 dist/
+
+# 챕터 5 도로그램 서버 런타임 데이터 (게시물·업로드)
+server/data/
+__pycache__/

@@ -1,0 +1,22 @@
+# 챕터 5 도로그램 서버 (서버에 한 번만 설치)
+#   sudo cp config/dorogram.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now dorogram
+# 코드는 배포 폴더(/home/ubuntu/breakout)가 아니라 별도 폴더(/home/ubuntu/dorogram)에 둔다.
+# 배포 스크립트가 /home/ubuntu/breakout 을 통째로 덮어써서 게시물 데이터가 날아가지 않게 하기 위함.
+[Unit]
+Description=DOROLAND chapter 5 Dorogram feed server
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/dorogram
+Environment=CH5_HOST=127.0.0.1
+Environment=CH5_PORT=8095
+Environment=CH5_STATIC=0
+# 운영자 비밀번호와 Gemini 키는 /home/ubuntu/dorogram/.env 에 둔다 (CH5_ADMIN_KEY=..., GEMINI_API_KEY=...)
+EnvironmentFile=-/home/ubuntu/dorogram/.env
+ExecStart=/usr/bin/python3 /home/ubuntu/dorogram/ch5_feed_server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
