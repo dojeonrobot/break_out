@@ -829,8 +829,12 @@
           <div class="ad-card"><h2><i data-lucide="trophy" class="icon"></i>점수 <span class="small muted" style="font-weight:400">아이들에게는 정답 공개 때만 보임</span></h2>
             <table class="ad-table"><thead><tr><th>순위</th><th>조</th><th class="num">합계</th><th class="num">맞힌 판별</th><th class="num">속인 조</th></tr></thead><tbody id="adScores"></tbody></table></div>
         </div>
-        <div class="ad-card"><h2><i data-lucide="list" class="icon"></i>게시물 관리 <span class="small muted" style="font-weight:400">문제 있는 게시물은 숨기기 · 판별 분량이 많으면 운영실 자료 일부를 숨기기</span></h2>
+        <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조가 올린 게시물 <span id="adTeamCount" class="ad-b team">0</span><span class="small muted" style="font-weight:400">문제 있는 글은 숨기기 또는 삭제(사진까지 지움)</span>
+            <button class="btn btn-ghost" id="adDelAllBtn" type="button" style="margin-left:auto;color:var(--fake)"><i data-lucide="trash-2" class="icon"></i>조 게시물 전부 삭제</button></h2>
           <div class="ad-posts" id="adPosts"></div></div>
+        <details class="ad-card" style="padding:0">
+          <summary style="padding:16px;cursor:pointer;font-weight:700;display:flex;gap:8px;align-items:center;list-style:none"><i data-lucide="database" class="icon"></i>운영실 자료 <span id="adSeedCount" class="ad-b seed">0</span><span class="small muted" style="font-weight:400">기본 세트. 지울 수는 없고, 판별 분량이 많으면 일부를 숨기기</span></summary>
+          <div class="ad-posts" id="adSeedPosts" style="padding:0 16px 16px"></div></details>
         <div class="ad-card"><h2><i data-lucide="rotate-ccw" class="icon"></i>새 기수 시작</h2>
           <p class="small muted">조 게시물, 판별, AI 사용 횟수를 모두 지우고 운영실 자료만 남깁니다. 되돌릴 수 없습니다.</p>
           <div class="opt-row"><input class="input" id="adResetTxt" placeholder="RESET 이라고 입력" style="max-width:220px" aria-label="초기화 확인 문구"><button class="btn btn-ghost" id="adResetBtn" type="button" style="color:var(--fake)">전부 초기화</button></div>
@@ -1103,7 +1107,7 @@ function postHTML(p) {
     <div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
     ${canJudge(p) ? judgeHTML(p) : ''}
     ${answerHTML(p)}
-    ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}"><i data-lucide="image-down"></i>이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}"><i data-lucide="pencil"></i>고치기</button>` : ''}</div>` : ''}
+    ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}"><i data-lucide="image-down"></i>이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}"><i data-lucide="pencil"></i>고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)"><i data-lucide="trash-2"></i>지우기</button>` : ''}</div>` : ''}
     </div>
   </article>`;
 }
@@ -1264,6 +1268,7 @@ document.addEventListener('click', async e => {
   if (act === 'submit-judge') submitJudge(id, t);
   if (act === 'png') savePng(id);
   if (act === 'edit') { closePost(); startEdit(id); }
+  if (act === 'del') deleteOwn(id);
 });
 $('#pmX').onclick = closePost; $('#pmPrev').onclick = () => stepPost(-1); $('#pmNext').onclick = () => stepPost(1);
 document.addEventListener('keydown', e => { if ($('#pm').hidden || !$('#sv').hidden) return; if (e.target.matches('input, textarea')) return; if (e.key === 'Escape') closePost(); if (e.key === 'ArrowRight') stepPost(1); if (e.key === 'ArrowLeft') stepPost(-1); });
@@ -1281,6 +1286,12 @@ async function submitJudge(id, btn) {
     toast('판정을 제출했습니다. 오른쪽 화살표로 다음 게시물을 보세요.');
     await refresh();
   } catch (err) { errEl.textContent = err.message; btn.disabled = false; }
+}
+
+async function deleteOwn(id) {
+  if (!confirm('이 게시물을 지울까요? 되돌릴 수 없습니다.')) return;
+  try { await api('/posts/delete', { team: S.team, postId: id }); closePost(); if (S.editing === id) resetForm(); toast('지웠습니다.'); await refresh(); }
+  catch (e) { toast(e.message); }
 }
 
 async function savePng(id) {
@@ -1561,12 +1572,18 @@ function adRender() {
     return `<tr><td><b>${t}조</b></td><td>${esc(C.FORMATS[m.format]?.label || '')} · ${esc(m.tactic || '')}</td><td class="num">${teamPosts.filter(p => p.team === t).length} / ${d.maxPosts}</td><td class="num">${d.aiUsedAll[t] || 0} / ${d.aiQuota}</td><td class="num">${judgedBy[t] || 0}</td></tr>`; }).join('');
   $('#adScores').innerHTML = (d.scores || []).map((r, i) => `<tr><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="num"><b>${r.total}</b></td><td class="num">${r.correct}</td><td class="num">${r.fooled}</td></tr>`).join('');
   const posts = [...d.posts].sort((a, b) => (a.seed === b.seed ? (b.createdAt || 0) - (a.createdAt || 0) : a.seed ? 1 : -1));
-  $('#adPosts').innerHTML = posts.map(p => { const truth = p.seed ? p.answer?.truth : 'fake', c = p.counts || { real: 0, fake: 0, unsure: 0 };
+  const teamN = posts.filter(p => !p.seed).length;
+  $('#adTeamCount').textContent = teamN;
+  $('#adSeedCount').textContent = posts.length - teamN;
+  $('#adDelAllBtn').disabled = !teamN;
+  const row = p => { const truth = p.seed ? p.answer?.truth : 'fake', c = p.counts || { real: 0, fake: 0, unsure: 0 };
     return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
       <div><div>${p.seed ? '<span class="ad-b seed">운영실 자료</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')}</span></div>
         <div class="t">${esc(p.title || p.body || '')}</div>
         <div class="m">${p.secret?.clue ? '단서: ' + esc(p.secret.clue) + ' · ' : ''}판별 진짜 ${c.real} · 가짜 ${c.fake}</div></div>
-      <button class="btn btn-ghost" data-adtoggle="${p.id}" data-hidden="${p.status === 'hidden'}">${p.status === 'hidden' ? '보이기' : '숨기기'}</button></div>`; }).join('');
+      <div style="display:grid;gap:6px"><button class="btn btn-ghost" data-adtoggle="${p.id}" data-hidden="${p.status === 'hidden'}">${p.status === 'hidden' ? '보이기' : '숨기기'}</button>${p.seed ? '' : `<button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button>`}</div></div>`; };
+  $('#adPosts').innerHTML = posts.filter(p => !p.seed).map(row).join('') || '<div class="panel-empty">아직 조가 올린 게시물이 없습니다.</div>';
+  $('#adSeedPosts').innerHTML = posts.filter(p => p.seed).map(row).join('');
   icons();
 }
 $('#adLoginBtn').onclick = adLogin;
@@ -1576,6 +1593,11 @@ document.addEventListener('click', async e => {
   try {
     if (ph) await adApi('/admin/phase', { phase: ph.dataset.adphase });
     if (tg) await adApi('/admin/moderate', { postId: tg.dataset.adtoggle, action: tg.dataset.hidden === 'true' ? 'show' : 'hide' });
+    const dl = e.target.closest('[data-addel]');
+    if (dl && confirm('이 게시물을 완전히 지울까요? 사진과 판별 기록도 함께 지워지고 되돌릴 수 없습니다.')) await adApi('/admin/delete', { postId: dl.dataset.addel });
+    if (e.target.closest('#adDelAllBtn') && confirm('조가 올린 게시물을 전부 지울까요? 운영실 자료와 진행 단계는 그대로 둡니다. 되돌릴 수 없습니다.')) {
+      const r = await adApi('/admin/delete-team-posts', { confirm: 'DELETE' }); toast(`조 게시물 ${r.deleted}개를 지웠습니다.`);
+    }
   } catch (x) { toast(x.message); }
 });
 $('#adResetBtn').onclick = async () => {

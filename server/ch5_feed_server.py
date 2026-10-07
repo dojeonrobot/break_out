@@ -116,6 +116,22 @@ def save_and_broadcast():
             q.put(msg)
 
 
+def remove_posts(posts):
+    """게시물과 그 판별 기록, 다른 글이 안 쓰는 업로드 사진 파일을 지운다. lock 안에서 호출할 것."""
+    ids = {p['id'] for p in posts}
+    DB['posts'] = [p for p in DB['posts'] if p['id'] not in ids]
+    DB['judgments'] = {k: v for k, v in DB['judgments'].items() if k.rsplit(':', 1)[0] not in ids}
+    still = {p.get('imageId') for p in DB['posts']} | {p.get('thumbImageId') for p in DB['posts']}
+    for p in posts:
+        for img in (p.get('imageId'), p.get('thumbImageId')):
+            if img and img not in still and re.fullmatch(r'[a-f0-9]{32}\.(jpg|png|webp)', img):
+                try:
+                    os.remove(os.path.join(UPLOAD_DIR, img))
+                except OSError:
+                    pass
+                DB.get('aiImages', {}).pop(img, None)
+
+
 def find_post(pid):
     return next((p for p in DB['posts'] if p['id'] == pid), None)
 
@@ -429,7 +445,8 @@ class Handler(BaseHTTPRequestHandler):
             '/api/ch5/upload': self.upload, '/api/ch5/posts': self.save_post, '/api/ch5/judge': self.judge,
             '/api/ch5/ai/image': self.ai_image, '/api/ch5/ai/polish': self.ai_polish,
             '/api/ch5/admin/phase': self.admin_phase, '/api/ch5/admin/moderate': self.admin_moderate,
-            '/api/ch5/admin/reset': self.admin_reset,
+            '/api/ch5/admin/reset': self.admin_reset, '/api/ch5/admin/delete': self.admin_delete,
+            '/api/ch5/admin/delete-team-posts': self.admin_delete_team_posts, '/api/ch5/posts/delete': self.delete_own_post,
         }
         fn = routes.get(path)
         if not fn:
@@ -592,6 +609,46 @@ class Handler(BaseHTTPRequestHandler):
             p['note'] = clean_text(b.get('note'), 120)
             save_and_broadcast()
             self.send_json({'ok': True})
+
+    def delete_own_post(self, b):
+        """아이들: 만들기 단계에서 우리 조 게시물 지우기."""
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조를 먼저 골라 주세요.')
+        with lock:
+            if DB['phase'] != 'make':
+                raise ValueError('게시물은 만들기 시간에만 지울 수 있습니다.')
+            p = find_post(b.get('postId'))
+            if not p or p.get('seed') or p['team'] != team:
+                raise ValueError('지울 수 없는 게시물입니다.')
+            remove_posts([p])
+            save_and_broadcast()
+            self.send_json({'ok': True})
+
+    def admin_delete(self, b):
+        """운영자: 조 게시물 하나 완전히 삭제(사진 파일 포함). 운영실 자료는 숨기기만 가능."""
+        with lock:
+            p = find_post(b.get('postId'))
+            if not p:
+                raise ValueError('없는 게시글입니다.')
+            if p.get('seed'):
+                raise ValueError('운영실 자료는 지울 수 없습니다. 숨기기를 써 주세요.')
+            remove_posts([p])
+            save_and_broadcast()
+            self.send_json({'ok': True})
+
+    def admin_delete_team_posts(self, b):
+        """운영자: 조 게시물 전부 삭제(판별 기록도 함께). 운영실 자료·단계·AI 사용 횟수는 그대로."""
+        if b.get('confirm') != 'DELETE':
+            raise ValueError('확인 문구가 필요합니다.')
+        with lock:
+            targets = [p for p in DB['posts'] if not p.get('seed')]
+            if b.get('team'):
+                t = clean_team(b.get('team'))
+                targets = [p for p in targets if p['team'] == t]
+            remove_posts(targets)
+            save_and_broadcast()
+            self.send_json({'ok': True, 'deleted': len(targets)})
 
     def admin_reset(self, b):
         global DB
