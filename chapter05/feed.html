@@ -376,7 +376,7 @@
       .mission-line { display: none; }
       .tray { padding: 8px 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
       .filters { margin: 0 0 16px; }
-      .feed.shorts { padding: 0; }
+      .feed-split { padding: 0; }
       .post { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: stretch; }
       .post-media { align-self: start; }
       .post-side { border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
@@ -437,6 +437,110 @@
       .pm-box .post-side { overflow: visible; border-left: 0; }
       .pm-nav { top: auto; bottom: 14px; transform: none; }
     }
+
+    /* ===== 왼쪽 쇼츠 + 오른쪽 기사 ===== */
+    .feed-split { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; padding: 0 16px; }
+    @media (max-width: 1100px) { .feed-split { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .feed-split { padding: 0 8px; } }
+    .shorts-panel { background: #0f0f0f; color: #f1f1f1; border-radius: 16px; padding: 16px 16px 20px; }
+    .sp-head { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 800; margin: 2px 2px 14px; }
+    .sp-logo { width: 28px; height: 28px; border-radius: 8px; background: #ff0033; display: grid; place-items: center; transform: rotate(-12deg); }
+    .sp-logo .icon { width: 16px; height: 16px; color: #fff; fill: #fff; transform: rotate(12deg); }
+    .sp-count { font-size: 13px; font-weight: 500; color: #aaa; margin-left: 4px; }
+    .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 14px; }
+    @media (max-width: 520px) { .shorts-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .shorts-panel { padding: 12px 8px 14px; border-radius: 12px; } }
+    .shorts-panel .tile { color: #f1f1f1; }
+    .shorts-panel .tile-media { border-radius: 12px; }
+    .tile-cap { position: absolute; left: 12px; right: 12px; bottom: 12px; font-size: 17px; font-weight: 800; line-height: 1.35; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.8); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+    .tile-dots { position: absolute; top: 8px; right: 4px; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+    .tile-dots .icon { width: 20px; height: 20px; }
+    .shorts-panel .tile-state { top: auto; bottom: auto; right: auto; left: 8px; top: 34px; }
+    .tile-plain.dark span { -webkit-line-clamp: 6; }
+
+    .news-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    @media (min-width: 1101px) { .news-panel { position: sticky; top: 16px; max-height: calc(100dvh - 32px); display: flex; flex-direction: column; } .news-list { overflow: auto; } }
+    .np-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 800; font-size: 17px; }
+    .np-head .icon { width: 20px; height: 20px; }
+    .np-head .sp-count { color: var(--muted); }
+    .news-item { width: 100%; border: 0; background: none; text-align: left; color: var(--ink); display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); align-items: start; }
+    .news-item:hover { background: var(--surface-2); }
+    .news-item:last-child { border-bottom: 0; }
+    .ni-tag { display: inline-block; font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 4px; margin-bottom: 4px; }
+    .ni-news { color: #c8102e; background: #fdecee; } .ni-notice { color: #fff; background: #e11d48; }
+    .ni-title { font-size: 15px; font-weight: 700; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+    .ni-meta { font-size: 12px; color: var(--muted); margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .ni-thumb { width: 92px; height: 64px; border-radius: 6px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+    .ni-thumb .icon { width: 22px; height: 22px; }
+    .ni-state { font-weight: 800; }
+    .ni-state.real { color: var(--real); } .ni-state.fake { color: var(--fake); } .ni-state.unsure { color: var(--muted); } .ni-state.mine { color: #d62976; }
+    .panel-empty { padding: 30px 16px; text-align: center; font-size: 14px; color: #aaa; }
+
+    /* ===== 쇼츠 프레임(세로) + 기사 카드(가로) ===== */
+    .sf { position: relative; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; background: #fff; color: #111; display: flex; flex-direction: column; text-align: center; transition: transform .2s; }
+    .tile:hover .sf { transform: translateY(-3px); }
+    .tile:focus-visible .sf { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .sf-band { flex-shrink: 0; height: 15%; min-height: 44px; background: var(--c); display: flex; align-items: center; gap: 6px; padding: 0 8px; color: #111; }
+    .sf-band.awning { background: repeating-linear-gradient(90deg, var(--c) 0 18px, #fff 18px 36px); border-bottom: 6px solid rgba(0,0,0,.06); }
+    .sf-band .icon { width: 14px; height: 14px; flex-shrink: 0; }
+    .sf-pill { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; background: #fff; border: 1.5px solid #111; border-radius: 999px; padding: 3px 8px; font-size: 12px; font-weight: 800; }
+    .sf-pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sf-band.awning .sf-pill { margin: 0 4px; box-shadow: 0 2px 0 rgba(0,0,0,.1); }
+    .sf-title { flex-shrink: 0; max-height: calc(1.35em * 3 + 16px); padding: 10px 10px 6px; font-size: 15px; font-weight: 900; line-height: 1.35; letter-spacing: -.02em; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .sf-meta { flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 10px; color: #666; padding: 0 8px 8px; border-bottom: 1px solid #e5e5e5; margin: 0 8px; white-space: nowrap; overflow: hidden; }
+    .sf-meta .avatar { width: 14px; height: 14px; font-size: 8px; }
+    .sf-meta b { color: #111; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+    .sf-img { position: relative; flex: 1; min-height: 0; margin: 8px; border-radius: 4px; overflow: hidden; background: #eee; }
+    .sf-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .sf-img .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; padding: 12px; font-size: 13px; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+    .sf-img .ph span { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+    .sf .tile-fmt { top: auto; bottom: 14px; left: 14px; }
+    .sf .tile-state { top: auto; bottom: 14px; right: 14px; left: auto; }
+
+    .news-list { display: grid; gap: 0; }
+    .nc { width: 100%; border: 0; background: none; text-align: left; color: var(--ink); padding: 14px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+    .nc:hover { background: var(--surface-2); }
+    .nc:last-child { border-bottom: 0; }
+    .nc-thumb { position: relative; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+    .nc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .nc:hover .nc-thumb img { transform: scale(1.03); }
+    .nc-thumb .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; }
+    .nc-thumb .ph .icon { width: 34px; height: 34px; opacity: .85; }
+    .nc-thumb .ni-tag { position: absolute; top: 8px; left: 8px; margin: 0; }
+    .nc-outlet { position: absolute; left: 10px; bottom: 8px; font-family: "Noto Serif KR", serif; font-weight: 900; font-size: 15px; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+    .nc .ni-title { font-size: 16px; }
+
+    /* ===== 촘촘한 템플릿 갤러리식 쇼츠 칸 (밝은 바탕, 한 줄 5~6개) ===== */
+    .shorts-panel { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+    .shorts-panel .tile { color: var(--ink); }
+    .sp-head { font-size: 18px; margin-bottom: 10px; }
+    .sp-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 2px 14px; }
+    .sp-chip { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 3px 12px; font-size: 13px; color: var(--ink); }
+    .sp-chip[aria-pressed="true"] { border-color: #0ea5a4; color: #0e8f8e; background: #e8f8f7; font-weight: 700; }
+    .shorts-grid { grid-template-columns: repeat(auto-fill, minmax(122px, 1fr)) !important; gap: 16px 10px !important; }
+    .sf { border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.08); border: 1px solid #ececec; }
+    .sf-band { min-height: 30px; height: 12%; padding: 0 5px; gap: 3px; }
+    .sf-band .icon { width: 10px; height: 10px; }
+    .sf-band.awning { background: repeating-linear-gradient(90deg, var(--c) 0 12px, #fff 12px 24px); border-bottom-width: 4px; }
+    .sf-pill { font-size: 9.5px; padding: 1px 6px; border-width: 1.2px; gap: 3px; }
+    .sf-pill .icon { width: 9px; height: 9px; }
+    .sf-title { font-size: 12px; padding: 7px 7px 4px; max-height: calc(1.35em * 3 + 11px); }
+    .sf-meta { font-size: 8px; padding: 0 4px 5px; margin: 0 6px; gap: 3px; }
+    .sf-meta .avatar { width: 10px; height: 10px; font-size: 6px; }
+    .sf-img { margin: 5px; }
+    .sf-img .ph { font-size: 11px; padding: 8px; }
+    .sf-stats { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.85); }
+    .sf-stats span { display: inline-flex; align-items: center; gap: 2px; }
+    .sf-stats .icon { width: 11px; height: 11px; }
+    .sf-stats .r { margin-left: auto; }
+    .sf-stats .heart .icon { color: #ff5a7a; fill: #ff5a7a; }
+    .sf-fmt { position: absolute; top: 5px; left: 5px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; }
+    .sf-fmt .icon { width: 11px; height: 11px; }
+    .sf .tile-state { position: absolute; top: 5px; right: 5px; bottom: auto; left: auto; font-size: 9.5px; padding: 2px 6px; }
+    .tile-title { font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .tile-sub { margin-top: -2px; font-size: 11.5px; }
+    .tile-sub .avatar { width: 16px; height: 16px; font-size: 8px; }
+    .feed-split { grid-template-columns: minmax(0, 1fr) 320px; }
+    @media (max-width: 1100px) { .feed-split { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -476,7 +580,7 @@
             <button class="chip" data-filter="todo" aria-pressed="false">아직 판별 안 함</button>
             <button class="chip" data-filter="mine" aria-pressed="false">우리 조가 만든 것</button>
           </div>
-          <div class="feed shorts" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
+          <div class="feed-split" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
         </div>
       </div>
     </section>
@@ -852,7 +956,7 @@ function feedPosts() {
   let posts = d.posts.filter(p => p.status === 'approved').sort((a, b) => a.order - b.order);
   if (S.filter === 'todo') posts = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]);
   if (S.filter === 'mine') posts = posts.filter(p => p.mine);
-  return posts;
+  return [...posts.filter(p => !['news', 'notice'].includes(p.format)), ...posts.filter(p => ['news', 'notice'].includes(p.format))];
 }
 
 // 쇼츠식 세로 썸네일
@@ -865,19 +969,59 @@ function tileHTML(p) {
   else if (mine) state = `<span class="tile-state ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
   else if (p.mine) state = `<span class="tile-state ts-mine">우리 조</span>`;
   const text = p.title || p.body || '';
+  // 쇼츠 프레임 템플릿: 색 띠(채널 검색창) → 큰 제목 → 조회수·댓글 줄 → 사진
+  const BANDS = ['#8b8cf6', '#5fd3ae', '#f794b4', '#bdbdbd', '#ffd166', '#7cc4f8'];
+  const band = BANDS[p.order % BANDS.length], awning = p.order % 3 === 0;
+  const head = (p.title || text || '').replace(/\s+/g, ' ');
+  const views = ((p.order % 9000) + 312).toLocaleString();
   const media = p.imageId
-    ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy"><div class="tile-shade"></div>${p.format === 'story' && p.body ? `<div class="tile-text">${esc(p.body)}</div>` : ''}`
-    : `<div class="tile-plain" style="background:linear-gradient(160deg, ${esc(a.color || '#4b5563')}, #111)"><div><i data-lucide="${f.icon || 'file-text'}"></i><span>${esc(text)}</span></div></div>`;
-  return `<button class="tile" data-open="${p.id}" aria-label="${esc(f.label || '')} 게시물 자세히 보기">
-    <div class="tile-media">${media}<span class="tile-fmt"><i data-lucide="${f.icon || 'file-text'}"></i>${esc(f.label || '')}</span>${state}</div>
-    <div class="tile-title">${esc(text || '(내용 없음)')}</div>
-    <div class="tile-sub"><div class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</div><span>${esc(handle)}${p.postedAt ? ' · ' + esc(p.postedAt) : ''}</span></div>
+    ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">`
+    : `<div class="ph" style="background:linear-gradient(160deg, ${esc(a.color || '#4b5563')}, #111)"><span>${esc(p.title ? p.body : '')}</span></div>`;
+  return `<button class="tile" data-open="${p.id}" aria-label="${esc(f.label || '')} 게시물 자세히 보기, ${esc(handle)}">
+    <div class="sf">
+      <div class="sf-band${awning ? ' awning' : ''}" style="--c:${band}">${awning ? '' : '<i data-lucide="sliders-horizontal"></i>'}<span class="sf-pill"><i data-lucide="search"></i><span>${esc(a.name || handle)}</span></span>${awning ? '' : '<i data-lucide="more-horizontal"></i><i data-lucide="x"></i>'}</div>
+      <div class="sf-title">${esc(head || '(내용 없음)')}</div>
+      <div class="sf-meta"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><b>${esc(handle)}</b><span>| 조회수 ${views}</span>${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
+      <div class="sf-img">${media}<span class="sf-fmt" title="${esc(f.label || '')}"><i data-lucide="${f.icon || 'file-text'}"></i></span>
+        <div class="sf-stats"><span><i data-lucide="play"></i>${views}</span>${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div></div>
+      ${state}
+    </div>
+    <div class="tile-title">${esc(head || '(내용 없음)')}</div>
+    <div class="tile-sub"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><span>${esc(a.name || handle)}</span></div>
+  </button>`;
+}
+
+const NEWS_FORMATS = ['news', 'notice'];
+// 오른쪽 기사·공지 목록 한 줄
+function newsItemHTML(p) {
+  const a = p.author || {}, mine = S.data.myJudgments[p.id], reveal = S.data.phase === 'reveal';
+  let state = '';
+  if (reveal) { const t = p.seed ? p.answer?.truth : 'fake'; state = `<span class="ni-state ${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
+  else if (mine) state = `<span class="ni-state ${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
+  else if (p.mine) state = `<span class="ni-state mine">우리 조</span>`;
+  const tag = p.format === 'notice' ? '<span class="ni-tag ni-notice">공지</span>' : '<span class="ni-tag ni-news">사회</span>';
+  // 가로형 기사 카드: 16:9 사진 → 제목 → 언론사·시간
+  return `<button class="nc" data-open="${p.id}">
+    <div class="nc-thumb">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)"><i data-lucide="${p.format === 'notice' ? 'megaphone' : 'newspaper'}"></i></span>`}${tag}<span class="nc-outlet">${esc(a.name || '')}</span></div>
+    <div class="ni-title">${esc(p.title || (p.body || '').slice(0, 50))}</div>
+    <div class="ni-meta"><span>${esc(a.name || '')}</span>${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div>
   </button>`;
 }
 
 function renderFeed() {
   const posts = feedPosts();
-  $('#feed').innerHTML = posts.length ? posts.map(tileHTML).join('') : `<div class="empty" style="grid-column:1/-1"><b>${S.filter === 'todo' ? '판별할 게시물을 모두 판별했습니다.' : '아직 올라온 게시물이 없습니다.'}</b><p class="muted small">${S.filter === 'mine' ? '"게시물 만들기"에서 우리 조 게시물을 올려 보세요.' : ''}</p></div>`;
+  const shorts = posts.filter(p => !NEWS_FORMATS.includes(p.format) && (!S.fmt || S.fmt === 'all' || p.format === S.fmt)), news = posts.filter(p => NEWS_FORMATS.includes(p.format));
+  const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : '아직 게시물이 없습니다.';
+  $('#feed').innerHTML = `
+    <section class="shorts-panel" aria-label="SNS·스토리·목격담">
+      <div class="sp-head"><span class="sp-logo"><i data-lucide="play"></i></span>도로그램 쇼츠<span class="sp-count">${shorts.length}</span></div>
+      <div class="sp-chips" role="group" aria-label="형식 거르기">${[['all', '전체'], ['sns', 'SNS 게시물'], ['story', '스토리'], ['witness', '목격담']].map(([k, l]) => `<button class="sp-chip" data-fmt="${k}" aria-pressed="${(S.fmt || 'all') === k}">${l}</button>`).join('')}</div>
+      ${shorts.length ? `<div class="shorts-grid">${shorts.map(tileHTML).join('')}</div>` : `<div class="panel-empty">${empty}</div>`}
+    </section>
+    <section class="news-panel" aria-label="기사·공지">
+      <div class="np-head"><i data-lucide="newspaper"></i>도로랜드 뉴스<span class="sp-count">${news.length}</span></div>
+      <div class="news-list">${news.length ? news.map(newsItemHTML).join('') : `<div class="panel-empty">${empty}</div>`}</div>
+    </section>`;
   renderModal();
 }
 
@@ -925,6 +1069,7 @@ function renderScores() {
 // ---------- 피드 동작 ----------
 document.addEventListener('click', async e => {
   const o = e.target.closest('[data-open]'); if (o) { openPost(o.dataset.open); return; }
+  const fm = e.target.closest('[data-fmt]'); if (fm) { S.fmt = fm.dataset.fmt; renderFeed(); icons(); return; }
   if (e.target === $('#pm')) { closePost(); return; }
   const t = e.target.closest('[data-act]'); if (!t) return;
   const id = t.dataset.id, act = t.dataset.act;
