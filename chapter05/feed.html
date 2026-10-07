@@ -371,12 +371,12 @@
       .sb-team { margin-top: 8px; border: 0; background: none; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
       .sb-team:hover { background: var(--surface-2); }
       .sb-team .team-av { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 12px; font-weight: 800; box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--ink); }
-      main { max-width: 1000px; padding: 24px 32px 80px; }
+      main { max-width: 1240px; padding: 24px 32px 80px; }
       main.wide { max-width: 1100px; padding: 24px 32px 80px; }
       .mission-line { display: none; }
       .tray { padding: 8px 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
       .filters { margin: 0 0 16px; }
-      .feed { padding: 0; gap: 28px; }
+      .feed.shorts { padding: 0; }
       .post { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: stretch; }
       .post-media { align-self: start; }
       .post-side { border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; }
@@ -390,11 +390,58 @@
       .post-media .ig-img, .post-media .ig-textpost { max-height: 540px; }
       .post-media .story { max-height: 620px; }
     }
+
+    /* ===== 쇼츠식 격자 피드 + 게시물 상세 창 ===== */
+    .feed.shorts { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 18px 12px; padding: 0 16px; }
+    @media (max-width: 520px) { .feed.shorts { grid-template-columns: repeat(2, 1fr); gap: 14px 8px; padding: 0 8px; } }
+    .tile { border: 0; padding: 0; background: none; text-align: left; color: var(--ink); display: grid; gap: 8px; align-content: start; }
+    .tile-media { position: relative; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; background: #262626; color: #fff; }
+    .tile-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .tile:hover .tile-media img { transform: scale(1.04); }
+    .tile:focus-visible .tile-media { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .tile-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 25%, transparent 55%, rgba(0,0,0,.7) 100%); }
+    .tile-fmt { position: absolute; top: 8px; left: 8px; display: inline-flex; gap: 4px; align-items: center; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+    .tile-fmt .icon { width: 13px; height: 13px; }
+    .tile-state { position: absolute; top: 8px; right: 8px; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
+    .ts-real { background: #e6f6ee; color: #0a8754; } .ts-fake { background: #fdeced; color: #d4283a; } .ts-unsure { background: #efefef; color: #555; }
+    .ts-mine { background: #fff; color: #d62976; }
+    .tile-text { position: absolute; left: 10px; right: 10px; bottom: 10px; font-size: 14px; font-weight: 800; line-height: 1.4; text-shadow: 0 1px 4px rgba(0,0,0,.6); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+    .tile-plain { position: absolute; inset: 0; display: grid; place-items: center; padding: 34px 14px; text-align: center; font-size: 15px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
+    .tile-plain span { display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+    .tile-plain .icon { width: 28px; height: 28px; opacity: .8; margin-bottom: 8px; }
+    .tile-title { font-size: 14px; font-weight: 700; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+    .tile-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: -4px; min-width: 0; }
+    .tile-sub .avatar { width: 20px; height: 20px; font-size: 10px; flex-shrink: 0; }
+    .tile-sub span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .pm { position: fixed; inset: 0; z-index: 65; background: rgba(0,0,0,.7); display: grid; place-items: center; padding: 24px 64px; }
+    .pm-x { position: fixed; top: 14px; right: 16px; border: 0; background: none; color: #fff; padding: 6px; z-index: 2; }
+    .pm-x .icon { width: 30px; height: 30px; }
+    .pm-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: #111; display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
+    .pm-nav.prev { left: 12px; } .pm-nav.next { right: 12px; }
+    .pm-nav:disabled { opacity: .3; }
+    .pm-box { width: min(1120px, 100%); height: min(88dvh, 860px); }
+    .pm-box .post { display: grid; grid-template-columns: minmax(0, 1fr) 380px; height: 100%; border-radius: 12px; border: 0; }
+    .pm-box .post-media { background: #111; overflow: auto; display: grid; align-items: center; padding: 0; }
+    .pm-box .post-media .png-target { max-width: 520px; width: 100%; margin: 0 auto; }
+    .pm-box .post-side { overflow: auto; border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+    .pm-box .post-side .verify { grid-template-columns: 1fr 1fr; border-top: 0; }
+    .pm-box .post-media .ig-img, .pm-box .post-media .ig-textpost { max-height: none; }
+    .pm-box .post-media .story { max-height: 86dvh; }
+    .pm-count { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 13px; opacity: .8; }
+    @media (max-width: 860px) {
+      .pm { padding: 0; }
+      .pm-box { width: 100%; height: 100dvh; }
+      .pm-box .post { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; border-radius: 0; }
+      .pm-box .post-media { overflow: visible; }
+      .pm-box .post-side { overflow: visible; border-left: 0; }
+      .pm-nav { top: auto; bottom: 14px; transform: none; }
+    }
   </style>
 </head>
 <body>
   <aside class="sidebar" aria-label="메뉴">
-    <div class="sb-brand">Dorogram<small>도로그램 · 도로랜드가 사라졌다?</small></div>
+    <div class="sb-brand">Dorogram<small>도로랜드 공식 도로그램</small></div>
     <nav role="tablist" aria-label="화면 선택" style="display:grid;gap:4px">
       <button class="sb-btn" role="tab" data-tab="feed" aria-selected="true"><i data-lucide="house" class="icon"></i>홈</button>
       <button class="sb-btn" role="tab" data-tab="make" aria-selected="false"><i data-lucide="square-plus" class="icon"></i>만들기</button>
@@ -405,7 +452,7 @@
   </aside>
   <header class="top">
     <div class="top-in">
-      <div class="brand">Dorogram<small>도로그램</small></div>
+      <div class="brand">Dorogram<small>도로랜드 공식 도로그램</small></div>
       <span class="phase-pill" id="phasePill">연결 중</span>
       <nav class="nav" role="tablist" aria-label="화면 선택">
         <button class="nav-btn" role="tab" data-tab="feed" aria-selected="true" aria-label="피드"><i data-lucide="house" class="icon"></i></button>
@@ -429,7 +476,7 @@
             <button class="chip" data-filter="todo" aria-pressed="false">아직 판별 안 함</button>
             <button class="chip" data-filter="mine" aria-pressed="false">우리 조가 만든 것</button>
           </div>
-          <div class="feed" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
+          <div class="feed shorts" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
         </div>
       </div>
     </section>
@@ -540,6 +587,13 @@
       <button class="btn btn-ghost" id="btnScreen" type="button"><i data-lucide="monitor" class="icon"></i>진행 화면으로 보기 (판별 안 함)</button>
     </div>
   </div>
+  <div class="pm" id="pm" hidden role="dialog" aria-modal="true" aria-label="게시물 자세히 보기">
+    <span class="pm-count" id="pmCount"></span>
+    <button class="pm-x" id="pmX" aria-label="닫기"><i data-lucide="x" class="icon"></i></button>
+    <button class="pm-nav prev" id="pmPrev" aria-label="이전 게시물"><i data-lucide="chevron-left" class="icon"></i></button>
+    <div class="pm-box" id="pmBox"></div>
+    <button class="pm-nav next" id="pmNext" aria-label="다음 게시물"><i data-lucide="chevron-right" class="icon"></i></button>
+  </div>
   <div class="sv" id="sv" hidden role="dialog" aria-modal="true" aria-label="스토리">
     <div class="sv-box" id="svBox">
       <div class="sv-bars" id="svBars"></div>
@@ -558,7 +612,7 @@ const SWATCHES = ['#1d4ed8', '#0f766e', '#db2777', '#7c3aed', '#ea580c', '#4b556
 const HEARSAY = /(들었는데|들었어|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|누가 그러는데|라고 함|라고 합니다|라고 해요)/g;
 
 const S = {
-  team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all',
+  team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null,
   open: {},      // postId -> 열린 확인 기준
   draft: {},     // postId -> {verdict, criterion, reason} 판별 작성 중
   form: null,    // 만들기 폼 값
@@ -792,17 +846,64 @@ function postHTML(p) {
   </article>`;
 }
 
-function renderFeed() {
+function feedPosts() {
   const d = S.data;
   // 모두에게 같은 섞인 순서 (운영실 자료와 조 게시물이 구별되지 않게)
   let posts = d.posts.filter(p => p.status === 'approved').sort((a, b) => a.order - b.order);
   if (S.filter === 'todo') posts = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]);
   if (S.filter === 'mine') posts = posts.filter(p => p.mine);
-  // 입력 중인 판별 이유가 다시 그려도 날아가지 않게 저장
-  $$('[data-act="reason"]').forEach(i => { (S.draft[i.dataset.id] ||= {}).reason = i.value; });
-  const focused = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.act === 'reason' ? document.activeElement.dataset.id : null;
-  $('#feed').innerHTML = posts.length ? posts.map(postHTML).join('') : `<div class="empty"><b>${S.filter === 'todo' ? '판별할 게시물을 모두 판별했습니다.' : '아직 올라온 게시물이 없습니다.'}</b><p class="muted small">${S.filter === 'mine' ? '"게시물 만들기"에서 우리 조 게시물을 올려 보세요.' : ''}</p></div>`;
-  if (focused) { const el = $(`[data-act="reason"][data-id="${focused}"]`); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+  return posts;
+}
+
+// 쇼츠식 세로 썸네일
+function tileHTML(p) {
+  const a = p.author || {}, f = C.FORMATS[p.format] || {};
+  const handle = (a.handle || '').replace(/^@/, '') || a.name || '';
+  const mine = S.data.myJudgments[p.id], reveal = S.data.phase === 'reveal';
+  let state = '';
+  if (reveal) { const t = p.seed ? p.answer?.truth : 'fake'; state = `<span class="tile-state ts-${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
+  else if (mine) state = `<span class="tile-state ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
+  else if (p.mine) state = `<span class="tile-state ts-mine">우리 조</span>`;
+  const text = p.title || p.body || '';
+  const media = p.imageId
+    ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy"><div class="tile-shade"></div>${p.format === 'story' && p.body ? `<div class="tile-text">${esc(p.body)}</div>` : ''}`
+    : `<div class="tile-plain" style="background:linear-gradient(160deg, ${esc(a.color || '#4b5563')}, #111)"><div><i data-lucide="${f.icon || 'file-text'}"></i><span>${esc(text)}</span></div></div>`;
+  return `<button class="tile" data-open="${p.id}" aria-label="${esc(f.label || '')} 게시물 자세히 보기">
+    <div class="tile-media">${media}<span class="tile-fmt"><i data-lucide="${f.icon || 'file-text'}"></i>${esc(f.label || '')}</span>${state}</div>
+    <div class="tile-title">${esc(text || '(내용 없음)')}</div>
+    <div class="tile-sub"><div class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</div><span>${esc(handle)}${p.postedAt ? ' · ' + esc(p.postedAt) : ''}</span></div>
+  </button>`;
+}
+
+function renderFeed() {
+  const posts = feedPosts();
+  $('#feed').innerHTML = posts.length ? posts.map(tileHTML).join('') : `<div class="empty" style="grid-column:1/-1"><b>${S.filter === 'todo' ? '판별할 게시물을 모두 판별했습니다.' : '아직 올라온 게시물이 없습니다.'}</b><p class="muted small">${S.filter === 'mine' ? '"게시물 만들기"에서 우리 조 게시물을 올려 보세요.' : ''}</p></div>`;
+  renderModal();
+}
+
+// 게시물 상세 창 (인스타 게시물 창: 왼쪽 게시물, 오른쪽 확인·판별)
+function renderModal() {
+  const box = $('#pm');
+  if (!S.modal) { box.hidden = true; return; }
+  const list = feedPosts(), all = S.data.posts;
+  const p = all.find(x => x.id === S.modal);
+  if (!p) { S.modal = null; box.hidden = true; return; }
+  $$('#pmBox [data-act="reason"]').forEach(i => { (S.draft[i.dataset.id] ||= {}).reason = i.value; });
+  const focused = document.activeElement?.dataset?.act === 'reason';
+  const scroll = $('#pmBox .post-side')?.scrollTop || 0;
+  $('#pmBox').innerHTML = postHTML(p);
+  const side = $('#pmBox .post-side'); if (side) side.scrollTop = scroll;
+  const i = list.findIndex(x => x.id === p.id);
+  $('#pmPrev').disabled = i <= 0; $('#pmNext').disabled = i < 0 || i >= list.length - 1;
+  $('#pmCount').textContent = i >= 0 ? `${i + 1} / ${list.length}` : '';
+  box.hidden = false;
+  if (focused) { const el = $('#pmBox [data-act="reason"]'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+}
+function openPost(id) { S.modal = id; renderModal(); icons(); }
+function closePost() { S.modal = null; $('#pm').hidden = true; }
+function stepPost(d) {
+  const list = feedPosts(), i = list.findIndex(x => x.id === S.modal);
+  const n = list[i + d]; if (n) { S.modal = n.id; renderModal(); icons(); }
 }
 
 function renderTwist() {
@@ -823,15 +924,19 @@ function renderScores() {
 
 // ---------- 피드 동작 ----------
 document.addEventListener('click', async e => {
+  const o = e.target.closest('[data-open]'); if (o) { openPost(o.dataset.open); return; }
+  if (e.target === $('#pm')) { closePost(); return; }
   const t = e.target.closest('[data-act]'); if (!t) return;
   const id = t.dataset.id, act = t.dataset.act;
-  if (act === 'verify') { S.open[id] = S.open[id] === t.dataset.c ? null : t.dataset.c; renderFeed(); icons(); }
-  if (act === 'verdict') { (S.draft[id] ||= {}).verdict = t.dataset.v; renderFeed(); icons(); }
-  if (act === 'crit') { (S.draft[id] ||= {}).criterion = t.dataset.c; renderFeed(); icons(); }
+  if (act === 'verify') { S.open[id] = S.open[id] === t.dataset.c ? null : t.dataset.c; renderModal(); renderMake(); icons(); }
+  if (act === 'verdict') { (S.draft[id] ||= {}).verdict = t.dataset.v; renderModal(); icons(); }
+  if (act === 'crit') { (S.draft[id] ||= {}).criterion = t.dataset.c; renderModal(); icons(); }
   if (act === 'submit-judge') submitJudge(id, t);
   if (act === 'png') savePng(id);
-  if (act === 'edit') startEdit(id);
+  if (act === 'edit') { closePost(); startEdit(id); }
 });
+$('#pmX').onclick = closePost; $('#pmPrev').onclick = () => stepPost(-1); $('#pmNext').onclick = () => stepPost(1);
+document.addEventListener('keydown', e => { if ($('#pm').hidden || !$('#sv').hidden) return; if (e.target.matches('input, textarea')) return; if (e.key === 'Escape') closePost(); if (e.key === 'ArrowRight') stepPost(1); if (e.key === 'ArrowLeft') stepPost(-1); });
 document.addEventListener('input', e => { if (e.target.dataset.act === 'reason') (S.draft[e.target.dataset.id] ||= {}).reason = e.target.value; });
 
 async function submitJudge(id, btn) {
@@ -843,7 +948,7 @@ async function submitJudge(id, btn) {
   try {
     await api('/judge', { team: S.team, postId: id, verdict: dft.verdict, criterion: dft.criterion, reason: dft.reason || '' });
     delete S.draft[id];
-    toast('판정을 제출했습니다.');
+    toast('판정을 제출했습니다. 오른쪽 화살표로 다음 게시물을 보세요.');
     await refresh();
   } catch (err) { errEl.textContent = err.message; btn.disabled = false; }
 }
