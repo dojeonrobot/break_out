@@ -787,15 +787,27 @@
               <details class="igc-det" id="secretBox" open>
                 <summary><i data-lucide="lock-keyhole" class="icon"></i>비밀 칸 <span class="small muted">정답 공개 때만 보임</span><i data-lucide="chevron-down" class="icon chev"></i></summary>
                 <div class="det-in">
-                  <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
-                  <div class="field"><div class="flabel">숨긴 단서는 어느 기준으로 찾을 수 있나요?</div><div class="opt-row" id="optClueCrit"></div></div>
-                  <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
+                  <div class="field"><div class="flabel">이 게시물은?</div>
+                    <div class="opt-row" id="optTruth">
+                      <button type="button" class="opt" data-truth="real" aria-pressed="false"><i data-lucide="badge-check" class="icon"></i>진짜</button>
+                      <button type="button" class="opt" data-truth="fake" aria-pressed="true"><i data-lucide="drama" class="icon"></i>가짜</button>
+                    </div>
+                    <p class="small muted" id="truthHelp" style="margin:0"></p></div>
+                  <div id="fakeFields">
+                    <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
+                    <div class="field"><div class="flabel">숨긴 단서는 어느 기준으로 찾을 수 있나요?</div><div class="opt-row" id="optClueCrit"></div></div>
+                    <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
+                  </div>
+                  <div id="realFields" hidden>
+                    <div class="field"><label for="fBasis">근거가 된 사실 카드</label><select id="fBasis"></select>
+                      <p class="small muted" style="margin:0">진짜 게시물은 사실 카드에 있는 내용으로만 씁니다. 사실 카드와 어긋나면 가짜로 판정됩니다.</p></div>
+                  </div>
                 </div>
               </details>
               </div>
               <div class="igc-foot">
                 <p class="err" id="formErr" role="alert"></p>
-                <p class="small muted" style="margin:0">우리 조 게시물은 모두 <b>진짜처럼 보이는 가짜</b>입니다. 공유하면 바로 피드에 들어가고, 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보입니다.</p>
+                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어가고, 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보입니다. 누가 만든 글인지, 진짜인지 가짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
               </div>
             </div>
           </div>
@@ -1073,7 +1085,7 @@ function verdictBadge(v) {
 function answerHTML(p) {
   if (S.data.phase !== 'reveal') return '';
   const mine = S.data.myJudgments[p.id];
-  const result = mine ? `<div class="small">우리 조 판정 ${verdictBadge(mine.verdict)} ${mine.verdict === (p.seed ? p.answer.truth : 'fake') ? '<b>맞혔습니다</b>' : '<b>틀렸습니다</b>'}</div>` : '';
+  const result = mine ? `<div class="small">우리 조 판정 ${verdictBadge(mine.verdict)} ${mine.verdict === (p.seed ? p.answer.truth : (p.secret?.truth || 'fake')) ? '<b>맞혔습니다</b>' : '<b>틀렸습니다</b>'}</div>` : '';
   if (p.seed && p.answer) {
     return `<div class="answer ${p.answer.truth}"><div>${verdictBadge(p.answer.truth)} <b>운영실이 준비한 자료</b></div><div>${esc(p.answer.explain)}</div>${result}${p.counts ? countsHTML(p.counts) : ''}</div>`;
   }
@@ -1081,7 +1093,7 @@ function answerHTML(p) {
     const s = p.secret;
     return `<div class="answer ${s.truth}"><div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'} 게시물</b></div>
       ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}
-      ${s.clue ? `<div><b>숨긴 단서</b>${s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}
+      ${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 사실 카드' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}
       ${p.aiGenerated ? `<div><b>AI로 만든 사진</b> 요청한 말: "${esc(p.aiPrompt || '')}"</div>` : ''}
       ${result}${p.counts ? countsHTML(p.counts) : ''}</div>`;
   }
@@ -1092,7 +1104,8 @@ function countsHTML(c) { return `<div class="counts"><span>진짜라고 한 조 
 function statusHTML(p) {
   if (!p.mine || S.data.phase === 'reveal') return '';
   const s = p.secret || {};
-  return `<div class="status-line st-pending"><i data-lucide="drama"></i>우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 숨긴 단서: ${esc(s.clue || '-')}</div>`;
+  return s.truth === 'real' ? `<div class="status-line st-approved"><i data-lucide="badge-check"></i>우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>`
+    : `<div class="status-line st-pending"><i data-lucide="drama"></i>우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 숨긴 단서: ${esc(s.clue || '-')}</div>`;
 }
 
 function postHTML(p) {
@@ -1127,7 +1140,7 @@ function tileHTML(p) {
   const handle = (a.handle || '').replace(/^@/, '') || a.name || '';
   const mine = S.data.myJudgments[p.id], reveal = S.data.phase === 'reveal';
   let state = '';
-  if (reveal) { const t = p.seed ? p.answer?.truth : 'fake'; state = `<span class="tile-state ts-${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
+  if (reveal) { const t = p.seed ? p.answer?.truth : (p.secret?.truth || 'fake'); state = `<span class="tile-state ts-${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
   else if (mine) state = `<span class="tile-state ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
   else if (p.mine) state = `<span class="tile-state ts-mine">우리 조</span>`;
   const text = p.title || p.body || '';
@@ -1185,7 +1198,7 @@ const NEWS_FORMATS = ['news', 'notice'];
 function newsItemHTML(p) {
   const a = p.author || {}, mine = S.data.myJudgments[p.id], reveal = S.data.phase === 'reveal';
   let state = '';
-  if (reveal) { const t = p.seed ? p.answer?.truth : 'fake'; state = `<span class="ni-state ${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
+  if (reveal) { const t = p.seed ? p.answer?.truth : (p.secret?.truth || 'fake'); state = `<span class="ni-state ${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
   else if (mine) state = `<span class="ni-state ${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
   else if (p.mine) state = `<span class="ni-state mine">우리 조</span>`;
   const tag = p.format === 'notice' ? '<span class="ni-tag ni-notice">공지</span>' : '<span class="ni-tag ni-news">사회</span>';
@@ -1308,7 +1321,7 @@ function myPosts() { return (S.data.posts || []).filter(p => p.mine); }
 function resetForm() {
   const m = C.TEAM_MISSIONS[S.team] || { format: 'news', tactic: C.TACTICS[0].id };
   S.form = { format: m.format, tactic: m.tactic, clueCriterion: null, clue: '', name: '', handle: '', joined: '', followers: '',
-    color: SWATCHES[(S.team || 1) % SWATCHES.length], reporter: '', likes: '', views: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
+    color: SWATCHES[(S.team || 1) % SWATCHES.length], truth: 'fake', basis: '', reporter: '', likes: '', views: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
   S.editing = null;
 }
 
@@ -1316,10 +1329,10 @@ function renderMake() {
   if (S.screen || !S.team) return;
   const d = S.data, m = C.TEAM_MISSIONS[S.team] || {}, tac = C.TACTICS.find(x => x.id === m.tactic);
   $('#missionCard').innerHTML = `<h2>${S.team}조 미션 카드</h2><dl>
-    <dt>할 일</dt><dd>"도로랜드가 사라졌다"는 이야기에 대해 <b>진짜처럼 보이는 가짜 게시물</b>을 ${d.maxPosts}개까지 만듭니다.</dd>
+    <dt>할 일</dt><dd>"도로랜드가 사라졌다"는 이야기에 대해 게시물을 ${d.maxPosts}개까지 만듭니다. <b>진짜 1개 + 가짜 1개</b>를 추천합니다(둘 다 가짜도 됩니다).</dd>
     <dt>형식</dt><dd>${esc(C.FORMATS[m.format]?.label || '')} (다른 형식도 써도 됩니다)</dd>
     <dt>수법</dt><dd><b>${esc(m.tactic || '')}</b>. ${esc(tac?.desc || '')}</dd>
-    <dt>규칙</dt><dd>실존 인물은 쓰지 않습니다. 확인 기준 4가지 중 하나로 들킬 수 있는 단서를 하나 꼭 남깁니다.</dd></dl>`;
+    <dt>규칙</dt><dd>실존 인물은 쓰지 않습니다. 진짜는 사실 카드에 있는 내용으로만, 가짜는 확인 기준 4가지 중 하나로 들킬 단서를 하나 꼭 남깁니다.</dd></dl>`;
   const mine = myPosts();
   $('#myPosts').innerHTML = mine.length ? `<div class="flabel">우리 조 게시물 (${mine.length} / ${d.maxPosts})</div>` + mine.map(postHTML).join('') : '';
   // 만들기 화면은 언제든 열어서 미리 써 볼 수 있다. 공유(저장)와 AI 사진은 「게시물 만들기」 단계에서만 서버가 받아 준다.
@@ -1335,6 +1348,10 @@ function renderMake() {
 function fillForm() {
   const f = S.form, fmt = C.FORMATS[f.format];
   $('#optFormat').innerHTML = Object.entries(C.FORMATS).map(([k, v]) => `<button type="button" class="opt" data-format="${k}" aria-pressed="${f.format === k}"><i data-lucide="${v.icon}"></i>${v.label}</button>`).join('');
+  $$('#optTruth .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.truth === (f.truth || 'fake')));
+  $('#truthHelp').textContent = f.truth === 'real' ? '진짜를 고르면 점수는 못 얻지만, 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못하게 합니다.' : '가짜를 진짜라고 믿은 조마다 1점을 얻습니다. 들킬 단서를 하나 꼭 남기세요.';
+  $('#fakeFields').hidden = f.truth === 'real'; $('#realFields').hidden = f.truth !== 'real';
+  $('#fBasis').innerHTML = '<option value="">사실 카드를 고르세요</option>' + C.FACTS.map(x => `<option ${f.basis === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
   $('#fTactic').innerHTML = C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
   $('#tacticDesc').textContent = (C.TACTICS.find(t => t.id === f.tactic) || {}).desc || '';
   $('#optClueCrit').innerHTML = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="opt" data-cluecrit="${k}" aria-pressed="${f.clueCriterion === k}">${c.label}</button>`).join('');
@@ -1378,7 +1395,8 @@ function renderPreview() {
 
 $('#postForm').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.format) S.form.format = b.dataset.format;
+  if (b.dataset.truth) S.form.truth = b.dataset.truth;
+  else if (b.dataset.format) S.form.format = b.dataset.format;
   else if (b.dataset.cluecrit) S.form.clueCriterion = b.dataset.cluecrit;
   else if (b.dataset.color) S.form.color = b.dataset.color;
   else if (b.dataset.img) S.imgTab = b.dataset.img;
@@ -1390,6 +1408,7 @@ $('#postForm').addEventListener('input', e => {
   if (map[e.target.id]) { S.form[map[e.target.id]] = e.target.value; renderPreview(); }
 });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
+$('#fBasis').addEventListener('change', e => { S.form.basis = e.target.value; });
 
 // 사진: 긴 변 1280px JPEG로 줄여서 올린다
 $('#fFile').addEventListener('change', e => { const file = e.target.files[0]; e.target.value = ''; if (file) uploadFile(file); });
@@ -1449,7 +1468,7 @@ function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {};
   S.form = { format: p.format, tactic: s.tactic || (C.TEAM_MISSIONS[S.team] || {}).tactic, clueCriterion: s.clueCriterion, clue: s.clue || '',
-    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null,
+    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.clue || '') : '', reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null,
     title: p.title, body: p.body, tags: p.tags, place: p.place, postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId };
   S.editing = id; showTab('make'); render();
   $('#postForm').scrollIntoView({ behavior: 'smooth' });
@@ -1461,7 +1480,8 @@ $('#postForm').addEventListener('submit', async e => {
   const f = S.form, err = $('#formErr'); err.textContent = '';
   if (!f.name.trim()) { err.textContent = C.FORMATS[f.format].authorLabel + '을(를) 써 주세요.'; return; }
   if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return; }
-  if (!f.clue.trim() || !f.clueCriterion) { err.textContent = '숨긴 단서와 그 단서를 찾는 기준을 꼭 적어 주세요.'; return; }
+  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 사실 카드를 골라 주세요.'; return; }
+  if (f.truth !== 'real' && (!f.clue.trim() || !f.clueCriterion)) { err.textContent = '가짜 게시물은 숨긴 단서와 그 단서를 찾는 기준을 꼭 적어 주세요.'; return; }
   const btn = $('#btnSubmit'); btn.disabled = true;
   try {
     await api('/posts', { id: S.editing, team: S.team, format: f.format,
@@ -1471,7 +1491,7 @@ $('#postForm').addEventListener('submit', async e => {
       thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
       title: C.FORMATS[f.format].titleLabel ? f.title : '', body: f.body, tags: ['sns', 'story'].includes(f.format) ? f.tags : '', place: f.place,
       postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId,
-      secret: { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });
+      secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basis, clueCriterion: 'cross' } : { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });
     toast(S.editing ? '고친 내용을 올렸습니다.' : '올렸습니다. 다른 조에게는 판별 시간부터 보입니다.');
     resetForm(); await refresh();
   } catch (x) { err.textContent = x.message; }
@@ -1576,7 +1596,7 @@ function adRender() {
   $('#adTeamCount').textContent = teamN;
   $('#adSeedCount').textContent = posts.length - teamN;
   $('#adDelAllBtn').disabled = !teamN;
-  const row = p => { const truth = p.seed ? p.answer?.truth : 'fake', c = p.counts || { real: 0, fake: 0, unsure: 0 };
+  const row = p => { const truth = p.seed ? p.answer?.truth : (p.secret?.truth || 'fake'), c = p.counts || { real: 0, fake: 0, unsure: 0 };
     return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
       <div><div>${p.seed ? '<span class="ad-b seed">운영실 자료</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')}</span></div>
         <div class="t">${esc(p.title || p.body || '')}</div>

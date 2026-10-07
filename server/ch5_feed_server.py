@@ -146,7 +146,7 @@ def compute_scores():
     for p in DB['posts']:
         if p['status'] != 'approved':
             continue
-        truth = p['answer']['truth'] if p.get('seed') else 'fake'
+        truth = p['answer']['truth'] if p.get('seed') else p['secret'].get('truth', 'fake')
         for t in range(1, TEAM_COUNT + 1):
             j = DB['judgments'].get(judgment_key(p['id'], t))
             if not j or t == p['team']:
@@ -492,13 +492,13 @@ class Handler(BaseHTTPRequestHandler):
             'postedAt': clean_text(b.get('postedAt'), 20),
             'photoTakenAt': clean_text(b.get('photoTakenAt'), 20),
             'imageId': clean_image_id(b.get('imageId')),
-            'secret': {'truth': 'fake', 'tactic': clean_text(secret.get('tactic'), 30),
+            'secret': {'truth': 'real' if secret.get('truth') == 'real' else 'fake', 'tactic': clean_text(secret.get('tactic'), 30),
                        'clue': clean_text(secret.get('clue'), 200), 'clueCriterion': secret.get('clueCriterion')
                        if secret.get('clueCriterion') in CRITERIA else None},
         }
         if not post['body'] and not post['title']:
             raise ValueError('제목이나 본문을 써 주세요.')
-        if not post['secret']['clue']:
+        if not post['secret']['clue']:  # 가짜면 숨긴 단서, 진짜면 근거가 된 사실 카드
             raise ValueError('가짜 게시글에는 들킬 수 있는 단서를 하나 꼭 적어 주세요.')
         with lock:
             if DB['phase'] != 'make':
