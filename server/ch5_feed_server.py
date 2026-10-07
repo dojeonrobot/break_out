@@ -10,7 +10,7 @@
 실행:
     python server/ch5_feed_server.py            # http://localhost:8095/chapter05/feed.html
 환경변수:
-    CH5_PORT=8095  CH5_HOST=127.0.0.1  CH5_ADMIN_KEY=0505
+    CH5_PORT=8095  CH5_HOST=127.0.0.1  CH5_ADMIN_KEY=0101
     GEMINI_API_KEY=...  GEMINI_IMAGE_MODEL=gemini-3.1-flash-image  GEMINI_TEXT_MODEL=gemini-2.5-flash
     CH5_AI_QUOTA=8 (조당 AI 이미지 횟수)  CH5_STATIC=1 (저장소 파일도 서빙, 로컬 확인용)
 """
@@ -36,7 +36,7 @@ SEED_PATH = os.path.join(HERE, 'ch5_seed.json')
 
 PORT = int(os.environ.get('CH5_PORT', '8095'))
 HOST = os.environ.get('CH5_HOST', '127.0.0.1')
-ADMIN_KEY = os.environ.get('CH5_ADMIN_KEY', '0505')
+ADMIN_KEY = os.environ.get('CH5_ADMIN_KEY', '0101')
 GEMINI_KEY = os.environ.get('GEMINI_API_KEY', '')
 IMAGE_MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-3.1-flash-image')
 TEXT_MODEL = os.environ.get('GEMINI_TEXT_MODEL', 'gemini-2.5-flash')

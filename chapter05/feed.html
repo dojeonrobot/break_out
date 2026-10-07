@@ -643,6 +643,69 @@
     .tpl-opt:disabled { opacity: .35; }
     .thumb-img-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .thumb-img-row img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+
+    /* ===== 만들기 한 화면 레이아웃 ===== */
+    @media (min-width: 1024px) {
+      main.wide { height: 100dvh; padding: 14px 20px 14px; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+      #tab-make { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+      #tab-make[hidden] { display: none; }
+      .make-wrap { flex: 1; min-height: 0; display: flex; }
+      .igc.mk { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+      .mk-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 250px 1.1fr 1.1fr 1fr; }
+      .mk-col { min-height: 0; overflow: auto; padding: 10px 12px 12px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+      .mk-col:first-child { border-left: 0; }
+    }
+    @media (max-width: 1023px) { .mk-body { display: grid; gap: 14px; } .mk-col { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; } }
+    .mk-top { display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px; flex-wrap: wrap; }
+    .mk-top .mission { margin: 0; flex: 1; padding: 8px 14px; font-size: 13px; line-height: 1.5; border-top-width: 3px; }
+    .mk-top .mission h2 { font-size: 14px; margin: 0 10px 0 0; display: inline; }
+    .mk-top .mission dl { display: inline; }
+    .mk-top .mission dt, .mk-top .mission dd { display: inline; margin: 0; }
+    .mk-top .mission dt::before { content: " · "; color: var(--muted); }
+    .mk-top .mission dt:first-of-type::before { content: ""; }
+    .mk-top .mission dt { font-weight: 800; margin-right: 4px; }
+    .mk-top .make-notice { margin: 0; padding: 8px 12px; font-size: 12.5px; max-width: 360px; }
+    .mk .igc-head { height: 42px; }
+    .mk-h { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+    .mk-h .icon { width: 16px; height: 16px; }
+    .mk .opt { font-size: 12px; padding: 5px 9px; gap: 4px; }
+    .mk .opt .icon { width: 14px; height: 14px; }
+    .mk .igc-row { min-height: 38px; border-bottom: 1px solid var(--line); }
+    .mk .igc-row input { padding: 8px 0; font-size: 13px; }
+    .mk .igc-row .icon { width: 16px; height: 16px; }
+    .mk .igc-caption { min-height: 96px; padding: 6px 2px !important; font-size: 13.5px; }
+    .mk .igc-cap-tools { padding: 0 0 6px; }
+    .mk-drop { border: 1px dashed var(--line); border-radius: 8px; padding: 8px 10px; min-height: 48px; display: grid; align-items: center; }
+    .mk-dropcta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .mk .thumb-row { display: flex; gap: 8px; align-items: center; }
+    .mk .thumb-row img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+    .mk-grid { gap: 6px 8px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .mk-grid .input { min-width: 0; width: 100%; }
+    .mk-grid .field:has(.swatches) { grid-column: 1 / -1; }
+    .mk-grid .swatches { flex-wrap: wrap; }
+    .mk-grid .field { gap: 2px; }
+    .mk-grid label, .mk-grid .flabel, .mk-secret label, .mk-secret .flabel { font-size: 12px; }
+    .mk .input, .mk select, .mk textarea { padding: 6px 9px; font-size: 13px; }
+    .mk .swatches { gap: 5px; } .mk .sw { width: 22px; height: 22px; }
+    .mk .tpl-grid { gap: 5px; }
+    .mk .tpl-opt { padding: 5px 2px; font-size: 11px; gap: 2px; } .mk .tpl-opt .icon { width: 16px; height: 16px; }
+    .mk .thumb-img-row img { width: 36px; height: 36px; }
+    .mk-stack { display: flex; flex-direction: column; gap: 8px; }
+    .mk-foot { margin-top: auto; display: grid; gap: 6px; padding-top: 8px; }
+    .mk-prev-area { flex: 1; min-height: 0; overflow: auto; }
+    .mk-prev .thumb-prev { padding: 4px 0; }
+    .mk-prev .thumb-prev .tile { width: 200px; }
+    .mk-prev .thumb-prev .nc { width: 100%; }
+    .mk-prev #preview .post { font-size: 12px; }
+    .mk-prev .igc-steps { border-bottom: 0; margin: -4px -6px 0; }
+    .mk-prev .igc-step { padding: 8px 6px; font-size: 13px; }
+    .my-posts { margin: 0; gap: 6px; }
+    .mp-row { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
+    .mp-row img, .mp-row .noimg { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; background: var(--surface-2); }
+    .mp-row .t { font-weight: 700; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    .mp-row .a { display: flex; gap: 6px; }
+    .mp-row .a button { border: 0; background: none; padding: 0; font-size: 12px; color: var(--blue); font-weight: 700; }
+    .mp-row .a button.d { color: var(--fake); }
   </style>
 </head>
 <body>
@@ -689,127 +752,106 @@
       </div>
     </section>
 
-    <!-- 만들기 -->
+    <!-- 만들기: 노트북 한 화면에 전부 (미리보기 | 글 | 계정·썸네일 | 비밀 칸) -->
     <section id="tab-make" hidden>
-      <div class="mission" id="missionCard"></div>
-      <div class="make-notice" id="makeNotice" hidden></div>
-      <div class="my-posts" id="myPosts"></div>
+      <div class="mk-top">
+        <div class="mission" id="missionCard"></div>
+        <div class="make-notice" id="makeNotice" hidden></div>
+      </div>
       <div id="makeClosed" class="empty" hidden></div>
       <div class="make-wrap" id="makeWrap">
-        <form class="igc" id="postForm" novalidate>
+        <form class="igc mk" id="postForm" novalidate>
           <div class="igc-head">
             <button type="button" class="igc-cancel" id="btnCancelEdit" hidden>취소</button>
             <h2 id="igcTitle" style="grid-column:2">새 게시물 만들기</h2>
             <button type="submit" class="igc-share" id="btnSubmit">공유하기</button>
           </div>
-          <div class="igc-steps" role="tablist">
-            <button type="button" class="igc-step" data-mstep="thumb" aria-selected="true"><b>1</b>썸네일 <small>목록에 보이는 화면</small></button>
-            <button type="button" class="igc-step" data-mstep="detail" aria-selected="false"><b>2</b>상세 내용 <small>눌렀을 때 화면</small></button>
-          </div>
-          <div class="igc-body">
-            <div class="igc-media">
-              <div class="igc-drop" id="dropZone">
-                <div class="drop-cta" id="dropCta">
-                  <i data-lucide="images" class="big"></i>
-                  <b>사진을 여기에 끌어다 놓으세요</b>
-                  <label class="btn btn-primary" for="fFile">컴퓨터에서 선택</label>
-                  <span class="small muted">사진 없이 글만 올려도 됩니다. 사람 얼굴이 크게 나온 사진은 쓰지 않습니다.</span>
-                </div>
-                <div id="preview" style="margin-top:12px"></div>
-                <div class="thumb-prev" id="thumbPrev" hidden></div>
+          <div class="mk-body">
+
+            <!-- 1열: 미리보기 + 우리 조 게시물 -->
+            <div class="mk-col mk-prev">
+              <div class="igc-steps" role="tablist">
+                <button type="button" class="igc-step" data-mstep="thumb" aria-selected="true"><b>1</b>썸네일</button>
+                <button type="button" class="igc-step" data-mstep="detail" aria-selected="false"><b>2</b>상세 화면</button>
               </div>
-              <input type="file" id="fFile" accept="image/*" hidden>
-              <div class="img-tools igc" style="border-radius:8px">
-                <div class="img-tabs" role="tablist">
-                  <button type="button" class="img-tab" role="tab" data-img="upload" aria-selected="true"><i data-lucide="image" class="icon"></i>사진</button>
-                  <button type="button" class="img-tab" role="tab" data-img="ai" aria-selected="false"><i data-lucide="sparkles" class="icon"></i>AI로 그리기</button>
-                  <button type="button" class="img-tab" role="tab" data-img="edit" aria-selected="false"><i data-lucide="eraser" class="icon"></i>AI로 사진 고치기</button>
-                </div>
-                <div class="img-pane" data-pane="upload">
-                  <div class="thumb-row" id="thumb" hidden style="display:flex;gap:10px;align-items:center"><img id="thumbImg" alt="넣은 사진" style="width:56px;height:56px;object-fit:cover;border-radius:6px"><span class="small muted" style="flex:1">사진이 들어갔습니다.</span><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
-                  <div class="field"><label for="fTaken">사진 찍은 때</label><input class="input" id="fTaken" maxlength="20" placeholder="예: 3년 전 10월 6일 (비우면 '사진 정보 없음')"></div>
-                </div>
-                <div class="img-pane" data-pane="ai" hidden>
-                  <div class="field"><label for="fAiPrompt">어떤 그림을 만들까요?</label>
-                    <textarea id="fAiPrompt" rows="3" maxlength="300" placeholder="예: 안개 낀 바다 위에 관람차가 반쯤 사라진 섬, 휴대폰으로 찍은 사진 느낌"></textarea></div>
-                  <button type="button" class="btn btn-primary" id="btnAiGen"><i data-lucide="sparkles" class="icon"></i>그림 만들기</button>
-                </div>
-                <div class="img-pane" data-pane="edit" hidden>
-                  <p class="small muted" style="margin:0">먼저 사진을 넣은 뒤 어떻게 고칠지 쓰세요. 예: 융합교육관 사진에서 건물을 지우기</p>
-                  <div class="field"><label for="fAiEdit">어떻게 고칠까요?</label>
-                    <textarea id="fAiEdit" rows="3" maxlength="300" placeholder="예: 뒤에 있는 건물을 지우고 그 자리에 바다만 보이게 해 줘"></textarea></div>
-                  <button type="button" class="btn btn-primary" id="btnAiEdit"><i data-lucide="eraser" class="icon"></i>사진 고치기</button>
-                </div>
-                <p class="ai-note img-pane" id="aiQuota" style="margin:0"></p>
+              <div class="mk-prev-area">
+                <div class="thumb-prev" id="thumbPrev"></div>
+                <div id="preview" hidden></div>
               </div>
+              <div class="my-posts" id="myPosts"></div>
             </div>
 
-            <div class="igc-side">
-              <div class="igc-acct"><span id="acctAv"></span><span id="acctName">계정 이름</span></div>
-              <div class="igc-sec"><div class="flabel">게시 형식</div><div class="opt-row" id="optFormat"></div></div>
-              <div id="thumbFields">
-                <div class="igc-sec"><div class="flabel">썸네일 디자인 <span class="small muted" style="font-weight:400">목록에서 보이는 모양</span></div><div class="tpl-grid" id="optTpl"></div></div>
-                <div class="igc-row"><label class="sr" for="fThumbTitle">썸네일 제목</label><i data-lucide="type" class="icon"></i><input id="fThumbTitle" maxlength="60" placeholder="썸네일에 크게 띄울 문구 (비우면 제목·문구 앞부분)"></div>
-                <div class="igc-sec"><div class="flabel">썸네일 사진</div>
-                  <div class="thumb-img-row">
-                    <button type="button" class="opt" id="thumbUseMain" aria-pressed="true">본문 사진 그대로</button>
-                    <label class="opt" for="fThumbFile" id="thumbUseOther" style="cursor:pointer"><i data-lucide="upload" class="icon"></i>다른 사진 올리기</label>
-                    <input type="file" id="fThumbFile" accept="image/*" hidden>
-                    <img id="thumbOwnImg" alt="썸네일 사진" hidden>
-                  </div>
-                  <p class="small muted" style="margin:0">썸네일은 누르기 전에 보이는 첫인상입니다. 본문과 다른 사진·문구로 눈길을 끌 수도 있어요(낚시성 썸네일도 판별 단서가 됩니다).</p>
-                </div>
-                <div class="igc-sec"><button type="button" class="btn btn-ghost" id="toDetail">다음: 상세 내용 쓰기 <i data-lucide="arrow-right" class="icon"></i></button></div>
-              </div>
-              <div id="detailFields">
+            <!-- 2열: 글 쓰기 -->
+            <div class="mk-col">
+              <div class="mk-h"><i data-lucide="pen-line" class="icon"></i>글</div>
+              <div class="opt-row" id="optFormat"></div>
               <div class="igc-row" id="titleField"><label class="sr" for="fTitle" id="fTitleLabel">제목</label><i data-lucide="heading" class="icon"></i><input id="fTitle" maxlength="80" placeholder="제목"></div>
               <label class="sr" for="fBody" id="fBodyLabel">문구</label>
               <textarea id="fBody" class="igc-caption" maxlength="1200" placeholder="문구를 입력하세요..."></textarea>
               <div class="igc-cap-tools"><button type="button" class="linkbtn" id="btnPolish"><i data-lucide="wand-sparkles" class="icon"></i>AI로 말투 다듬기</button><span class="igc-count" id="bodyCount">0/1,200</span></div>
-              <div class="igc-row" id="tagsField"><label class="sr" for="fTags">해시태그</label><i data-lucide="hash" class="icon"></i><input id="fTags" maxlength="80" placeholder="해시태그 추가 (#도로랜드)"></div>
+              <div class="igc-row" id="tagsField"><label class="sr" for="fTags">해시태그</label><i data-lucide="hash" class="icon"></i><input id="fTags" maxlength="80" placeholder="해시태그 (#도로랜드)"></div>
               <div class="igc-row"><label class="sr" for="fPlace">위치</label><i data-lucide="map-pin" class="icon"></i><input id="fPlace" maxlength="40" placeholder="위치 추가"></div>
-              <div class="igc-row"><label class="sr" for="fPosted">게시 시점</label><i data-lucide="clock-3" class="icon"></i><input id="fPosted" maxlength="20" placeholder="게시 시점 (예: 1시간 전, 10월 9일)"></div>
-              <details class="igc-det">
-                <summary><i data-lucide="user-round-pen" class="icon"></i>계정 꾸미기<i data-lucide="chevron-down" class="icon chev"></i></summary>
-                <div class="det-in">
-                  <div class="grid2">
-                    <div class="field"><label for="fName" id="fNameLabel">이름</label><input class="input" id="fName" maxlength="30" placeholder="예: 도로일보"></div>
-                    <div class="field"><label for="fHandle">계정 아이디</label><input class="input" id="fHandle" maxlength="29" placeholder="예: doroilbo"></div>
-                    <div class="field"><label for="fJoined">가입한 때</label><input class="input" id="fJoined" maxlength="20" placeholder="예: 2019.03"></div>
-                    <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
-                    <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
-                    <div class="field" id="likesField"><label for="fLikes" id="fLikesLabel">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
-                    <div class="field"><label for="fViews">조회수</label><input class="input" id="fViews" maxlength="10" placeholder="예: 3.2만"></div>
-                  </div>
-                  <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
-                </div>
-              </details>
-              <details class="igc-det" id="secretBox" open>
-                <summary><i data-lucide="lock-keyhole" class="icon"></i>비밀 칸 <span class="small muted">정답 공개 때만 보임</span><i data-lucide="chevron-down" class="icon chev"></i></summary>
-                <div class="det-in">
-                  <div class="field"><div class="flabel">이 게시물은?</div>
-                    <div class="opt-row" id="optTruth">
-                      <button type="button" class="opt" data-truth="real" aria-pressed="false"><i data-lucide="badge-check" class="icon"></i>진짜</button>
-                      <button type="button" class="opt" data-truth="fake" aria-pressed="true"><i data-lucide="drama" class="icon"></i>가짜</button>
-                    </div>
-                    <p class="small muted" id="truthHelp" style="margin:0"></p></div>
-                  <div id="fakeFields">
-                    <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
-                    <div class="field"><div class="flabel">숨긴 단서는 어느 기준으로 찾을 수 있나요?</div><div class="opt-row" id="optClueCrit"></div></div>
-                    <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="2" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
-                  </div>
-                  <div id="realFields" hidden>
-                    <div class="field"><label for="fBasis">근거가 된 사실 카드</label><select id="fBasis"></select>
-                      <p class="small muted" style="margin:0">진짜 게시물은 사실 카드에 있는 내용으로만 씁니다. 사실 카드와 어긋나면 가짜로 판정됩니다.</p></div>
-                  </div>
-                </div>
-              </details>
+              <div class="igc-row"><label class="sr" for="fPosted">게시 시점</label><i data-lucide="clock-3" class="icon"></i><input id="fPosted" maxlength="20" placeholder="게시 시점 (예: 1시간 전)"></div>
+              <div class="mk-h" style="margin-top:6px"><i data-lucide="image" class="icon"></i>본문 사진</div>
+              <div class="igc-drop mk-drop" id="dropZone">
+                <div id="dropCta" class="mk-dropcta"><label class="btn btn-ghost" for="fFile"><i data-lucide="upload" class="icon"></i>사진 고르기</label><span class="small muted">끌어다 놓아도 됩니다. 사진 없이 글만 올려도 됩니다.</span></div>
+                <div class="thumb-row" id="thumb" hidden><img id="thumbImg" alt="넣은 사진"><span class="small muted" style="flex:1">사진이 들어갔습니다.</span><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
               </div>
-              <div class="igc-foot">
-                <p class="err" id="formErr" role="alert"></p>
-                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어가고, 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보입니다. 누가 만든 글인지, 진짜인지 가짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
+              <input type="file" id="fFile" accept="image/*" hidden>
+              <div class="igc-row"><label class="sr" for="fTaken">사진 찍은 때</label><i data-lucide="calendar-clock" class="icon"></i><input id="fTaken" maxlength="20" placeholder="사진 찍은 때 (예: 3년 전 10월 6일)"></div>
+            </div>
+
+            <!-- 3열: 계정 + 썸네일 -->
+            <div class="mk-col">
+              <div class="mk-h"><i data-lucide="user-round-pen" class="icon"></i>계정 <span class="igc-acct" style="padding:0;margin-left:auto"><span id="acctAv"></span><span id="acctName">계정 이름</span></span></div>
+              <div class="grid2 mk-grid">
+                <div class="field"><label for="fName" id="fNameLabel">이름</label><input class="input" id="fName" maxlength="30" placeholder="예: 도로일보"></div>
+                <div class="field"><label for="fHandle">계정 아이디</label><input class="input" id="fHandle" maxlength="29" placeholder="예: doroilbo"></div>
+                <div class="field"><label for="fJoined">가입한 때</label><input class="input" id="fJoined" maxlength="20" placeholder="예: 2019.03"></div>
+                <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
+                <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
+                <div class="field" id="likesField"><label for="fLikes" id="fLikesLabel">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
+                <div class="field"><label for="fViews">조회수</label><input class="input" id="fViews" maxlength="10" placeholder="예: 3.2만"></div>
+                <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
+              </div>
+              <div class="mk-h" style="margin-top:8px"><i data-lucide="layout-template" class="icon"></i>썸네일 <span class="small muted" style="font-weight:400">목록에서 보이는 모양</span></div>
+              <div id="thumbFields">
+                <div class="tpl-grid" id="optTpl"></div>
+                <div class="igc-row"><label class="sr" for="fThumbTitle">썸네일 제목</label><i data-lucide="type" class="icon"></i><input id="fThumbTitle" maxlength="60" placeholder="썸네일 제목 (비우면 제목·문구 앞부분)"></div>
+                <div class="thumb-img-row">
+                  <button type="button" class="opt" id="thumbUseMain" aria-pressed="true">본문 사진 그대로</button>
+                  <label class="opt" for="fThumbFile" id="thumbUseOther" style="cursor:pointer"><i data-lucide="upload" class="icon"></i>다른 사진</label>
+                  <input type="file" id="fThumbFile" accept="image/*" hidden>
+                  <img id="thumbOwnImg" alt="썸네일 사진" hidden>
+                </div>
               </div>
             </div>
+
+            <!-- 4열: 비밀 칸 -->
+            <div class="mk-col mk-secret" id="secretBox">
+              <div class="mk-h"><i data-lucide="lock-keyhole" class="icon"></i>비밀 칸 <span class="small muted" style="font-weight:400">정답 공개 때만 보임</span></div>
+              <div class="field"><div class="flabel">이 게시물은?</div>
+                <div class="opt-row" id="optTruth">
+                  <button type="button" class="opt" data-truth="real" aria-pressed="false"><i data-lucide="badge-check" class="icon"></i>진짜</button>
+                  <button type="button" class="opt" data-truth="fake" aria-pressed="true"><i data-lucide="drama" class="icon"></i>가짜</button>
+                </div>
+                <p class="small muted" id="truthHelp" style="margin:0"></p></div>
+              <div id="fakeFields" class="mk-stack">
+                <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
+                <div class="field"><div class="flabel">단서를 찾는 기준</div><div class="opt-row" id="optClueCrit"></div></div>
+                <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="3" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
+              </div>
+              <div id="realFields" class="mk-stack" hidden>
+                <div class="field"><label for="fBasis">근거가 된 사실 카드</label><select id="fBasis"></select>
+                  <p class="small muted" style="margin:0">진짜 게시물은 사실 카드에 있는 내용으로만 씁니다. 사실 카드와 어긋나면 가짜로 판정됩니다.</p></div>
+              </div>
+              <div id="detailFields" hidden></div>
+              <div class="mk-foot">
+                <p class="err" id="formErr" role="alert"></p>
+                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 운영실 자료와 섞여 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
+              </div>
+            </div>
+
           </div>
         </form>
       </div>
@@ -892,7 +934,7 @@ const S = {
   open: {},      // postId -> 열린 확인 기준
   draft: {},     // postId -> {verdict, criterion, reason} 판별 작성 중
   form: null,    // 만들기 폼 값
-  editing: null, imgTab: 'upload', busy: false
+  editing: null, busy: false
 };
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -1328,20 +1370,21 @@ function resetForm() {
 function renderMake() {
   if (S.screen || !S.team) return;
   const d = S.data, m = C.TEAM_MISSIONS[S.team] || {}, tac = C.TACTICS.find(x => x.id === m.tactic);
-  $('#missionCard').innerHTML = `<h2>${S.team}조 미션 카드</h2><dl>
-    <dt>할 일</dt><dd>"도로랜드가 사라졌다"는 이야기에 대해 게시물을 ${d.maxPosts}개까지 만듭니다. <b>진짜 1개 + 가짜 1개</b>를 추천합니다(둘 다 가짜도 됩니다).</dd>
-    <dt>형식</dt><dd>${esc(C.FORMATS[m.format]?.label || '')} (다른 형식도 써도 됩니다)</dd>
-    <dt>수법</dt><dd><b>${esc(m.tactic || '')}</b>. ${esc(tac?.desc || '')}</dd>
-    <dt>규칙</dt><dd>실존 인물은 쓰지 않습니다. 진짜는 사실 카드에 있는 내용으로만, 가짜는 확인 기준 4가지 중 하나로 들킬 단서를 하나 꼭 남깁니다.</dd></dl>`;
+  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl>
+    <dt>할 일</dt><dd>게시물 ${d.maxPosts}개까지, <b>진짜 1 + 가짜 1</b> 추천</dd>
+    <dt>형식</dt><dd>${esc(C.FORMATS[m.format]?.label || '')}</dd>
+    <dt>수법</dt><dd><b>${esc(m.tactic || '')}</b> (${esc(tac?.desc || '')})</dd>
+    <dt>규칙</dt><dd>실존 인물 금지 · 진짜는 사실 카드대로 · 가짜는 단서 하나</dd></dl>`;
   const mine = myPosts();
-  $('#myPosts').innerHTML = mine.length ? `<div class="flabel">우리 조 게시물 (${mine.length} / ${d.maxPosts})</div>` + mine.map(postHTML).join('') : '';
+  $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 ${mine.length} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
+    <div><div class="t">${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
   // 만들기 화면은 언제든 열어서 미리 써 볼 수 있다. 공유(저장)와 AI 사진은 「게시물 만들기」 단계에서만 서버가 받아 준다.
   const canMake = S.editing || mine.length < d.maxPosts;
   $('#makeWrap').hidden = !canMake;
   $('#makeClosed').hidden = canMake;
   $('#makeClosed').innerHTML = `<b>우리 조 게시물을 모두 올렸습니다.</b><p class="muted small">위 게시물의 "고치기"로 내용을 바꿀 수 있습니다.</p>`;
   $('#makeNotice').hidden = d.phase === 'make';
-  $('#makeNotice').innerHTML = `<b>지금은 「${esc(C.PHASES[d.phase].label)}」 단계입니다.</b> 미리 써 볼 수는 있지만, <b>공유하기</b>와 AI 사진 만들기는 운영자가 「게시물 만들기」를 시작하면 열립니다.`;
+  $('#makeNotice').innerHTML = `<b>지금은 「${esc(C.PHASES[d.phase].label)}」 단계입니다.</b> 미리 써 볼 수는 있고, <b>공유하기</b>는 운영자가 「게시물 만들기」를 시작하면 열립니다.`;
   if (canMake) fillForm();
 }
 
@@ -1366,14 +1409,11 @@ function fillForm() {
   const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fThumbTitle: 'thumbTitle', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (document.activeElement !== el) el.value = f[k] || ''; });
   $('#thumb').hidden = !f.imageId; $('#thumb').style.display = f.imageId ? 'flex' : 'none'; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
-  $$('.img-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.img === S.imgTab));
-  $$('.img-pane[data-pane]').forEach(p => p.hidden = p.dataset.pane !== S.imgTab);
   const d = S.data;
-  $('#aiQuota').textContent = d.aiEnabled ? `AI 이미지는 조마다 ${d.aiQuota}번까지 만들 수 있습니다. 지금까지 ${d.aiUsed}번 썼습니다. AI로 만든 사진은 서버에 기록이 남고, 정답 공개 때 다른 조에게도 보입니다.` : 'AI 이미지 기능이 꺼져 있습니다. 사진 올리기를 써 주세요.';
-  ['btnAiGen', 'btnAiEdit', 'btnPolish'].forEach(id => $('#' + id).disabled = !d.aiEnabled || S.busy);
+  $('#btnPolish').disabled = !d.aiEnabled || S.busy;
+  $('#btnPolish').title = d.aiEnabled ? '' : 'AI 기능이 꺼져 있습니다';
   $('#btnSubmit').textContent = S.editing ? '수정 완료' : '공유하기';
   $('#btnSubmit').disabled = d.phase !== 'make';
-  if (d.phase !== 'make') ['btnAiGen', 'btnAiEdit'].forEach(id => $('#' + id).disabled = true);
   $('#igcTitle').textContent = S.editing ? '게시물 수정' : '새 게시물 만들기';
   $('#dropCta').hidden = !!f.imageId;
   $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
@@ -1399,7 +1439,6 @@ $('#postForm').addEventListener('click', e => {
   else if (b.dataset.format) S.form.format = b.dataset.format;
   else if (b.dataset.cluecrit) S.form.clueCriterion = b.dataset.cluecrit;
   else if (b.dataset.color) S.form.color = b.dataset.color;
-  else if (b.dataset.img) S.imgTab = b.dataset.img;
   else return;
   fillForm();
 });
@@ -1440,21 +1479,6 @@ function shrink(file) {
 }
 $('#btnRmImg').onclick = () => { S.form.imageId = null; fillForm(); };
 
-async function aiImage(prompt, base, btn) {
-  if (!prompt.trim()) { toast('어떻게 만들지 먼저 써 주세요.'); return; }
-  S.busy = true; fillForm();
-  const label = btn.innerHTML; btn.innerHTML = '만드는 중… (10~20초)';
-  try {
-    const r = await api('/ai/image', { team: S.team, prompt, baseImageId: base });
-    S.form.imageId = r.imageId; S.data.aiUsed = r.aiUsed; toast('AI 그림을 넣었습니다.');
-  } catch (err) { toast(err.message); }
-  btn.innerHTML = label; S.busy = false; fillForm();
-}
-$('#btnAiGen').onclick = e => aiImage($('#fAiPrompt').value, null, e.currentTarget);
-$('#btnAiEdit').onclick = e => {
-  if (!S.form.imageId) { toast('먼저 "사진 올리기"로 고칠 사진을 넣어 주세요.'); return; }
-  aiImage($('#fAiEdit').value, S.form.imageId, e.currentTarget);
-};
 $('#btnPolish').onclick = async e => {
   const btn = e.currentTarget, label = btn.innerHTML;
   if ((S.form.body || '').trim().length < 5) { toast('다듬을 글을 먼저 써 주세요.'); return; }
@@ -1638,7 +1662,6 @@ function previewPost() {
 function renderMakeStep() {
   const thumb = S.mstep === 'thumb', f = S.form, news = ['news', 'notice'].includes(f.format);
   $$('.igc-step').forEach(b => b.setAttribute('aria-selected', b.dataset.mstep === S.mstep));
-  $('#thumbFields').hidden = !thumb; $('#detailFields').hidden = thumb;
   $('#preview').hidden = thumb; $('#thumbPrev').hidden = !thumb;
   const hasImg = !!(f.thumbImageId || f.imageId);
   $('#optTpl').innerHTML = TPL_OPTS.map(([k, l, ic]) => `<button type="button" class="tpl-opt" data-tpl="${k}" aria-pressed="${(f.thumbTpl || 'auto') === k}" ${news || (k !== 'auto' && (k === 'text' ? hasImg : !hasImg)) ? 'disabled' : ''}><i data-lucide="${ic}"></i>${l}</button>`).join('');
@@ -1646,7 +1669,7 @@ function renderMakeStep() {
   $('#thumbOwnImg').hidden = !f.thumbImageId; if (f.thumbImageId) $('#thumbOwnImg').src = imgSrc(f.thumbImageId);
   if (thumb) {
     const p = previewPost();
-    $('#thumbPrev').innerHTML = `<div class="cap">${news ? '기사 목록에 이렇게 보입니다' : '쇼츠 목록에 이렇게 보입니다'}</div>${news ? newsItemHTML(p) : tileHTML(p)}<div class="cap">누르면 "② 상세 내용"이 열립니다</div>`;
+    $('#thumbPrev').innerHTML = `<div class="cap">${news ? '기사 목록에 이렇게 보입니다' : '쇼츠 목록에 이렇게 보입니다'}</div>${news ? newsItemHTML(p) : tileHTML(p)}`;
   }
   icons();
 }

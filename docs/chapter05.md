@@ -38,7 +38,7 @@
 ```
 python server/ch5_feed_server.py
 # 학생: http://localhost:8095/chapter05/feed.html   (?team=3 으로 조 고정, ?view=screen 진행 화면)
-# 운영자: http://localhost:8095/chapter05/feed-admin.html  (비밀번호 기본 0505, CH5_ADMIN_KEY로 변경)
+# 운영자: http://localhost:8095/chapter05/feed-admin.html  (비밀번호 기본 0101, CH5_ADMIN_KEY로 변경)
 ```
 로컬 확인용으로 이 서버가 저장소 파일도 같이 서빙한다(`CH5_STATIC=1`, 기본). 서버에서는 nginx가 정적 파일을 서빙하므로 `CH5_STATIC=0`.
 
