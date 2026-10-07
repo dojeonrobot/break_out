@@ -654,6 +654,7 @@
                     <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
                     <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
                     <div class="field" id="likesField"><label for="fLikes" id="fLikesLabel">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
+                    <div class="field"><label for="fViews">조회수</label><input class="input" id="fViews" maxlength="10" placeholder="예: 3.2만"></div>
                   </div>
                   <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
                 </div>
@@ -880,7 +881,7 @@ function canJudge(p) {
 
 function vpanelHTML(p, c) {
   const a = p.author || {};
-  if (c === 'who') return `<b>${C.CRITERIA.who.label}</b><dl><dt>이름</dt><dd>${esc(a.name || '-')}</dd><dt>계정</dt><dd>${esc(a.handle || '-')}</dd>${a.reporter ? `<dt>기자</dt><dd>${esc(a.reporter)}</dd>` : ''}<dt>가입한 때</dt><dd>${esc(a.joined || '정보 없음')}</dd><dt>팔로워</dt><dd>${esc(a.followers || '정보 없음')}</dd></dl>`;
+  if (c === 'who') return `<b>${C.CRITERIA.who.label}</b><dl><dt>이름</dt><dd>${esc(a.name || '-')}</dd><dt>계정</dt><dd>${esc(a.handle || '-')}</dd>${a.reporter ? `<dt>기자</dt><dd>${esc(a.reporter)}</dd>` : ''}<dt>가입한 때</dt><dd>${esc(a.joined || '정보 없음')}</dd><dt>팔로워</dt><dd>${esc(a.followers || '정보 없음')}</dd><dt>조회수</dt><dd>${esc(p.views || '-')}</dd><dt>좋아요</dt><dd>${esc(p.likes || '-')}</dd></dl><p class="small muted" style="margin:8px 0 0">팔로워에 비해 조회수·좋아요가 지나치게 크면 의심해 보세요.</p>`;
   if (c === 'when') return `<b>${C.CRITERIA.when.label}</b><dl><dt>올린 때</dt><dd>${esc(p.postedAt || '정보 없음')}</dd><dt>사진 찍은 때</dt><dd>${p.imageId || p.photoTakenAt ? esc(p.photoTakenAt || '사진 정보 없음') : '사진 없음'}</dd></dl>`;
   if (c === 'witness') {
     const text = esc((p.title ? p.title + '\n' : '') + (p.body || '')).replace(HEARSAY, '<mark class="hear">$1</mark>');
@@ -973,7 +974,7 @@ function tileHTML(p) {
   const BANDS = ['#8b8cf6', '#5fd3ae', '#f794b4', '#bdbdbd', '#ffd166', '#7cc4f8'];
   const band = BANDS[p.order % BANDS.length], awning = p.order % 3 === 0;
   const head = (p.title || text || '').replace(/\s+/g, ' ');
-  const views = ((p.order % 9000) + 312).toLocaleString();
+  const views = p.views || '';
   const media = p.imageId
     ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">`
     : `<div class="ph" style="background:linear-gradient(160deg, ${esc(a.color || '#4b5563')}, #111)"><span>${esc(p.title ? p.body : '')}</span></div>`;
@@ -981,9 +982,9 @@ function tileHTML(p) {
     <div class="sf">
       <div class="sf-band${awning ? ' awning' : ''}" style="--c:${band}">${awning ? '' : '<i data-lucide="sliders-horizontal"></i>'}<span class="sf-pill"><i data-lucide="search"></i><span>${esc(a.name || handle)}</span></span>${awning ? '' : '<i data-lucide="more-horizontal"></i><i data-lucide="x"></i>'}</div>
       <div class="sf-title">${esc(head || '(내용 없음)')}</div>
-      <div class="sf-meta"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><b>${esc(handle)}</b><span>| 조회수 ${views}</span>${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
+      <div class="sf-meta"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><b>${esc(handle)}</b>${views ? `<span>| 조회수 ${esc(views)}</span>` : ''}${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
       <div class="sf-img">${media}<span class="sf-fmt" title="${esc(f.label || '')}"><i data-lucide="${f.icon || 'file-text'}"></i></span>
-        <div class="sf-stats"><span><i data-lucide="play"></i>${views}</span>${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div></div>
+        <div class="sf-stats">${views ? `<span><i data-lucide="play"></i>${esc(views)}</span>` : ""}${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div></div>
       ${state}
     </div>
     <div class="tile-title">${esc(head || '(내용 없음)')}</div>
@@ -1004,7 +1005,7 @@ function newsItemHTML(p) {
   return `<button class="nc" data-open="${p.id}">
     <div class="nc-thumb">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)"><i data-lucide="${p.format === 'notice' ? 'megaphone' : 'newspaper'}"></i></span>`}${tag}<span class="nc-outlet">${esc(a.name || '')}</span></div>
     <div class="ni-title">${esc(p.title || (p.body || '').slice(0, 50))}</div>
-    <div class="ni-meta"><span>${esc(a.name || '')}</span>${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div>
+    <div class="ni-meta"><span>${esc(a.name || '')}</span>${p.views ? `<span>· 조회 ${esc(p.views)}</span>` : ''}${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div>
   </button>`;
 }
 
@@ -1112,7 +1113,7 @@ function myPosts() { return (S.data.posts || []).filter(p => p.mine); }
 function resetForm() {
   const m = C.TEAM_MISSIONS[S.team] || { format: 'news', tactic: C.TACTICS[0].id };
   S.form = { format: m.format, tactic: m.tactic, clueCriterion: null, clue: '', name: '', handle: '', joined: '', followers: '',
-    color: SWATCHES[(S.team || 1) % SWATCHES.length], reporter: '', likes: '', title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
+    color: SWATCHES[(S.team || 1) % SWATCHES.length], reporter: '', likes: '', views: '', title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
   S.editing = null;
 }
 
@@ -1149,7 +1150,7 @@ function fillForm() {
   $('#reporterField').hidden = f.format !== 'news';
   $('#likesField').hidden = !['sns', 'witness'].includes(f.format);
   $('#fLikesLabel').textContent = f.format === 'witness' ? '추천 수' : '좋아요 수';
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
+  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (document.activeElement !== el) el.value = f[k] || ''; });
   $('#thumb').hidden = !f.imageId; $('#thumb').style.display = f.imageId ? 'flex' : 'none'; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
   $$('.img-tab').forEach(b => b.setAttribute('aria-selected', b.dataset.img === S.imgTab));
@@ -1186,7 +1187,7 @@ $('#postForm').addEventListener('click', e => {
   fillForm();
 });
 $('#postForm').addEventListener('input', e => {
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
+  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
   if (map[e.target.id]) { S.form[map[e.target.id]] = e.target.value; renderPreview(); }
 });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
@@ -1249,7 +1250,7 @@ function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {};
   S.form = { format: p.format, tactic: s.tactic || (C.TEAM_MISSIONS[S.team] || {}).tactic, clueCriterion: s.clueCriterion, clue: s.clue || '',
-    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '',
+    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '',
     title: p.title, body: p.body, tags: p.tags, place: p.place, postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId };
   S.editing = id; showTab('make'); render();
   $('#postForm').scrollIntoView({ behavior: 'smooth' });
@@ -1267,6 +1268,7 @@ $('#postForm').addEventListener('submit', async e => {
     await api('/posts', { id: S.editing, team: S.team, format: f.format,
       author: { name: f.name, handle: f.handle ? '@' + f.handle.replace(/^@/, '') : '', joined: f.joined, followers: f.followers, color: f.color, reporter: f.format === 'news' ? f.reporter : '' },
       likes: ['sns', 'witness'].includes(f.format) ? f.likes : '',
+      views: f.views || '',
       title: C.FORMATS[f.format].titleLabel ? f.title : '', body: f.body, tags: ['sns', 'story'].includes(f.format) ? f.tags : '', place: f.place,
       postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId,
       secret: { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });

@@ -6,7 +6,7 @@ window.DOROGRAM = {
 
   // 확인 기준 4가지 (미션 1에서 배우고 2일차 스캔 검증에서 다시 씀)
   CRITERIA: {
-    who:     { label: '작성자',   icon: 'user-round-search', hint: '계정 이름, 가입일, 팔로워 수를 확인합니다. 공식 계정은 @doroland 하나뿐입니다.' },
+    who:     { label: '작성자',   icon: 'user-round-search', hint: '계정 이름, 가입일, 팔로워 수를 확인합니다. 공식 계정은 @doroland 하나뿐입니다. 조회수·좋아요가 많다고 믿을 수 있는 건 아닙니다. 팔로워 수와 비교해 보세요.' },
     when:    { label: '날짜',     icon: 'calendar-clock',    hint: '게시 날짜와 사진 촬영 날짜가 서로 맞는지 확인합니다.' },
     witness: { label: '직접 목격', icon: 'eye',               hint: '"들었는데", "~래요"처럼 건너 들은 말인지, 직접 본 내용인지 확인합니다.' },
     cross:   { label: '자료 대조', icon: 'files',             hint: '사실 카드, 다른 게시물과 내용이 맞는지 대조합니다.' }

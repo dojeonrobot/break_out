@@ -29,7 +29,8 @@
     },
     "imagePrompt": "흐린 날 낚싯배 위에서 본 바다 수평선, 멀리 섬과 관람차가 희미하게 보이는 신문 보도 사진 느낌, 약간 바랜 색감",
     "image": "seed-6y.jpg",
-    "imagePromptEn": "view from a small fishing boat on a hazy grey sea, a distant island amusement park with a ferris wheel barely visible in thick fog, faded colors"
+    "imagePromptEn": "view from a small fishing boat on a hazy grey sea, a distant island amusement park with a ferris wheel barely visible in thick fog, faded colors",
+    "views": "2.1만"
   },
   {
     "id": "seed-3y",
@@ -61,7 +62,8 @@
     },
     "imagePrompt": "항구에서 관광객들이 바다 쪽을 가리키는 뒷모습, 바다 위 섬이 안개처럼 흐릿한 뉴스 사진",
     "image": "seed-3y.jpg",
-    "imagePromptEn": "tourists at a seaside harbor pointing toward the sea, back view, an island amusement park blurred in white mist on the horizon"
+    "imagePromptEn": "tourists at a seaside harbor pointing toward the sea, back view, an island amusement park blurred in white mist on the horizon",
+    "views": "3.8만"
   },
   {
     "id": "seed-now",
@@ -93,7 +95,8 @@
     },
     "imagePrompt": "바다 위 놀이공원 섬, 관람차가 반쯤 투명하게 흐려진 모습, 휴대폰으로 찍은 보도 사진",
     "image": "seed-now.jpg",
-    "imagePromptEn": "island amusement park on the sea, the ferris wheel looks half transparent and fading into the sky, overcast"
+    "imagePromptEn": "island amusement park on the sea, the ferris wheel looks half transparent and fading into the sky, overcast",
+    "views": "9.6만"
   },
   {
     "id": "seed-photo",
@@ -124,8 +127,9 @@
     },
     "imagePrompt": "바다 위 섬이 사라지고 수평선만 보이는 항구 풍경, 휴대폰 사진, 오래된 사진처럼 살짝 바랜 색",
     "image": "seed-photo.jpg",
-    "likes": "23",
-    "imagePromptEn": "empty sea horizon seen from a harbor pier, nothing on the horizon, slightly faded old photo"
+    "likes": "3.1만",
+    "imagePromptEn": "empty sea horizon seen from a harbor pier, nothing on the horizon, slightly faded old photo",
+    "views": "48.2만"
   },
   {
     "id": "seed-closing",
@@ -156,7 +160,8 @@
     },
     "imagePrompt": "",
     "image": "seed-closing.jpg",
-    "imagePromptEn": "closed amusement park gate with a chain and padlock, gloomy cloudy sky"
+    "imagePromptEn": "closed amusement park gate with a chain and padlock, gloomy cloudy sky",
+    "views": "21만"
   },
   {
     "id": "seed-rumor",
@@ -187,8 +192,9 @@
     },
     "imagePrompt": "",
     "image": null,
-    "likes": "4",
-    "imagePromptEn": ""
+    "likes": "2,310",
+    "imagePromptEn": "",
+    "views": "8.7만"
   },
   {
     "id": "seed-carousel",
@@ -219,7 +225,8 @@
     },
     "imagePrompt": "점검 중 안내판이 세워진 회전목마, 낮, 안전 테이프",
     "image": "seed-carousel.jpg",
-    "imagePromptEn": "colorful carousel in an amusement park closed for maintenance, yellow safety tape around it, daytime"
+    "imagePromptEn": "colorful carousel in an amusement park closed for maintenance, yellow safety tape around it, daytime",
+    "views": "3.4만"
   },
   {
     "id": "seed-expert",
@@ -251,7 +258,8 @@
     "imagePrompt": "깊은 바닷속에 잠긴 놀이공원 관람차 상상도, 유튜브 썸네일 느낌",
     "image": "seed-expert.jpg",
     "likes": "1.2만",
-    "imagePromptEn": "dramatic illustration of a ferris wheel sunk deep under the ocean, fish swimming around, mysterious blue light"
+    "imagePromptEn": "dramatic illustration of a ferris wheel sunk deep under the ocean, fish swimming around, mysterious blue light",
+    "views": "126만"
   },
   {
     "id": "seed-lights",
@@ -283,7 +291,8 @@
     "imagePrompt": "밤의 놀이공원 광장, 가로등과 조명이 모두 꺼져 어두운 모습, 휴대폰 사진",
     "image": "seed-lights.jpg",
     "likes": "87",
-    "imagePromptEn": "dark amusement park plaza at night with every lamp turned off, only faint moonlight, smartphone photo"
+    "imagePromptEn": "dark amusement park plaza at night with every lamp turned off, only faint moonlight, smartphone photo",
+    "views": "1,204"
   },
   {
     "id": "seed-story-ferry",
@@ -314,7 +323,8 @@
     "imagePrompt": "배 위에서 본 바다 위 놀이공원 섬과 관람차, 맑은 날, 세로 휴대폰 사진",
     "image": "seed-story-ferry.jpg",
     "imageId": null,
-    "imagePromptEn": "view from the deck of a ferry, island amusement park with a big ferris wheel ahead, clear blue sky, vertical photo"
+    "imagePromptEn": "view from the deck of a ferry, island amusement park with a big ferris wheel ahead, clear blue sky, vertical photo",
+    "views": "412"
   },
   {
     "id": "daily-handsome",
@@ -346,7 +356,8 @@
     },
     "imagePrompt": "놀이공원 회전목마 앞 풍경, 사람 얼굴은 보이지 않게, 휴대폰 사진, 맑은 오후",
     "image": "daily-handsome.jpg",
-    "imagePromptEn": "colorful carousel with horses in an amusement park on a sunny afternoon"
+    "imagePromptEn": "colorful carousel with horses in an amusement park on a sunny afternoon",
+    "views": "2,841"
   },
   {
     "id": "daily-coaster",
@@ -378,7 +389,8 @@
     },
     "imagePrompt": "바다 옆 놀이공원 롤러코스터가 하늘을 향해 올라가는 장면, 휴대폰 사진, 파란 하늘",
     "image": "daily-coaster.jpg",
-    "imagePromptEn": "roller coaster train climbing a steep track toward a bright blue sky next to the sea"
+    "imagePromptEn": "roller coaster train climbing a steep track toward a bright blue sky next to the sea",
+    "views": "1.5만"
   },
   {
     "id": "daily-churros",
@@ -410,7 +422,8 @@
     },
     "imagePrompt": "놀이공원 노란 푸드트럭에서 파는 시나몬 츄러스 클로즈업, 휴대폰 사진",
     "image": "daily-churros.jpg",
-    "imagePromptEn": "close-up of cinnamon sugar churros held in front of a yellow food truck in an amusement park"
+    "imagePromptEn": "close-up of cinnamon sugar churros held in front of a yellow food truck in an amusement park",
+    "views": "640"
   },
   {
     "id": "daily-sunset",
@@ -442,7 +455,8 @@
     },
     "imagePrompt": "관람차 꼭대기에서 내려다본 바다 위 노을, 세로 휴대폰 사진",
     "image": "daily-sunset.jpg",
-    "imagePromptEn": "orange sunset over the sea seen from inside the top cabin of a ferris wheel, vertical photo"
+    "imagePromptEn": "orange sunset over the sea seen from inside the top cabin of a ferris wheel, vertical photo",
+    "views": "389"
   },
   {
     "id": "daily-safari",
@@ -474,7 +488,8 @@
     },
     "imagePrompt": "사파리 투어 지프 앞에 다가온 기린, 휴대폰 사진",
     "image": "daily-safari.jpg",
-    "imagePromptEn": "a giraffe leaning toward an open safari jeep on a dirt road, close up"
+    "imagePromptEn": "a giraffe leaning toward an open safari jeep on a dirt road, close up",
+    "views": "2.3만"
   },
   {
     "id": "daily-lost",
@@ -506,7 +521,8 @@
     },
     "imagePrompt": "",
     "image": "daily-lost.jpg",
-    "imagePromptEn": "empty front row seats of an outdoor music stage, black sunglasses left on one seat"
+    "imagePromptEn": "empty front row seats of an outdoor music stage, black sunglasses left on one seat",
+    "views": "212"
   },
   {
     "id": "daily-free",
@@ -524,7 +540,7 @@
     "place": "",
     "postedAt": "40분 전",
     "photoTakenAt": "",
-    "likes": "96",
+    "likes": "2.8만",
     "imageId": null,
     "secret": {
       "truth": "fake",
@@ -538,7 +554,8 @@
     },
     "imagePrompt": "",
     "image": null,
-    "imagePromptEn": ""
+    "imagePromptEn": "",
+    "views": "34만"
   },
   {
     "id": "daily-event",
@@ -570,7 +587,8 @@
     },
     "imagePrompt": "",
     "image": null,
-    "imagePromptEn": ""
+    "imagePromptEn": "",
+    "views": "18만"
   },
   {
     "id": "daily-lastship",
@@ -602,7 +620,8 @@
     },
     "imagePrompt": "해 질 녘 항구를 떠나는 작은 여객선, 휴대폰 사진",
     "image": "daily-lastship.jpg",
-    "imagePromptEn": "small white passenger ferry leaving a harbor at dusk, calm sea, pink sky"
+    "imagePromptEn": "small white passenger ferry leaving a harbor at dusk, calm sea, pink sky",
+    "views": "9,870"
   },
   {
     "id": "daily-viking",
@@ -634,7 +653,8 @@
     },
     "imagePrompt": "",
     "image": "daily-viking.jpg",
-    "imagePromptEn": "pirate ship swing ride in an amusement park at the top of its swing, blue sky"
+    "imagePromptEn": "pirate ship swing ride in an amusement park at the top of its swing, blue sky",
+    "views": "1,033"
   },
   {
     "id": "daily-closing-rumor",
@@ -666,7 +686,8 @@
     },
     "imagePrompt": "해 질 녘 놀이공원 입구 실루엣, 세로 휴대폰 사진, 쓸쓸한 분위기",
     "image": "daily-closing-rumor.jpg",
-    "imagePromptEn": "amusement park entrance gate silhouette at dusk, lonely mood, vertical photo"
+    "imagePromptEn": "amusement park entrance gate silhouette at dusk, lonely mood, vertical photo",
+    "views": "52만"
   },
   {
     "id": "daily-parade",
@@ -698,6 +719,7 @@
     },
     "imagePrompt": "놀이공원 중앙 광장의 퍼레이드 행렬, 풍선과 깃발, 사람 얼굴은 흐릿하게, 휴대폰 사진",
     "image": "daily-parade.jpg",
-    "imagePromptEn": "parade in an amusement park plaza with big balloons and colorful flags, people seen from behind"
+    "imagePromptEn": "parade in an amusement park plaza with big balloons and colorful flags, people seen from behind",
+    "views": "4.1만"
   }
 ]

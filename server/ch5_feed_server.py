@@ -154,7 +154,7 @@ def verdict_counts(pid):
     return c
 
 
-PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'body', 'tags', 'place', 'postedAt', 'photoTakenAt', 'imageId', 'likes', 'status')
+PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'body', 'tags', 'place', 'postedAt', 'photoTakenAt', 'imageId', 'likes', 'views', 'status')
 
 
 def order_key(pid):
@@ -463,6 +463,7 @@ class Handler(BaseHTTPRequestHandler):
                        'joined': clean_text(a.get('joined'), 20), 'followers': clean_text(a.get('followers'), 12),
                        'color': clean_text(a.get('color'), 12), 'reporter': clean_text(a.get('reporter'), 20)},
             'likes': clean_text(b.get('likes'), 10),
+            'views': clean_text(b.get('views'), 10),
             'title': clean_text(b.get('title'), 80),
             'body': clean_text(b.get('body'), 1200),
             'tags': clean_text(b.get('tags'), 80),
