@@ -283,9 +283,9 @@
       </div>
 
       <!-- Chapter 5 (코덱스의 선택) - 진입로 둘: 보이드의 기록(3D 디지털 트윈) / 도로그램(가짜뉴스 피드) -->
-      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-orange-500/30" onclick="handleEnterChapter(5, 'active', this)">
-        <!-- Banner (챕터 4 로고 카드 색만 바꾼 임시본. 공식 배너가 나오면 images/chapter5-logo.png 를 같은 이름으로 덮어쓰기) -->
-        <div class="h-48 w-full relative overflow-hidden border-b border-orange-100 bg-orange-50">
+      <div class="group flex flex-col bg-transparent rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-red-500/30" onclick="handleEnterChapter(5, 'active', this)">
+        <!-- Banner (챕터 4 로고 카드를 빨간 계열로 바꾼 임시본. 공식 배너가 나오면 images/chapter5-logo.png 를 같은 이름으로 덮어쓰기) -->
+        <div class="h-48 w-full relative overflow-hidden border-b border-red-100 bg-red-50">
           <img src="images/chapter5-logo.png" alt="챕터 5 로고" class="absolute inset-0 w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x200?text=Chapter+5'"/>
           <div class="banner-shine hidden absolute top-0 -inset-x-full w-[200%] h-full bg-gradient-to-r from-transparent via-white/80 to-transparent z-20 mix-blend-overlay -skew-x-12 pointer-events-none"></div>
         </div>
@@ -293,12 +293,12 @@
         <div class="p-6 sm:p-8 flex-grow flex flex-col relative bg-white">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center space-x-2">
-              <span class="px-2.5 py-1 bg-orange-50 text-orange-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-orange-100">
+              <span class="px-2.5 py-1 bg-red-50 text-red-700 text-[11px] font-black tracking-widest uppercase rounded-md border border-red-100">
                 Chapter 05
               </span>
-              <span class="text-xs font-bold text-orange-600/70">코덱스의 선택</span>
+              <span class="text-xs font-bold text-red-600/70">코덱스의 선택</span>
             </div>
-            <i data-lucide="lock" class="w-4 h-4 text-orange-500 opacity-60"></i>
+            <i data-lucide="lock" class="w-4 h-4 text-red-500 opacity-60"></i>
           </div>
           <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-4 leading-tight tracking-tight">보이드의 기록</h3>
 
@@ -310,12 +310,12 @@
 
           <div class="mt-auto flex gap-2.5">
             <!-- 보이드의 기록: 카드 클릭과 동일 동작이라 별도 핸들러 없이 버블링에 맡김 -->
-            <div class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-white text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-400 hover:to-amber-300 shadow-md shadow-orange-500/20 group-hover:shadow-orange-500/40 transform group-hover:-translate-y-0.5">
+            <div class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-white text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-500 hover:to-red-300 shadow-md shadow-red-500/20 group-hover:shadow-red-500/40 transform group-hover:-translate-y-0.5">
               <span>보이드의 기록</span>
               <i data-lucide="arrow-right" class="w-4 h-4 shrink-0 transform group-hover:translate-x-1 transition-transform"></i>
             </div>
             <div onclick="event.stopPropagation(); handleEnterChapter('5-feed', 'active', this)"
-                 class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-orange-600 text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-white border-2 border-orange-200 hover:bg-orange-50 hover:border-orange-300 shadow-md shadow-orange-500/10 transform group-hover:-translate-y-0.5">
+                 class="flex-1 py-3.5 px-2 flex items-center justify-center space-x-1.5 font-bold text-red-600 text-[13px] whitespace-nowrap rounded-xl transition-all duration-300 bg-white border-2 border-red-200 hover:bg-red-50 hover:border-red-300 shadow-md shadow-red-500/10 transform group-hover:-translate-y-0.5">
               <i data-lucide="radio-tower" class="w-4 h-4 shrink-0"></i>
               <span>도로그램</span>
             </div>
