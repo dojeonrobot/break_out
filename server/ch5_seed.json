@@ -317,37 +317,6 @@
     "imagePromptEn": "view from the deck of a ferry, island amusement park with a big ferris wheel ahead, clear blue sky, vertical photo"
   },
   {
-    "id": "seed-story-side",
-    "format": "story",
-    "author": {
-      "name": "코덱스지킴이",
-      "handle": "@codex_guard",
-      "joined": "4일 전",
-      "followers": "57",
-      "color": "#7c3aed"
-    },
-    "title": "",
-    "body": "도로랜드 망친 건 직원들이다!! 코덱스 편 모여라 공유 안 하면 너도 같은 편",
-    "tags": "#코덱스편",
-    "place": "",
-    "postedAt": "30분 전",
-    "photoTakenAt": "",
-    "secret": {
-      "truth": "fake",
-      "tactic": "편 가르기",
-      "clue": "근거 없이 편을 나누고 공유를 강요합니다. 가입 4일 째 계정.",
-      "clueCriterion": "who"
-    },
-    "answer": {
-      "truth": "fake",
-      "explain": "믿으면 안 되는 글입니다. 근거 없이 사람들을 두 편으로 나누고 공유를 강요해요(편 가르기). 가입한 지 4일 된 계정입니다."
-    },
-    "imagePrompt": "놀이공원 광장에 모인 사람들 실루엣, 보라색과 초록색 조명, 세로 휴대폰 사진",
-    "image": "seed-story-side.jpg",
-    "imageId": null,
-    "imagePromptEn": "crowd silhouettes in an amusement park plaza at night under purple and green lights, vertical photo"
-  },
-  {
     "id": "daily-handsome",
     "format": "sns",
     "author": {
