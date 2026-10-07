@@ -43,11 +43,12 @@ TEXT_MODEL = os.environ.get('GEMINI_TEXT_MODEL', 'gemini-2.5-flash')
 AI_QUOTA = int(os.environ.get('CH5_AI_QUOTA', '8'))
 SERVE_STATIC = os.environ.get('CH5_STATIC', '1') == '1'
 
-TEAM_COUNT = 10
-MAX_POSTS_PER_TEAM = int(os.environ.get('CH5_MAX_POSTS', '2'))   # 조마다 올릴 수 있는 가짜 게시물 수
+DEFAULT_TEAM_COUNT = 10   # 실제 조 수는 DB['teamCount'] (운영자 화면에서 바꿈)
+MAX_POSTS_PER_TEAM = 3    # 조마다 스토리·기사·쇼츠 1개씩
 MAX_UPLOAD = 6 * 1024 * 1024
 PHASES = ['read', 'make', 'judge', 'reveal']
-FORMATS = {'news', 'sns', 'story', 'witness', 'notice'}
+FORMATS = {'news', 'story', 'shorts'}
+FORMAT_ALIAS = {'sns': 'shorts', 'witness': 'shorts', 'notice': 'news'}   # 예전 자료 형식 변환
 VERDICTS = {'real', 'fake', 'unsure'}
 THUMB_TPLS = {'auto', 'frame', 'full', 'cam', 'pola', 'collage', 'black', 'text'}
 CRITERIA = {'who', 'when', 'witness', 'cross'}
@@ -75,7 +76,8 @@ def load_seed_posts():
         seeds = json.load(f)
     out = []
     for i, s in enumerate(seeds):
-        p = {k: v for k, v in s.items() if k not in ('id', 'image', 'imagePrompt')}
+        p = {k: v for k, v in s.items() if k not in ('id', 'image', 'imagePrompt', 'imagePromptEn')}
+        p['format'] = FORMAT_ALIAS.get(p.get('format'), p.get('format'))
         p.update(id='p' + uuid.uuid4().hex[:10], seedKey=s.get('id'), team=0, status='approved', seed=True,
                  createdAt=now_ms() - (len(seeds) - i) * 1000, imageId=None)
         img = s.get('image')
@@ -87,7 +89,7 @@ def load_seed_posts():
 
 
 def fresh_db():
-    return {'version': 1, 'phase': 'read', 'posts': load_seed_posts(), 'judgments': {},
+    return {'version': 1, 'phase': 'read', 'teamCount': DEFAULT_TEAM_COUNT, 'posts': load_seed_posts(), 'judgments': {},
             'aiUsed': {}, 'updatedAt': now_ms()}
 
 
@@ -95,7 +97,9 @@ def read_db():
     if not os.path.exists(DB_PATH):
         return fresh_db()
     with open(DB_PATH, encoding='utf-8') as f:
-        return json.load(f)
+        db = json.load(f)
+    db.setdefault('teamCount', DEFAULT_TEAM_COUNT)
+    return db
 
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -142,12 +146,13 @@ def judgment_key(pid, team):
 
 def compute_scores():
     """공개 단계 점수: 맞힌 판별 1점(근거 기준을 고른 경우만), 우리 조 가짜를 진짜라고 한 조마다 1점."""
-    scores = {t: {'team': t, 'correct': 0, 'fooled': 0, 'judged': 0} for t in range(1, TEAM_COUNT + 1)}
+    n = DB['teamCount']
+    scores = {t: {'team': t, 'correct': 0, 'fooled': 0, 'judged': 0, 'total': 0} for t in range(1, n + 1)}
     for p in DB['posts']:
-        if p['status'] != 'approved':
+        if p['status'] != 'approved' or p.get('seed'):   # 예제(운영실 자료)는 연습이라 점수에 안 넣음
             continue
-        truth = p['answer']['truth'] if p.get('seed') else p['secret'].get('truth', 'fake')
-        for t in range(1, TEAM_COUNT + 1):
+        truth = p['secret'].get('truth', 'fake')
+        for t in range(1, n + 1):
             j = DB['judgments'].get(judgment_key(p['id'], t))
             if not j or t == p['team']:
                 continue
@@ -159,6 +164,7 @@ def compute_scores():
     rows = list(scores.values())
     for r in rows:
         r['total'] = r['correct'] + r['fooled']
+        r['judgable'] = sum(1 for p in DB['posts'] if p['status'] == 'approved' and not p.get('seed') and p['team'] != r['team'])
     rows.sort(key=lambda r: (-r['total'], r['team']))
     return rows
 
@@ -190,6 +196,10 @@ def public_post(p, team, admin=False):
         out['mine'] = True
         out['secret'] = p.get('secret')
         out['aiGenerated'] = p.get('aiGenerated')
+    if p.get('seed'):
+        out['seed'] = True
+        if admin or reveal or (team and judgment_key(p['id'], team) in DB['judgments']):
+            out['answer'] = p.get('answer')   # 연습: 판정하자마자 해설이 열림
     if admin or reveal:
         out.update(seed=bool(p.get('seed')), team=p['team'], secret=p.get('secret'), answer=p.get('answer'),
                    aiGenerated=p.get('aiGenerated'), aiPrompt=p.get('aiPrompt'), counts=verdict_counts(p['id']))
@@ -217,7 +227,7 @@ def state_for(team, admin=False):
             pid, t = k.rsplit(':', 1)
             if int(t) == team:
                 mine[pid] = j
-    res = {'version': DB['version'], 'phase': DB['phase'], 'posts': posts, 'myJudgments': mine,
+    res = {'version': DB['version'], 'phase': DB['phase'], 'teamCount': DB['teamCount'], 'posts': posts, 'myJudgments': mine,
            'aiQuota': AI_QUOTA, 'aiUsed': DB['aiUsed'].get(str(team), 0) if team else 0,
            'aiEnabled': bool(GEMINI_KEY), 'maxPosts': MAX_POSTS_PER_TEAM}
     if admin or DB['phase'] == 'reveal':
@@ -241,7 +251,7 @@ def clean_team(v):
         t = int(v)
     except (TypeError, ValueError):
         return None
-    return t if 1 <= t <= TEAM_COUNT else None
+    return t if 1 <= t <= DB['teamCount'] else None
 
 
 def clean_image_id(v):
@@ -315,8 +325,8 @@ def gemini_image(prompt, base_image=None):
 
 
 def gemini_polish(text, fmt):
-    style = {'news': '신문 기사체(~했다, ~로 알려졌다)', 'sns': 'SNS 게시글 말투(짧고 생생하게, 해시태그 1~2개)',
-             'witness': '목격담 말투(~했어요, 직접 겪은 듯)', 'notice': '공지문 말투(~합니다, ~바랍니다)'}[fmt]
+    style = {'news': '신문 기사체(~했다, ~로 알려졌다)', 'story': '인스타 스토리 한 줄(짧고 생생하게)',
+             'shorts': '쇼츠 설명글 말투(짧고 재미있게, 해시태그 1~2개)'}.get(fmt, '자연스러운 말투')
     prompt = (f'다음 글을 {style}로 다듬어라. 내용(사실 관계, 날짜, 이름)은 바꾸지 말고 문장만 다듬는다. '
               f'초등학생이 읽을 수 있는 쉬운 말로, 5문장 이내. 다듬은 글만 출력한다.\n\n{text}')
     res = gemini(TEXT_MODEL, [{'text': prompt}])
@@ -445,7 +455,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/ch5/upload': self.upload, '/api/ch5/posts': self.save_post, '/api/ch5/judge': self.judge,
             '/api/ch5/ai/image': self.ai_image, '/api/ch5/ai/polish': self.ai_polish,
             '/api/ch5/admin/phase': self.admin_phase, '/api/ch5/admin/moderate': self.admin_moderate,
-            '/api/ch5/admin/reset': self.admin_reset, '/api/ch5/admin/delete': self.admin_delete,
+            '/api/ch5/admin/reset': self.admin_reset, '/api/ch5/admin/delete': self.admin_delete, '/api/ch5/admin/settings': self.admin_settings,
             '/api/ch5/admin/delete-team-posts': self.admin_delete_team_posts, '/api/ch5/posts/delete': self.delete_own_post,
         }
         fn = routes.get(path)
@@ -508,6 +518,8 @@ class Handler(BaseHTTPRequestHandler):
                 old = find_post(pid)
                 if not old or old['team'] != team:
                     raise ValueError('고칠 수 없는 게시글입니다.')
+                if any(p['format'] == fmt and p['id'] != pid for p in DB['posts'] if p['team'] == team):
+                    raise ValueError('그 형식은 이미 다른 글로 올렸습니다.')
                 ai_meta = {k: old.get(k) for k in ('aiGenerated', 'aiPrompt')}
                 if post['imageId'] != old.get('imageId'):
                     ai_meta = self.image_meta(post['imageId'])
@@ -517,6 +529,8 @@ class Handler(BaseHTTPRequestHandler):
                 active = [p for p in DB['posts'] if p['team'] == team]
                 if len(active) >= MAX_POSTS_PER_TEAM:
                     raise ValueError(f'게시글은 조마다 {MAX_POSTS_PER_TEAM}개까지 올릴 수 있습니다.')
+                if any(p['format'] == fmt for p in active):
+                    raise ValueError({'news': '기사', 'story': '스토리', 'shorts': '쇼츠'}[fmt] + '는 이미 올렸습니다. 다른 형식을 만들거나 올린 글을 고쳐 주세요.')
                 saved = dict(post, id='p' + uuid.uuid4().hex[:10], team=team, status='approved', note='',
                              createdAt=now_ms(), **self.image_meta(post['imageId']))
                 DB['posts'].append(saved)
@@ -542,8 +556,11 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('판별할 수 없는 게시글입니다.')
             if p['team'] == team:
                 raise ValueError('우리 조 게시글은 판별하지 않습니다.')
-            if DB['phase'] != 'judge':
-                raise ValueError('지금은 판별하는 시간이 아닙니다.')
+            if p.get('seed'):
+                if DB['phase'] == 'reveal':
+                    raise ValueError('정답 공개 중에는 판정을 바꿀 수 없습니다.')
+            elif DB['phase'] != 'judge':
+                raise ValueError('다른 조 게시물은 판별 시간에만 판별할 수 있습니다.')
             DB['judgments'][judgment_key(p['id'], team)] = {
                 'verdict': verdict, 'criterion': criterion if criterion in CRITERIA else None,
                 'reason': clean_text(b.get('reason'), 120), 'at': now_ms()}
@@ -650,14 +667,28 @@ class Handler(BaseHTTPRequestHandler):
             save_and_broadcast()
             self.send_json({'ok': True, 'deleted': len(targets)})
 
+    def admin_settings(self, b):
+        """운영자: 조 수 바꾸기(2~12). 번호가 범위를 벗어나는 조의 글은 그대로 남지만 그 조 화면에서는 안 보인다."""
+        try:
+            n = int(b.get('teamCount'))
+        except (TypeError, ValueError):
+            raise ValueError('조 수를 숫자로 보내 주세요.')
+        if not 2 <= n <= 12:
+            raise ValueError('조 수는 2에서 12 사이여야 합니다.')
+        with lock:
+            DB['teamCount'] = n
+            save_and_broadcast()
+            self.send_json({'teamCount': n})
+
     def admin_reset(self, b):
         global DB
         if b.get('confirm') != 'RESET':
             raise ValueError('확인 문구가 필요합니다.')
         with lock:
-            version = DB['version']
+            version, n = DB['version'], DB['teamCount']
             DB = fresh_db()
             DB['version'] = version
+            DB['teamCount'] = n
             save_and_broadcast()
             self.send_json({'ok': True})
 

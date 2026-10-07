@@ -100,7 +100,7 @@
   },
   {
     "id": "seed-photo",
-    "format": "sns",
+    "format": "story",
     "author": {
       "name": "바다뷰맛집탐방",
       "handle": "@seaview_hunter99",
@@ -133,7 +133,7 @@
   },
   {
     "id": "seed-closing",
-    "format": "notice",
+    "format": "news",
     "author": {
       "name": "도로랜드 공식",
       "handle": "@doroland_officiall",
@@ -165,7 +165,7 @@
   },
   {
     "id": "seed-rumor",
-    "format": "witness",
+    "format": "shorts",
     "author": {
       "name": "궁금한초딩",
       "handle": "@curious_kid",
@@ -198,7 +198,7 @@
   },
   {
     "id": "seed-carousel",
-    "format": "notice",
+    "format": "news",
     "author": {
       "name": "도로랜드 운영실",
       "handle": "@doroland",
@@ -230,7 +230,7 @@
   },
   {
     "id": "seed-expert",
-    "format": "sns",
+    "format": "shorts",
     "author": {
       "name": "세상의모든비밀",
       "handle": "@secret_world_tv",
@@ -263,7 +263,7 @@
   },
   {
     "id": "seed-lights",
-    "format": "witness",
+    "format": "shorts",
     "author": {
       "name": "회전목마러버",
       "handle": "@merrygo_round",
@@ -328,7 +328,7 @@
   },
   {
     "id": "daily-handsome",
-    "format": "sns",
+    "format": "shorts",
     "author": {
       "name": "하루하루기록",
       "handle": "@haru_daily_",
@@ -361,7 +361,7 @@
   },
   {
     "id": "daily-coaster",
-    "format": "sns",
+    "format": "shorts",
     "author": {
       "name": "놀이기구정복러",
       "handle": "@ride_master_jun",
@@ -394,7 +394,7 @@
   },
   {
     "id": "daily-churros",
-    "format": "witness",
+    "format": "story",
     "author": {
       "name": "츄러스요정",
       "handle": "@churros_fairy",
@@ -460,7 +460,7 @@
   },
   {
     "id": "daily-safari",
-    "format": "sns",
+    "format": "shorts",
     "author": {
       "name": "동물원덕후",
       "handle": "@zoo_lover_min",
@@ -493,7 +493,7 @@
   },
   {
     "id": "daily-lost",
-    "format": "witness",
+    "format": "shorts",
     "author": {
       "name": "덜렁이",
       "handle": "@clumsy_dana",
@@ -526,7 +526,7 @@
   },
   {
     "id": "daily-free",
-    "format": "sns",
+    "format": "story",
     "author": {
       "name": "꿀팁전도사",
       "handle": "@honey_tip_kr",
@@ -559,7 +559,7 @@
   },
   {
     "id": "daily-event",
-    "format": "notice",
+    "format": "news",
     "author": {
       "name": "도로랜드 이벤트",
       "handle": "@doroland_event",
@@ -592,7 +592,7 @@
   },
   {
     "id": "daily-lastship",
-    "format": "sns",
+    "format": "story",
     "author": {
       "name": "여행가는길",
       "handle": "@onmyway_trip",
@@ -625,7 +625,7 @@
   },
   {
     "id": "daily-viking",
-    "format": "witness",
+    "format": "shorts",
     "author": {
       "name": "줄서기장인",
       "handle": "@line_king",
@@ -691,7 +691,7 @@
   },
   {
     "id": "daily-parade",
-    "format": "sns",
+    "format": "shorts",
     "author": {
       "name": "퍼레이드사랑",
       "handle": "@parade_love",
