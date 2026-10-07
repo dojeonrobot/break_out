@@ -1,5 +1,5 @@
 // 도로그램(챕터 5 미션 1) 운영 데이터. 학생 화면(feed.html)과 운영자 화면(feed-admin.html)이 같이 읽는다.
-// 문구·미션 배정을 바꿀 때는 이 파일만 고치면 된다. 연습 게시물 9개는 server/ch5_seed.json 에 있다.
+// 문구·미션 배정을 바꿀 때는 이 파일만 고치면 된다. 운영실 자료(정답 포함)는 server/ch5_seed.json 에 있다.
 window.DOROGRAM = {
   API: '/api/ch5',
   TEAM_COUNT: 10,

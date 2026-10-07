@@ -335,5 +335,377 @@
     "imagePrompt": "놀이공원 광장에 모인 사람들 실루엣, 보라색과 초록색 조명, 세로 휴대폰 사진",
     "image": "seed-story-side.jpg",
     "imageId": null
+  },
+  {
+    "id": "daily-handsome",
+    "format": "sns",
+    "author": {
+      "name": "하루하루기록",
+      "handle": "@haru_daily_",
+      "joined": "2019.04",
+      "followers": "812",
+      "color": "#db2777"
+    },
+    "title": "",
+    "body": "오늘 도로랜드 회전목마 앞에서 하늘색 모자 쓰고 계셨던 분…🫣 같이 사진 찍어 주셔서 감사했어요! 혹시 이 글 보시면 DM 주세요🙏",
+    "tags": "#도로랜드 #회전목마 #사람찾아요",
+    "place": "회전목마",
+    "postedAt": "2시간 전",
+    "photoTakenAt": "",
+    "likes": "204",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "오래된 계정, 사실 카드와 어긋나는 점 없음",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "평범한 방문객 글입니다. 오래된 계정이고, 사실 카드나 다른 게시물과 어긋나는 내용이 없어요. 다만 모르는 사람을 찾는 글에 개인정보를 남기는 건 조심해야 합니다."
+    },
+    "imagePrompt": "놀이공원 회전목마 앞 풍경, 사람 얼굴은 보이지 않게, 휴대폰 사진, 맑은 오후",
+    "image": "daily-handsome.jpg"
+  },
+  {
+    "id": "daily-coaster",
+    "format": "sns",
+    "author": {
+      "name": "놀이기구정복러",
+      "handle": "@ride_master_jun",
+      "joined": "2020.08",
+      "followers": "3,120",
+      "color": "#ea580c"
+    },
+    "title": "",
+    "body": "도로랜드 롤러코스터 진짜 미쳤음ㅋㅋㅋ 오늘만 3번 탐 🎢 맨 앞자리 강추!! 내려오는 순간 바다 보이는 거 레전드",
+    "tags": "#도로랜드 #롤러코스터 #강추",
+    "place": "롤러코스터",
+    "postedAt": "어제",
+    "photoTakenAt": "",
+    "likes": "1,482",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "오래된 후기 계정, 내용 자연스러움",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 오래 활동한 후기 계정이고, 내용도 다른 자료와 맞아요."
+    },
+    "imagePrompt": "바다 옆 놀이공원 롤러코스터가 하늘을 향해 올라가는 장면, 휴대폰 사진, 파란 하늘",
+    "image": "daily-coaster.jpg"
+  },
+  {
+    "id": "daily-churros",
+    "format": "witness",
+    "author": {
+      "name": "츄러스요정",
+      "handle": "@churros_fairy",
+      "joined": "2022.02",
+      "followers": "96",
+      "color": "#ca8a04"
+    },
+    "title": "회전목마 옆 츄러스 맛집 발견",
+    "body": "회전목마 옆 노란 푸드트럭 츄러스 진짜 맛있어요!! 시나몬 듬뿍이고 줄도 5분밖에 안 섰어요. 다음에 또 갈 듯",
+    "tags": "",
+    "place": "회전목마 앞 광장",
+    "postedAt": "3시간 전",
+    "photoTakenAt": "",
+    "likes": "31",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "직접 겪은 후기",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 직접 먹어 본 후기이고 사실 카드와 어긋나는 내용이 없어요."
+    },
+    "imagePrompt": "놀이공원 노란 푸드트럭에서 파는 시나몬 츄러스 클로즈업, 휴대폰 사진",
+    "image": "daily-churros.jpg"
+  },
+  {
+    "id": "daily-sunset",
+    "format": "story",
+    "author": {
+      "name": "바다랑나랑",
+      "handle": "@sea_and_me",
+      "joined": "2021.06",
+      "followers": "540",
+      "color": "#0891b2"
+    },
+    "title": "",
+    "body": "관람차 꼭대기에서 본 노을🌅 오늘 하루 끝!",
+    "tags": "",
+    "place": "관람차",
+    "postedAt": "어제 오후 5:52",
+    "photoTakenAt": "어제 오후 5:48",
+    "likes": "",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "찍은 때와 올린 때가 맞음",
+      "clueCriterion": "when"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 사진 찍은 시간과 올린 시간이 맞고, 내용도 자연스러워요."
+    },
+    "imagePrompt": "관람차 꼭대기에서 내려다본 바다 위 노을, 세로 휴대폰 사진",
+    "image": "daily-sunset.jpg"
+  },
+  {
+    "id": "daily-safari",
+    "format": "sns",
+    "author": {
+      "name": "동물원덕후",
+      "handle": "@zoo_lover_min",
+      "joined": "2018.11",
+      "followers": "5,402",
+      "color": "#0f766e"
+    },
+    "title": "",
+    "body": "사파리 지프 투어에서 기린이 차 바로 앞까지 왔어요🦒 가이드님 설명도 너무 재밌었음. 아이랑 오면 무조건 사파리부터!",
+    "tags": "#도로랜드사파리 #기린",
+    "place": "사파리",
+    "postedAt": "4시간 전",
+    "photoTakenAt": "",
+    "likes": "2,031",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "오래된 계정, 내용 자연스러움",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 오래된 계정이고 다른 자료와 어긋나는 점이 없어요."
+    },
+    "imagePrompt": "사파리 투어 지프 앞에 다가온 기린, 휴대폰 사진",
+    "image": "daily-safari.jpg"
+  },
+  {
+    "id": "daily-lost",
+    "format": "witness",
+    "author": {
+      "name": "덜렁이",
+      "handle": "@clumsy_dana",
+      "joined": "2023.03",
+      "followers": "58",
+      "color": "#4b5563"
+    },
+    "title": "하모니아 선글라스 주인 찾아요",
+    "body": "오늘 오후 2시쯤 하모니아 공연장 맨 앞줄에 검은 선글라스 두고 왔어요ㅠㅠ 혹시 보신 분 운영실에 맡겨 주시면 감사하겠습니다!",
+    "tags": "",
+    "place": "하모니아",
+    "postedAt": "1시간 전",
+    "photoTakenAt": "",
+    "likes": "7",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "직접 겪은 일, 장소와 시간이 구체적",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 본인이 직접 겪은 일이고 확인할 수 있는 장소·시간이 정확해요."
+    },
+    "imagePrompt": "",
+    "image": null
+  },
+  {
+    "id": "daily-free",
+    "format": "sns",
+    "author": {
+      "name": "꿀팁전도사",
+      "handle": "@honey_tip_kr",
+      "joined": "3일 전",
+      "followers": "23",
+      "color": "#16a34a"
+    },
+    "title": "",
+    "body": "도로랜드 오늘 모든 놀이기구 무료래요!! 친구가 그러는데 오후 4시까지만이래요 빨리 가세요🔥🔥",
+    "tags": "#도로랜드 #무료",
+    "place": "",
+    "postedAt": "40분 전",
+    "photoTakenAt": "",
+    "likes": "96",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "감정 자극",
+      "clue": "\"친구가 그러는데\" 건너 들은 말, 가입 3일",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. 글쓴이가 직접 확인한 게 아니라 \"친구가 그러는데\"로 들은 말이고, 가입 3일 된 계정이에요. 공식 계정 공지도 없습니다."
+    },
+    "imagePrompt": "",
+    "image": null
+  },
+  {
+    "id": "daily-event",
+    "format": "notice",
+    "author": {
+      "name": "도로랜드 이벤트",
+      "handle": "@doroland_event",
+      "joined": "1주 전",
+      "followers": "211",
+      "color": "#7c3aed"
+    },
+    "title": "[이벤트] 연간회원권 100명 무료 증정",
+    "body": "개장 10주년 기념! 연간회원권을 선착순 100분께 무료로 드립니다. 아래 링크에 이름, 생년월일, 전화번호를 남겨 주세요.",
+    "tags": "",
+    "place": "",
+    "postedAt": "5시간 전",
+    "photoTakenAt": "",
+    "likes": "",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "사칭",
+      "clue": "공식 계정(@doroland)이 아님, 개인정보 요구",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. 공식 계정은 @doroland 하나뿐인데 @doroland_event 계정이 공지를 올렸어요. 개인정보를 모으려는 사칭 글입니다."
+    },
+    "imagePrompt": "",
+    "image": null
+  },
+  {
+    "id": "daily-lastship",
+    "format": "sns",
+    "author": {
+      "name": "여행가는길",
+      "handle": "@onmyway_trip",
+      "joined": "2020.01",
+      "followers": "760",
+      "color": "#1d4ed8"
+    },
+    "title": "",
+    "body": "저녁 7시 막배 타고 나왔는데 사람 하나도 없어서 너무 좋았다🚢 다들 막배 노려 보세요",
+    "tags": "#도로랜드 #막배",
+    "place": "도로랜드 항구",
+    "postedAt": "어제",
+    "photoTakenAt": "",
+    "likes": "143",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "날짜 조작",
+      "clue": "배는 오후 6시까지만 운항 (사실 카드)",
+      "clueCriterion": "cross"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. 사실 카드에 따르면 배는 오후 6시까지만 운항해요. 저녁 7시 배는 없습니다."
+    },
+    "imagePrompt": "해 질 녘 항구를 떠나는 작은 여객선, 휴대폰 사진",
+    "image": "daily-lastship.jpg"
+  },
+  {
+    "id": "daily-viking",
+    "format": "witness",
+    "author": {
+      "name": "줄서기장인",
+      "handle": "@line_king",
+      "joined": "2019.09",
+      "followers": "201",
+      "color": "#b91c1c"
+    },
+    "title": "바이킹 대기 시간 공유합니다",
+    "body": "바이킹 줄 40분 기다렸어요ㅠ 그래도 끝자리 타니까 완전 재밌었어요. 평일 오전에 가면 덜 기다릴 듯!",
+    "tags": "",
+    "place": "바이킹",
+    "postedAt": "어제",
+    "photoTakenAt": "",
+    "likes": "48",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "직접 겪은 후기",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 직접 타 본 후기이고 다른 자료와 어긋나는 점이 없어요."
+    },
+    "imagePrompt": "",
+    "image": null
+  },
+  {
+    "id": "daily-closing-rumor",
+    "format": "story",
+    "author": {
+      "name": "소문난아이",
+      "handle": "@rumor_kid",
+      "joined": "2일 전",
+      "followers": "14",
+      "color": "#9333ea"
+    },
+    "title": "",
+    "body": "도로랜드 내일부터 문 닫는대ㅠㅠ 직원 친구한테 들음. 오늘이 마지막!!",
+    "tags": "",
+    "place": "",
+    "postedAt": "20분 전",
+    "photoTakenAt": "",
+    "likes": "",
+    "imageId": null,
+    "secret": {
+      "truth": "fake",
+      "tactic": "감정 자극",
+      "clue": "건너 들은 말, 가입 2일, 공식 공지 없음",
+      "clueCriterion": "witness"
+    },
+    "answer": {
+      "truth": "fake",
+      "explain": "가짜입니다. 직원 친구한테 \"들은\" 이야기이고 가입 2일 된 계정이에요. 운영실(@doroland) 공지에는 그런 내용이 없습니다."
+    },
+    "imagePrompt": "해 질 녘 놀이공원 입구 실루엣, 세로 휴대폰 사진, 쓸쓸한 분위기",
+    "image": "daily-closing-rumor.jpg"
+  },
+  {
+    "id": "daily-parade",
+    "format": "sns",
+    "author": {
+      "name": "퍼레이드사랑",
+      "handle": "@parade_love",
+      "joined": "2017.05",
+      "followers": "9,870",
+      "color": "#be185d"
+    },
+    "title": "",
+    "body": "오후 3시 퍼레이드에서 자일로 캐릭터가 손 흔들어 줌😭 오늘 운 다 썼다",
+    "tags": "#도로랜드퍼레이드",
+    "place": "중앙 광장",
+    "postedAt": "5시간 전",
+    "photoTakenAt": "",
+    "likes": "3,904",
+    "imageId": null,
+    "secret": {
+      "truth": "real",
+      "tactic": "",
+      "clue": "오래된 계정, 내용 자연스러움",
+      "clueCriterion": "who"
+    },
+    "answer": {
+      "truth": "real",
+      "explain": "진짜입니다. 오래 활동한 팬 계정이고, 사실 카드와 어긋나는 점이 없어요."
+    },
+    "imagePrompt": "놀이공원 중앙 광장의 퍼레이드 행렬, 풍선과 깃발, 사람 얼굴은 흐릿하게, 휴대폰 사진",
+    "image": "daily-parade.jpg"
   }
 ]
