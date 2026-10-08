@@ -52,6 +52,8 @@ FORMAT_ALIAS = {'sns': 'shorts', 'witness': 'shorts', 'notice': 'news'}   # 예�
 VERDICTS = {'real', 'fake', 'unsure'}
 THUMB_TPLS = {'auto', 'frame', 'full', 'cam', 'pola', 'collage', 'black', 'text'}
 CRITERIA = {'who', 'when', 'witness', 'cross'}
+AUTHOR_KINDS = {'official', 'press', 'creator', 'person'}   # 공식 계정·언론사·크리에이터·일반 계정
+MAX_EXTRA_IMAGES = 3
 # 아이들이 입력하는 AI 프롬프트에서 막을 말 (모델 자체 안전 필터와 별도로 한 번 더 거른다)
 BLOCKED_WORDS = ['피가', '피투성', '시체', '죽이', '살인', '총으로', '칼로', '야한', '벗은', '나체', '대통령', '연예인',
                  '아이돌', '유튜버', '실제 사람', '자살', '마약', '담배', '술 마시']
@@ -71,19 +73,28 @@ SEED_IMG_DIR = os.path.join(HERE, 'seed_images')
 
 
 def load_seed_posts():
-    """운영실 자료(정답이 정해진 게시물). 판별 화면에서 조 게시물과 구별되지 않도록 id는 무작위로 새로 붙인다."""
+    """운영실 자료(정답이 정해진 게시물). 판별 화면에서 조 게시물과 구별되지 않도록 id는 무작위로 새로 붙인다.
+    seed의 images({키: 영어 설명})는 seed_images/<id>-<키>.jpg 파일을 업로드 폴더로 복사해 imageId로 바꾸고,
+    slides/scenes의 img 키도 같은 imageId로 바꾼다. 'main' 키가 대표 사진(imageId)이 된다."""
     with open(SEED_PATH, encoding='utf-8') as f:
         seeds = json.load(f)
     out = []
     for i, s in enumerate(seeds):
-        p = {k: v for k, v in s.items() if k not in ('id', 'image', 'imagePrompt', 'imagePromptEn')}
+        p = {k: v for k, v in s.items() if k not in ('id', 'image', 'images', 'imagePrompt', 'imagePromptEn')}
         p['format'] = FORMAT_ALIAS.get(p.get('format'), p.get('format'))
         p.update(id='p' + uuid.uuid4().hex[:10], seedKey=s.get('id'), team=0, status='approved', seed=True,
                  createdAt=now_ms() - (len(seeds) - i) * 1000, imageId=None)
-        img = s.get('image')
-        if img and os.path.exists(os.path.join(SEED_IMG_DIR, img)):
-            with open(os.path.join(SEED_IMG_DIR, img), 'rb') as f:
-                p['imageId'] = store_image(f.read())
+        ids = {}
+        for key in (s.get('images') or {}):
+            fp = os.path.join(SEED_IMG_DIR, f"{s['id']}-{key}.jpg")
+            if os.path.exists(fp):
+                with open(fp, 'rb') as f:
+                    ids[key] = store_image(f.read())
+        p['imageId'] = ids.get('main') or (next(iter(ids.values())) if ids else None)
+        p['extraImages'] = [v for k, v in ids.items() if v != p['imageId']]
+        for part in ('slides', 'scenes'):
+            for item in p.get(part) or []:
+                item['imageId'] = ids.get(item.pop('img', None) or '') or None
         out.append(p)
     return out
 
@@ -126,8 +137,10 @@ def remove_posts(posts):
     DB['posts'] = [p for p in DB['posts'] if p['id'] not in ids]
     DB['judgments'] = {k: v for k, v in DB['judgments'].items() if k.rsplit(':', 1)[0] not in ids}
     still = {p.get('imageId') for p in DB['posts']} | {p.get('thumbImageId') for p in DB['posts']}
+    for p in DB['posts']:
+        still.update(p.get('extraImages') or [])
     for p in posts:
-        for img in (p.get('imageId'), p.get('thumbImageId')):
+        for img in (p.get('imageId'), p.get('thumbImageId'), *(p.get('extraImages') or [])):
             if img and img not in still and re.fullmatch(r'[a-f0-9]{32}\.(jpg|png|webp)', img):
                 try:
                     os.remove(os.path.join(UPLOAD_DIR, img))
@@ -177,7 +190,8 @@ def verdict_counts(pid):
     return c
 
 
-PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'body', 'tags', 'place', 'postedAt', 'photoTakenAt', 'imageId', 'likes', 'views', 'thumbTpl', 'thumbTitle', 'thumbImageId', 'status')
+PUBLIC_FIELDS = ('id', 'format', 'author', 'title', 'subhead', 'body', 'tags', 'place', 'postedAt', 'editedAt', 'photoTakenAt', 'imageId', 'extraImages',
+                 'slides', 'scenes', 'quote', 'stats', 'poll', 'music', 'comments', 'commentCount', 'likes', 'views', 'thumbTpl', 'thumbTitle', 'thumbImageId', 'status')
 
 
 def order_key(pid):
@@ -258,6 +272,30 @@ def clean_image_id(v):
     if isinstance(v, str) and re.fullmatch(r'[a-f0-9]{32}\.(jpg|png|webp)', v) and os.path.exists(os.path.join(UPLOAD_DIR, v)):
         return v
     return None
+
+
+def clean_quote(q):
+    if not isinstance(q, dict):
+        return None
+    text, who = clean_text(q.get('text'), 200), clean_text(q.get('who'), 40)
+    return {'text': text, 'who': who} if text else None
+
+
+def clean_stats(v):
+    out = []
+    for item in (v or [])[:3]:
+        if isinstance(item, dict):
+            label, value = clean_text(item.get('label'), 20), clean_text(item.get('value'), 20)
+            if label and value:
+                out.append({'label': label, 'value': value})
+    return out
+
+
+def clean_poll(q):
+    if not isinstance(q, dict):
+        return None
+    qq, a, bb = clean_text(q.get('q'), 60), clean_text(q.get('a'), 20), clean_text(q.get('b'), 20)
+    return {'q': qq, 'a': a, 'b': bb} if qq and a and bb else None
 
 
 def sniff_ext(raw):
@@ -488,8 +526,17 @@ class Handler(BaseHTTPRequestHandler):
         post = {
             'format': fmt,
             'author': {'name': clean_text(a.get('name'), 30), 'handle': clean_text(a.get('handle'), 30),
+                       'kind': a.get('kind') if a.get('kind') in AUTHOR_KINDS else 'person', 'verified': False,
                        'joined': clean_text(a.get('joined'), 20), 'followers': clean_text(a.get('followers'), 12),
+                       'posts': clean_text(a.get('posts'), 10), 'bio': clean_text(a.get('bio'), 80),
                        'color': clean_text(a.get('color'), 12), 'reporter': clean_text(a.get('reporter'), 20)},
+            'subhead': clean_text(b.get('subhead'), 120),
+            'quote': clean_quote(b.get('quote')),
+            'stats': clean_stats(b.get('stats')),
+            'poll': clean_poll(b.get('poll')),
+            'music': clean_text(b.get('music'), 40),
+            'commentCount': clean_text(b.get('commentCount'), 10),
+            'extraImages': [x for x in [clean_image_id(v) for v in (b.get('extraImages') or [])[:MAX_EXTRA_IMAGES]] if x],
             'likes': clean_text(b.get('likes'), 10),
             'views': clean_text(b.get('views'), 10),
             'thumbTpl': b.get('thumbTpl') if b.get('thumbTpl') in THUMB_TPLS else 'auto',

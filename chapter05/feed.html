@@ -6,7 +6,7 @@
   <title>도로그램 - 도로랜드가 사라졌다?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Black+Han+Sans&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Black+Han+Sans&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
   <script src="feed-config.js"></script>
@@ -15,7 +15,7 @@
     :root {
       --bg: #fafafa; --surface: #ffffff; --surface-2: #efefef; --line: #dbdbdb;
       --ink: #000000; --muted: #737373; --navy: #262626; --navy-ink: #ffffff;
-      --blue: #0095f6; --blue-ink: #ffffff; --link: #00376b;
+      --blue: #0095f6; --blue-ink: #ffffff; --link: #00376b; --verify: #0095f6;
       --real: #0a8754; --real-bg: #e6f6ee; --fake: #ed4956; --fake-bg: #fdeced; --unsure: #737373; --unsure-bg: #efefef;
       --focus: #0095f6; --r-card: 8px; --r-input: 8px;
       --ig-grad: conic-gradient(from 210deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5, #feda75);
@@ -36,6 +36,9 @@
     .icon { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
     .muted { color: var(--muted); } .small { font-size: 13px; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .vb { display: inline-grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: var(--verify); color: #fff; vertical-align: -2px; margin-left: 3px; flex-shrink: 0; }
+    .vb .icon { width: 10px; height: 10px; stroke-width: 3.5; }
+    .vb.lg { width: 18px; height: 18px; } .vb.lg .icon { width: 12px; height: 12px; }
 
     /* ---------- 상단(좁은 화면) ---------- */
     .top { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
@@ -78,6 +81,10 @@
     .phase-line { padding: 0 16px 12px; font-size: 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
     .phase-line b { font-size: 15px; }
     @media (min-width: 1024px) { .phase-line { display: none; } }
+    .read-hint { margin: 0 16px 14px; padding: 12px 16px; border-radius: 12px; background: #e8f4fe; color: #0b3d66; font-size: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .read-hint .btn { margin-left: auto; }
+    @media (min-width: 1024px) { .read-hint { margin: 0 0 14px; } }
+    @media (prefers-color-scheme: dark) { .read-hint { background: #0b2a42; color: #cfe8ff; } }
 
     /* ---------- 스토리 줄 ---------- */
     .tray-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 6px; margin: 0 16px 16px; }
@@ -87,10 +94,11 @@
     .tray { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; }
     .tray::-webkit-scrollbar { display: none; }
     .st { border: 0; background: none; padding: 0; width: 76px; flex-shrink: 0; display: grid; justify-items: center; gap: 6px; color: var(--ink); position: relative; }
-    .st-ring { width: 68px; height: 68px; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
+    .st-ring { width: 68px; height: 68px; border-radius: 50%; padding: 3px; background: var(--ig-grad); position: relative; }
     .st.seen .st-ring { background: var(--line); }
     .st-in { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--surface); overflow: hidden; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 20px; }
     .st-in img { width: 100%; height: 100%; object-fit: cover; }
+    .st-ring .vb { position: absolute; right: -2px; bottom: 2px; width: 18px; height: 18px; border: 2px solid var(--surface); margin: 0; } .st-ring .vb .icon { width: 10px; height: 10px; }
     .st-label { font-size: 12px; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .st-badge { position: absolute; top: 48px; right: 0; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; border: 2px solid var(--surface); }
     .ts-real { background: var(--real-bg); color: var(--real); } .ts-fake { background: var(--fake-bg); color: var(--fake); } .ts-unsure { background: var(--unsure-bg); color: var(--unsure); } .ts-mine { background: #fff; color: #d62976; box-shadow: 0 0 0 1px #d62976 inset; }
@@ -126,10 +134,11 @@
     .tile-title { font-size: 14px; font-weight: 700; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; margin-top: 2px; }
     .tile-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); min-width: 0; }
     .tile-sub .avatar { width: 16px; height: 16px; font-size: 8px; }
-    .tile-sub span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tile-sub .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-flex; align-items: center; min-width: 0; }
     .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 14px; flex-shrink: 0; }
     .sf { position: relative; aspect-ratio: 9 / 16; border-radius: 10px; overflow: hidden; background: #fff; color: #111; display: flex; flex-direction: column; text-align: center; transition: transform .2s; border: 1px solid #ececec; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
     .tile:hover .sf { transform: translateY(-3px); }
+    .sf-dur { position: absolute; right: 6px; top: 6px; z-index: 3; background: rgba(0,0,0,.75); color: #fff; font-size: 10.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; font-family: var(--mono); }
     .sf-band { flex-shrink: 0; height: 12%; min-height: 40px; background: var(--c); display: flex; align-items: center; gap: 5px; padding: 0 8px; color: #111; }
     .sf-band.awning { background: repeating-linear-gradient(90deg, var(--c) 0 14px, #fff 14px 28px); border-bottom: 4px solid rgba(0,0,0,.06); }
     .sf-band .icon { width: 13px; height: 13px; }
@@ -146,7 +155,7 @@
     .sf-stats span { display: inline-flex; align-items: center; gap: 2px; } .sf-stats .icon { width: 11px; height: 11px; } .sf-stats .r { margin-left: auto; }
     .sf-stats .heart .icon { color: #ff5a7a; fill: #ff5a7a; }
     .sf-fmt { position: absolute; top: 5px; left: 5px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; z-index: 2; } .sf-fmt .icon { width: 11px; height: 11px; }
-    .tile-state { position: absolute; top: 5px; right: 5px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 999px; z-index: 3; }
+    .tile-state { position: absolute; top: 30px; right: 5px; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 999px; z-index: 3; }
     .sf.t-full, .sf.t-cam, .sf.t-collage { background: #111; color: #fff; }
     .t-full .big { position: absolute; left: 10px; right: 10px; top: 50%; transform: translateY(-50%); text-align: center; font-family: "Black Han Sans", sans-serif; font-size: 26px; line-height: 1.2; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.6); word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
     .t-full .tag { position: absolute; left: 50%; transform: translateX(-50%); top: calc(50% + 62px); font-size: 10px; letter-spacing: .3em; opacity: .85; white-space: nowrap; }
@@ -187,8 +196,9 @@
     .nc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; } .nc:hover .nc-thumb img { transform: scale(1.03); }
     .nc-thumb .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; } .nc-thumb .ph .icon { width: 34px; height: 34px; opacity: .85; }
     .ni-tag { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 4px; color: #c8102e; background: #fdecee; }
-    .nc-outlet { position: absolute; left: 10px; bottom: 8px; font-family: "Noto Serif KR", serif; font-weight: 900; font-size: 15px; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+    .nc-outlet { position: absolute; left: 10px; bottom: 8px; font-family: "Noto Serif KR", serif; font-weight: 900; font-size: 15px; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.7); display: inline-flex; align-items: center; }
     .ni-title { font-size: 16px; font-weight: 700; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+    .ni-sub { font-size: 12.5px; color: var(--muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
     .ni-meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .ni-state { font-weight: 800; } .ni-state.ts-real { color: var(--real); background: none; } .ni-state.ts-fake { color: var(--fake); background: none; } .ni-state.ts-unsure { color: var(--muted); background: none; } .ni-state.ts-mine { color: #d62976; background: none; box-shadow: none; }
 
@@ -196,63 +206,127 @@
     .post { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
     .post-card { position: relative; --c-ink: #0f1419; --c-sub: #737373; --c-line: #efefef; background: #fff; color: var(--c-ink); font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
     .post-card .icon { width: 22px; height: 22px; stroke-width: 1.8; }
-    .train-mark { position: absolute; bottom: 8px; right: 8px; font: 500 10px var(--mono); padding: 2px 7px; border-radius: 999px; background: #ffd400; color: #1d2f55; z-index: 3; opacity: .9; }
+    .train-mark { position: absolute; bottom: 8px; right: 8px; font: 500 10px var(--mono); padding: 2px 7px; border-radius: 999px; background: #ffd400; color: #1d2f55; z-index: 5; opacity: .9; }
+    .who-btn { border: 0; background: none; padding: 0; color: inherit; font: inherit; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-align: left; }
+    .who-btn:hover { text-decoration: underline; }
+    /* 켄번즈(사진이 천천히 움직여 영상처럼 보이게) */
+    @keyframes kb1 { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.12) translate(-2%, -1.5%); } }
+    @keyframes kb2 { from { transform: scale(1.12) translate(2%, 1%); } to { transform: scale(1) translate(0, 0); } }
+    @keyframes kb3 { from { transform: scale(1.05) translate(-2%, 2%); } to { transform: scale(1.15) translate(1%, -2%); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .paused .kb { animation-play-state: paused !important; }
     /* 스토리 */
-    .story { aspect-ratio: 9 / 16; max-height: 680px; margin: 0 auto; background: linear-gradient(170deg, #2b3a67, #0f1730); color: #fff; overflow: hidden; }
+    .story { aspect-ratio: 9 / 16; max-height: 680px; margin: 0 auto; background: linear-gradient(170deg, #2b3a67, #0f1730); color: #fff; overflow: hidden; user-select: none; }
     .story .train-mark { bottom: auto; top: 52px; right: 10px; }
     .story-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .story-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.42) 0%, transparent 18%, transparent 70%, rgba(0,0,0,.5) 100%); }
-    .story-bars { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 3px; } .story-bars i { flex: 1; height: 2px; border-radius: 2px; background: rgba(255,255,255,.4); } .story-bars i:first-child { background: #fff; }
-    .story-head { position: absolute; top: 18px; left: 10px; right: 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
-    .story-head .avatar { width: 30px; height: 30px; font-size: 12px; } .story-head b { font-weight: 700; } .story-head .t { color: rgba(255,255,255,.75); } .story-head .r { margin-left: auto; display: flex; gap: 12px; }
-    .story-text { position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%); max-width: 86%; text-align: center; font-size: 19px; font-weight: 800; line-height: 1.5; word-break: keep-all; white-space: pre-wrap; }
+    .story-bars { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 3px; z-index: 4; } .story-bars i { flex: 1; height: 2.5px; border-radius: 2px; background: rgba(255,255,255,.35); overflow: hidden; display: block; } .story-bars i b { display: block; height: 100%; width: 0; background: #fff; }
+    .story-head { position: absolute; top: 18px; left: 10px; right: 10px; display: flex; align-items: center; gap: 8px; font-size: 13px; z-index: 4; }
+    .story-head .avatar { width: 30px; height: 30px; font-size: 12px; } .story-head b { font-weight: 700; display: inline-flex; align-items: center; } .story-head .t { color: rgba(255,255,255,.75); } .story-head .r { margin-left: auto; display: flex; gap: 12px; }
+    .story-head .r .icon { width: 20px; height: 20px; }
+    .story-slide { position: absolute; inset: 0; animation: fadeUp .25s ease-out; }
+    .story-text { position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%); max-width: 86%; text-align: center; font-size: 19px; font-weight: 800; line-height: 1.5; word-break: keep-all; white-space: pre-wrap; z-index: 3; }
     .story-text span { background: rgba(0,0,0,.55); padding: 3px 8px; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-    .story-place { position: absolute; left: 50%; top: 40%; transform: translateX(-50%) rotate(-4deg); background: #fff; color: #c13584; font-weight: 800; font-size: 14px; padding: 6px 12px; border-radius: 10px; display: inline-flex; gap: 4px; align-items: center; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.25); } .story-place .icon { width: 16px; height: 16px; }
-    .story-tags { position: absolute; left: 0; right: 0; top: 70%; text-align: center; font-weight: 700; font-size: 14px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
-    .story-foot { position: absolute; left: 10px; right: 10px; bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .story.noimg .story-text { top: 50%; font-size: 24px; } .story.noimg .story-text span { background: none; padding: 0; }
+    .stk { position: absolute; left: 50%; transform: translateX(-50%) rotate(-3deg); z-index: 3; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.25); font-weight: 800; }
+    .stk-place { top: 38%; background: #fff; color: #c13584; font-size: 14px; padding: 6px 12px; border-radius: 10px; display: inline-flex; gap: 4px; align-items: center; } .stk-place .icon { width: 16px; height: 16px; }
+    .stk-music { top: 76%; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 6px 12px; border-radius: 999px; display: inline-flex; gap: 6px; align-items: center; transform: translateX(-50%); } .stk-music .icon { width: 14px; height: 14px; }
+    .stk-poll { top: 74%; transform: translateX(-50%); width: 78%; background: #fff; color: #111; border-radius: 14px; padding: 10px 12px; font-size: 14px; white-space: normal; text-align: center; }
+    .stk-poll .pq { font-weight: 800; margin-bottom: 8px; } .stk-poll .po { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid #ddd; border-radius: 10px; overflow: hidden; }
+    .stk-poll .po button { border: 0; background: #fff; padding: 8px 4px; font-weight: 800; color: #0095f6; position: relative; } .stk-poll .po button + button { border-left: 1.5px solid #ddd; color: #e1306c; }
+    .stk-poll .po button i { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(0,149,246,.14); z-index: 0; } .stk-poll .po button + button i { background: rgba(225,48,108,.14); } .stk-poll .po button span { position: relative; }
+    .stk-poll.voted .po button { color: #111; }
+    .stk-q { top: 74%; transform: translateX(-50%); width: 78%; background: #fff; color: #111; border-radius: 14px; padding: 10px 12px; font-size: 14px; white-space: normal; text-align: center; }
+    .stk-q .qa { margin-top: 8px; border-radius: 999px; background: #efefef; color: #999; font-weight: 500; padding: 7px 12px; font-size: 13px; }
+    .stk-link { top: 80%; transform: translateX(-50%); background: #fff; color: #111; font-size: 13px; padding: 7px 14px; border-radius: 999px; display: inline-flex; gap: 6px; align-items: center; } .stk-link .icon { width: 14px; height: 14px; }
+    .stk-count { top: 76%; transform: translateX(-50%) rotate(-2deg); background: #fff; color: #111; border-radius: 14px; padding: 10px 16px; text-align: center; font-size: 12px; white-space: nowrap; } .stk-count b { display: block; font-family: var(--mono); font-size: 22px; letter-spacing: .04em; }
+    .story-tags { position: absolute; left: 0; right: 0; top: 70%; text-align: center; font-weight: 700; font-size: 14px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.7); z-index: 3; }
+    .story-foot { position: absolute; left: 10px; right: 10px; bottom: 12px; display: flex; align-items: center; gap: 12px; z-index: 4; }
     .story-foot .msg { flex: 1; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; padding: 9px 14px; font-size: 13px; color: rgba(255,255,255,.9); }
+    .story-seen { position: absolute; left: 12px; bottom: 56px; font-size: 12px; color: rgba(255,255,255,.9); display: inline-flex; gap: 4px; align-items: center; z-index: 4; text-shadow: 0 1px 3px rgba(0,0,0,.7); } .story-seen .icon { width: 14px; height: 14px; }
+    .tapzone { position: absolute; top: 60px; bottom: 60px; z-index: 6; cursor: pointer; } .tapzone.l { left: 0; width: 30%; } .tapzone.r { right: 0; width: 70%; }
+    .pause-ico { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 5; opacity: 0; transition: opacity .15s; pointer-events: none; }
+    .pause-ico .icon { width: 30px; height: 30px; color: #fff; fill: #fff; }
+    .paused .pause-ico { opacity: 1; }
+    .story-end { position: absolute; inset: 0; z-index: 7; background: rgba(0,0,0,.6); display: grid; place-items: center; gap: 8px; align-content: center; text-align: center; font-size: 14px; }
+    .story-end .btn { background: #fff; color: #111; }
     /* 쇼츠 */
-    .shorts-card { aspect-ratio: 9 / 16; max-height: 680px; margin: 0 auto; background: #000; color: #fff; overflow: hidden; }
+    .shorts-card { aspect-ratio: 9 / 16; max-height: 680px; margin: 0 auto; background: #000; color: #fff; overflow: hidden; user-select: none; }
     .shorts-card .train-mark { bottom: auto; top: 44px; right: 10px; }
-    .sc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .sc-plain { position: absolute; inset: 0; display: grid; place-items: center; padding: 30px 24px 120px; text-align: center; font-size: 20px; font-weight: 800; line-height: 1.5; word-break: keep-all; }
-    .sc-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.45), transparent 20%, transparent 55%, rgba(0,0,0,.75)); }
-    .sc-top { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; align-items: center; gap: 8px; }
+    .sc-scene { position: absolute; inset: 0; overflow: hidden; }
+    .sc-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+    .sc-img.kb { animation: kb1 7s linear forwards; }
+    .sc-plain { position: absolute; inset: 0; display: grid; place-items: center; padding: 30px 24px 160px; text-align: center; font-size: 22px; font-weight: 800; line-height: 1.5; word-break: keep-all; }
+    .sc-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.45), transparent 20%, transparent 55%, rgba(0,0,0,.78)); }
+    .sc-cap { position: absolute; left: 14px; right: 70px; top: 44%; z-index: 3; animation: fadeUp .3s ease-out; }
+    .sc-cap span { display: inline; background: rgba(0,0,0,.72); color: #fff; font-weight: 800; font-size: 17px; line-height: 1.55; padding: 4px 8px; border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; word-break: keep-all; }
+    .sc-top { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; align-items: center; gap: 8px; z-index: 4; }
     .sc-top .lg { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 16px; }
     .sc-top .lg .sp-logo { width: 22px; height: 22px; border-radius: 6px; } .sc-top .lg .sp-logo .icon { width: 12px; height: 12px; }
-    .sc-top .r { margin-left: auto; display: flex; gap: 14px; }
-    .sc-rail { position: absolute; right: 10px; bottom: 90px; display: grid; gap: 16px; justify-items: center; text-align: center; font-size: 12px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+    .sc-top .r { margin-left: auto; display: flex; gap: 14px; } .sc-top .r .icon { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+    .sc-rail { position: absolute; right: 10px; bottom: 96px; display: grid; gap: 14px; justify-items: center; text-align: center; font-size: 12px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.7); z-index: 4; }
     .sc-rail .icon { width: 28px; height: 28px; filter: drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
-    .sc-rail div { display: grid; gap: 2px; justify-items: center; }
-    .sc-bottom { position: absolute; left: 12px; right: 64px; bottom: 16px; display: grid; gap: 6px; }
-    .sc-ch { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; } .sc-ch .avatar { width: 30px; height: 30px; font-size: 12px; }
+    .sc-rail button { border: 0; background: none; color: #fff; display: grid; gap: 2px; justify-items: center; padding: 0; font: inherit; font-weight: 700; }
+    .sc-rail .liked .icon { fill: #fff; }
+    .sc-disc { width: 32px; height: 32px; border-radius: 50%; border: 3px solid #333; background: conic-gradient(#555, #222, #555); display: grid; place-items: center; animation: spin 4s linear infinite; } .sc-disc .icon { width: 14px; height: 14px; } .paused .sc-disc { animation-play-state: paused; }
+    .sc-bottom { position: absolute; left: 12px; right: 64px; bottom: 22px; display: grid; gap: 6px; z-index: 4; }
+    .sc-ch { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; } .sc-ch .avatar { width: 30px; height: 30px; font-size: 12px; } .sc-ch .subs { font-size: 11px; font-weight: 500; opacity: .85; }
     .sc-ch .sub { margin-left: 4px; background: #fff; color: #000; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 800; }
-    .sc-title { font-size: 15px; line-height: 1.45; word-break: keep-all; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+    .sc-title { font-size: 14.5px; line-height: 1.45; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 4px rgba(0,0,0,.7); font-weight: 600; }
     .sc-tags { color: #bfdbfe; font-size: 13px; }
-    .sc-music { display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: .9; } .sc-music .icon { width: 14px; height: 14px; }
+    .sc-music { display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: .9; overflow: hidden; white-space: nowrap; } .sc-music .icon { width: 14px; height: 14px; } .sc-music span { overflow: hidden; text-overflow: ellipsis; }
+    .sc-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.3); z-index: 5; } .sc-prog b { display: block; height: 100%; width: 0; background: #ff0033; }
+    .sc-dots { position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; gap: 4px; z-index: 5; } .sc-dots i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.4); } .sc-dots i.on { background: #fff; }
+    .sc-tap { position: absolute; left: 0; right: 64px; top: 50px; bottom: 110px; z-index: 5; cursor: pointer; }
+    .sc-cm { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; background: #fff; color: #111; border-radius: 14px 14px 0 0; z-index: 8; display: flex; flex-direction: column; transform: translateY(100%); transition: transform .25s; }
+    .sc-cm.open { transform: none; }
+    .sc-cm .cm-h { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid #eee; font-weight: 800; font-size: 14px; } .sc-cm .cm-h button { margin-left: auto; border: 0; background: none; padding: 0; } .sc-cm .cm-h .icon { width: 20px; height: 20px; color: #111; }
+    .cm-list { overflow: auto; padding: 8px 14px; display: grid; gap: 12px; align-content: start; font-size: 13px; }
+    .cm { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: start; } .cm .avatar { width: 30px; height: 30px; font-size: 11px; } .cm .nm { font-weight: 700; font-size: 12px; } .cm .nm span { color: #888; font-weight: 500; margin-left: 6px; } .cm .tx { line-height: 1.5; word-break: keep-all; } .cm .lk { font-size: 11px; color: #888; display: grid; justify-items: center; gap: 2px; } .cm .lk .icon { width: 14px; height: 14px; }
+    .cm-in { margin-top: auto; padding: 10px 14px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #999; } .cm-in span { flex: 1; border-radius: 999px; background: #f1f1f1; padding: 8px 12px; }
     /* 뉴스 */
-    .nw-mast { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 3px double #d4d4d4; }
-    .nw-logo { font-family: "Noto Serif KR", serif; font-weight: 900; font-size: 22px; letter-spacing: -.03em; } .nw-sub { font-size: 12px; color: var(--c-sub); border: 1px solid #d4d4d4; border-radius: 999px; padding: 3px 10px; }
-    .nw-sec { padding: 14px 18px 0; font-size: 13px; font-weight: 800; color: #c8102e; }
-    .nw-h { margin: 6px 18px 10px; font-size: 23px; font-weight: 800; line-height: 1.38; letter-spacing: -.03em; word-break: keep-all; }
-    .nw-by { padding: 0 18px 12px; font-size: 12px; color: var(--c-sub); display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--c-line); }
-    .nw-fig { margin: 16px 18px 0; } .nw-fig img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; } .nw-fig figcaption { font-size: 12px; color: var(--c-sub); padding-top: 6px; }
-    .nw-body { padding: 14px 18px 4px; font-size: 16px; line-height: 1.85; color: #222; word-break: keep-all; overflow-wrap: anywhere; } .nw-body p { margin: 0 0 12px; }
+    .news { font-family: "Noto Sans KR", -apple-system, sans-serif; }
+    .nw-mast { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px 8px; border-bottom: 3px double #d4d4d4; gap: 10px; }
+    .nw-logo { font-family: "Noto Serif KR", serif; font-weight: 900; font-size: 22px; letter-spacing: -.03em; display: inline-flex; align-items: center; } .nw-sub { font-size: 12px; color: var(--c-sub); border: 1px solid #d4d4d4; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+    .nw-date { font-size: 11px; color: var(--c-sub); margin-left: auto; white-space: nowrap; }
+    .nw-tabs { display: flex; gap: 14px; padding: 8px 18px; border-bottom: 1px solid var(--c-line); font-size: 12.5px; color: var(--c-sub); } .nw-tabs b { color: #c8102e; }
+    .nw-h { margin: 16px 18px 8px; font-size: 24px; font-weight: 800; line-height: 1.38; letter-spacing: -.03em; word-break: keep-all; }
+    .nw-dek { margin: 0 18px 12px; font-size: 15px; line-height: 1.6; color: #444; word-break: keep-all; }
+    .nw-by { padding: 10px 18px; font-size: 12px; color: var(--c-sub); display: flex; gap: 8px 14px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--c-line); border-bottom: 1px solid var(--c-line); }
+    .nw-by .rp { display: inline-flex; align-items: center; gap: 6px; color: #222; font-weight: 700; } .nw-by .rp .avatar { width: 22px; height: 22px; font-size: 10px; }
+    .nw-by .tools { margin-left: auto; display: flex; gap: 10px; } .nw-by .tools .icon { width: 16px; height: 16px; }
+    .nw-fig { margin: 16px 18px 0; } .nw-fig img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; } .nw-fig figcaption { font-size: 12px; color: var(--c-sub); padding-top: 6px; line-height: 1.5; }
+    .nw-body { padding: 14px 18px 4px; font-size: 16px; line-height: 1.85; color: #222; word-break: keep-all; overflow-wrap: anywhere; } .nw-body p { margin: 0 0 14px; } .nw-body p:first-child::first-letter { font-weight: 800; }
+    .nw-stats { margin: 4px 18px 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+    .nw-stats div { background: #f6f6f6; border-top: 2px solid #c8102e; padding: 8px 10px; } .nw-stats b { display: block; font-size: 19px; font-family: var(--mono); letter-spacing: -.02em; } .nw-stats span { font-size: 11.5px; color: var(--c-sub); }
+    .nw-quote { margin: 4px 18px 16px; padding: 12px 16px; border-left: 4px solid #c8102e; background: #fafafa; font-size: 15.5px; line-height: 1.7; color: #222; word-break: keep-all; } .nw-quote footer { margin-top: 6px; font-size: 12.5px; color: var(--c-sub); font-style: normal; }
+    .nw-foot { padding: 6px 18px 10px; font-size: 12px; color: var(--c-sub); display: flex; flex-wrap: wrap; gap: 6px 14px; border-top: 1px solid var(--c-line); }
+    .nw-cm { padding: 10px 18px 14px; border-top: 1px solid var(--c-line); } .nw-cm h4 { margin: 0 0 8px; font-size: 14px; } .nw-cm .cm-list { padding: 0; }
+    .nw-rel { padding: 12px 18px 16px; border-top: 1px solid var(--c-line); font-size: 13px; } .nw-rel h4 { margin: 0 0 6px; font-size: 13px; color: #c8102e; } .nw-rel li { margin: 4px 0; color: #222; word-break: keep-all; }
     .nw-copy { padding: 4px 18px 16px; font-size: 11px; color: #a3a3a3; }
+    .news .train-mark { top: 8px; right: 8px; bottom: auto; }
 
     /* ---------- 상세 창 + 확인·판별 ---------- */
-    .pm { position: fixed; inset: 0; z-index: 65; background: rgba(0,0,0,.7); display: grid; place-items: center; padding: 24px 64px; }
+    .pm { position: fixed; inset: 0; z-index: 65; background: rgba(0,0,0,.72); display: grid; place-items: center; padding: 24px 64px; }
     .pm-x { position: fixed; top: 14px; right: 16px; border: 0; background: none; color: #fff; padding: 6px; z-index: 2; } .pm-x .icon { width: 30px; height: 30px; }
     .pm-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: #111; display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
     .pm-nav.prev { left: 12px; } .pm-nav.next { right: 12px; } .pm-nav:disabled { opacity: .3; }
     .pm-count { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 13px; opacity: .8; }
     .pm-box { width: min(1120px, 100%); height: min(88dvh, 860px); }
     .pm-box .post { display: grid; grid-template-columns: minmax(0, 1fr) 380px; height: 100%; border-radius: 12px; border: 0; }
-    .post-media { background: #111; overflow: auto; display: grid; align-items: center; }
+    .post-media { background: #111; overflow: auto; display: grid; align-items: center; position: relative; }
     .post-media .png-target { max-width: 520px; width: 100%; margin: 0 auto; }
+    .post-media.vert .png-target { max-width: min(400px, calc((88dvh - 20px) * 9 / 16)); }
+    .vnav { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); display: grid; gap: 10px; z-index: 3; }
+    .vnav button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; display: grid; place-items: center; } .vnav button:hover { background: rgba(255,255,255,.3); } .vnav button:disabled { opacity: .25; }
     .post-side { overflow: auto; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
-    @media (max-width: 860px) { .pm { padding: 0; } .pm-box { width: 100%; height: 100dvh; } .pm-box .post { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; border-radius: 0; } .post-media, .post-side { overflow: visible; } .post-side { border-left: 0; } .pm-nav { top: auto; bottom: 14px; transform: none; } }
+    @media (max-width: 860px) { .pm { padding: 0; } .pm-box { width: 100%; height: 100dvh; } .pm-box .post { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; border-radius: 0; } .post-media, .post-side { overflow: visible; } .post-side { border-left: 0; } .pm-nav { top: auto; bottom: 14px; transform: none; } .vnav { display: none; } }
     .side-h { display: flex; align-items: center; gap: 8px; padding: 14px 14px 4px; font-weight: 800; font-size: 15px; } .side-h .icon { width: 18px; height: 18px; }
+    .side-who { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .side-who .nm { font-weight: 800; display: flex; align-items: center; } .side-who .meta { color: var(--muted); font-size: 12px; }
+    .kind-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink); } .kind-chip .icon { width: 12px; height: 12px; }
+    .kind-chip.official { background: #dbeafe; color: #1e40af; } .kind-chip.press { background: #fde7e9; color: #9f1239; } .kind-chip.creator { background: #fef3c7; color: #92400e; }
     .status-line { padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; gap: 6px; align-items: center; }
     .st-pending { background: #fff7d6; color: #7a5b00; } .st-approved { background: var(--real-bg); color: var(--real); } .st-seed { background: #dbeafe; color: #1e40af; }
     .verify { padding: 10px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -260,6 +334,8 @@
     .vbtn[aria-expanded="true"] { background: var(--navy); color: var(--navy-ink); border-color: var(--navy); } .vbtn .icon { width: 15px; height: 15px; }
     .vpanel { margin: 0 12px 12px; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 14px; }
     .vpanel dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 6px 0 0; } .vpanel dt { color: var(--muted); } .vpanel dd { margin: 0; font-weight: 700; } .vpanel ul { margin: 6px 0 0; padding-left: 18px; }
+    .vpanel .reg { margin-top: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; } .reg.ok { background: var(--real-bg); color: var(--real); } .reg.no { background: var(--fake-bg); color: var(--fake); } .reg.na { background: var(--surface); color: var(--muted); }
+    .vpanel details { margin-top: 6px; } .vpanel summary { cursor: pointer; font-weight: 700; font-size: 13px; }
     mark.hear { background: #ffe58a; color: #3d2f00; padding: 0 2px; border-radius: 3px; }
     .judge { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 10px; }
     .judge-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -284,12 +360,42 @@
     .err { color: var(--fake); font-size: 13px; font-weight: 700; margin: 0; } .err:empty { display: none; }
     .row-actions { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); flex-wrap: wrap; margin-top: auto; }
 
+    /* 프로필 창 */
+    .prof { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,.5); display: grid; place-items: center; padding: 16px; }
+    .prof-box { background: #fff; color: #111; border-radius: 16px; width: min(380px, 100%); overflow: hidden; }
+    .prof-top { display: flex; align-items: center; gap: 14px; padding: 18px 18px 12px; } .prof-top .avatar { width: 64px; height: 64px; font-size: 26px; }
+    .prof-top .nm { font-size: 17px; font-weight: 800; display: flex; align-items: center; } .prof-top .hd { color: #737373; font-size: 13px; }
+    .prof-stats { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; padding: 6px 18px 12px; font-size: 12px; color: #737373; } .prof-stats b { display: block; color: #111; font-size: 15px; }
+    .prof-bio { padding: 0 18px 12px; font-size: 13.5px; line-height: 1.5; word-break: keep-all; } .prof-bio .kind-chip { margin-bottom: 6px; }
+    .prof-reg { margin: 0 18px 14px; padding: 9px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+    .prof-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 18px 18px; } .prof-btns .btn { background: #efefef; color: #111; } .prof-btns .btn.f { background: #0095f6; color: #fff; }
+
     /* 정답 공개 배너 */
     .twist { margin: 0 16px 16px; background: linear-gradient(135deg, #962fbf, #d62976 55%, #fa7e1e); color: #fff; border-radius: 12px; padding: 18px; }
     @media (min-width: 1024px) { .twist { margin: 0 0 16px; } }
     .twist h2 { margin: 0 0 4px; font-size: 19px; }
     .twist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
     .twist-grid div { background: rgba(255,255,255,.14); border-radius: 10px; padding: 10px 12px; } .twist-grid b { display: block; font-size: 26px; }
+
+    /* ---------- 자료실 ---------- */
+    .arc { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; padding: 0 16px; }
+    .arc-hero { background: linear-gradient(135deg, #0e4a84, #1d4ed8 60%, #0891b2); color: #fff; border-radius: 14px; padding: 22px 24px; display: grid; gap: 6px; }
+    .arc-hero h2 { margin: 0; font-size: 24px; display: flex; gap: 10px; align-items: center; } .arc-hero p { margin: 0; opacity: .92; font-size: 14px; line-height: 1.6; max-width: 70ch; }
+    .arc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 820px) { .arc-grid { grid-template-columns: 1fr; } }
+    .arc-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+    .arc-card h3 { margin: 0 0 10px; font-size: 16px; display: flex; gap: 8px; align-items: center; } .arc-card h3 .icon { width: 18px; height: 18px; }
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px; margin: 0; } .kv dt { color: var(--muted); white-space: nowrap; } .kv dd { margin: 0; font-weight: 600; }
+    .zone-list { display: grid; gap: 8px; } .zone { display: grid; grid-template-columns: 132px 1fr; gap: 10px; font-size: 14px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); } .zone b { font-size: 14px; }
+    .numcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } @media (max-width: 560px) { .numcards { grid-template-columns: 1fr 1fr; } }
+    .numcard { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; } .numcard span { font-size: 12px; color: var(--muted); display: block; } .numcard b { font-size: 17px; font-family: var(--mono); letter-spacing: -.02em; display: block; margin: 2px 0; } .numcard small { font-size: 11.5px; color: var(--muted); line-height: 1.4; display: block; }
+    .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 150px; margin: 12px 4px 0; }
+    .bar { display: grid; justify-items: center; gap: 4px; align-content: end; height: 100%; font-size: 12px; } .bar i { width: 100%; max-width: 56px; background: linear-gradient(180deg, #0095f6, #1d4ed8); border-radius: 6px 6px 0 0; display: block; } .bar b { font-family: var(--mono); font-size: 13px; } .bar span { color: var(--muted); }
+    .tl { display: grid; gap: 10px; } .tl-item { display: grid; grid-template-columns: 150px 1fr; gap: 10px; font-size: 14px; padding: 10px 12px; border-left: 3px solid #1d4ed8; background: var(--surface-2); border-radius: 0 8px 8px 0; } .tl-item .w { font-family: var(--mono); font-size: 12.5px; color: var(--muted); } .tl-item b { display: block; } .tl-item small { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+    .tl-item.inc { border-left-color: #ea580c; }
+    @media (max-width: 560px) { .tl-item { grid-template-columns: 1fr; } }
+    .acct { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; } .acct:last-child { border-bottom: 0; }
+    .acct .avatar { width: 40px; height: 40px; } .acct .nm { font-weight: 800; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; } .acct .meta { font-size: 12px; color: var(--muted); }
+    .stance li { margin: 4px 0; font-size: 14px; line-height: 1.6; }
 
     /* ---------- 만들기 (한 화면 4열) ---------- */
     .make-wrap { display: block; }
@@ -310,10 +416,11 @@
       main.wide { height: 100dvh; padding: 14px 20px; display: flex; flex-direction: column; overflow: hidden; }
       #tab-make { display: flex; flex-direction: column; flex: 1; min-height: 0; } #tab-make[hidden] { display: none; }
       .make-wrap { flex: 1; min-height: 0; display: flex; } .igc.mk { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-      .mk-body { flex: 1; min-height: 0; grid-template-columns: 250px 1.1fr 1.1fr 1fr; gap: 0; }
+      .mk-body { flex: 1; min-height: 0; grid-template-columns: 250px 1.15fr 1.05fr 1fr; gap: 0; }
       .mk-col { min-height: 0; overflow: auto; border-left: 1px solid var(--line); } .mk-col:first-child { border-left: 0; }
     }
     .mk-h { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; padding-bottom: 4px; border-bottom: 1px solid var(--line); white-space: nowrap; flex-wrap: wrap; } .mk-h .icon { width: 16px; height: 16px; }
+    .fmt-nature { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 0; padding: 6px 8px; background: var(--surface-2); border-radius: 8px; }
     .opt-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .opt { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 5px 9px; font-weight: 600; font-size: 12px; display: inline-flex; gap: 4px; align-items: center; color: var(--ink); } .opt .icon { width: 14px; height: 14px; }
     .opt[aria-pressed="true"] { border-color: var(--navy); background: var(--navy); color: var(--navy-ink); } .opt:disabled { opacity: .4; cursor: not-allowed; }
@@ -326,8 +433,10 @@
     .mk-drop.drag::after { content: "여기에 놓으면 사진이 들어갑니다"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,149,246,.12); border: 2px dashed var(--blue); border-radius: 8px; color: var(--blue); font-weight: 800; }
     .mk-dropcta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .thumb-row { display: flex; gap: 8px; align-items: center; } .thumb-row img { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+    .extra-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; } .extra-row .ex-img { position: relative; } .extra-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; display: block; }
+    .extra-row .ex-img button { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; border: 0; background: #262626; color: #fff; font-size: 11px; line-height: 1; padding: 0; }
     .mk-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 8px; } .mk-grid .field { gap: 2px; } .mk-grid label, .mk-grid .flabel, .mk-secret label, .mk-secret .flabel { font-size: 12px; }
-    .mk-grid .input { min-width: 0; width: 100%; } .mk-grid .field:has(.swatches) { grid-column: 1 / -1; }
+    .mk-grid .input { min-width: 0; width: 100%; } .mk-grid .field:has(.swatches), .mk-grid .field.wide { grid-column: 1 / -1; }
     .mk .input, .mk select, .mk textarea { padding: 6px 9px; font-size: 13px; }
     .swatches { display: flex; gap: 5px; flex-wrap: wrap; } .sw { width: 22px; height: 22px; border-radius: 50%; border: 3px solid transparent; } .sw[aria-pressed="true"] { border-color: var(--ink); }
     .tpl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
@@ -341,7 +450,7 @@
     .igc-step[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); } .igc-step[aria-selected="true"] b { background: var(--ink); color: var(--surface); }
     .mk-prev-area { flex: 1; min-height: 0; overflow: auto; }
     .thumb-prev { display: grid; justify-items: center; gap: 8px; padding: 4px 0; } .thumb-prev .cap { font-size: 12px; color: var(--muted); text-align: center; } .thumb-prev .tile { width: 200px; pointer-events: none; } .thumb-prev .nc { width: 100%; pointer-events: none; border: 1px solid var(--line); border-radius: 12px; } .thumb-prev .st { pointer-events: none; }
-    #preview .post { font-size: 12px; }
+    #preview .post { font-size: 12px; } #preview .cap { font-size: 12px; color: var(--muted); text-align: center; padding: 6px 0; }
     .my-posts { display: grid; gap: 6px; }
     .mp-row { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
     .mp-row img, .mp-row .noimg { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; background: var(--surface-2); }
@@ -385,7 +494,9 @@
     .ex .tag { display: inline-block; font-size: 12px; font-weight: 800; padding: 1px 8px; border-radius: 999px; margin-bottom: 4px; }
     .fmt3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; } @media (max-width: 760px) { .fmt3 { grid-template-columns: 1fr; } }
     .fmt3 > div { border: 1px solid var(--line); border-radius: 10px; padding: 12px; } .fmt3 b { display: flex; gap: 6px; align-items: center; font-size: 15px; margin-bottom: 6px; }
-    .fmt3 ul { padding-left: 18px; font-size: 14px; }
+    .fmt3 ul { padding-left: 18px; font-size: 14px; } .fmt3 p { font-size: 13px; color: var(--muted); margin: 0 0 6px; line-height: 1.55; }
+    .kinds4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } @media (max-width: 760px) { .kinds4 { grid-template-columns: 1fr 1fr; } }
+    .kinds4 > div { background: var(--surface-2); border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.5; } .kinds4 b { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; font-size: 14px; }
     .ok-no { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } @media (max-width: 640px) { .ok-no { grid-template-columns: 1fr; } }
     .ok-no > div { border-radius: 10px; padding: 12px 14px; } .ok-no .ok { background: var(--real-bg); } .ok-no .no { background: var(--fake-bg); } .ok-no b { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
 
@@ -397,7 +508,7 @@
     .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #262626; color: #fff; padding: 10px 18px; border-radius: 8px; font-weight: 700; z-index: 80; max-width: calc(100% - 32px); }
     .skeleton { height: 220px; border-radius: 12px; background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%); background-size: 200% 100%; animation: sk 1.4s infinite; }
     @keyframes sk { to { background-position: -200% 0; } }
-    @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .btn, .sf, .nc-thumb img { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .skeleton, .sc-img.kb, .sc-disc { animation: none !important; } .btn, .sf, .nc-thumb img, .sc-cm { transition: none; } }
     body.screen main { font-size: 17px; }
   </style>
 </head>
@@ -406,6 +517,7 @@
     <div class="sb-brand">Dorogram<small>도로랜드 공식 도로그램</small></div>
     <nav role="tablist" aria-label="화면 선택" style="display:grid;gap:2px">
       <button class="sb-btn" role="tab" data-tab="feed" aria-selected="true"><i data-lucide="house" class="icon"></i>홈</button>
+      <button class="sb-btn" role="tab" data-tab="archive" aria-selected="false"><i data-lucide="library-big" class="icon"></i>자료실</button>
       <button class="sb-btn" role="tab" data-tab="make" aria-selected="false"><i data-lucide="square-plus" class="icon"></i>만들기</button>
       <button class="sb-btn" role="tab" data-tab="score" aria-selected="false" hidden><i data-lucide="trophy" class="icon"></i>점수</button>
       <button class="sb-btn" role="tab" data-tab="help" aria-selected="false"><i data-lucide="circle-help" class="icon"></i>도움말</button>
@@ -421,6 +533,7 @@
       <span class="phase-pill" id="phasePill">연결 중</span>
       <nav class="nav" role="tablist" aria-label="화면 선택">
         <button class="nav-btn" role="tab" data-tab="feed" aria-selected="true" aria-label="홈"><i data-lucide="house" class="icon"></i></button>
+        <button class="nav-btn" role="tab" data-tab="archive" aria-selected="false" aria-label="자료실"><i data-lucide="library-big" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="make" aria-selected="false" aria-label="만들기"><i data-lucide="square-plus" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="score" aria-selected="false" aria-label="점수" hidden><i data-lucide="trophy" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="help" aria-selected="false" aria-label="도움말"><i data-lucide="circle-help" class="icon"></i></button>
@@ -436,6 +549,7 @@
     <!-- 홈: 스토리 줄 / 쇼츠 / 뉴스 -->
     <section id="tab-feed">
       <div id="twist" hidden></div>
+      <div class="read-hint" id="readHint" hidden><i data-lucide="library-big" class="icon"></i><span>도로랜드를 잘 모르면 판별할 수 없습니다. 먼저 <b>자료실</b>(도로랜드 정리본)을 읽고 오세요.</span><button class="btn btn-primary" type="button" data-goto="archive">자료실 열기</button></div>
       <div class="tray-wrap"><div class="tray-head"><i data-lucide="circle-dashed" class="icon"></i>스토리<span class="cnt" id="trayCnt"></span></div><div class="tray" id="tray"></div></div>
       <div class="filters" role="group" aria-label="게시물 거르기">
         <button class="chip" data-filter="all" aria-pressed="true">전체</button>
@@ -446,6 +560,9 @@
       </div>
       <div class="feed-split" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
     </section>
+
+    <!-- 자료실 -->
+    <section id="tab-archive" hidden><div class="arc" id="archiveBody"></div></section>
 
     <!-- 만들기 -->
     <section id="tab-make" hidden>
@@ -473,32 +590,50 @@
             <div class="mk-col">
               <div class="mk-h"><i data-lucide="pen-line" class="icon"></i>글</div>
               <div class="opt-row" id="optFormat"></div>
-              <p class="small muted" id="fmtWhere" style="margin:0"></p>
+              <p class="fmt-nature" id="fmtNature"></p>
               <div class="igc-row" id="titleField"><label class="sr" for="fTitle" id="fTitleLabel">제목</label><i data-lucide="heading" class="icon"></i><input id="fTitle" maxlength="80" placeholder="기사 제목"></div>
+              <div class="igc-row" id="subheadField"><label class="sr" for="fSubhead">부제</label><i data-lucide="text" class="icon"></i><input id="fSubhead" maxlength="120" placeholder="부제 (제목 아래 한 줄 요약)"></div>
               <label class="sr" for="fBody" id="fBodyLabel">문구</label>
               <textarea id="fBody" class="igc-caption" maxlength="1200" placeholder="문구를 입력하세요..."></textarea>
               <div class="igc-cap-tools"><button type="button" class="linkbtn" id="btnPolish"><i data-lucide="wand-sparkles" class="icon"></i>AI로 말투 다듬기</button><span class="igc-count" id="bodyCount">0/1,200</span></div>
+              <div id="newsExtra" class="mk-stack">
+                <div class="igc-row"><label class="sr" for="fQuoteText">인용문</label><i data-lucide="quote" class="icon"></i><input id="fQuoteText" maxlength="200" placeholder="인용문 (누군가가 한 말 한 문장)"></div>
+                <div class="igc-row"><label class="sr" for="fQuoteWho">말한 사람</label><i data-lucide="user-round" class="icon"></i><input id="fQuoteWho" maxlength="40" placeholder="말한 사람 (예: 운영실 관계자, 방문객 김모 씨(34))"></div>
+                <div class="mk-grid">
+                  <div class="field"><label for="fStat1L">숫자 1 이름</label><input class="input" id="fStat1L" maxlength="20" placeholder="예: 주말 방문객"></div>
+                  <div class="field"><label for="fStat1V">숫자 1 값</label><input class="input" id="fStat1V" maxlength="20" placeholder="예: 1만 2,600명"></div>
+                  <div class="field"><label for="fStat2L">숫자 2 이름</label><input class="input" id="fStat2L" maxlength="20" placeholder="예: 예약 취소"></div>
+                  <div class="field"><label for="fStat2V">숫자 2 값</label><input class="input" id="fStat2V" maxlength="20" placeholder="예: 1,900건"></div>
+                </div>
+              </div>
               <div class="igc-row" id="tagsField"><label class="sr" for="fTags">해시태그</label><i data-lucide="hash" class="icon"></i><input id="fTags" maxlength="80" placeholder="해시태그 (#도로랜드)"></div>
-              <div class="igc-row"><label class="sr" for="fPlace">위치</label><i data-lucide="map-pin" class="icon"></i><input id="fPlace" maxlength="40" placeholder="위치 추가"></div>
-              <div class="igc-row"><label class="sr" for="fPosted">게시 시점</label><i data-lucide="clock-3" class="icon"></i><input id="fPosted" maxlength="20" placeholder="게시 시점 (예: 1시간 전)"></div>
+              <div class="igc-row"><label class="sr" for="fPlace">위치</label><i data-lucide="map-pin" class="icon"></i><input id="fPlace" maxlength="40" placeholder="위치 추가 (스토리는 위치 스티커로 뜸)"></div>
+              <div class="igc-row" id="pollField"><label class="sr" for="fPoll">투표 스티커</label><i data-lucide="bar-chart-2" class="icon"></i><input id="fPoll" maxlength="100" placeholder="투표 스티커: 질문 | 보기1 | 보기2 (비워도 됨)"></div>
+              <div class="igc-row" id="musicField"><label class="sr" for="fMusic">음악</label><i data-lucide="music-2" class="icon"></i><input id="fMusic" maxlength="40" placeholder="음악 (예: 원본 오디오, Sunny Afternoon)"></div>
+              <div class="igc-row"><label class="sr" for="fPosted">게시 시점</label><i data-lucide="clock-3" class="icon"></i><input id="fPosted" maxlength="20" placeholder="게시 시점 (예: 1시간 전, 어제 오후 5:52)"></div>
               <div class="mk-h" style="margin-top:6px"><i data-lucide="image" class="icon"></i>사진</div>
               <div class="mk-drop" id="dropZone">
                 <div id="dropCta" class="mk-dropcta"><label class="btn btn-ghost" for="fFile"><i data-lucide="upload" class="icon"></i>사진 고르기</label><span class="small muted">끌어다 놓아도 됩니다. 사진 없이 글만 올려도 됩니다.</span></div>
-                <div class="thumb-row" id="thumb" hidden><img id="thumbImg" alt="넣은 사진"><span class="small muted" style="flex:1">사진이 들어갔습니다.</span><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
+                <div class="thumb-row" id="thumb" hidden><img id="thumbImg" alt="넣은 사진"><span class="small muted" style="flex:1">대표 사진</span><button type="button" class="btn btn-ghost" id="btnRmImg">빼기</button></div>
               </div>
               <input type="file" id="fFile" accept="image/*" hidden>
-              <div class="igc-row"><label class="sr" for="fTaken">사진 찍은 때</label><i data-lucide="calendar-clock" class="icon"></i><input id="fTaken" maxlength="20" placeholder="사진 찍은 때 (예: 3년 전 10월 6일)"></div>
+              <div class="extra-row" id="extraRow"><span class="small muted" id="extraHint">장면·슬라이드마다 다른 사진을 쓰려면</span><label class="opt" for="fExtraFile" style="cursor:pointer"><i data-lucide="images" class="icon"></i>사진 더 넣기</label><input type="file" id="fExtraFile" accept="image/*" hidden><span id="extraThumbs" style="display:contents"></span></div>
+              <div class="igc-row"><label class="sr" for="fTaken">사진 찍은 때</label><i data-lucide="calendar-clock" class="icon"></i><input id="fTaken" maxlength="20" placeholder="사진·영상 찍은 때 (예: 3년 전 10월 6일)"></div>
             </div>
             <div class="mk-col">
               <div class="mk-h"><i data-lucide="user-round-pen" class="icon"></i>계정 <span style="margin-left:auto;display:flex;gap:6px;align-items:center;font-size:13px"><span id="acctAv"></span><span id="acctName">계정 이름</span></span></div>
+              <div class="field"><div class="flabel small">계정 종류</div><div class="opt-row" id="optKind"></div><p class="small muted" id="kindDesc" style="margin:0"></p></div>
               <div class="mk-grid">
                 <div class="field"><label for="fName" id="fNameLabel">이름</label><input class="input" id="fName" maxlength="30" placeholder="예: 도로일보"></div>
                 <div class="field"><label for="fHandle">계정 아이디</label><input class="input" id="fHandle" maxlength="29" placeholder="예: doroilbo"></div>
                 <div class="field"><label for="fJoined">가입한 때</label><input class="input" id="fJoined" maxlength="20" placeholder="예: 2019.03"></div>
-                <div class="field"><label for="fFollowers">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
+                <div class="field"><label for="fFollowers" id="fFollowersLabel">팔로워 수</label><input class="input" id="fFollowers" maxlength="12" placeholder="예: 3.2만"></div>
+                <div class="field"><label for="fPostsCount">게시물 수</label><input class="input" id="fPostsCount" maxlength="10" placeholder="예: 412"></div>
                 <div class="field" id="reporterField"><label for="fReporter">기자 이름</label><input class="input" id="fReporter" maxlength="20" placeholder="예: 한바다"></div>
+                <div class="field wide"><label for="fBio">소개 한 줄</label><input class="input" id="fBio" maxlength="80" placeholder="예: 주말마다 어디든. 섬 여행 좋아함"></div>
                 <div class="field" id="likesField"><label for="fLikes">좋아요 수</label><input class="input" id="fLikes" maxlength="10" placeholder="예: 1,284"></div>
                 <div class="field"><label for="fViews">조회수</label><input class="input" id="fViews" maxlength="10" placeholder="예: 3.2만"></div>
+                <div class="field" id="commentField"><label for="fCommentCount">댓글 수</label><input class="input" id="fCommentCount" maxlength="10" placeholder="예: 84"></div>
                 <div class="field"><div class="flabel">프로필 색</div><div class="swatches" id="swatches"></div></div>
               </div>
               <div class="mk-h" style="margin-top:8px"><i data-lucide="layout-template" class="icon"></i>썸네일 <span class="small muted" style="font-weight:400" id="thumbWhere">목록에서 보이는 모양</span></div>
@@ -506,7 +641,7 @@
                 <div class="tpl-grid" id="optTpl"></div>
                 <div class="igc-row" id="thumbTitleRow"><label class="sr" for="fThumbTitle">썸네일 제목</label><i data-lucide="type" class="icon"></i><input id="fThumbTitle" maxlength="60" placeholder="썸네일 제목 (비우면 제목·문구 앞부분)"></div>
                 <div class="thumb-img-row">
-                  <button type="button" class="opt" id="thumbUseMain" aria-pressed="true">본문 사진 그대로</button>
+                  <button type="button" class="opt" id="thumbUseMain" aria-pressed="true">대표 사진 그대로</button>
                   <label class="opt" for="fThumbFile" style="cursor:pointer"><i data-lucide="upload" class="icon"></i>다른 사진</label>
                   <input type="file" id="fThumbFile" accept="image/*" hidden>
                   <img id="thumbOwnImg" alt="썸네일 사진" hidden>
@@ -524,15 +659,15 @@
               <div id="fakeFields" class="mk-stack">
                 <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
                 <div class="field"><div class="flabel">단서를 찾는 기준</div><div class="opt-row" id="optClueCrit"></div></div>
-                <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="3" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다"></textarea></div>
+                <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="3" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다 / 매출을 386억이 아니라 193억이라고 썼다"></textarea></div>
               </div>
               <div id="realFields" class="mk-stack" hidden>
-                <div class="field"><label for="fBasis">근거가 된 사실 카드</label><select id="fBasis"></select>
-                  <p class="small muted" style="margin:0">진짜 게시물은 사실 카드에 있는 내용으로만 씁니다. 사실 카드와 어긋나면 가짜로 판정됩니다.</p></div>
+                <div class="field"><label for="fBasis">근거가 된 자료실 내용</label><select id="fBasis"></select>
+                  <p class="small muted" style="margin:0">진짜 게시물은 자료실에 있는 내용으로만 씁니다. 자료실과 어긋나면 가짜로 판정됩니다.</p></div>
               </div>
               <div class="mk-foot">
                 <p class="err" id="formErr" role="alert"></p>
-                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
+                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다. 인증 배지는 조가 붙일 수 없습니다.</p>
               </div>
             </div>
           </div>
@@ -588,6 +723,7 @@
     <div class="pm-box" id="pmBox"></div>
     <button class="pm-nav next" id="pmNext" aria-label="다음 게시물"><i data-lucide="chevron-right" class="icon"></i></button>
   </div>
+  <div class="prof" id="prof" hidden role="dialog" aria-modal="true" aria-label="계정 정보"><div class="prof-box" id="profBox"></div></div>
   <div class="modal" id="teamModal" hidden>
     <div class="modal-box">
       <h2>우리 조를 골라 주세요</h2>
@@ -599,10 +735,10 @@
   <div class="toast" id="toast" hidden></div>
 
 <script>
-const C = window.DOROGRAM, API = C.API;
+const C = window.DOROGRAM, API = C.API, A = C.ARCHIVE;
 const SWATCHES = ['#1d4ed8', '#0f766e', '#db2777', '#7c3aed', '#ea580c', '#4b5563', '#0891b2', '#b91c1c'];
-const HEARSAY = /(들었는데|들었어|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|누가 그러는데|라고 함|라고 합니다|라고 해요)/g;
-const S = { team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null, mstep: 'thumb', open: {}, draft: {}, form: null, editing: null, busy: false };
+const HEARSAY = /(들었는데|들었어|들음|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|지인이|누가 그러는데|라고 함|라고 합니다|라고 해요|제보)/g;
+const S = { team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null, modalRendered: null, mstep: 'thumb', open: {}, draft: {}, form: null, editing: null, busy: false };
 
 const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -614,6 +750,24 @@ const imgSrc = id => id ? API + '/img/' + id : '';
 const initials = name => esc((name || '?').trim().slice(0, 1));
 const teamTactic = t => C.TEAM_TACTICS[((t || 1) - 1) % C.TEAM_TACTICS.length];
 const truthOf = p => p.seed ? p.answer?.truth : (p.secret?.truth || 'fake');
+const ic = (n, cls = '') => `<i data-lucide="${n}"${cls ? ` class="${cls}"` : ''}></i>`;
+const vbadge = (a, lg) => a && a.verified ? `<span class="vb${lg ? ' lg' : ''}" title="도로그램 인증 계정">${ic('check')}</span>` : '';
+const fmtNum = v => /^\d+$/.test(String(v ?? '')) ? Number(v).toLocaleString() : esc(v);
+const handleOf = a => ((a && a.handle) || '').replace(/^@/, '');
+const kindOf = a => C.AUTHOR_KINDS[(a && a.kind) || 'person'] ? ((a && a.kind) || 'person') : 'person';
+const followLabel = (p, a) => p.format === 'shorts' ? '구독자' : (kindOf(a) === 'press' ? '구독자' : '팔로워');
+const kindChip = a => { const k = kindOf(a), d = C.AUTHOR_KINDS[k]; return `<span class="kind-chip ${k}">${ic(d.icon)}${d.label}</span>`; };
+// 자료실 등록 계정 대조: 공식·언론사·크리에이터가 자료실 목록에 있는지
+function regCheck(a) {
+  const h = handleOf(a).toLowerCase(), k = kindOf(a);
+  const hit = A.accounts.find(x => x.handle.replace(/^@/, '').toLowerCase() === h);
+  if (hit) return { cls: 'ok', text: `자료실 등록 계정 (${hit.name}, ${C.AUTHOR_KINDS[hit.kind].label}, 인증)` };
+  if (k === 'official' || k === 'press') {
+    const near = A.accounts.find(x => (a.name || '').replace(/\s/g, '').includes(x.name.replace(/\s/g, '')) || x.name.replace(/\s/g, '').includes((a.name || '').replace(/\s/g, '').slice(0, 3)));
+    return { cls: 'no', text: `자료실에 등록되지 않은 ${C.AUTHOR_KINDS[k].label} 계정${near ? ` (등록된 ${near.name}은 ${near.handle})` : ''}` };
+  }
+  return { cls: 'na', text: '개인·크리에이터 계정은 자료실에 따로 등록되지 않습니다. 가입일·팔로워·조회수를 비교하세요.' };
+}
 
 async function api(path, body) {
   const res = await fetch(API + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
@@ -685,6 +839,7 @@ function render() {
   $$('[data-tab="make"]').forEach(b => b.hidden = S.screen);
   $('[data-filter="mine"]').hidden = S.screen || !(d.posts || []).some(p => p.mine);
   $('[data-filter="seed"]').hidden = !['judge', 'reveal'].includes(d.phase);
+  $('#readHint').hidden = d.phase !== 'read' || load('dorogram-archive-seen') === '1';
   if ((S.tab === 'score' && d.phase !== 'reveal') || (S.tab === 'make' && S.screen)) showTab('feed');
   if (S.tab === 'admin' && AD.key) adRefresh();
   renderTwist(); renderFeed(); renderMake(); renderScores(); icons();
@@ -692,10 +847,11 @@ function render() {
 function showTab(t) {
   S.tab = t;
   $$('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
-  ['feed', 'make', 'score', 'help', 'admin'].forEach(x => $('#tab-' + x).hidden = x !== t);
+  ['feed', 'archive', 'make', 'score', 'help', 'admin'].forEach(x => $('#tab-' + x).hidden = x !== t);
   $('main').classList.toggle('wide', t === 'make');
   if (t === 'admin') adShow();
   if (t === 'help') renderHelp();
+  if (t === 'archive') { renderArchive(); store('dorogram-archive-seen', '1'); $('#readHint').hidden = true; }
   window.scrollTo({ top: 0 });
 }
 
@@ -725,46 +881,70 @@ function stateBadge(p, cls) {
   return '';
 }
 
-// 스토리 줄
+// ---------- 슬라이드(스토리)·장면(쇼츠) 만들기: 예제는 저장된 것, 조 게시물은 본문의 빈 줄로 나눔 ----------
+const paras = t => (t || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+function slidesOf(p) {
+  if (p.slides && p.slides.length) return p.slides;
+  const ps = paras(p.body), imgs = [p.imageId, ...(p.extraImages || [])].filter(Boolean);
+  if (!ps.length) ps.push('');
+  return ps.map((text, i) => {
+    const last = i === ps.length - 1;
+    let sticker = null;
+    if (i === 0 && p.place) sticker = { type: 'place', text: p.place };
+    else if (last && p.poll) sticker = { type: 'poll', q: p.poll.q, a: p.poll.a, b: p.poll.b, pa: 40 + ((p.order || 0) % 41) };
+    else if (last && p.music) sticker = { type: 'music', text: p.music };
+    return { imageId: imgs[i] ?? imgs[imgs.length - 1] ?? null, text, sticker, time: p.postedAt };
+  });
+}
+function scenesOf(p) {
+  if (p.scenes && p.scenes.length) return p.scenes;
+  const ps = paras(p.body), imgs = [p.imageId, ...(p.extraImages || [])].filter(Boolean);
+  if (!ps.length) ps.push(p.title || '');
+  return ps.map((text, i) => ({ imageId: imgs.length ? imgs[i % imgs.length] : null, text }));
+}
+const durOf = (kind, text) => Math.min(kind === 'story' ? 7000 : 7500, Math.max(kind === 'story' ? 4500 : 3200, 2200 + (text || '').length * 70));
+const totalDur = p => scenesOf(p).reduce((s, x) => s + durOf('shorts', x.text), 0);
+const mmss = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+// ---------- 목록 카드 ----------
 function trayHTML(p) {
-  const a = p.author || {}, img = p.thumbImageId || p.imageId, handle = (a.handle || '').replace(/^@/, '') || a.name || '';
+  const a = p.author || {}, img = p.thumbImageId || p.imageId, handle = handleOf(a) || a.name || '';
   const seen = !!S.data.myJudgments[p.id] || p.mine;
   return `<button class="st${seen ? ' seen' : ''}" data-open="${p.id}" aria-label="${esc(handle)} 스토리 보기">
-    <span class="st-ring"><span class="st-in" style="background:${esc(a.color || '#4b5563')}">${img ? `<img src="${imgSrc(img)}" alt="">` : initials(a.name)}</span></span>
+    <span class="st-ring"><span class="st-in" style="background:${esc(a.color || '#4b5563')}">${img ? `<img src="${imgSrc(img)}" alt="">` : initials(a.name)}</span>${vbadge(a)}</span>
     <span class="st-label">${esc(handle)}</span>${stateBadge(p, 'st-badge')}</button>`;
 }
-// 쇼츠 썸네일 (디자인 6종 돌아가며, 썸네일 설정이 있으면 그대로)
 function tileHTML(p) {
-  const a = p.author || {}, f = C.FORMATS[p.format] || {}, handle = (a.handle || '').replace(/^@/, '') || a.name || '';
+  const a = p.author || {}, f = C.FORMATS[p.format] || {}, handle = handleOf(a) || a.name || '';
   const text = p.title || p.body || '', head = (p.thumbTitle || p.title || text || '').replace(/\s+/g, ' ');
   const short = head.length > 22 ? head.slice(0, 22) + '…' : head;
   const BANDS = ['#8b8cf6', '#5fd3ae', '#f794b4', '#bdbdbd', '#ffd166', '#7cc4f8'];
   const band = BANDS[p.order % BANDS.length], awning = p.order % 3 === 0, views = p.views || '';
   const timg = p.thumbImageId || p.imageId, src = timg ? imgSrc(timg) : '', color = esc(a.color || '#4b5563');
-  const state = stateBadge(p, 'tile-state');
-  const stats = `<div class="sf-stats">${views ? `<span><i data-lucide="play"></i>${esc(views)}</span>` : ''}${p.likes ? `<span class="r heart"><i data-lucide="heart"></i>${esc(p.likes)}</span>` : ''}</div>`;
-  const fmt = `<span class="sf-fmt" title="${esc(f.label || '')}"><i data-lucide="${f.icon || 'play'}"></i></span>`;
+  const state = stateBadge(p, 'tile-state'), dur = `<span class="sf-dur">${mmss(totalDur(p))}</span>`;
+  const stats = `<div class="sf-stats">${views ? `<span>${ic('play')}${esc(views)}</span>` : ''}${p.likes ? `<span class="r heart">${ic('heart')}${esc(p.likes)}</span>` : ''}</div>`;
+  const fmt = `<span class="sf-fmt" title="${esc(f.label || '')}">${ic(f.icon || 'play')}</span>`;
   const TPL = src ? ['frame', 'full', 'cam', 'pola', 'collage', 'black'] : ['text'];
   const tpl = (p.thumbTpl && p.thumbTpl !== 'auto' && (src ? p.thumbTpl !== 'text' : p.thumbTpl === 'text')) ? p.thumbTpl : TPL[Math.floor(p.order / 7) % TPL.length];
   let inner;
-  if (tpl === 'full') inner = `<div class="sf t-full"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div><div class="big">${esc(short)}</div><div class="tag">DOROLAND</div>${fmt}${stats}${state}</div>`;
-  else if (tpl === 'cam') inner = `<div class="sf t-cam"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div><div class="cam-top"><span class="rec">● REC</span><i data-lucide="zap-off"></i><i data-lucide="settings"></i></div><div class="cam-side"><i data-lucide="type"></i><i data-lucide="music-2"></i><i data-lucide="sparkles"></i><i data-lucide="timer"></i></div><div class="cam-cap">${esc(short)}</div><div class="modes"><span>사진</span><b>동영상</b><span>인물</span></div><div class="shutter"></div>${stats}${state}</div>`;
-  else if (tpl === 'pola') inner = `<div class="sf t-pola"><div class="pola"><div class="ph-wrap"><img src="${src}" alt="" loading="lazy"></div><div class="hand">${esc(short)}</div></div><span class="tape"></span><div class="pola-date">${esc(p.postedAt || '')} · ${esc(p.place || '도로랜드')}</div>${stats.replace('sf-stats', 'sf-stats" style="color:#2b2b2b;text-shadow:none')}${state}</div>`;
-  else if (tpl === 'collage') inner = `<div class="sf t-collage"><div class="cells"><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div></div><div class="ctitle">Moment<small>${esc(short)}</small></div>${fmt}${stats}${state}</div>`;
-  else if (tpl === 'black') inner = `<div class="sf t-black"><div class="bt">${esc(short)}</div><div class="bimg"><img src="${src}" alt="" loading="lazy"><div class="sub"><span>${esc((p.body || '').slice(0, 40))}</span></div>${stats}</div><div class="bb">${esc(p.tags || '#도로랜드')}</div>${state}</div>`;
-  else if (tpl === 'text') inner = `<div class="sf t-text" style="background:linear-gradient(160deg, ${color}, #111)"><div class="q">“</div><div class="tt${p.order % 2 ? '' : ' pen'}">${esc(text)}</div><div class="who">@${esc(handle)}</div>${fmt}${stats}${state}</div>`;
-  else inner = `<div class="sf"><div class="sf-band${awning ? ' awning' : ''}" style="--c:${band}">${awning ? '' : '<i data-lucide="sliders-horizontal"></i>'}<span class="sf-pill"><i data-lucide="search"></i><span>${esc(a.name || handle)}</span></span>${awning ? '' : '<i data-lucide="more-horizontal"></i><i data-lucide="x"></i>'}</div>
+  if (tpl === 'full') inner = `<div class="sf t-full"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div><div class="big">${esc(short)}</div><div class="tag">DOROLAND</div>${fmt}${dur}${stats}${state}</div>`;
+  else if (tpl === 'cam') inner = `<div class="sf t-cam"><img class="bg" src="${src}" alt="" loading="lazy"><div class="shade"></div><div class="cam-top"><span class="rec">● REC</span>${ic('zap-off')}${ic('settings')}</div><div class="cam-side">${ic('type')}${ic('music-2')}${ic('sparkles')}${ic('timer')}</div><div class="cam-cap">${esc(short)}</div><div class="modes"><span>사진</span><b>동영상</b><span>인물</span></div><div class="shutter"></div>${dur}${stats}${state}</div>`;
+  else if (tpl === 'pola') inner = `<div class="sf t-pola"><div class="pola"><div class="ph-wrap"><img src="${src}" alt="" loading="lazy"></div><div class="hand">${esc(short)}</div></div><span class="tape"></span><div class="pola-date">${esc(p.postedAt || '')} · ${esc(p.place || '도로랜드')}</div>${dur}${stats.replace('sf-stats', 'sf-stats" style="color:#2b2b2b;text-shadow:none')}${state}</div>`;
+  else if (tpl === 'collage') inner = `<div class="sf t-collage"><div class="cells"><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div><div style="background-image:url('${src}')"></div></div><div class="ctitle">Moment<small>${esc(short)}</small></div>${fmt}${dur}${stats}${state}</div>`;
+  else if (tpl === 'black') inner = `<div class="sf t-black"><div class="bt">${esc(short)}</div><div class="bimg"><img src="${src}" alt="" loading="lazy"><div class="sub"><span>${esc((p.body || '').slice(0, 40))}</span></div>${stats}</div><div class="bb">${esc(p.tags || '#도로랜드')}</div>${dur}${state}</div>`;
+  else if (tpl === 'text') inner = `<div class="sf t-text" style="background:linear-gradient(160deg, ${color}, #111)"><div class="q">“</div><div class="tt${p.order % 2 ? '' : ' pen'}">${esc(text)}</div><div class="who">@${esc(handle)}</div>${fmt}${dur}${stats}${state}</div>`;
+  else inner = `<div class="sf"><div class="sf-band${awning ? ' awning' : ''}" style="--c:${band}">${awning ? '' : ic('sliders-horizontal')}<span class="sf-pill">${ic('search')}<span>${esc(a.name || handle)}</span></span>${awning ? '' : ic('more-horizontal') + ic('x')}</div>
       <div class="sf-title">${esc(head || '(내용 없음)')}</div><div class="sf-meta"><span class="avatar" style="background:${color}">${initials(a.name)}</span><b>${esc(handle)}</b>${views ? `<span>| 조회수 ${esc(views)}</span>` : ''}${p.likes ? `<span>| 좋아요 ${esc(p.likes)}</span>` : ''}</div>
-      <div class="sf-img"><img src="${src}" alt="" loading="lazy">${fmt}${stats}</div>${state}</div>`;
-  return `<button class="tile" data-open="${p.id}" aria-label="쇼츠 자세히 보기, ${esc(handle)}">${inner}<div class="tile-title">${esc(head || '(내용 없음)')}</div><div class="tile-sub"><span class="avatar" style="background:${color}">${initials(a.name)}</span><span>${esc(a.name || handle)}</span></div></button>`;
+      <div class="sf-img"><img src="${src}" alt="" loading="lazy">${fmt}${stats}</div>${dur}${state}</div>`;
+  return `<button class="tile" data-open="${p.id}" aria-label="쇼츠 자세히 보기, ${esc(handle)}">${inner}<div class="tile-title">${esc(head || '(내용 없음)')}</div><div class="tile-sub"><span class="avatar" style="background:${color}">${initials(a.name)}</span><span class="nm">${esc(a.name || handle)}${vbadge(a)}</span>${a.followers ? `<span>· 구독자 ${esc(a.followers)}</span>` : ''}</div></button>`;
 }
-// 기사 카드 (가로)
 function newsItemHTML(p) {
   const a = p.author || {}, state = stateBadge(p, 'ni-state'), img = p.thumbImageId || p.imageId;
   return `<button class="nc" data-open="${p.id}">
-    <div class="nc-thumb">${img ? `<img src="${imgSrc(img)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)"><i data-lucide="newspaper"></i></span>`}<span class="ni-tag">사회</span><span class="nc-outlet">${esc(a.name || '')}</span></div>
+    <div class="nc-thumb">${img ? `<img src="${imgSrc(img)}" alt="" loading="lazy">` : `<span class="ph" style="background:linear-gradient(135deg, ${esc(a.color || '#4b5563')}, #111)">${ic('newspaper')}</span>`}<span class="ni-tag">${kindOf(a) === 'official' ? '공지' : '사회'}</span><span class="nc-outlet">${esc(a.name || '')}${vbadge(a)}</span></div>
     <div class="ni-title">${esc(p.thumbTitle || p.title || (p.body || '').slice(0, 50))}</div>
-    <div class="ni-meta"><span>${esc(a.name || '')}</span>${p.views ? `<span>· 조회 ${esc(p.views)}</span>` : ''}${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div></button>`;
+    ${p.subhead ? `<div class="ni-sub">${esc(p.subhead)}</div>` : ''}
+    <div class="ni-meta"><span>${esc(a.name || '')}</span>${a.reporter ? `<span>· ${esc(a.reporter)} 기자</span>` : ''}${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${p.views ? `<span>· 조회 ${esc(p.views)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div></button>`;
 }
 
 function renderFeed() {
@@ -776,9 +956,9 @@ function renderFeed() {
   $('#tray').innerHTML = stories.length ? stories.map(trayHTML).join('') : `<div class="tray-empty">${empty}</div>`;
   $('#feedCnt').textContent = `${d.phase === 'read' ? '예제' : late ? '판별할 게시물' : '게시물'} ${posts.length}개`;
   $('#feed').innerHTML = `
-    <section class="shorts-panel" aria-label="쇼츠"><div class="sp-head"><span class="sp-logo"><i data-lucide="play"></i></span>쇼츠<span class="cnt">${shorts.length}</span></div>
+    <section class="shorts-panel" aria-label="쇼츠"><div class="sp-head"><span class="sp-logo">${ic('play')}</span>쇼츠<span class="cnt">${shorts.length}</span></div>
       ${shorts.length ? `<div class="shorts-grid">${shorts.map(tileHTML).join('')}</div>` : `<div class="panel-empty">${empty}</div>`}</section>
-    <section class="news-panel" aria-label="뉴스"><div class="np-head"><i data-lucide="newspaper"></i>도로랜드 뉴스<span class="cnt">${news.length}</span></div>
+    <section class="news-panel" aria-label="뉴스"><div class="np-head">${ic('newspaper')}도로랜드 뉴스<span class="cnt">${news.length}</span></div>
       <div class="news-list">${news.length ? news.map(newsItemHTML).join('') : `<div class="panel-empty">${empty}</div>`}</div></section>`;
   renderModal();
 }
@@ -790,7 +970,7 @@ function renderTwist() {
   const rank = me ? (d.scores.findIndex(r => r.team === S.team) + 1) : null;
   box.innerHTML = `<div class="twist"><h2>정답 공개</h2>
     ${me ? `<div class="twist-grid"><div><b>${me.correct} / ${me.judgable}</b>다른 조 게시물 중 맞힌 수</div><div><b>${me.fooled}</b>우리 가짜를 믿은 조</div><div><b>${rank}위</b>합계 ${me.total}점</div></div>` : ''}
-    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다. "섬이 사라졌다" 기사 3개는 모두 진짜였습니다. 3년마다 같은 시기에 같은 일이 일어났고, 원인은 아직 모릅니다.</p></div>`;
+    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다. "섬이 사라졌다" 기사 3개는 모두 진짜였습니다. 3년마다 같은 시기에 같은 일이 일어났고, 원인은 아직 아무도 모릅니다.</p></div>`;
 }
 function renderScores() {
   const rows = S.data.scores;
@@ -799,31 +979,132 @@ function renderScores() {
     `<tr${r.team === S.team ? ' style="background:var(--surface-2)"' : ''}><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="big">${r.total}</td><td>${r.correct} / ${r.judgable}</td><td>${r.fooled}</td></tr>`).join('')}</tbody>`;
 }
 
-// ---------- 상세 카드 ----------
-function cardHTML(p) {
-  const a = p.author || {}, handle = a.handle ? (a.handle.startsWith('@') ? a.handle : '@' + a.handle) : '', id = handle.replace(/^@/, '') || (a.name || '이름 없음');
+// ---------- 상세 카드 (실제 서비스 화면) ----------
+const whoBtn = (p, inner, cls = '') => `<button type="button" class="who-btn ${cls}" data-profile="${p.id}">${inner}</button>`;
+const commentsHTML = (p, light) => (p.comments || []).map(c => `<div class="cm"><span class="avatar" style="background:${esc(SWATCHES[(c.name || '').length % SWATCHES.length])}">${initials(c.name)}</span><div><div class="nm">${esc(c.name)}<span>${esc(c.time || '')}</span></div><div class="tx">${esc(c.text)}</div></div><div class="lk">${ic('heart')}${c.likes ?? ''}</div></div>`).join('') || `<div class="muted small" style="padding:8px 0">아직 댓글이 없습니다.</div>`;
+function cardHTML(p, opts = {}) {
+  const a = p.author || {}, handle = handleOf(a), id = handle || (a.name || '이름 없음');
   const color = esc(a.color || '#4b5563'), av = `<div class="avatar" style="background:${color}">${initials(a.name)}</div>`;
-  const src = p.imageId ? imgSrc(p.imageId) : (p.previewImg || ''), ic = n => `<i data-lucide="${n}"></i>`, mark = `<span class="train-mark">훈련용</span>`;
-  const paras = t => esc(t || '').split(/\n+/).filter(Boolean).map(x => `<p>${x}</p>`).join('');
-  if (p.format === 'story') return `<div class="post-card story">${src ? `<img class="story-img" src="${src}" alt="스토리 사진" crossorigin="anonymous">` : ''}<div class="story-shade"></div><div class="story-bars"><i></i><i></i><i></i></div>${mark}
-      <div class="story-head">${av}<b>${esc(id)}</b><span class="t">${esc(p.postedAt || '')}</span><span class="r">${ic('more-horizontal')}${ic('x')}</span></div>
-      ${p.place ? `<div class="story-place">${ic('map-pin')}${esc(p.place)}</div>` : ''}${p.body ? `<div class="story-text"><span>${esc(p.body)}</span></div>` : ''}${p.tags ? `<div class="story-tags">${esc(p.tags)}</div>` : ''}
+  const src = p.imageId ? imgSrc(p.imageId) : '', mark = `<span class="train-mark">훈련용</span>`;
+  const ps = t => esc(t || '').split(/\n+/).filter(Boolean).map(x => `<p>${x}</p>`).join('');
+  if (p.format === 'story') {
+    const slides = slidesOf(p), first = slides[0] || {};
+    return `<div class="post-card story${first.imageId ? '' : ' noimg'}" data-player="story">
+      <div class="story-stage"></div><div class="story-shade"></div>
+      <div class="story-bars">${slides.map(() => '<i><b></b></i>').join('')}</div>${mark}
+      <div class="story-head">${whoBtn(p, `${av}<b>${esc(id)}${vbadge(a)}</b>`)}<span class="t story-time">${esc(first.time || p.postedAt || '')}</span><span class="r">${ic('volume-2')}${ic('more-horizontal')}</span></div>
+      <div class="tapzone l" data-tap="prev" aria-label="이전 슬라이드"></div><div class="tapzone r" data-tap="next" aria-label="다음 슬라이드"></div>
+      <div class="pause-ico">${ic('play')}</div>
+      ${p.views ? `<span class="story-seen">${ic('eye')}${esc(p.views)}</span>` : ''}
       <div class="story-foot"><span class="msg">메시지 보내기</span>${ic('heart')}${ic('send')}</div></div>`;
-  if (p.format === 'news') return `<div class="post-card news">${mark}<div class="nw-mast"><span class="nw-logo" style="color:${color}">${esc(a.name || '언론사')}</span><span class="nw-sub">구독</span></div><div class="nw-sec">사회</div>
-      <h3 class="nw-h">${esc(p.title || '제목 없음')}</h3><div class="nw-by">${a.reporter ? `<span>${esc(a.reporter)} 기자</span>` : ''}<span>입력 ${esc(p.postedAt || '-')}</span>${p.views ? `<span>조회 ${esc(p.views)}</span>` : ''}</div>
-      ${src ? `<figure class="nw-fig"><img src="${src}" alt="기사 사진" crossorigin="anonymous">${p.place ? `<figcaption>▲ ${esc(p.place)}</figcaption>` : ''}</figure>` : ''}
-      <div class="nw-body">${paras(p.body)}</div><div class="nw-copy">ⓒ ${esc(a.name || '언론사')} 무단전재 및 재배포 금지</div></div>`;
-  return `<div class="post-card shorts-card">${src ? `<img class="sc-img" src="${src}" alt="쇼츠 화면" crossorigin="anonymous">` : `<div class="sc-plain" style="background:linear-gradient(160deg, ${color}, #111)"><span>${esc(p.body || '')}</span></div>`}<div class="sc-shade"></div>${mark}
+  }
+  if (p.format === 'news') {
+    const related = (S.data?.posts || []).filter(x => x.format === 'news' && x.id !== p.id && x.status === 'approved').slice(0, 3);
+    const kind = kindOf(a);
+    return `<div class="post-card news">${mark}
+      <div class="nw-mast"><span class="nw-logo" style="color:${color}">${whoBtn(p, esc(a.name || '언론사') + vbadge(a, true))}</span><span class="nw-date">${esc(p.postedAt || '')}</span><span class="nw-sub">구독</span></div>
+      <div class="nw-tabs">${kind === 'official' ? '<b>공지</b><span>안내</span><span>이벤트</span><span>채용</span>' : '<span>정치</span><span>경제</span><b>사회</b><span>문화</span><span>지역</span>'}</div>
+      <h3 class="nw-h">${esc(p.title || '제목 없음')}</h3>${p.subhead ? `<p class="nw-dek">${esc(p.subhead)}</p>` : ''}
+      <div class="nw-by">${a.reporter ? `<span class="rp">${whoBtn(p, `<span class="avatar" style="background:${color}">${initials(a.reporter)}</span>${esc(a.reporter)} 기자`)}</span>` : (kind === 'official' ? `<span class="rp">${esc(a.name)}</span>` : '')}<span>입력 ${esc(p.postedAt || '-')}</span>${p.editedAt ? `<span>수정 ${esc(p.editedAt)}</span>` : ''}${p.views ? `<span>조회 ${esc(p.views)}</span>` : ''}<span class="tools">${ic('printer')}${ic('share-2')}${ic('text')}</span></div>
+      ${src ? `<figure class="nw-fig"><img src="${src}" alt="기사 사진" crossorigin="anonymous"><figcaption>▲ ${esc(p.place || '도로랜드')}${p.photoTakenAt ? ` (${esc(p.photoTakenAt)} 촬영)` : ''}. ${esc(a.name || '')} 제공</figcaption></figure>` : ''}
+      <div class="nw-body">${ps(p.body)}</div>
+      ${p.stats && p.stats.length ? `<div class="nw-stats">${p.stats.map(s => `<div><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join('')}</div>` : ''}
+      ${p.quote && p.quote.text ? `<blockquote class="nw-quote">“${esc(p.quote.text)}”${p.quote.who ? `<footer>${esc(p.quote.who)}</footer>` : ''}</blockquote>` : ''}
+      <div class="nw-foot">${a.reporter ? `<span>${esc(a.reporter)} 기자 ${esc(handle || 'news')}@${esc((handle || 'news').replace(/[^a-z0-9]/gi, ''))}.kr</span>` : ''}<span>댓글 ${fmtNum(p.commentCount || (p.comments || []).length || 0)}</span>${p.likes ? `<span>좋아요 ${esc(p.likes)}</span>` : ''}</div>
+      ${opts.static ? '' : `<div class="nw-cm"><h4>댓글 ${fmtNum(p.commentCount || (p.comments || []).length || 0)}</h4><div class="cm-list">${commentsHTML(p)}</div></div>`}
+      ${related.length && !opts.static ? `<div class="nw-rel"><h4>관련 기사</h4><ul style="margin:0;padding-left:18px">${related.map(r => `<li>${esc(r.title || '')}</li>`).join('')}</ul></div>` : ''}
+      <div class="nw-copy">ⓒ ${esc(a.name || '언론사')} 무단전재 및 재배포 금지</div></div>`;
+  }
+  const scenes = scenesOf(p), cmN = fmtNum(p.commentCount || (p.comments || []).length || 0);
+  return `<div class="post-card shorts-card" data-player="shorts"><div class="sc-stage"></div><div class="sc-shade"></div>${mark}
       <div class="sc-top"><span class="lg"><span class="sp-logo">${ic('play')}</span>Shorts</span><span class="r">${ic('search')}${ic('camera')}${ic('more-vertical')}</span></div>
-      <div class="sc-rail"><div>${ic('thumbs-up')}<span>${esc(p.likes || '좋아요')}</span></div><div>${ic('thumbs-down')}<span>싫어요</span></div><div>${ic('message-circle')}<span>댓글</span></div><div>${ic('share-2')}<span>공유</span></div></div>
-      <div class="sc-bottom"><div class="sc-ch">${av}@${esc(id)}<span class="sub">구독</span></div>${src && p.body ? `<div class="sc-title">${esc(p.body)}</div>` : ''}${p.tags ? `<div class="sc-tags">${esc(p.tags)}</div>` : ''}<div class="sc-music">${ic('music-2')}${esc(a.name || id)} · 원본 오디오${p.views ? ` · 조회수 ${esc(p.views)}회` : ''}</div></div></div>`;
+      <div class="sc-tap" data-tap="toggle"></div><div class="pause-ico">${ic('play')}</div>
+      <div class="sc-rail"><button type="button" data-rail="like">${ic('thumbs-up')}<span>${esc(p.likes || '좋아요')}</span></button><button type="button">${ic('thumbs-down')}<span>싫어요</span></button><button type="button" data-rail="comments">${ic('message-circle')}<span>${esc(cmN)}</span></button><button type="button">${ic('share-2')}<span>공유</span></button><button type="button">${ic('repeat')}<span>리믹스</span></button><span class="sc-disc">${ic('music-2')}</span></div>
+      <div class="sc-bottom"><div class="sc-ch">${whoBtn(p, `${av}<span>@${esc(id)}${vbadge(a)}</span>`)}${a.followers ? `<span class="subs">구독자 ${esc(a.followers)}</span>` : ''}<span class="sub">구독</span></div>${p.title ? `<div class="sc-title">${esc(p.title)}</div>` : ''}${p.tags ? `<div class="sc-tags">${esc(p.tags)}</div>` : ''}<div class="sc-music">${ic('music-2')}<span>${esc(p.music || a.name + ' · 원본 오디오')}${p.views ? ` · 조회수 ${esc(p.views)}회` : ''}</span></div></div>
+      <div class="sc-dots">${scenes.map(() => '<i></i>').join('')}</div><div class="sc-prog"><b></b></div>
+      <div class="sc-cm"><div class="cm-h">댓글 <span class="muted">${esc(cmN)}</span><button type="button" data-rail="comments">${ic('x')}</button></div><div class="cm-list">${commentsHTML(p)}</div><div class="cm-in"><span>댓글 추가...</span></div></div></div>`;
 }
+
+// ---------- 플레이어 (스토리 슬라이드·쇼츠 장면 자동 재생) ----------
+const PL = { id: null, kind: null, items: [], idx: 0, playing: false, raf: 0, start: 0, elapsed: 0, dur: 0, root: null, p: null, ended: false };
+function playerMount(root, p, kind, autoplay = true) {
+  playerStop();
+  PL.root = root; PL.p = p; PL.id = p.id; PL.kind = kind; PL.items = kind === 'story' ? slidesOf(p) : scenesOf(p); PL.idx = 0; PL.ended = false;
+  playerShow();
+  if (autoplay) playerPlay(); else root.classList.add('paused');
+}
+function playerStop() { PL.playing = false; cancelAnimationFrame(PL.raf); PL.id = null; PL.root = null; }
+function playerShow() {
+  const root = PL.root, it = PL.items[PL.idx] || {}, src = it.imageId ? imgSrc(it.imageId) : (it.img ? imgSrc(it.img) : '');
+  PL.elapsed = 0; PL.dur = durOf(PL.kind, it.text); PL.start = performance.now();
+  root.querySelector('.story-end')?.remove();
+  if (PL.kind === 'story') {
+    const stage = root.querySelector('.story-stage'), p = PL.p, stk = it.sticker || null;
+    root.classList.toggle('noimg', !src);
+    let sticker = '';
+    if (stk) {
+      if (stk.type === 'place') sticker = `<span class="stk stk-place">${ic('map-pin')}${esc(stk.text)}</span>`;
+      else if (stk.type === 'music') sticker = `<span class="stk stk-music">${ic('music-2')}${esc(stk.text)}</span>`;
+      else if (stk.type === 'link') sticker = `<span class="stk stk-link">${ic('link')}${esc(stk.text)}</span>`;
+      else if (stk.type === 'question') sticker = `<div class="stk stk-q"><div>${esc(stk.text)}</div><div class="qa">답장 보내기...</div></div>`;
+      else if (stk.type === 'countdown') sticker = `<div class="stk stk-count">${esc(stk.text)}<b>${esc(stk.value || '0:00:00')}</b></div>`;
+      else if (stk.type === 'poll') sticker = `<div class="stk stk-poll" data-pa="${+stk.pa || 50}"><div class="pq">${esc(stk.q)}</div><div class="po"><button type="button" data-vote="a"><i></i><span>${esc(stk.a)}</span></button><button type="button" data-vote="b"><i></i><span>${esc(stk.b)}</span></button></div></div>`;
+    }
+    stage.innerHTML = `<div class="story-slide">${src ? `<img class="story-img" src="${src}" alt="" crossorigin="anonymous">` : ''}${it.text ? `<div class="story-text"><span>${esc(it.text)}</span></div>` : ''}${sticker}${PL.idx === 0 && p.tags && !stk ? `<div class="story-tags">${esc(p.tags)}</div>` : ''}</div>`;
+    const t = root.querySelector('.story-time'); if (t) t.textContent = it.time || p.postedAt || '';
+    root.querySelectorAll('.story-bars i b').forEach((b, i) => b.style.width = i < PL.idx ? '100%' : '0');
+  } else {
+    const stage = root.querySelector('.sc-stage'), color = esc((PL.p.author || {}).color || '#4b5563'), kb = ['kb1', 'kb2', 'kb3'][PL.idx % 3];
+    stage.innerHTML = `<div class="sc-scene">${src ? `<img class="sc-img kb" src="${src}" alt="" crossorigin="anonymous" style="animation-name:${kb};animation-duration:${PL.dur + 600}ms">` : `<div class="sc-plain" style="background:linear-gradient(160deg, ${color}, #111)"><span>${esc(it.text || '')}</span></div>`}</div>${src && it.text ? `<div class="sc-cap"><span>${esc(it.text)}</span></div>` : ''}`;
+    root.querySelectorAll('.sc-dots i').forEach((d, i) => d.classList.toggle('on', i === PL.idx));
+    const b = root.querySelector('.sc-prog b'); if (b) b.style.width = '0';
+  }
+  icons();
+}
+function playerTick(ts) {
+  if (!PL.playing || !PL.root) return;
+  const e = PL.elapsed + (ts - PL.start), pct = Math.min(100, e / PL.dur * 100);
+  const bar = PL.kind === 'story' ? PL.root.querySelectorAll('.story-bars i b')[PL.idx] : PL.root.querySelector('.sc-prog b');
+  if (bar) bar.style.width = pct + '%';
+  if (e >= PL.dur) playerNext(true); else PL.raf = requestAnimationFrame(playerTick);
+}
+function playerPlay() { if (PL.playing || !PL.root) return; PL.playing = true; PL.start = performance.now(); PL.root.classList.remove('paused'); PL.raf = requestAnimationFrame(playerTick); }
+function playerPause() { if (!PL.playing) return; PL.elapsed += performance.now() - PL.start; PL.playing = false; cancelAnimationFrame(PL.raf); PL.root?.classList.add('paused'); }
+function playerToggle() { PL.playing ? playerPause() : playerPlay(); }
+function playerNext(auto) {
+  if (PL.idx < PL.items.length - 1) { PL.idx++; playerShow(); return; }
+  if (PL.kind === 'shorts') { PL.idx = 0; playerShow(); return; }           // 쇼츠는 끝나면 다시 반복
+  const n = neighborPost(1, 'story');                                       // 스토리는 끝나면 다음 계정 스토리로
+  if (n && auto !== 'stay') { openPost(n.id); return; }
+  playerPause(); PL.ended = true;
+  PL.root.querySelectorAll('.story-bars i b').forEach(b => b.style.width = '100%');
+  PL.root.insertAdjacentHTML('beforeend', `<div class="story-end"><b>스토리를 다 봤습니다</b><span class="small" style="opacity:.8">${n ? '' : '마지막 스토리입니다'}</span><button type="button" class="btn" data-tap="replay">${ic('rotate-ccw')}다시 보기</button></div>`); icons();
+}
+function playerPrev() {
+  if (PL.idx > 0) { PL.idx--; playerShow(); return; }
+  if (PL.kind === 'story') { const n = neighborPost(-1, 'story'); if (n) { openPost(n.id); return; } }
+  playerShow();
+}
+function neighborPost(dir, format) {
+  const list = feedPosts().filter(p => !format || p.format === format), i = list.findIndex(x => x.id === S.modal);
+  return list[i + dir] || null;
+}
+
+// ---------- 상세 창: 왼쪽(화면·재생) + 오른쪽(확인·판별) ----------
 function vpanelHTML(p, c) {
-  const a = p.author || {};
-  if (c === 'who') return `<b>${C.CRITERIA.who.label}</b><dl><dt>이름</dt><dd>${esc(a.name || '-')}</dd><dt>계정</dt><dd>${esc(a.handle || '-')}</dd>${a.reporter ? `<dt>기자</dt><dd>${esc(a.reporter)}</dd>` : ''}<dt>가입한 때</dt><dd>${esc(a.joined || '정보 없음')}</dd><dt>팔로워</dt><dd>${esc(a.followers || '정보 없음')}</dd><dt>조회수</dt><dd>${esc(p.views || '-')}</dd><dt>좋아요</dt><dd>${esc(p.likes || '-')}</dd></dl><p class="small muted" style="margin:8px 0 0">팔로워에 비해 조회수·좋아요가 지나치게 크면 의심해 보세요.</p>`;
-  if (c === 'when') return `<b>${C.CRITERIA.when.label}</b><dl><dt>올린 때</dt><dd>${esc(p.postedAt || '정보 없음')}</dd><dt>사진 찍은 때</dt><dd>${p.imageId || p.photoTakenAt ? esc(p.photoTakenAt || '사진 정보 없음') : '사진 없음'}</dd></dl>`;
-  if (c === 'witness') { const text = esc((p.title ? p.title + '\n' : '') + (p.body || '')).replace(HEARSAY, '<mark class="hear">$1</mark>'); return `<b>${C.CRITERIA.witness.label}</b><p class="small muted" style="margin:4px 0">건너 들은 말로 보이는 부분을 노랗게 표시했습니다. 표시가 없어도 직접 봤는지 따져 보세요.</p><div style="white-space:pre-wrap">${text}</div>`; }
-  return `<b>${C.CRITERIA.cross.label}</b><ul>${C.FACTS.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+  const a = p.author || {}, k = kindOf(a), reg = regCheck(a);
+  if (c === 'who') return `<b>${C.CRITERIA.who.label}</b> ${kindChip(a)}${a.verified ? ` <span class="small" style="color:var(--verify);font-weight:700">인증 배지 있음</span>` : ' <span class="small muted">인증 배지 없음</span>'}
+    <dl><dt>이름</dt><dd>${esc(a.name || '-')}${vbadge(a)}</dd><dt>계정</dt><dd>${esc(a.handle || '-')}</dd>${a.reporter ? `<dt>기자</dt><dd>${esc(a.reporter)}</dd>` : ''}<dt>가입한 때</dt><dd>${esc(a.joined || '정보 없음')}</dd><dt>${followLabel(p, a)}</dt><dd>${esc(a.followers || '정보 없음')}</dd><dt>게시물 수</dt><dd>${esc(a.posts || '-')}</dd><dt>조회수</dt><dd>${esc(p.views || '-')}</dd><dt>좋아요</dt><dd>${esc(p.likes || '-')}</dd>${a.bio ? `<dt>소개</dt><dd style="font-weight:500">${esc(a.bio)}</dd>` : ''}</dl>
+    <div class="reg ${reg.cls}">${reg.text}</div>
+    <p class="small muted" style="margin:8px 0 0">${esc(C.AUTHOR_KINDS[k].desc)} ${followLabel(p, a)}에 비해 조회수·좋아요가 지나치게 크면 의심해 보세요. 프로필(이름)을 누르면 계정 정보가 열립니다.</p>`;
+  if (c === 'when') return `<b>${C.CRITERIA.when.label}</b><dl><dt>올린 때</dt><dd>${esc(p.postedAt || '정보 없음')}</dd>${p.editedAt ? `<dt>수정한 때</dt><dd>${esc(p.editedAt)}</dd>` : ''}<dt>${p.format === 'shorts' ? '영상 찍은 때' : '사진 찍은 때'}</dt><dd>${p.imageId || p.photoTakenAt ? esc(p.photoTakenAt || '사진 정보 없음') : '사진 없음'}</dd></dl>
+    <details><summary>자료실 연표 보기</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}</ul></details>`;
+  if (c === 'witness') { const text = esc((p.title ? p.title + '\n' : '') + (p.subhead ? p.subhead + '\n' : '') + (p.body || '') + (p.quote?.text ? '\n"' + p.quote.text + '" - ' + (p.quote.who || '') : '')).replace(HEARSAY, '<mark class="hear">$1</mark>'); return `<b>${C.CRITERIA.witness.label}</b><p class="small muted" style="margin:4px 0">건너 들은 말로 보이는 부분을 노랗게 표시했습니다. 표시가 없어도 직접 봤는지, 말한 사람의 이름·소속이 있는지 따져 보세요.</p><div style="white-space:pre-wrap;font-size:13px">${text}</div>`; }
+  return `<b>${C.CRITERIA.cross.label}</b><p class="small muted" style="margin:4px 0">자료실 요약입니다. 전체는 왼쪽 메뉴 <b>자료실</b>에서 보세요.</p>
+    <details open><summary>숫자·시간</summary><ul>${A.overview.map(x => `<li>${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.ferry.map(x => `<li>배 ${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.numbers.cards.map(x => `<li>${esc(x.label)} ${esc(x.value)} (${esc(x.note)})</li>`).join('')}<li>${esc(A.numbers.recent)}</li></ul></details>
+    <details><summary>구역·놀이기구</summary><ul>${A.zones.map(z => `<li>${esc(z.name)}: ${esc(z.desc)}</li>`).join('')}</ul></details>
+    <details><summary>섬이 안 보인 날·이상 현상</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}</ul></details>
+    <details><summary>운영실 입장·등록 계정</summary><ul>${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}${A.accounts.map(x => `<li>${esc(x.name)} ${esc(x.handle)} (${esc(C.AUTHOR_KINDS[x.kind].label)}, 인증)</li>`).join('')}</ul></details>`;
 }
 function verdictBadge(v) { return { real: '<span class="badge b-real">진짜</span>', fake: '<span class="badge b-fake">가짜</span>', unsure: '<span class="badge b-unsure">모르겠음</span>' }[v] || ''; }
 function judgeHTML(p) {
@@ -843,54 +1124,86 @@ function answerHTML(p) {
   const result = t => mine ? `<div class="big">${mine.verdict === t ? '맞혔습니다!' : mine.verdict === 'unsure' ? '모르겠음으로 넘겼습니다' : '틀렸습니다'}</div>` : '';
   if (p.seed && p.answer) return `<div class="answer ${p.answer.truth}">${result(p.answer.truth)}<div>${verdictBadge(p.answer.truth)} <b>해설</b></div><div>${esc(p.answer.explain)}</div>${p.counts ? countsHTML(p.counts) : ''}</div>`;
   if (S.data.phase === 'reveal' && p.secret) { const s = p.secret; return `<div class="answer ${s.truth}">${result(s.truth)}<div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}</b></div>
-      ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 사실 카드' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
+      ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 자료실 내용' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
   return '';
 }
 const countsHTML = c => `<div class="counts"><span>진짜라고 한 조 ${c.real}</span><span>가짜라고 한 조 ${c.fake}</span><span>모르겠음 ${c.unsure}</span></div>`;
 function statusHTML(p) {
-  if (p.seed) return '<div class="status-line st-seed"><i data-lucide="graduation-cap"></i>예제 자료 · 연습용 (점수 없음)</div>';
+  if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예제 자료 · 연습용 (점수 없음)</div>`;
   if (!p.mine || S.data.phase === 'reveal') return '';
   const s = p.secret || {};
-  return s.truth === 'real' ? `<div class="status-line st-approved"><i data-lucide="badge-check"></i>우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending"><i data-lucide="drama"></i>우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
+  return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
 }
-function postHTML(p) {
-  const open = S.open[p.id], own = !!p.mine;
-  const vbar = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="vbtn" data-act="verify" data-id="${p.id}" data-c="${k}" aria-expanded="${open === k}"><i data-lucide="${c.icon}"></i>${c.label}</button>`).join('');
-  return `<article class="post" id="post-${p.id}" data-id="${p.id}">
-    <div class="post-media"><div class="png-target">${cardHTML(p)}</div></div>
-    <div class="post-side">${statusHTML(p)}
-      <div class="side-h"><i data-lucide="search-check"></i>확인하기</div><div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
+function sideHTML(p) {
+  const open = S.open[p.id], own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
+  const vbar = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="vbtn" data-act="verify" data-id="${p.id}" data-c="${k}" aria-expanded="${open === k}">${ic(c.icon)}${c.label}</button>`).join('');
+  return `${statusHTML(p)}
+      <div class="side-who">${whoBtn(p, `<span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span>`)}<div style="min-width:0"><div class="nm">${whoBtn(p, esc(a.name || '이름 없음') + vbadge(a))}</div><div class="meta">${esc(f.label || '')} · ${esc(a.handle || '')} · ${kindChip(a)}${a.followers ? ` · ${followLabel(p, a)} ${esc(a.followers)}` : ''}</div></div></div>
+      <div class="side-h">${ic('search-check')}확인하기</div><div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
       ${canJudge(p) ? judgeHTML(p) : ''}${answerHTML(p)}
-      ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}"><i data-lucide="image-down"></i>이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}"><i data-lucide="pencil"></i>고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)"><i data-lucide="trash-2"></i>지우기</button>` : ''}</div>` : ''}
-    </div></article>`;
+      ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}">${ic('image-down')}이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}">${ic('pencil')}고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)">${ic('trash-2')}지우기</button>` : ''}</div>` : ''}`;
+}
+function postShell(p) {
+  const vert = p.format !== 'news';
+  return `<article class="post" id="post-${p.id}" data-id="${p.id}">
+    <div class="post-media${vert ? ' vert' : ''}"><div class="png-target"></div>${vert ? `<div class="vnav"><button type="button" data-act="vprev" aria-label="이전 ${p.format === 'story' ? '스토리' : '쇼츠'}">${ic('chevron-up')}</button><button type="button" data-act="vnext" aria-label="다음 ${p.format === 'story' ? '스토리' : '쇼츠'}">${ic('chevron-down')}</button></div>` : ''}</div>
+    <div class="post-side"></div></article>`;
 }
 function renderModal() {
   const box = $('#pm');
   if (!S.modal) { box.hidden = true; return; }
   const list = feedPosts(), p = S.data.posts.find(x => x.id === S.modal);
-  if (!p) { S.modal = null; box.hidden = true; return; }
+  if (!p) { closePost(); return; }
   $$('#pmBox [data-act="reason"]').forEach(i => { (S.draft[i.dataset.id] ||= {}).reason = i.value; });
   const focused = document.activeElement?.dataset?.act === 'reason', scroll = $('#pmBox .post-side')?.scrollTop || 0;
-  $('#pmBox').innerHTML = postHTML(p);
+  if (S.modalRendered !== p.id) {
+    $('#pmBox').innerHTML = postShell(p); S.modalRendered = p.id;
+    const target = $('#pmBox .png-target'); target.innerHTML = cardHTML(p);
+    const card = target.firstElementChild;
+    if (p.format !== 'news') playerMount(card, p, p.format);
+  }
+  $('#pmBox .post-side').innerHTML = sideHTML(p);
   const side = $('#pmBox .post-side'); if (side) side.scrollTop = scroll;
-  const i = list.findIndex(x => x.id === p.id);
+  const i = list.findIndex(x => x.id === p.id), same = list.filter(x => x.format === p.format), j = same.findIndex(x => x.id === p.id);
   $('#pmPrev').disabled = i <= 0; $('#pmNext').disabled = i < 0 || i >= list.length - 1;
+  const vp = $('#pmBox [data-act="vprev"]'), vn = $('#pmBox [data-act="vnext"]'); if (vp) vp.disabled = j <= 0; if (vn) vn.disabled = j >= same.length - 1;
   $('#pmCount').textContent = i >= 0 ? `${i + 1} / ${list.length}` : '';
   box.hidden = false;
   if (focused) { const el = $('#pmBox [data-act="reason"]'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+  icons();
 }
-function openPost(id) { S.modal = id; renderModal(); icons(); }
-function closePost() { S.modal = null; $('#pm').hidden = true; }
-function stepPost(d) { const list = feedPosts(), i = list.findIndex(x => x.id === S.modal), n = list[i + d]; if (n) { S.modal = n.id; renderModal(); icons(); } }
+function openPost(id) { S.modal = id; renderModal(); }
+function closePost() { S.modal = null; S.modalRendered = null; playerStop(); $('#pm').hidden = true; $('#pmBox').innerHTML = ''; }
+function stepPost(d, format) { const n = neighborPost(d, format); if (n) openPost(n.id); }
+
+// 프로필 창
+function openProfile(id) {
+  const p = id === 'preview' ? previewPost() : S.data.posts.find(x => x.id === id); if (!p) return;
+  const a = p.author || {}, k = kindOf(a), reg = regCheck(a), fl = followLabel(p, a);
+  $('#profBox').innerHTML = `<div class="prof-top"><span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span><div style="min-width:0"><div class="nm">${esc(a.name || '이름 없음')}${vbadge(a, true)}</div><div class="hd">${esc(a.handle || '아이디 없음')}${a.reporter ? ` · ${esc(a.reporter)} 기자` : ''}</div></div></div>
+    <div class="prof-stats"><div><b>${esc(a.posts || '-')}</b>게시물</div><div><b>${esc(a.followers || '-')}</b>${fl}</div><div><b>${esc(a.joined || '-')}</b>가입</div></div>
+    <div class="prof-bio">${kindChip(a)}<div>${esc(a.bio || '소개가 없습니다.')}</div></div>
+    <div class="prof-reg reg ${reg.cls}">${reg.text}</div>
+    <div class="prof-btns"><button type="button" class="btn f">${fl === '구독자' ? '구독' : '팔로우'}</button><button type="button" class="btn" data-act="prof-close">닫기</button></div>`;
+  $('#prof').hidden = false; icons();
+}
 
 document.addEventListener('click', async e => {
+  const g = e.target.closest('[data-goto]'); if (g) { showTab(g.dataset.goto); return; }
+  const pr = e.target.closest('[data-profile]'); if (pr) { openProfile(pr.dataset.profile); return; }
+  if (e.target === $('#prof') || e.target.closest('[data-act="prof-close"]')) { $('#prof').hidden = true; return; }
+  const vote = e.target.closest('[data-vote]'); if (vote) { const poll = vote.closest('.stk-poll'); if (poll && !poll.classList.contains('voted')) { const pa = +poll.dataset.pa; poll.classList.add('voted'); const [ba, bb] = poll.querySelectorAll('button'); ba.querySelector('i').style.width = pa + '%'; bb.querySelector('i').style.width = (100 - pa) + '%'; ba.querySelector('span').textContent += ` ${pa}%`; bb.querySelector('span').textContent += ` ${100 - pa}%`; } return; }
+  const rail = e.target.closest('[data-rail]'); if (rail) { if (rail.dataset.rail === 'comments') { const cm = $('#pmBox .sc-cm'); if (cm) { cm.classList.toggle('open'); cm.classList.contains('open') ? playerPause() : playerPlay(); } } if (rail.dataset.rail === 'like') rail.classList.toggle('liked'); return; }
+  const tap = e.target.closest('[data-tap]');
+  if (tap) { const t = tap.dataset.tap; if (t === 'next') playerNext('stay'); else if (t === 'prev') playerPrev(); else if (t === 'replay') { PL.idx = 0; PL.ended = false; playerShow(); playerPlay(); } else playerToggle(); return; }
   const o = e.target.closest('[data-open]'); if (o) { openPost(o.dataset.open); return; }
   if (e.target === $('#pm')) { closePost(); return; }
   const t = e.target.closest('[data-act]'); if (!t) return;
   const id = t.dataset.id, act = t.dataset.act;
-  if (act === 'verify') { S.open[id] = S.open[id] === t.dataset.c ? null : t.dataset.c; renderModal(); icons(); }
-  if (act === 'verdict') { (S.draft[id] ||= {}).verdict = t.dataset.v; renderModal(); icons(); }
-  if (act === 'crit') { (S.draft[id] ||= {}).criterion = t.dataset.c; renderModal(); icons(); }
+  if (act === 'vprev' || act === 'vnext') { const p = S.data.posts.find(x => x.id === S.modal); stepPost(act === 'vnext' ? 1 : -1, p?.format); }
+  if (act === 'verify') { S.open[id] = S.open[id] === t.dataset.c ? null : t.dataset.c; renderModal(); }
+  if (act === 'verdict') { (S.draft[id] ||= {}).verdict = t.dataset.v; renderModal(); }
+  if (act === 'crit') { (S.draft[id] ||= {}).criterion = t.dataset.c; renderModal(); }
   if (act === 'submit-judge') submitJudge(id, t);
   if (act === 'png') savePng(id);
   if (act === 'edit') { closePost(); startEdit(id); }
@@ -898,7 +1211,24 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('input', e => { if (e.target.dataset.act === 'reason') (S.draft[e.target.dataset.id] ||= {}).reason = e.target.value; });
 $('#pmX').onclick = closePost; $('#pmPrev').onclick = () => stepPost(-1); $('#pmNext').onclick = () => stepPost(1);
-document.addEventListener('keydown', e => { if ($('#pm').hidden || e.target.matches('input, textarea')) return; if (e.key === 'Escape') closePost(); if (e.key === 'ArrowRight') stepPost(1); if (e.key === 'ArrowLeft') stepPost(-1); });
+document.addEventListener('keydown', e => {
+  if (!$('#prof').hidden && e.key === 'Escape') { $('#prof').hidden = true; return; }
+  if ($('#pm').hidden || e.target.matches('input, textarea')) return;
+  const p = S.data?.posts.find(x => x.id === S.modal), vert = p && p.format !== 'news';
+  if (e.key === 'Escape') closePost();
+  else if (e.key === ' ' && vert) { e.preventDefault(); playerToggle(); }
+  else if (e.key === 'ArrowRight') vert ? playerNext('stay') : stepPost(1);
+  else if (e.key === 'ArrowLeft') vert ? playerPrev() : stepPost(-1);
+  else if (e.key === 'ArrowDown' && vert) { e.preventDefault(); stepPost(1, p.format); }
+  else if (e.key === 'ArrowUp' && vert) { e.preventDefault(); stepPost(-1, p.format); }
+});
+// 길게 누르면 멈춤(스토리·쇼츠)
+let holdT = 0, held = false;
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.tapzone, .sc-tap')) return; held = false; holdT = setTimeout(() => { held = true; playerPause(); }, 220); });
+document.addEventListener('pointerup', e => { clearTimeout(holdT); if (held) { held = false; playerPlay(); e.target.closest('.tapzone, .sc-tap') && e.target.addEventListener('click', ev => ev.stopPropagation(), { once: true, capture: true }); } });
+// 마우스 휠로 다음 쇼츠·스토리
+let wheelT = 0;
+document.addEventListener('wheel', e => { const m = e.target.closest('.post-media.vert'); if (!m || Math.abs(e.deltaY) < 30) return; const now = Date.now(); if (now - wheelT < 700) return; wheelT = now; const p = S.data?.posts.find(x => x.id === S.modal); if (p) stepPost(e.deltaY > 0 ? 1 : -1, p.format); }, { passive: true });
 
 async function submitJudge(id, btn) {
   const dft = S.draft[id] || {}, errEl = $(`[data-err="${id}"]`);
@@ -914,22 +1244,25 @@ async function deleteOwn(id) {
 }
 async function savePng(id) {
   const node = $(`#post-${id} .png-target`); if (!node) return;
+  playerPause();
   try { const url = await htmlToImage.toPng(node, { pixelRatio: 2, backgroundColor: '#fff', cacheBust: true }); const a = document.createElement('a'); a.href = url; a.download = `도로그램_${S.team || 'screen'}조_${id}.png`; a.click(); }
   catch (e) { toast('이미지로 저장하지 못했습니다. 다시 시도해 주세요.'); }
 }
 
 // ---------- 만들기 ----------
 const myPosts = () => (S.data?.posts || []).filter(p => p.mine);
+const FIELD_MAP = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fPostsCount: 'posts', fBio: 'bio', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fCommentCount: 'commentCount', fThumbTitle: 'thumbTitle', fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fTags: 'tags', fPlace: 'place', fPoll: 'poll', fMusic: 'music', fPosted: 'postedAt', fTaken: 'photoTakenAt', fQuoteText: 'quoteText', fQuoteWho: 'quoteWho', fStat1L: 'stat1L', fStat1V: 'stat1V', fStat2L: 'stat2L', fStat2V: 'stat2V' };
 function resetForm() {
   const done = new Set(myPosts().map(p => p.format)), first = ['story', 'shorts', 'news'].find(f => !done.has(f)) || 'story';
-  S.form = { format: first, tactic: teamTactic(S.team), clueCriterion: null, clue: '', name: '', handle: '', joined: '', followers: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
-    truth: 'fake', basis: '', reporter: '', likes: '', views: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', body: '', tags: '', place: '', postedAt: '', photoTakenAt: '', imageId: null };
+  S.form = { format: first, tactic: teamTactic(S.team), clueCriterion: null, clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
+    truth: 'fake', basis: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
+    quoteText: '', quoteWho: '', stat1L: '', stat1V: '', stat2L: '', stat2V: '' };
   S.editing = null;
 }
 function renderMake() {
   if (S.screen || !S.team) return;
-  const d = S.data, tac = C.TACTICS.find(x => x.id === teamTactic(S.team)), mine = myPosts();
-  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>스토리·쇼츠·기사 <b>1개씩</b> (각각 진짜/가짜 선택)</dd><dt>가짜 수법</dt><dd><b>${esc(tac.id)}</b> (${esc(tac.desc)})</dd><dt>규칙</dt><dd>실존 인물 금지 · 진짜는 사실 카드대로 · 가짜는 단서 하나</dd></dl>`;
+  const d = S.data, tac = C.TACTICS.find(x => x.id === teamTactic(S.team)) || C.TACTICS[0], mine = myPosts();
+  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>스토리·쇼츠·기사 <b>1개씩</b> (각각 진짜/가짜 선택)</dd><dt>가짜 수법</dt><dd><b>${esc(tac.id)}</b> (${esc(tac.desc)})</dd><dt>규칙</dt><dd>실존 인물 금지 · 진짜는 자료실대로 · 가짜는 단서 하나 · 형식의 성격에 맞게</dd></dl>`;
   $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 ${mine.length} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
     <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
   const canMake = S.editing || mine.length < d.maxPosts;
@@ -942,43 +1275,50 @@ function renderMake() {
 const TPL_OPTS = [['auto', '자동', 'shuffle'], ['frame', '프레임', 'panel-top'], ['full', '큰 제목', 'heading-1'], ['cam', '카메라', 'camera'], ['pola', '폴라로이드', 'image'], ['collage', '콜라주', 'layout-grid'], ['black', '자막형', 'captions'], ['text', '글만', 'quote']];
 function fillForm() {
   const f = S.form, fmt = C.FORMATS[f.format], d = S.data, done = new Set(myPosts().filter(p => p.id !== S.editing).map(p => p.format));
-  $('#optFormat').innerHTML = Object.entries(C.FORMATS).map(([k, v]) => `<button type="button" class="opt" data-format="${k}" aria-pressed="${f.format === k}" ${done.has(k) ? 'disabled title="이미 올렸습니다"' : ''}><i data-lucide="${v.icon}"></i>${v.label}${done.has(k) ? ' ✓' : ''}</button>`).join('');
-  $('#fmtWhere').textContent = `${fmt.label}는 ${fmt.where}에 올라갑니다.`;
+  const isNews = f.format === 'news', isShorts = f.format === 'shorts', isStory = f.format === 'story';
+  $('#optFormat').innerHTML = Object.entries(C.FORMATS).map(([k, v]) => `<button type="button" class="opt" data-format="${k}" aria-pressed="${f.format === k}" ${done.has(k) ? 'disabled title="이미 올렸습니다"' : ''}>${ic(v.icon)}${v.label}${done.has(k) ? ' ✓' : ''}</button>`).join('');
+  $('#fmtNature').textContent = `${fmt.label}는 ${fmt.where}에 올라갑니다. ${fmt.nature}`;
+  $('#optKind').innerHTML = Object.entries(C.AUTHOR_KINDS).map(([k, v]) => `<button type="button" class="opt" data-kind="${k}" aria-pressed="${f.kind === k}">${ic(v.icon)}${v.label}</button>`).join('');
+  $('#kindDesc').textContent = C.AUTHOR_KINDS[f.kind].desc + (f.kind === 'official' || f.kind === 'press' ? ' 조가 만든 글에는 인증 배지가 붙지 않습니다.' : '');
   $$('#optTruth .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.truth === f.truth));
   $('#truthHelp').textContent = f.truth === 'real' ? '진짜를 고르면 점수는 못 얻지만, 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못하게 합니다.' : '가짜를 진짜라고 믿은 조마다 1점을 얻습니다. 들킬 단서를 하나 꼭 남기세요.';
   $('#fakeFields').hidden = f.truth === 'real'; $('#realFields').hidden = f.truth !== 'real';
-  $('#fBasis').innerHTML = '<option value="">사실 카드를 고르세요</option>' + C.FACTS.map(x => `<option ${f.basis === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  $('#fBasis').innerHTML = '<option value="">자료실 내용을 고르세요</option>' + C.FACTS.map(x => `<option ${f.basis === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
   $('#fTactic').innerHTML = C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
   $('#tacticDesc').textContent = (C.TACTICS.find(t => t.id === f.tactic) || {}).desc || '';
   $('#optClueCrit').innerHTML = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="opt" data-cluecrit="${k}" aria-pressed="${f.clueCriterion === k}">${c.label}</button>`).join('');
   $('#swatches').innerHTML = SWATCHES.map(c => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="프로필 색 ${c}" aria-pressed="${f.color === c}"></button>`).join('');
-  $('#fNameLabel').textContent = fmt.authorLabel; $('#fName').placeholder = f.format === 'news' ? '예: 도로일보' : f.format === 'shorts' ? '예: 놀이기구정복러' : '예: 여행하는 다은';
-  $('#titleField').hidden = !fmt.titleLabel; $('#fBody').placeholder = fmt.bodyLabel;
-  $('#tagsField').hidden = f.format === 'news'; $('#reporterField').hidden = f.format !== 'news'; $('#likesField').hidden = f.format === 'news';
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fThumbTitle: 'thumbTitle', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
-  Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (document.activeElement !== el) el.value = f[k] || ''; });
+  $('#fNameLabel').textContent = fmt.authorLabel; $('#fName').placeholder = isNews ? '예: 도로일보' : isShorts ? '예: 놀이기구정복러' : '예: 여행하는 다은';
+  $('#fFollowersLabel').textContent = isShorts ? '구독자 수' : '팔로워 수';
+  $('#titleField').hidden = !fmt.titleLabel; $('#fTitle').placeholder = fmt.titleLabel || ''; $('#fBody').placeholder = fmt.bodyLabel;
+  $('#subheadField').hidden = !isNews; $('#newsExtra').hidden = !isNews; $('#reporterField').hidden = !isNews; $('#commentField').hidden = isStory;
+  $('#tagsField').hidden = isNews; $('#likesField').hidden = isNews || isStory; $('#pollField').hidden = !isStory; $('#musicField').hidden = isNews;
+  $('#extraRow').hidden = isNews; $('#extraHint').textContent = isStory ? '슬라이드마다 다른 사진을 쓰려면' : '장면마다 다른 사진을 쓰려면';
+  Object.entries(FIELD_MAP).forEach(([id, k]) => { const el = $('#' + id); if (el && document.activeElement !== el) el.value = f[k] || ''; });
   $('#thumb').hidden = !f.imageId; $('#dropCta').hidden = !!f.imageId; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
+  $('#extraThumbs').innerHTML = (f.extraImages || []).map((id, i) => `<span class="ex-img"><img src="${imgSrc(id)}" alt=""><button type="button" data-rmextra="${i}" aria-label="사진 빼기">×</button></span>`).join('');
   $('#btnPolish').disabled = !d.aiEnabled || S.busy; $('#btnPolish').title = d.aiEnabled ? '' : 'AI 기능이 꺼져 있습니다';
   $('#btnSubmit').textContent = S.editing ? '수정 완료' : '공유하기'; $('#btnSubmit').disabled = d.phase !== 'make';
   $('#igcTitle').textContent = S.editing ? '게시물 수정' : `새 ${fmt.label} 만들기`;
   $('#btnCancelEdit').hidden = !S.editing;
-  // 썸네일: 쇼츠는 디자인 고르기, 기사는 사진·제목, 스토리는 프로필 동그라미에 사진
-  const isShorts = f.format === 'shorts', hasImg = !!(f.thumbImageId || f.imageId);
-  $('#thumbWhere').textContent = isShorts ? '쇼츠 목록에서 보이는 모양' : f.format === 'news' ? '뉴스 칸에서 보이는 사진·제목' : '스토리 줄의 프로필 동그라미에 사진이 보입니다';
+  const hasImg = !!(f.thumbImageId || f.imageId);
+  $('#thumbWhere').textContent = isShorts ? '쇼츠 목록에서 보이는 모양' : isNews ? '뉴스 칸에서 보이는 사진·제목' : '스토리 줄의 프로필 동그라미에 사진이 보입니다';
   $('#optTpl').hidden = !isShorts;
-  $('#optTpl').innerHTML = TPL_OPTS.map(([k, l, ic]) => `<button type="button" class="tpl-opt" data-tpl="${k}" aria-pressed="${(f.thumbTpl || 'auto') === k}" ${(k !== 'auto' && (k === 'text' ? hasImg : !hasImg)) ? 'disabled' : ''}><i data-lucide="${ic}"></i>${l}</button>`).join('');
-  $('#thumbTitleRow').hidden = f.format === 'story';
+  $('#optTpl').innerHTML = TPL_OPTS.map(([k, l, i]) => `<button type="button" class="tpl-opt" data-tpl="${k}" aria-pressed="${(f.thumbTpl || 'auto') === k}" ${(k !== 'auto' && (k === 'text' ? hasImg : !hasImg)) ? 'disabled' : ''}>${ic(i)}${l}</button>`).join('');
+  $('#thumbTitleRow').hidden = isStory;
   $('#thumbUseMain').setAttribute('aria-pressed', !f.thumbImageId); $('#thumbOwnImg').hidden = !f.thumbImageId; if (f.thumbImageId) $('#thumbOwnImg').src = imgSrc(f.thumbImageId);
   renderPreview(); icons();
 }
+function parsePoll(s) { const a = (s || '').split('|').map(x => x.trim()).filter(Boolean); return a.length >= 3 ? { q: a[0], a: a[1], b: a[2] } : null; }
 function previewPost() {
-  const f = S.form;
-  return { id: 'preview', order: (S.team || 1) * 7, format: f.format, likes: f.likes, views: f.views, thumbTpl: f.thumbTpl, thumbTitle: f.thumbTitle, thumbImageId: f.thumbImageId,
-    author: { name: f.name, handle: f.handle, color: f.color, reporter: f.reporter }, title: f.title, body: f.body, tags: f.tags, place: f.place, postedAt: f.postedAt, imageId: f.imageId, photoTakenAt: f.photoTakenAt, mine: true };
+  const f = S.form, stats = [[f.stat1L, f.stat1V], [f.stat2L, f.stat2V]].filter(x => x[0] && x[1]).map(([label, value]) => ({ label, value }));
+  return { id: 'preview', order: (S.team || 1) * 7, format: f.format, likes: f.likes, views: f.views, commentCount: f.commentCount, thumbTpl: f.thumbTpl, thumbTitle: f.thumbTitle, thumbImageId: f.thumbImageId,
+    author: { name: f.name, handle: f.handle, kind: f.kind, verified: false, joined: f.joined, followers: f.followers, posts: f.posts, bio: f.bio, color: f.color, reporter: f.format === 'news' ? f.reporter : '' },
+    title: f.title, subhead: f.format === 'news' ? f.subhead : '', body: f.body, tags: f.tags, place: f.place, poll: parsePoll(f.poll), music: f.music, postedAt: f.postedAt, imageId: f.imageId, extraImages: f.extraImages || [], photoTakenAt: f.photoTakenAt,
+    quote: f.quoteText ? { text: f.quoteText, who: f.quoteWho } : null, stats, mine: true };
 }
 function renderPreview() {
   const f = S.form, p = previewPost();
-  $('#preview').innerHTML = `<div class="post" style="display:block">${cardHTML(p)}</div>`;
   $('#acctAv').innerHTML = `<div class="avatar" style="background:${esc(f.color)};width:24px;height:24px;font-size:11px">${initials(f.name)}</div>`;
   $('#acctName').textContent = f.handle ? f.handle.replace(/^@/, '') : (f.name || '계정 이름');
   $('#bodyCount').textContent = `${(f.body || '').length.toLocaleString()}/1,200`;
@@ -989,6 +1329,10 @@ function renderPreview() {
     const where = C.FORMATS[f.format].where;
     const html = f.format === 'news' ? newsItemHTML(p) : f.format === 'story' ? `<div class="tray" style="justify-content:center">${trayHTML(p)}</div>` : tileHTML(p);
     $('#thumbPrev').innerHTML = `<div class="cap">${where}에 이렇게 보입니다</div>${html}<div class="cap">누르면 "② 눌렀을 때" 화면이 열립니다</div>`;
+  } else {
+    const n = f.format === 'story' ? slidesOf(p).length : f.format === 'shorts' ? scenesOf(p).length : 0;
+    $('#preview').innerHTML = `<div class="post" style="display:block">${cardHTML(p, { static: true })}</div>${n ? `<div class="cap">${f.format === 'story' ? '슬라이드' : '장면'} ${n}개 · 재생은 피드에서 눌러 확인</div>` : ''}`;
+    const card = $('#preview .post-card'); if (card && f.format !== 'news') { playerMount(card, p, f.format, false); }
   }
   lucide.createIcons({ attrs: { class: 'icon' } });
 }
@@ -996,17 +1340,18 @@ $('#postForm').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.truth) S.form.truth = b.dataset.truth;
   else if (b.dataset.format && !b.disabled) S.form.format = b.dataset.format;
+  else if (b.dataset.kind) S.form.kind = b.dataset.kind;
   else if (b.dataset.cluecrit) S.form.clueCriterion = b.dataset.cluecrit;
   else if (b.dataset.color) S.form.color = b.dataset.color;
   else if (b.dataset.tpl && !b.disabled) S.form.thumbTpl = b.dataset.tpl;
   else if (b.dataset.mstep) S.mstep = b.dataset.mstep;
+  else if (b.dataset.rmextra !== undefined) S.form.extraImages.splice(+b.dataset.rmextra, 1);
   else if (b.id === 'thumbUseMain') S.form.thumbImageId = null;
   else return;
   fillForm();
 });
 $('#postForm').addEventListener('input', e => {
-  const map = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fThumbTitle: 'thumbTitle', fTitle: 'title', fBody: 'body', fTags: 'tags', fPlace: 'place', fPosted: 'postedAt', fTaken: 'photoTakenAt' };
-  if (map[e.target.id]) { S.form[map[e.target.id]] = e.target.value; renderPreview(); }
+  if (FIELD_MAP[e.target.id]) { S.form[FIELD_MAP[e.target.id]] = e.target.value; renderPreview(); }
 });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
 $('#fBasis').addEventListener('change', e => { S.form.basis = e.target.value; });
@@ -1019,16 +1364,19 @@ function shrink(file) {
   });
 }
 async function uploadFile(file, key = 'imageId') {
-  try { S.busy = true; fillForm(); toast('사진을 올리는 중입니다.'); const r = await api('/upload', { team: S.team, dataUrl: await shrink(file) }); S.form[key] = r.imageId; toast('사진을 넣었습니다.'); }
+  try { S.busy = true; fillForm(); toast('사진을 올리는 중입니다.'); const r = await api('/upload', { team: S.team, dataUrl: await shrink(file) });
+    if (key === 'extra') { if (!S.form.imageId) S.form.imageId = r.imageId; else if ((S.form.extraImages || []).length < 3) S.form.extraImages.push(r.imageId); else toast('사진은 대표 1장 + 3장까지입니다.'); } else S.form[key] = r.imageId;
+    toast('사진을 넣었습니다.'); }
   catch (err) { toast(err.message || '사진을 올리지 못했습니다.'); }
   S.busy = false; fillForm();
 }
 $('#fFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) uploadFile(f); });
+$('#fExtraFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) uploadFile(f, 'extra'); });
 $('#fThumbFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) uploadFile(f, 'thumbImageId'); });
 const dz = $('#dropZone');
 ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
 ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
-dz.addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) uploadFile(f); else toast('사진 파일만 넣을 수 있습니다.'); });
+dz.addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) uploadFile(f, S.form.imageId ? 'extra' : 'imageId'); else toast('사진 파일만 넣을 수 있습니다.'); });
 $('#btnRmImg').onclick = () => { S.form.imageId = null; fillForm(); };
 $('#btnPolish').onclick = async e => {
   const btn = e.currentTarget, label = btn.innerHTML;
@@ -1039,10 +1387,11 @@ $('#btnPolish').onclick = async e => {
 };
 function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
-  const s = p.secret || {}, a = p.author || {};
+  const s = p.secret || {}, a = p.author || {}, st = p.stats || [];
   S.form = { format: p.format, tactic: s.tactic || teamTactic(S.team), clueCriterion: s.clueCriterion, clue: s.truth === 'real' ? '' : (s.clue || ''), truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.clue || '') : '',
-    name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '',
-    thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null, title: p.title, body: p.body, tags: p.tags, place: p.place, postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId };
+    kind: kindOf(a), name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, posts: a.posts || '', bio: a.bio || '', color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', commentCount: p.commentCount || '',
+    thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null, title: p.title || '', subhead: p.subhead || '', body: p.body, tags: p.tags, place: p.place, poll: p.poll ? `${p.poll.q} | ${p.poll.a} | ${p.poll.b}` : '', music: p.music || '', postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId, extraImages: [...(p.extraImages || [])],
+    quoteText: p.quote?.text || '', quoteWho: p.quote?.who || '', stat1L: st[0]?.label || '', stat1V: st[0]?.value || '', stat2L: st[1]?.label || '', stat2V: st[1]?.value || '' };
   S.editing = id; showTab('make'); render();
 }
 $('#btnCancelEdit').onclick = () => { resetForm(); render(); };
@@ -1052,13 +1401,16 @@ $('#postForm').addEventListener('submit', async e => {
   if (!f.name.trim()) { err.textContent = C.FORMATS[f.format].authorLabel + '을(를) 써 주세요.'; return; }
   if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return; }
   if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return; }
-  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 사실 카드를 골라 주세요.'; return; }
+  if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요. 진짜 기사처럼 보여야 합니다.'; return; }
+  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 자료실 내용을 골라 주세요.'; return; }
   if (f.truth !== 'real' && (!f.clue.trim() || !f.clueCriterion)) { err.textContent = '가짜 게시물은 숨긴 단서와 그 단서를 찾는 기준을 꼭 적어 주세요.'; return; }
   const btn = $('#btnSubmit'); btn.disabled = true;
+  const pv = previewPost();
   try {
-    await api('/posts', { id: S.editing, team: S.team, format: f.format, author: { name: f.name, handle: f.handle ? '@' + f.handle.replace(/^@/, '') : '', joined: f.joined, followers: f.followers, color: f.color, reporter: f.format === 'news' ? f.reporter : '' },
-      likes: f.format === 'news' ? '' : f.likes, views: f.views || '', thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
-      title: f.format === 'news' ? f.title : '', body: f.body, tags: f.format === 'news' ? '' : f.tags, place: f.place, postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId,
+    await api('/posts', { id: S.editing, team: S.team, format: f.format, author: { name: f.name, handle: f.handle ? '@' + f.handle.replace(/^@/, '') : '', kind: f.kind, joined: f.joined, followers: f.followers, posts: f.posts, bio: f.bio, color: f.color, reporter: f.format === 'news' ? f.reporter : '' },
+      likes: f.format === 'news' ? '' : f.likes, views: f.views || '', commentCount: f.format === 'story' ? '' : f.commentCount, thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
+      title: f.format === 'story' ? '' : f.title, subhead: pv.subhead, body: f.body, tags: f.format === 'news' ? '' : f.tags, place: f.place, poll: f.format === 'story' ? pv.poll : null, music: f.format === 'news' ? '' : f.music,
+      postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId, extraImages: f.format === 'news' ? [] : f.extraImages, quote: f.format === 'news' ? pv.quote : null, stats: f.format === 'news' ? pv.stats : [],
       secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basis, clueCriterion: 'cross' } : { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });
     toast(S.editing ? '고친 내용을 올렸습니다.' : '올렸습니다. 다른 조에게는 판별 시간부터 보입니다.');
     resetForm(); await refresh();
@@ -1101,7 +1453,7 @@ function adRender() {
   $('#adTeamCount').textContent = teamN; $('#adSeedCount').textContent = posts.length - teamN; $('#adDelAllBtn').disabled = !teamN;
   const row = p => { const truth = truthOf(p), c = p.counts || { real: 0, fake: 0, unsure: 0 };
     return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
-      <div><div>${p.seed ? '<span class="ad-b seed">예제</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')}</span></div>
+      <div><div>${p.seed ? '<span class="ad-b seed">예제</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')} · ${esc((p.author || {}).name || '')}</span></div>
         <div class="t">${esc(p.title || p.body || '')}</div><div class="m">${p.secret?.clue ? '단서: ' + esc(p.secret.clue) + ' · ' : ''}판별 진짜 ${c.real} · 가짜 ${c.fake}</div></div>
       <div style="display:grid;gap:6px"><button class="btn btn-ghost" data-adtoggle="${p.id}" data-hidden="${p.status === 'hidden'}">${p.status === 'hidden' ? '보이기' : '숨기기'}</button>${p.seed ? '' : `<button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button>`}</div></div>`; };
   $('#adPosts').innerHTML = posts.filter(p => !p.seed).map(row).join('') || '<div class="panel-empty">아직 조가 올린 게시물이 없습니다.</div>';
@@ -1123,44 +1475,77 @@ $('#adResetBtn').onclick = async () => {
   try { await adApi('/admin/reset', { confirm: $('#adResetTxt').value.trim() }); $('#adResetTxt').value = ''; $('#adResetErr').textContent = ''; toast('초기화했습니다.'); } catch (e) { $('#adResetErr').textContent = e.message; }
 };
 
+// ---------- 자료실 (도로랜드 정리본) ----------
+function renderArchive() {
+  const max = Math.max(...A.numbers.yearly.map(y => y.value));
+  $('#archiveBody').innerHTML = `
+  <div class="arc-hero"><h2>${ic('library-big')}도로랜드 자료실</h2><p>${esc(A.intro)}</p><p class="small" style="opacity:.85">${esc(A.weather)}</p></div>
+  <div class="arc-grid">
+    <div class="arc-card"><h3>${ic('map')}한눈에 보기</h3><dl class="kv">${A.overview.map(x => `<dt>${esc(x.k)}</dt><dd>${esc(x.v)}</dd>`).join('')}</dl></div>
+    <div class="arc-card"><h3>${ic('ship')}배 시간표</h3><dl class="kv">${A.ferry.map(x => `<dt>${esc(x.k)}</dt><dd>${esc(x.v)}</dd>`).join('')}</dl><p class="small muted" style="margin:10px 0 0">섬에서 나오는 마지막 배가 7시 30분이라 그 뒤의 섬 안 이야기는 직원이 아니면 할 수 없습니다.</p></div>
+  </div>
+  <div class="arc-card"><h3>${ic('ferris-wheel')}구역과 놀이기구</h3><div class="zone-list">${A.zones.map(z => `<div class="zone"><b>${esc(z.name)}</b><span>${esc(z.desc)}</span></div>`).join('')}</div></div>
+  <div class="arc-grid">
+    <div class="arc-card"><h3>${ic('bar-chart-3')}숫자로 보는 도로랜드</h3><div class="numcards">${A.numbers.cards.map(c => `<div class="numcard"><span>${esc(c.label)}</span><b>${esc(c.value)}</b><small>${esc(c.note)}</small></div>`).join('')}</div><p class="small" style="margin:12px 0 0;padding:8px 10px;border-radius:8px;background:var(--fake-bg);color:var(--fake);font-weight:700">${esc(A.numbers.recent)}</p></div>
+    <div class="arc-card"><h3>${ic('trending-up')}연간 방문객 (${esc(A.numbers.yearlyUnit)})</h3><div class="bars">${A.numbers.yearly.map(y => `<div class="bar"><b>${y.value}</b><i style="height:${Math.round(y.value / max * 100)}%"></i><span>${esc(y.label)}</span></div>`).join('')}</div><p class="small muted" style="margin:10px 0 0">5년 동안 해마다 늘었습니다. "방문객이 반으로 줄었다"는 말은 이 표와 맞지 않습니다.</p></div>
+  </div>
+  <div class="arc-grid">
+    <div class="arc-card"><h3>${ic('eye-off')}섬이 안 보인 날 (연표)</h3><div class="tl">${A.timeline.map(t => `<div class="tl-item"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
+    <div class="arc-card"><h3>${ic('alert-triangle')}최근 이상 현상 (운영실 기록)</h3><div class="tl">${A.incidents.map(t => `<div class="tl-item inc"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
+  </div>
+  <div class="arc-grid">
+    <div class="arc-card"><h3>${ic('megaphone')}운영실 공식 입장</h3><ul class="stance" style="margin:0;padding-left:18px">${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
+    <div class="arc-card"><h3>${ic('badge-check')}등록된 계정 (인증 배지)</h3>${A.accounts.map(x => `<div class="acct"><span class="avatar" style="background:${x.kind === 'official' ? '#0e4a84' : x.kind === 'press' ? '#1d4ed8' : '#ea580c'}">${initials(x.name)}</span><div><div class="nm">${esc(x.name)}<span class="vb">${ic('check')}</span><span class="kind-chip ${x.kind}">${esc(C.AUTHOR_KINDS[x.kind].label)}</span></div><div class="meta">${esc(x.handle)} · ${esc(x.joined)} 가입 · ${x.kind === 'creator' ? '구독자' : '팔로워'} ${esc(x.followers)} · ${esc(x.note)}</div></div></div>`).join('')}
+      <p class="small muted" style="margin:10px 0 0">인증 배지(파란 체크)는 도로그램이 확인한 계정에만 붙습니다. 이름에 ✓ 글자를 넣거나 "공식"이라고 쓴다고 배지가 생기지는 않습니다. 여기 없는 "도로랜드 ○○" 계정은 모두 공식이 아닙니다.</p></div>
+  </div>`;
+  icons();
+}
+
 // ---------- 도움말 ----------
 function renderHelp() {
-  const crit = C.CRITERIA, ic = n => `<i data-lucide="${n}" class="icon"></i>`;
+  const crit = C.CRITERIA;
   $('#helpBody').innerHTML = `
   <div class="hp"><h2>${ic('map')}도로그램은 이렇게 진행됩니다</h2>
-    <p>도로랜드가 사라졌다는 이야기가 도로그램에 퍼지고 있습니다. 어떤 글이 진짜이고 어떤 글이 가짜인지 가려내고, 직접 "진짜처럼 보이는 글"을 만들어 다른 조를 시험해 봅니다.</p>
+    <p>도로랜드가 사라졌다는 이야기가 도로그램에 퍼지고 있습니다. 어떤 글이 진짜이고 어떤 글이 가짜인지 가려내고, 직접 "진짜처럼 보이는 글"을 만들어 다른 조를 시험해 봅니다. 도로랜드를 잘 모르면 판별할 수 없으니 <b>자료실</b>부터 읽습니다.</p>
     <div class="steps">${Object.values(C.PHASES).map((p, i) => `<div class="step"><b>${i + 1}. ${p.label}</b><span>${esc(p.desc)}</span></div>`).join('')}</div>
     <h3>점수</h3><ul><li>다른 조 게시물을 맞게 판별하면 <b>1점</b> (근거 기준을 고른 판정만 인정)</li><li>우리 조가 만든 가짜를 다른 조가 진짜라고 믿을 때마다 <b>1점</b></li><li>예제 자료 판정은 연습이라 점수에 들어가지 않습니다.</li></ul></div>
 
+  <div class="hp"><h2>${ic('users-round')}누가 올렸는지부터 봅니다</h2>
+    <p>같은 내용이라도 <b>운영실 공식 계정</b>이 올린 것과 <b>가입 2일 된 계정</b>이 올린 것은 무게가 다릅니다. 게시물의 이름·프로필을 누르면 계정 정보(종류, 인증 배지, 가입일, 팔로워·구독자, 게시물 수, 소개)가 열리고, 자료실 등록 계정과 자동으로 대조됩니다.</p>
+    <div class="kinds4">${Object.entries(C.AUTHOR_KINDS).map(([k, v]) => `<div><b>${ic(v.icon)}${v.label}</b>${esc(v.desc)}</div>`).join('')}</div>
+    <ul style="margin-top:10px"><li><b>인증 배지</b>(파란 체크)는 도로그램이 확인한 계정에만 붙습니다. 조가 만든 글에는 붙일 수 없으니, 공식·언론사를 흉내 낸 글은 배지가 없습니다.</li><li><b>100만 구독자</b> 채널이라고 다 맞는 말을 하는 건 아니지만, 구독자 2,904명에 조회수 126만처럼 <b>숫자가 안 맞는 계정</b>은 의심합니다.</li><li>공식 계정은 <b>@doroland</b> 하나뿐입니다. "도로랜드 이벤트", "도로랜드 공식"은 모두 사칭입니다.</li></ul></div>
+
   <div class="hp"><h2>${ic('search-check')}판별하는 법: 확인 기준 4가지</h2>
     <p>게시물을 누르면 오른쪽에 <b>확인하기</b> 버튼 4개가 있습니다. 하나씩 눌러 단서를 찾은 뒤 진짜·가짜·모르겠음을 고르고, 어떤 기준으로 판단했는지 꼭 고릅니다.</p>
-    <div class="ex"><div><img src="images/help/ex-impersonate.jpg" alt=""><div class="cap">예제: "[긴급] 도로랜드 영구 폐장" 공지</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('user-round-search')} ${crit.who.label}</h3><p>${esc(crit.who.hint)}</p><p>이 공지는 <b>@doroland_officiall</b>이 올렸습니다. 공식 계정은 @doroland 하나뿐이고, 가입한 지 5일, 팔로워 38명입니다. 전화번호까지 남기라고 하니 사칭입니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-oldphoto.jpg" alt=""><div class="cap">예제: "방금 도로랜드 사라지는 거 직접 찍음!!!"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('calendar-clock')} ${crit.when.label}</h3><p>${esc(crit.when.hint)}</p><p>"방금" 찍었다는데 <b>사진 찍은 때는 3년 전 10월 6일</b>입니다. 옛날 사진을 지금 일처럼 올린 사진 바꿔치기입니다.</p></div></div>
-    <div class="ex"><div><div style="aspect-ratio:4/3;border-radius:10px;background:linear-gradient(160deg,#ea580c,#111);color:#fff;display:grid;place-items:center;padding:16px;text-align:center;font-weight:700;line-height:1.5">친구 사촌 형이 도로랜드 직원인데요, 관람차 밑 지하에 괴물이 산대요.</div><div class="cap">예제: 쇼츠 설명글</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('eye')} ${crit.witness.label}</h3><p>${esc(crit.witness.hint)}</p><p>글쓴이가 직접 본 게 아니라 <b>"친구 사촌 형"에게 들은 말</b>입니다. 확인하기의 "직접 목격"을 누르면 이런 표현이 노랗게 표시됩니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-expert.jpg" alt=""><div class="cap">예제: "[충격] 해양학 박사 '도로랜드는 3년마다 바다에 잠긴다'"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('files')} ${crit.cross.label}</h3><p>${esc(crit.cross.hint)}</p><p>박사의 이름도 소속도 없고, <b>사실 카드에는 "섬이 바다에 잠긴 기록은 없다"</b>고 되어 있습니다. 팔로워 2,904명인데 조회수 126만인 것도 수상합니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-real.jpg" alt=""><div class="cap">예제: "롤러코스터 오늘만 3번 탐, 맨 앞자리 강추"</div></div><div><span class="tag" style="background:var(--real-bg);color:var(--real)">진짜</span><h3 style="margin-top:0">진짜 글은 이렇게 생겼습니다</h3><p>2020년부터 쓴 후기 계정이고, 팔로워 3,120명에 좋아요 1,482개로 숫자가 자연스럽습니다. 내용도 사실 카드(롤러코스터 운영 중)와 어긋나지 않습니다.</p><p class="small muted">중요: <b>조회수·좋아요가 많다고 진짜가 아닙니다.</b> 가짜 글일수록 작은 계정인데 숫자만 크게 부풀려 놓는 경우가 많습니다.</p></div></div>
-    <h3>사실 카드 (자료 대조의 기준)</h3><ul>${C.FACTS.map(f => `<li>${esc(f)}</li>`).join('')}</ul></div>
+    <div class="ex"><div><img src="images/help/ex-impersonate.jpg" alt=""><div class="cap">예제: "[긴급] 도로랜드 영구 폐장" 공지</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('user-round-search')} ${crit.who.label}</h3><p>${esc(crit.who.hint)}</p><p>이 공지는 <b>@doroland_officiall</b>이 올렸습니다. 공식 계정은 @doroland 하나뿐이고, 가입 5일, 팔로워 38명, 인증 배지 없음. 계좌번호까지 남기라고 하니 사칭입니다.</p></div></div>
+    <div class="ex"><div><img src="images/help/ex-oldphoto.jpg" alt=""><div class="cap">예제: "방금 도로랜드 사라지는 순간 직캠!!!"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('calendar-clock')} ${crit.when.label}</h3><p>${esc(crit.when.hint)}</p><p>"방금" 찍었다는데 <b>영상 찍은 때는 3년 전 10월 6일</b>입니다. 옛날 영상을 지금 일처럼 올린 바꿔치기입니다. 댓글에 "3년 전 영상 아님?"이라는 말도 있습니다.</p></div></div>
+    <div class="ex"><div><div style="aspect-ratio:4/3;border-radius:10px;background:linear-gradient(160deg,#ea580c,#111);color:#fff;display:grid;place-items:center;padding:16px;text-align:center;font-weight:700;line-height:1.5">친구 사촌 형이 도로랜드 직원인데요, 섬이 안 보일 때 직원들은 지하 3층으로 대피한대요.</div><div class="cap">예제: 쇼츠 자막</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('eye')} ${crit.witness.label}</h3><p>${esc(crit.witness.hint)}</p><p>글쓴이가 직접 본 게 아니라 <b>"친구 사촌 형"에게 들은 말</b>입니다. 확인하기의 "직접 목격"을 누르면 이런 표현이 노랗게 표시됩니다.</p></div></div>
+    <div class="ex"><div><img src="images/help/ex-expert.jpg" alt=""><div class="cap">예제: "[단독] 도로랜드 지난해 매출 반토막"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('files')} ${crit.cross.label}</h3><p>${esc(crit.cross.hint)}</p><p>자료실에는 지난해 매출 <b>386억 원</b>, 방문객 <b>128만 4천 명</b>이 있는데 기사는 193억·64만 명이라고 씁니다. 도로일보 이름과 기자 이름까지 베꼈지만 계정이 @doro_ilbo(인증 없음)입니다. 맞는 숫자를 하나 섞어 그럴듯하게 만드는 게 <b>숫자 부풀리기</b>입니다.</p></div></div>
+    <div class="ex"><div><img src="images/help/ex-real.jpg" alt=""><div class="cap">예제: "롤러코스터 맨 앞자리 POV"</div></div><div><span class="tag" style="background:var(--real-bg);color:var(--real)">진짜</span><h3 style="margin-top:0">진짜 글은 이렇게 생겼습니다</h3><p>2017년부터 활동한 인증 크리에이터(구독자 112만)이고, 최고 높이 42m·시속 92km가 자료실과 맞습니다. 평범한 소식(조명 설치 기사, 츄러스 스토리)도 진짜입니다. 자극적이지 않다고 가짜가 아니고, 자극적이라고 가짜도 아닙니다.</p><p class="small muted">중요: <b>조회수·좋아요가 많다고 진짜가 아닙니다.</b> 가짜 글일수록 작은 계정인데 숫자만 크게 부풀려 놓는 경우가 많습니다.</p></div></div></div>
 
   <div class="hp"><h2>${ic('square-plus')}게시물 만드는 법</h2>
-    <p>조마다 <b>스토리 · 쇼츠 · 기사를 1개씩</b> 만듭니다. 게시물마다 진짜인지 가짜인지 비밀 칸에서 정합니다. <b>진짜 1개 + 가짜 2개</b>처럼 섞으면 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못합니다.</p>
+    <p>조마다 <b>스토리 · 쇼츠 · 기사를 1개씩</b> 만듭니다. 게시물마다 진짜인지 가짜인지 비밀 칸에서 정합니다. <b>진짜 1개 + 가짜 2개</b>처럼 섞으면 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못합니다. 형식마다 성격이 다르니 그 성격에 맞게 써야 진짜처럼 보입니다.</p>
     <div class="fmt3">
-      <div><b>${ic('smartphone')}스토리</b><ul><li>세로 사진 한 장 + 짧은 한 줄</li><li>상단 <b>스토리 줄</b>에 계정 동그라미로 뜹니다</li><li>위치 스티커, 해시태그를 넣을 수 있습니다</li></ul><img src="images/help/ex-story.jpg" alt="" style="width:100%;aspect-ratio:9/14;object-fit:cover;border-radius:8px;margin-top:8px"></div>
-      <div><b>${ic('play')}쇼츠</b><ul><li>세로 영상처럼 보이는 화면 + 설명글 + 해시태그</li><li>왼쪽 <b>쇼츠 칸</b>에 썸네일로 뜹니다</li><li>썸네일 디자인(프레임·큰 제목·카메라·폴라로이드·콜라주·자막형)과 썸네일 제목을 따로 정할 수 있습니다</li></ul></div>
-      <div><b>${ic('newspaper')}기사</b><ul><li>언론사 이름 + 기사 제목 + 본문 3~5문장 + 기자 이름</li><li>오른쪽 <b>뉴스 칸</b>에 가로 카드로 뜹니다</li><li>"~했다, ~로 알려졌다" 기사체로 씁니다</li></ul></div>
+      <div><b>${ic('circle-dashed')}스토리</b><p>${esc(C.FORMATS.story.nature)}</p><ul><li>빈 줄로 나누면 슬라이드가 나뉘고 자동으로 넘어갑니다</li><li>위치는 위치 스티커, "질문 | 보기1 | 보기2"는 투표 스티커가 됩니다</li><li>사진을 더 넣으면 슬라이드마다 다른 사진이 나옵니다</li></ul></div>
+      <div><b>${ic('play')}쇼츠</b><p>${esc(C.FORMATS.shorts.nature)}</p><ul><li>영상 제목 + 자막(빈 줄로 장면 나눔)이 재생됩니다. 사진이 천천히 움직여 영상처럼 보입니다</li><li>채널 이름, 구독자 수, 조회수, 댓글 수, 음악을 정합니다</li><li>썸네일 디자인과 썸네일 제목을 따로 정할 수 있습니다</li></ul></div>
+      <div><b>${ic('newspaper')}기사</b><p>${esc(C.FORMATS.news.nature)}</p><ul><li>제목 + 부제 + 본문 2문단 이상 + 기자 이름</li><li>인용문(누가 말했는지)과 숫자 2개를 넣으면 기사다워집니다</li><li>"~했다, ~로 알려졌다" 기사체로 씁니다</li></ul></div>
     </div>
-    <h3>진짜를 만들 때</h3><p>사실 카드에 있는 내용으로만 씁니다. 비밀 칸에서 <b>근거가 된 사실 카드</b>를 고릅니다. 계정 이름·가입일·팔로워·조회수도 자연스럽게 맞춥니다.</p>
-    <h3>가짜를 만들 때</h3><p>미션 카드의 수법을 씁니다. 그리고 <b>확인 기준 4가지 중 하나로 들킬 수 있는 단서를 하나 꼭 남깁니다.</b> 단서가 없으면 판별이 찍기가 됩니다.</p>
+    <h3>진짜를 만들 때</h3><p>자료실에 있는 내용으로만 씁니다. 비밀 칸에서 <b>근거가 된 자료실 내용</b>을 고릅니다. 계정 종류·가입일·팔로워·조회수도 자연스럽게 맞춥니다(일반 계정이면 팔로워 수십~수백 명, 조회수도 비슷하게).</p>
+    <h3>가짜를 만들 때</h3><p>미션 카드의 수법을 씁니다. 그리고 <b>확인 기준 4가지 중 하나로 들킬 수 있는 단서를 하나 꼭 남깁니다.</b> 단서가 없으면 판별이 찍기가 됩니다. 교묘하게 만들려면 맞는 숫자·시간을 여러 개 섞고 틀린 것은 하나만 넣으세요.</p>
     <ul>${C.TACTICS.map(t => `<li><b>${esc(t.id)}</b>: ${esc(t.desc)}</li>`).join('')}</ul>
-    <h3>잘 만든 단서의 예</h3><ul><li>작성자: 공식 계정은 @doroland인데 <b>@doroland_kr</b>로 씀 / 가입한 지 2일, 팔로워 15명인데 조회수 30만</li><li>날짜: "방금" 찍었다면서 사진 찍은 때를 3년 전으로 적음</li><li>직접 목격: "직원 친구한테 들었는데"로 시작</li><li>자료 대조: 배는 오후 6시까지인데 "저녁 7시 막배"라고 씀</li></ul>
+    <h3>잘 만든 단서의 예</h3><ul><li>작성자: 공식 계정은 @doroland인데 <b>@doroland_kr</b>로 씀 / 가입한 지 2일, 팔로워 15명인데 조회수 30만 / 언론사인데 기자 이름이 없음</li><li>날짜: "방금" 찍었다면서 사진 찍은 때를 3년 전으로 적음 / 15주년 행사를 10월에 함</li><li>직접 목격: "직원 지인한테 들었는데"로 시작</li><li>자료 대조: 막배는 7시 30분인데 "밤 9시 막배"라고 씀 / 매출 386억을 193억으로 씀</li></ul>
     <div class="ok-no"><div class="ok"><b>${ic('check')} 해도 되는 것</b>도로랜드 안의 사건·놀이기구·캐릭터 이야기, 지어낸 계정 이름, 노트북 사진 자료실의 사진, AI로 말투 다듬기</div><div class="no"><b>${ic('x')} 하면 안 되는 것</b>실제 사람(친구, 선생님, 연예인) 이름이나 사진, 욕설·폭력적 표현, 다른 조 이름 언급, 전화번호 같은 개인정보</div></div>
     <h3>썸네일과 상세 화면</h3><p>만들기 왼쪽 미리보기에서 <b>① 목록에서</b>(썸네일)와 <b>② 눌렀을 때</b>(상세 화면)를 바꿔 볼 수 있습니다. 썸네일은 누르기 전 첫인상이라 본문과 다른 사진·문구를 넣어 눈길을 끌 수도 있습니다. 그런 낚시성 썸네일도 판별 단서가 됩니다.</p></div>
 
   <div class="hp"><h2>${ic('monitor')}화면 사용법</h2><ul>
-    <li><b>홈</b>: 위는 스토리 줄, 왼쪽은 쇼츠, 오른쪽은 뉴스입니다. 아무거나 누르면 상세 창이 열리고, 양옆 화살표(←/→)로 넘깁니다.</li>
+    <li><b>홈</b>: 위는 스토리 줄, 왼쪽은 쇼츠, 오른쪽은 뉴스입니다. 누르면 상세 창이 열립니다.</li>
+    <li><b>스토리</b>: 자동으로 넘어갑니다. 오른쪽을 누르면 다음, 왼쪽은 이전, 길게 누르면 멈춤. 끝나면 다음 계정 스토리로 넘어갑니다. 투표 스티커는 눌러 볼 수 있습니다.</li>
+    <li><b>쇼츠</b>: 자동 재생되고 끝나면 반복됩니다. 화면을 누르면 멈춤/재생, 댓글 버튼으로 댓글 창, 마우스 휠이나 ↑↓(오른쪽 화살표 버튼)로 다음 쇼츠.</li>
+    <li><b>기사</b>: 아래로 내리면 본문·숫자·인용·댓글·관련 기사가 있습니다. ←/→로 다음 게시물.</li>
+    <li><b>계정 정보</b>: 이름이나 프로필을 누르면 계정 종류·인증·가입일·팔로워·소개가 열립니다.</li>
+    <li><b>자료실</b>: 도로랜드 정리본. 판별할 때 "자료 대조"의 기준입니다.</li>
     <li><b>필터</b>: "아직 판별 안 함"을 누르면 남은 것만 보입니다. 판별 시간에는 "예제 자료"로 예제를 다시 볼 수 있습니다.</li>
-    <li><b>만들기</b>: 한 화면에서 글·사진·계정·썸네일·비밀 칸을 모두 고칩니다. 공유하기는 「게시물 만들기」 단계에서만 열립니다.</li>
-    <li><b>조 바꾸기</b>: 왼쪽 아래 조 번호를 누르면 바꿀 수 있습니다. 한 노트북은 한 조로만 씁니다.</li>
-    <li><b>이미지로 저장</b>: 정답 공개 뒤 상세 창에서 게시물을 PNG로 저장해 3일차 발표 자료에 쓸 수 있습니다.</li></ul></div>`;
+    <li><b>이미지로 저장</b>: 정답 공개 뒤 상세 창에서 게시물을 PNG로 저장할 수 있습니다.</li></ul></div>`;
   icons();
 }
 
