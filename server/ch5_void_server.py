@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """챕터 5 「보이드의 기록」 스캔 링크 제출 서버 (표준 라이브러리만 사용, 추가 설치 없음).
 
-chapter05/index.html(보이드의 기록)이 쓰는 API. 조별로 어느 구역에 어떤 Scaniverse 링크를 냈는지 저장하고,
-운영자(비밀번호)가 전체 목록 확인·삭제·초기화를 한다. 도로그램 서버(ch5_feed_server.py)와는 완전히 별개다.
+chapter05/index.html(보이드의 기록)과 chapter05/feed.html(도로그램 사이드바 현황)이 쓰는 API.
+조별로 어느 구역에 어떤 Scaniverse 링크를 냈는지 저장하고, 운영자(비밀번호)가 전체 목록 확인·삭제·초기화를 한다.
+도로그램 서버(ch5_feed_server.py)와는 완전히 별개다.
 - 제출 기록: data/ch5_void.json (gitignore)
+- 짝 목록: ch5_void_pairs.json (erica-twin build.py가 dist/void-pairs.json으로 만든 것. 캠퍼스 지점 ↔ 섬 구역, 이미 3D에 들어간 스캔 id)
 - 초기화: 제출 기록을 지우고, 페이지에 이미 3D로 들어가 있는 스캔은 "숨김" 목록에 넣어 구역을 다시 "복구 필요"로 되돌린다.
   (3D 데이터 자체는 페이지에 박혀 있으므로 지우지 않고 숨기기만 한다. "되살리기"로 되돌릴 수 있다.)
+- 썸네일: /api/void/thumb/<scanId> 가 Scaniverse 미리보기 사진을 받아 data/thumbs/ 에 캐시해 준다(핫링크 차단·CSP 회피).
 
 실행:
     python server/ch5_void_server.py           # http://localhost:8096/chapter05/index.html
@@ -17,6 +20,8 @@ import os
 import re
 import threading
 import time
+import urllib.error
+import urllib.request
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
@@ -24,7 +29,9 @@ from urllib.parse import unquote, urlparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 DATA_DIR = os.path.join(HERE, 'data')
+THUMB_DIR = os.path.join(DATA_DIR, 'thumbs')
 DB_PATH = os.path.join(DATA_DIR, 'ch5_void.json')
+PAIRS_PATH = os.path.join(HERE, 'ch5_void_pairs.json')
 
 PORT = int(os.environ.get('VOID_PORT', '8096'))
 HOST = os.environ.get('VOID_HOST', '127.0.0.1')
@@ -34,9 +41,11 @@ SERVE_STATIC = os.environ.get('VOID_STATIC', '1') == '1'
 MAX_TEAM = 12
 SCAN_ID = re.compile(r'^[a-z0-9]{6,40}$')
 MISSION_ID = re.compile(r'^[a-z0-9_-]{1,40}$')
+UA = 'Mozilla/5.0 (DOROLAND void record)'
 
 lock = threading.Lock()
 DB = None
+PAIRS = []
 
 
 def now_ms():
@@ -56,6 +65,14 @@ def read_db():
         return db
     except (OSError, ValueError):
         return fresh_db()
+
+
+def read_pairs():
+    try:
+        with open(PAIRS_PATH, encoding='utf-8') as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return []
 
 
 def save():
@@ -79,12 +96,59 @@ def clean_text(v, limit):
     return re.sub(r'\s+', ' ', str(v or '')).strip()[:limit]
 
 
+def pair_status():
+    """짝마다 복구 상태: ok(3D에 들어간 스캔이 보임) / pend(링크 제출됨) / void."""
+    hidden = set(DB['hidden'])
+    out = []
+    for p in PAIRS:
+        ids = {p['campus']['id'], p['island']['id']}
+        shown = [s for s in p.get('scans', []) if s not in hidden]
+        subs = [s for s in DB['subs'] if s['mission'] in ids and s['scanId'] not in shown]
+        st = 'ok' if shown else 'pend' if subs else 'void'
+        out.append({'id': p['id'], 'campus': p['campus'], 'island': p['island'], 'status': st,
+                    'teams': sorted({s['team'] for s in subs}), 'scans': shown,
+                    'subs': [{'scanId': s['scanId'], 'team': s['team'], 'note': s.get('note', ''), 'caption': s.get('caption', ''),
+                              'createdAt': s['createdAt']} for s in subs]})
+    return out
+
+
 def state():
-    return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden']}
+    return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'pairs': pair_status()}
+
+
+def scan_meta(scan_id):
+    """Scaniverse 공유 페이지의 og:title(스캔 제목)·설명(@작성자)을 읽는다. 실패해도 제출은 된다."""
+    try:
+        req = urllib.request.Request(f'https://scaniverse.com/scan/{scan_id}', headers={'User-Agent': UA})
+        html = urllib.request.urlopen(req, timeout=6).read(200000).decode('utf-8', 'ignore')
+        title = re.search(r'property="og:title"\s+content="([^"]*)"', html)
+        desc = re.search(r'property="og:description"\s+content="([^"]*)"', html)
+        author = re.search(r'@([\w.]+)', desc.group(1)) if desc else None
+        return clean_text(title.group(1) if title else '', 60), (author.group(1) if author else '')
+    except Exception:
+        return '', ''
+
+
+def fetch_thumb(scan_id):
+    os.makedirs(THUMB_DIR, exist_ok=True)
+    fp = os.path.join(THUMB_DIR, scan_id + '.jpg')
+    if os.path.isfile(fp):
+        return fp
+    try:
+        req = urllib.request.Request(f'https://scaniverse.com/api/media/{scan_id}/preview.jpg', headers={'User-Agent': UA})
+        raw = urllib.request.urlopen(req, timeout=8).read(5 * 1024 * 1024)
+        if not raw.startswith(b'\xff\xd8'):
+            return None
+        with open(fp + '.tmp', 'wb') as f:
+            f.write(raw)
+        os.replace(fp + '.tmp', fp)
+        return fp
+    except Exception:
+        return None
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'VoidRecordServer/1.0'
+    server_version = 'VoidRecordServer/1.1'
 
     def send_json(self, obj, code=200):
         body = json.dumps(obj, ensure_ascii=False).encode()
@@ -117,9 +181,23 @@ class Handler(BaseHTTPRequestHandler):
                 return self.fail('운영자 비밀번호가 맞지 않습니다.', 403)
             with lock:
                 return self.send_json(dict(state(), admin=True))
+        m = re.fullmatch(r'/api/void/thumb/([a-z0-9]{6,40})', path)
+        if m:
+            fp = fetch_thumb(m.group(1))
+            if not fp:
+                return self.fail('미리보기를 가져오지 못했습니다.', 404)
+            return self.send_bytes(open(fp, 'rb').read(), 'image/jpeg', cache=True)
         if SERVE_STATIC and not path.startswith('/api/'):
             return self.send_static(path)
         self.fail('없는 주소입니다.', 404)
+
+    def send_bytes(self, data, ctype, cache=False):
+        self.send_response(200)
+        self.send_header('Content-Type', ctype)
+        self.send_header('Cache-Control', 'public, max-age=86400' if cache else 'no-store')
+        self.send_header('Content-Length', str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def send_static(self, path):
         rel = unquote(path).lstrip('/') or 'index.html'
@@ -132,13 +210,7 @@ class Handler(BaseHTTPRequestHandler):
         ctype = {'.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css',
                  '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.txt': 'text/plain'}.get(ext, 'application/octet-stream')
         with open(fp, 'rb') as f:
-            data = f.read()
-        self.send_response(200)
-        self.send_header('Content-Type', ctype)
-        self.send_header('Cache-Control', 'no-store')
-        self.send_header('Content-Length', str(len(data)))
-        self.end_headers()
-        self.wfile.write(data)
+            self.send_bytes(f.read(), ctype)
 
     def do_POST(self):
         path = urlparse(self.path).path
@@ -157,8 +229,7 @@ class Handler(BaseHTTPRequestHandler):
         if path.startswith('/api/void/admin/') and not self.is_admin():
             return self.fail('운영자 비밀번호가 맞지 않습니다.', 403)
         try:
-            with lock:
-                fn(body)
+            fn(body)
         except ValueError as e:
             self.fail(str(e))
 
@@ -173,56 +244,68 @@ class Handler(BaseHTTPRequestHandler):
         mission = str(b.get('mission') or '')
         if not MISSION_ID.match(mission):
             raise ValueError('구역 정보가 없습니다.')
-        dup = next((s for s in DB['subs'] if s['scanId'] == scan_id), None)
+        with lock:
+            dup = next((s for s in DB['subs'] if s['scanId'] == scan_id), None)
         if dup:
             raise ValueError(f'이미 제출된 링크입니다 ({dup["team"]}조).')
-        DB['subs'].append({
-            'id': uuid.uuid4().hex[:12], 'scanId': scan_id, 'url': f'https://scaniverse.com/scan/{scan_id}',
-            'mission': mission, 'team': team, 'note': clean_text(b.get('note'), 60), 'createdAt': now_ms(),
-        })
-        save()
-        self.send_json(state())
+        caption, author = scan_meta(scan_id)      # 네트워크는 잠금 밖에서
+        with lock:
+            if any(s['scanId'] == scan_id for s in DB['subs']):
+                raise ValueError('이미 제출된 링크입니다.')
+            DB['subs'].append({
+                'id': uuid.uuid4().hex[:12], 'scanId': scan_id, 'url': f'https://scaniverse.com/scan/{scan_id}',
+                'mission': mission, 'team': team, 'note': clean_text(b.get('note'), 60),
+                'caption': caption, 'author': author, 'createdAt': now_ms(),
+            })
+            save()
+            self.send_json(state())
+        threading.Thread(target=fetch_thumb, args=(scan_id,), daemon=True).start()
 
     # 학생: 우리 조가 낸 제출 취소
     def unsubmit(self, b):
         team = clean_team(b.get('team'))
         sid = str(b.get('id') or '')
-        before = len(DB['subs'])
-        DB['subs'] = [s for s in DB['subs'] if not (s['id'] == sid and s['team'] == team)]
-        if len(DB['subs']) == before:
-            raise ValueError('우리 조가 낸 제출만 취소할 수 있습니다.')
-        save()
-        self.send_json(state())
+        with lock:
+            before = len(DB['subs'])
+            DB['subs'] = [s for s in DB['subs'] if not (s['id'] == sid and s['team'] == team)]
+            if len(DB['subs']) == before:
+                raise ValueError('우리 조가 낸 제출만 취소할 수 있습니다.')
+            save()
+            self.send_json(state())
 
     def admin_delete(self, b):
         sid = str(b.get('id') or '')
-        DB['subs'] = [s for s in DB['subs'] if s['id'] != sid]
-        save()
-        self.send_json(state())
+        with lock:
+            DB['subs'] = [s for s in DB['subs'] if s['id'] != sid]
+            save()
+            self.send_json(state())
 
     # 운영자: 제출 기록 전부 삭제 + 페이지에 이미 들어간 스캔을 숨겨 모든 구역을 "복구 필요"로
     def admin_reset(self, b):
         if b.get('confirm') != 'RESET':
             raise ValueError('확인 문구가 필요합니다.')
         hide = [str(x).lower() for x in (b.get('hide') or []) if SCAN_ID.match(str(x).lower())]
-        DB['subs'] = []
-        DB['hidden'] = sorted(set(DB['hidden']) | set(hide))
-        save()
-        self.send_json(state())
+        with lock:
+            DB['subs'] = []
+            DB['hidden'] = sorted(set(DB['hidden']) | set(hide))
+            save()
+            self.send_json(state())
 
     # 운영자: 숨긴 스캔을 다시 보이게
     def admin_unhide(self, b):
-        DB['hidden'] = []
-        save()
-        self.send_json(state())
+        with lock:
+            DB['hidden'] = []
+            save()
+            self.send_json(state())
 
 
 def main():
-    global DB
+    global DB, PAIRS
     DB = read_db()
+    PAIRS = read_pairs()
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     srv.daemon_threads = True
-    print(f'보이드의 기록 서버: http://{HOST}:{PORT}/chapter05/index.html  (운영자 비밀번호는 CH5_ADMIN_KEY)')
+    print(f'보이드의 기록 서버: http://{HOST}:{PORT}/chapter05/index.html  (운영자 비밀번호는 CH5_ADMIN_KEY, 짝 {len(PAIRS)}개)')
     srv.serve_forever()
 
 

@@ -18,6 +18,11 @@
 - 제출된 링크를 실제 3D로 넣는 건 여전히 수동: 운영자 목록에서 링크를 받아 erica-twin에서 `add_scan.py <url>=<구역id>` → `build.py` → 이 폴더에 덮어쓰기. 반영된 뒤에는 목록에 "3D 반영됨"으로 표시된다.
 - 서버 설치(처음 한 번): `/home/ubuntu/voidrecord/`에 `ch5_void_server.py` 복사, `.env`에 `CH5_ADMIN_KEY=0101`, `sudo cp config/voidrecord.service /etc/systemd/system/ && sudo systemctl enable --now voidrecord`, nginx에 `location ^~ /api/void/` 블록(`config/nginx-breakout.conf`) 추가 후 reload. 데이터는 `/home/ubuntu/voidrecord/data/ch5_void.json`.
 - 로컬 확인: `python server/ch5_void_server.py` 후 `http://localhost:8096/chapter05/index.html`.
+- **짝(트윈)**: erica-twin `missions.json`의 `twin`이 캠퍼스 지점 ↔ 섬 구역을 묶는다(라이언스홀↔사파리, 약학대학↔하모니아, 학술정보관↔회전목마, 노천극장↔관람차, 본관↔롤러코스터 — 임시 배정). 한쪽에 들어온 스캔·제출은 다른 쪽에도 같은 상태로 보인다. build.py가 `dist/void-pairs.json`을 만들고, 이를 `server/ch5_void_pairs.json`으로 복사해 서버 폴더에 같이 올린다(서버 `pairs` 상태 계산용).
+- **오른쪽 복구 현황판**: 짝마다 한 줄(섬 구역 이름 · 캠퍼스 지점/좌표 · 상태 · 제출 조 · 미리보기). 줄을 누르면 지금 보는 월드에서 그 구역으로 이동. 기본 탭은 "복구 필요". 휴대폰 폭(760px 이하)에서는 현황판이 숨고 왼쪽 패널만 쓴다.
+- **큰 화면 모드** `index.html?view=screen`: 패널·바 숨김, 카메라 자동 회전, 8초마다 갱신, 새 제출이 오면 알림 후 그 구역으로 이동. 현황판의 "큰 화면으로 보기" 버튼이 새 창으로 연다.
+- **도로그램과 공유**: 조 번호는 도로그램과 같은 localStorage 키(`dorogram-team`)를 쓰므로 한 번 고르면 두 화면 모두 적용(`?team=N`도 됨). 운영자 비밀번호도 같다. 도로그램 사이드바에 「보이드의 기록 · 도로랜드 복구」 위젯이 `/api/void/state`를 30초마다 읽어 N/5와 복구 중인 조를 보여 준다(서버가 없으면 숨김).
+- 제출 줄과 현황판의 미리보기는 `/api/void/thumb/<scanId>`(Scaniverse preview.jpg를 서버가 받아 `data/thumbs/`에 캐시). 제출 시 Scaniverse 페이지의 og:title(스캔 제목)·작성자도 같이 저장한다.
 
 ## 도로그램
 

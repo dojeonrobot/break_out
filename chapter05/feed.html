@@ -67,6 +67,13 @@
       .sb-btn:hover { background: var(--surface-2); }
       .sb-btn[aria-selected="true"] { font-weight: 800; } .sb-btn[aria-selected="true"] .icon { stroke-width: 2.6; }
       .sb-phase { margin-top: auto; padding: 12px; border-radius: 8px; background: var(--surface-2); font-size: 12.5px; }
+      .sb-void { display: grid; gap: 5px; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--line); text-decoration: none; color: inherit; font-size: 12px; }
+      .sb-void:hover { background: var(--surface-2); }
+      .sb-void span { color: var(--muted); font-weight: 700; }
+      .sb-void b { font-size: 20px; font-weight: 800; line-height: 1; }
+      .sb-void i { display: block; height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+      .sb-void i u { display: block; height: 100%; width: 0; background: #12b35a; border-radius: 2px; transition: width .6s; }
+      .sb-void small { color: var(--muted); min-height: 1.2em; }
       .sb-phase span { display: block; color: var(--muted); } .sb-phase b { display: block; font-size: 15px; margin: 2px 0 4px; } .sb-phase p { margin: 0; color: var(--muted); line-height: 1.5; }
       .sb-team { margin-top: 6px; border: 0; background: none; display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
       .sb-team:hover { background: var(--surface-2); }
@@ -523,6 +530,7 @@
       <button class="sb-btn" role="tab" data-tab="help" aria-selected="false"><i data-lucide="circle-help" class="icon"></i>도움말</button>
     </nav>
     <div class="sb-phase"><span>지금 단계</span><b id="sbPhase">연결 중</b><p id="sbPhaseDesc"></p></div>
+    <a class="sb-void" id="sbVoid" href="index.html" hidden><span>보이드의 기록 · 도로랜드 복구</span><b id="sbVoidN">0 / 0</b><i><u id="sbVoidBar"></u></i><small id="sbVoidTxt"></small></a>
     <button class="sb-team" id="sbTeam" type="button"><span class="team-av" id="sbTeamAv">?</span><span id="sbTeamTxt">조 선택</span></button>
     <button class="sb-small" role="tab" data-tab="admin" aria-selected="false"><i data-lucide="settings" class="icon"></i>운영자</button>
   </aside>
@@ -1553,6 +1561,20 @@ function renderHelp() {
 
 // ---------- 시작 ----------
 $$('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+// ---------- 보이드의 기록(미션 4 Scan Break) 복구 현황 — 다른 서버(/api/void)라 응답할 때만 보여 준다 ----------
+async function voidStatus() {
+  try {
+    const r = await fetch('/api/void/state', { cache: 'no-store' }); if (!r.ok) throw 0;
+    const d = await r.json(), ps = d.pairs || []; if (!ps.length) throw 0;
+    const ok = ps.filter(p => p.status === 'ok').length, pend = ps.filter(p => p.status === 'pend');
+    $('#sbVoidN').textContent = `${ok} / ${ps.length}`; $('#sbVoidBar').style.width = `${ok / ps.length * 100}%`;
+    $('#sbVoidTxt').textContent = pend.length ? pend.map(p => `${p.teams.join('·')}조 ${p.island.name} 복구 중`).join(' · ')
+      : ok === ps.length ? '모든 구역이 돌아왔습니다' : `복구 필요 ${ps.length - ok}곳`;
+    $('#sbVoid').hidden = false;
+  } catch (e) { $('#sbVoid').hidden = true; }
+}
+voidStatus(); setInterval(voidStatus, 30000);
 $$('[data-filter]').forEach(b => b.onclick = () => { S.filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderFeed(); icons(); });
 icons();
 initTeam();

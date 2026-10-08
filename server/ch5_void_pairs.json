@@ -1,0 +1,77 @@
+[
+ {
+  "id": "lions",
+  "campus": {
+   "id": "lions",
+   "name": "라이언스홀",
+   "lat": 37.295777,
+   "lng": 126.841176
+  },
+  "island": {
+   "id": "dl-safari",
+   "name": "사파리"
+  },
+  "scans": [
+   "fjpg4hyqcumbeopi"
+  ]
+ },
+ {
+  "id": "pharm",
+  "campus": {
+   "id": "pharm",
+   "name": "약학대학",
+   "lat": 37.296365,
+   "lng": 126.837851
+  },
+  "island": {
+   "id": "dl-harmonia",
+   "name": "하모니아"
+  },
+  "scans": [
+   "7657ldzgdiufi233",
+   "u5aqvwu7kkhmsh2w"
+  ]
+ },
+ {
+  "id": "library",
+  "campus": {
+   "id": "library",
+   "name": "ERICA학술정보관",
+   "lat": 37.296646,
+   "lng": 126.835103
+  },
+  "island": {
+   "id": "dl-carousel",
+   "name": "회전목마"
+  },
+  "scans": []
+ },
+ {
+  "id": "amphi",
+  "campus": {
+   "id": "amphi",
+   "name": "노천극장",
+   "lat": 37.297349,
+   "lng": 126.839506
+  },
+  "island": {
+   "id": "dl-ferris",
+   "name": "관람차"
+  },
+  "scans": []
+ },
+ {
+  "id": "main",
+  "campus": {
+   "id": "main",
+   "name": "본관",
+   "lat": 37.298995,
+   "lng": 126.833072
+  },
+  "island": {
+   "id": "dl-coaster",
+   "name": "롤러코스터"
+  },
+  "scans": []
+ }
+]
