@@ -1,0 +1,21 @@
+# 챕터 5 보이드의 기록 제출 서버 (서버에 한 번만 설치)
+#   sudo cp config/voidrecord.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now voidrecord
+# 코드는 /home/ubuntu/voidrecord 에 둔다 (배포가 /home/ubuntu/breakout 을 덮어써도 제출 데이터가 남게).
+[Unit]
+Description=DOROLAND chapter 5 Void Record submission server
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/voidrecord
+Environment=VOID_HOST=127.0.0.1
+Environment=VOID_PORT=8096
+Environment=VOID_STATIC=0
+# 운영자 비밀번호는 /home/ubuntu/voidrecord/.env 에 둔다 (CH5_ADMIN_KEY=...)
+EnvironmentFile=-/home/ubuntu/voidrecord/.env
+ExecStart=/usr/bin/python3 /home/ubuntu/voidrecord/ch5_void_server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

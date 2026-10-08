@@ -4,14 +4,20 @@
 
 | 버튼 | 파일 | 내용 | 서버 필요 |
 |---|---|---|---|
-| 보이드의 기록 | `chapter05/index.html` + `chapter05/scans/` | ERICA 캠퍼스 / 도로랜드 섬 3D 디지털 트윈. 학생 Scaniverse 스캔이 빈 구역을 채움 | 없음 (정적) |
+| 보이드의 기록 | `chapter05/index.html` + `chapter05/scans/` | ERICA 캠퍼스 / 도로랜드 섬 3D 디지털 트윈. 학생 Scaniverse 스캔이 빈 구역을 채움 | **있음** (`server/ch5_void_server.py`, 링크 제출·운영자용) |
 | 도로그램 | `chapter05/feed.html`, `chapter05/feed-admin.html`, `chapter05/feed-config.js` | 미션 1 「도로랜드가 사라졌다?」 가짜뉴스 피드 | **있음** (`server/ch5_feed_server.py`) |
 
 ## 보이드의 기록
 
 - 원본 빌드 도구는 `C:\Users\dlgus\erica-twin` (template.html + build.py). `python build.py` 결과(`dist/index.html`, `dist/scans/*`)를 이 폴더에 덮어쓴다.
 - 게시본(claude.ai 아티팩트)에서 받은 `index.html`은 앞에 아티팩트 껍데기가 붙어 있지만 그대로 열어도 동작한다.
-- 스캔 링크 제출은 아직 그 기기 브라우저(localStorage)에만 저장된다. 서버 저장은 도로버스 서버로 옮길 때 붙인다.
+- 스캔 링크 제출은 `server/ch5_void_server.py`(포트 8096, `/api/void/*`)에 저장된다. 조별로 어느 구역에 어떤 링크를 냈는지(찍은 것 메모 포함) 운영자가 한눈에 본다. 서버에 못 붙으면(파일로 열었을 때 등) 예전처럼 그 기기 브라우저에만 저장된다.
+- 화면: 패널의 **우리 조** 선택(기기에 기억) → "복구 필요" 구역 카드에서 링크 + 찍은 것 메모 제출 → 구역이 "복구 중". 취소는 우리 조 제출만 가능.
+- **운영자**(패널의 운영자 버튼, 비밀번호 `CH5_ADMIN_KEY` 기본 0101): 조별 제출 목록(구역 실제 이름·메모·링크·시각·3D 반영 여부), 개별 삭제, 목록 복사(탭 구분 텍스트), **전체 초기화**, 숨긴 스캔 되살리기.
+- **전체 초기화**는 제출 기록을 모두 지우고, 페이지에 이미 3D로 들어간 스캔을 "숨김"으로 표시해 모든 구역을 "복구 필요"로 되돌린다. 3D 데이터는 파일에 그대로 있으므로(지우려면 erica-twin에서 scans.json을 비우고 다시 빌드) "숨긴 스캔 되살리기"로 복구된다. 숨김 목록은 서버에 있고 각 기기는 상태를 받을 때 한 번 새로고침해 반영한다.
+- 제출된 링크를 실제 3D로 넣는 건 여전히 수동: 운영자 목록에서 링크를 받아 erica-twin에서 `add_scan.py <url>=<구역id>` → `build.py` → 이 폴더에 덮어쓰기. 반영된 뒤에는 목록에 "3D 반영됨"으로 표시된다.
+- 서버 설치(처음 한 번): `/home/ubuntu/voidrecord/`에 `ch5_void_server.py` 복사, `.env`에 `CH5_ADMIN_KEY=0101`, `sudo cp config/voidrecord.service /etc/systemd/system/ && sudo systemctl enable --now voidrecord`, nginx에 `location ^~ /api/void/` 블록(`config/nginx-breakout.conf`) 추가 후 reload. 데이터는 `/home/ubuntu/voidrecord/data/ch5_void.json`.
+- 로컬 확인: `python server/ch5_void_server.py` 후 `http://localhost:8096/chapter05/index.html`.
 
 ## 도로그램
 
