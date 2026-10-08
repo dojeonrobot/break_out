@@ -391,7 +391,7 @@
     .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 150px; margin: 12px 4px 0; }
     .bar { display: grid; justify-items: center; gap: 4px; align-content: end; height: 100%; font-size: 12px; } .bar i { width: 100%; max-width: 56px; background: linear-gradient(180deg, #0095f6, #1d4ed8); border-radius: 6px 6px 0 0; display: block; } .bar b { font-family: var(--mono); font-size: 13px; } .bar span { color: var(--muted); }
     .tl { display: grid; gap: 10px; } .tl-item { display: grid; grid-template-columns: 150px 1fr; gap: 10px; font-size: 14px; padding: 10px 12px; border-left: 3px solid #1d4ed8; background: var(--surface-2); border-radius: 0 8px 8px 0; } .tl-item .w { font-family: var(--mono); font-size: 12.5px; color: var(--muted); } .tl-item b { display: block; } .tl-item small { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
-    .tl-item.inc { border-left-color: #ea580c; }
+    .tl-item.inc { border-left-color: #ea580c; } .tl-item.rec { border-left-color: #0a8754; }
     @media (max-width: 560px) { .tl-item { grid-template-columns: 1fr; } }
     .acct { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; } .acct:last-child { border-bottom: 0; }
     .acct .avatar { width: 40px; height: 40px; } .acct .nm { font-weight: 800; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; } .acct .meta { font-size: 12px; color: var(--muted); }
@@ -970,7 +970,7 @@ function renderTwist() {
   const rank = me ? (d.scores.findIndex(r => r.team === S.team) + 1) : null;
   box.innerHTML = `<div class="twist"><h2>정답 공개</h2>
     ${me ? `<div class="twist-grid"><div><b>${me.correct} / ${me.judgable}</b>다른 조 게시물 중 맞힌 수</div><div><b>${me.fooled}</b>우리 가짜를 믿은 조</div><div><b>${rank}위</b>합계 ${me.total}점</div></div>` : ''}
-    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다. "섬이 사라졌다" 기사 3개는 모두 진짜였습니다. 3년마다 같은 시기에 같은 일이 일어났고, 원인은 아직 아무도 모릅니다.</p></div>`;
+    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다. "섬이 사라졌다" 기사 3개는 모두 진짜였습니다. 3년마다 같은 시기에 같은 일이 일어났고, 원인은 아직 아무도 모릅니다. 드론쇼·팝업·아기 기린 같은 평범한 소식이 진짜였고, 자극적인 속보일수록 가짜가 많았습니다.</p></div>`;
 }
 function renderScores() {
   const rows = S.data.scores;
@@ -1098,11 +1098,12 @@ function vpanelHTML(p, c) {
     <div class="reg ${reg.cls}">${reg.text}</div>
     <p class="small muted" style="margin:8px 0 0">${esc(C.AUTHOR_KINDS[k].desc)} ${followLabel(p, a)}에 비해 조회수·좋아요가 지나치게 크면 의심해 보세요. 프로필(이름)을 누르면 계정 정보가 열립니다.</p>`;
   if (c === 'when') return `<b>${C.CRITERIA.when.label}</b><dl><dt>올린 때</dt><dd>${esc(p.postedAt || '정보 없음')}</dd>${p.editedAt ? `<dt>수정한 때</dt><dd>${esc(p.editedAt)}</dd>` : ''}<dt>${p.format === 'shorts' ? '영상 찍은 때' : '사진 찍은 때'}</dt><dd>${p.imageId || p.photoTakenAt ? esc(p.photoTakenAt || '사진 정보 없음') : '사진 없음'}</dd></dl>
-    <details><summary>자료실 연표 보기</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}</ul></details>`;
+    <details><summary>자료실 연표 보기</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.recent.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}</ul></details>`;
   if (c === 'witness') { const text = esc((p.title ? p.title + '\n' : '') + (p.subhead ? p.subhead + '\n' : '') + (p.body || '') + (p.quote?.text ? '\n"' + p.quote.text + '" - ' + (p.quote.who || '') : '')).replace(HEARSAY, '<mark class="hear">$1</mark>'); return `<b>${C.CRITERIA.witness.label}</b><p class="small muted" style="margin:4px 0">건너 들은 말로 보이는 부분을 노랗게 표시했습니다. 표시가 없어도 직접 봤는지, 말한 사람의 이름·소속이 있는지 따져 보세요.</p><div style="white-space:pre-wrap;font-size:13px">${text}</div>`; }
   return `<b>${C.CRITERIA.cross.label}</b><p class="small muted" style="margin:4px 0">자료실 요약입니다. 전체는 왼쪽 메뉴 <b>자료실</b>에서 보세요.</p>
     <details open><summary>숫자·시간</summary><ul>${A.overview.map(x => `<li>${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.ferry.map(x => `<li>배 ${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.numbers.cards.map(x => `<li>${esc(x.label)} ${esc(x.value)} (${esc(x.note)})</li>`).join('')}<li>${esc(A.numbers.recent)}</li></ul></details>
     <details><summary>구역·놀이기구</summary><ul>${A.zones.map(z => `<li>${esc(z.name)}: ${esc(z.desc)}</li>`).join('')}</ul></details>
+    <details><summary>최근 소식 (드론쇼·팝업·아기 기린·신메뉴·러닝 크루·AI 합성)</summary><ul>${A.recent.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}</ul></details>
     <details><summary>섬이 안 보인 날·이상 현상</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}</ul></details>
     <details><summary>운영실 입장·등록 계정</summary><ul>${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}${A.accounts.map(x => `<li>${esc(x.name)} ${esc(x.handle)} (${esc(C.AUTHOR_KINDS[x.kind].label)}, 인증)</li>`).join('')}</ul></details>`;
 }
@@ -1493,6 +1494,7 @@ function renderArchive() {
     <div class="arc-card"><h3>${ic('eye-off')}섬이 안 보인 날 (연표)</h3><div class="tl">${A.timeline.map(t => `<div class="tl-item"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
     <div class="arc-card"><h3>${ic('alert-triangle')}최근 이상 현상 (운영실 기록)</h3><div class="tl">${A.incidents.map(t => `<div class="tl-item inc"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
   </div>
+  <div class="arc-card"><h3>${ic('sparkles')}최근 소식 (운영실 공개 자료)</h3><div class="tl">${A.recent.map(t => `<div class="tl-item rec"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
   <div class="arc-grid">
     <div class="arc-card"><h3>${ic('megaphone')}운영실 공식 입장</h3><ul class="stance" style="margin:0;padding-left:18px">${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
     <div class="arc-card"><h3>${ic('badge-check')}등록된 계정 (인증 배지)</h3>${A.accounts.map(x => `<div class="acct"><span class="avatar" style="background:${x.kind === 'official' ? '#0e4a84' : x.kind === 'press' ? '#1d4ed8' : '#ea580c'}">${initials(x.name)}</span><div><div class="nm">${esc(x.name)}<span class="vb">${ic('check')}</span><span class="kind-chip ${x.kind}">${esc(C.AUTHOR_KINDS[x.kind].label)}</span></div><div class="meta">${esc(x.handle)} · ${esc(x.joined)} 가입 · ${x.kind === 'creator' ? '구독자' : '팔로워'} ${esc(x.followers)} · ${esc(x.note)}</div></div></div>`).join('')}
