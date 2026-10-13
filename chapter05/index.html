@@ -210,6 +210,8 @@ body.screen #board{width:460px;max-height:calc(100% - 32px)}
 body.screen #board .bh h2{font-size:22px} body.screen #board .bh b{font-size:34px}
 body.screen .brow{padding:12px;grid-template-columns:64px 1fr auto} body.screen .brow .th{width:64px;height:64px} body.screen .brow h4{font-size:16px} body.screen .brow .pair{font-size:13px}
 body.screen #worlds{top:auto;bottom:24px}
+#screenExit{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:31;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none}
+body.screen #screenExit{display:block}
 #info.off{opacity:0;transform:translateX(12px);pointer-events:none}
 .ih{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .ih h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
@@ -303,17 +305,27 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 .cstep[hidden]{display:none}
 #cs1{grid-template-rows:1fr}
 #capV{width:100%;height:100%;object-fit:cover;display:block;background:#000}
-.cguide{position:absolute;left:0;right:0;top:14px;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.cguide{position:absolute;left:0;right:0;top:12px;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px;z-index:2}
 .cguide p{margin:0;font-size:13.5px;font-weight:600;text-align:center;line-height:1.45;padding:7px 12px;border-radius:999px;background:rgba(11,14,18,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.cring{position:relative;width:132px;height:132px}
-.cring svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
-.cring line{stroke:rgba(255,255,255,.3);stroke-width:4;stroke-linecap:round}
-.cring line.on{stroke:var(--restored)}
-.cring .pt{fill:#fff}
-.cring .pt.off{display:none}
-.cnum{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-family:var(--mono)}
-.cnum b{font-size:28px;font-weight:500;line-height:1}
+/* coverage map: columns = turning left/right, rows = tilting up/down (top row = looking up) */
+.cmap{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(11,14,18,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.cmap svg{display:block;width:min(300px,52vw);height:auto;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.cmap rect{fill:rgba(255,255,255,.18)}
+.cmap rect.on{fill:var(--restored)}
+.cmap .pt{fill:#fff;stroke:#0b0e12;stroke-width:1}
+.cmap .pt.off{display:none}
+.cnum{text-align:center;font-family:var(--mono);min-width:56px}
+.cnum b{display:block;font-size:26px;font-weight:500;line-height:1}
 .cnum span{font-size:11px;color:#a8b2bd}
+.crot{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgba(11,14,18,.86);text-align:center}
+.crot[hidden]{display:none}
+.crot svg{width:72px;height:72px;margin-bottom:14px;animation:rotHint 1.6s ease-in-out infinite}
+.crot b{display:block;font-size:19px;margin-bottom:6px}
+.crot span{font-size:13px;color:#a8b2bd}
+@keyframes rotHint{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
+.dome{position:absolute;inset:0;background:#000;touch-action:none}
+.dome canvas{display:block}
+.dload{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:#a8b2bd;pointer-events:none}
 .cctl{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(11,14,18,.85))}
 .cmode{display:flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;overflow:hidden;justify-self:start}
 .cmode button{border:0;background:transparent;color:#eef1f4;padding:7px 11px;font-size:12px;font-weight:600;white-space:nowrap}
@@ -411,7 +423,6 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
   <div class="bbar"><i id="bFill"></i></div>
   <p class="bhint">캠퍼스의 빈 곳을 카메라로 스캔하면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.</p>
   <div id="bRows"></div>
-  <div class="bfoot"><a href="feed.html">미션 1 · 도로그램 →</a><button type="button" class="mini" id="bScreen">큰 화면으로 보기</button></div>
 </aside>
 <section id="info" class="glass off" aria-live="polite">
   <div class="ih">
@@ -448,19 +459,20 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
     <button id="lHome">처음 시점</button>
   </div>
 </div>
+<a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
 <div id="fade"></div>
 <section id="inside" class="glass" hidden aria-live="polite">
   <div><small>INSIDE</small><h2 id="inT"></h2><p id="inD"></p><p class="hint">드래그해서 둘러보고, 휠로 가까이 갑니다.</p></div>
   <button class="enter" id="inX">밖으로 나가기</button>
 </section>
-<div id="credit">지도 데이터 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 기여자 (ODbL) · 기록은 이 페이지의 카메라로 촬영 · 일부 스캔 <a href="https://scaniverse.com" target="_blank" rel="noopener">Scaniverse</a></div>
+<div id="credit">지도 데이터 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 기여자 (ODbL)</div>
 
 <section id="viewer" hidden aria-modal="true" role="dialog" aria-labelledby="vT">
   <div class="vh">
     <div><h2 id="vT"></h2><p id="vS"></p></div>
     <div class="acts">
-      <a class="vb" id="vLink" href="#" target="_blank" rel="noopener">Scaniverse에서 보기</a>
+      <button class="vb" id="vPhoto" type="button" hidden>사진으로 보기</button>
       <button class="vb" id="vX">닫기</button>
     </div>
   </div>
@@ -478,9 +490,13 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
     <div class="cstep" id="cs1">
       <video id="capV" playsinline muted autoplay></video>
       <div class="cguide">
-        <div class="cring"><svg viewBox="0 0 100 100" id="capRing" aria-hidden="true"></svg><div class="cnum"><b id="capN">0</b><span>/ 36</span></div></div>
+        <div class="cmap"><svg viewBox="0 0 180 50" id="capMap" aria-hidden="true"></svg><div class="cnum"><b id="capN">0</b><span id="capNt">/ 68장</span></div></div>
         <p id="capMsg">카메라를 여는 중입니다</p>
       </div>
+      <div class="crot" id="capRot" hidden><div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
+        <b>태블릿을 가로로 돌려 주세요</b><span>가로로 찍어야 한 장에 넓게 담깁니다. 가로가 되면 바로 찍기 시작합니다.</span>
+      </div></div>
       <div class="cctl">
         <div class="cmode" role="group" aria-label="찍는 방법"><button type="button" data-mode="object" aria-pressed="true">사물 한 바퀴</button><button type="button" data-mode="space" aria-pressed="false">공간 둘러보기</button></div>
         <button id="capShot" type="button" aria-label="직접 한 장 찍기"></button>
@@ -495,7 +511,7 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
           <select id="capTeam"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
         </label>
         <input id="capNote" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
-        <div class="crow"><button class="vb" id="capRetry" type="button">다시 찍기</button><button class="cprimary" id="capUp" type="button">올리기</button></div>
+        <div class="crow"><button class="vb" id="capRetry" type="button">다시 찍기</button><button class="vb" id="capPhoto" type="button">사진으로 보기</button><button class="cprimary" id="capUp" type="button">올리기</button></div>
         <p class="subhelp" id="capHelp"></p>
       </div>
     </div>
@@ -540,7 +556,7 @@ const SCANS = SCANS_ALL.filter(s=>!HIDDEN.has(s.id));
 // Once the server marks one restored it joins the scans before the map is built, so the zone renders restored like a splat would.
 const orbitThumb = s => s.thumb || `${API}/scan/${s.scanId || s.id}/thumb.jpg`;
 const orbitScan = s => ({id:s.scanId, kind:'orbit', caption:s.note || '이름 없는 기록', author:s.team ? s.team+'조' : '', captured:s.createdAt,
-  frames:s.frames || 0, mode:s.mode, urls:s.urls || null, thumb:orbitThumb(s), mission:s.mission, url:''});
+  frames:s.frames || 0, mode:s.mode, urls:s.urls || null, items:s.items || null, thumb:orbitThumb(s), mission:s.mission, url:''});
 const orbitOk = list => (list || []).filter(s=>s.kind==='orbit' && s.status==='ok');
 const orbitSig = list => orbitOk(list).map(s=>s.scanId).sort().join(',');
 orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
@@ -966,12 +982,6 @@ function formHTML(m, pre=''){
       <p class="subhelp">휴대폰 카메라로 사물 주위를 천천히 한 바퀴 돌며 찍습니다. 찍은 기록은 바로 돌려 보고 올릴 수 있습니다.</p>
       ${msg.text ? `<p class="subhelp" data-kind="${msg.kind}">${esc(msg.text)}</p>` : ''}
       ${LOCAL ? '<p class="subhelp">서버 연결 전이라 기록은 이 기기에만 남습니다.</p>' : ''}
-      <details class="linkalt"><summary>다른 앱(Scaniverse) 링크로 내기</summary>
-      <form class="cardsub" data-sub="${esc(m.id)}" novalidate>
-        <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="https://scaniverse.com/scan/..." autocomplete="off" aria-label="스캔 링크"><button type="submit">제출</button></div>
-        <input data-draft="n-${pre}${esc(m.id)}" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
-        <p class="subhelp">링크로 낸 기록은 운영자가 따로 3D로 반영합니다.</p>
-      </form></details>
     </div>`;
 }
 const subThumb = s => s.kind==='orbit' ? orbitThumb(s) : `${API}/thumb/${esc(s.scanId)}`;
@@ -1000,7 +1010,6 @@ document.addEventListener('click', e=>{
   const ids = pairIds(row.dataset.pair), m = M.find(x=>ids.includes(x.id));
   if(m && m.bi != null) select(m.bi, true);
 });
-$('bScreen').onclick = ()=> open(location.pathname + '?view=screen', '_blank', 'noopener');
 let lastSig = null;
 function pairSig(){ return PAIRS().map(p=>{ const st = zoneState(p.campus); return `${p.campus.id}:${st}:${subsFor(p.campus).map(s=>s.team).join('+')}`; }).join('|'); }
 function announceChanges(){
@@ -1481,13 +1490,19 @@ async function openScan(s){
   const orbit = s.kind==='orbit';
   $('vT').textContent = s.caption || '이름 없는 기록';
   $('vS').textContent = [s.author && (orbit ? s.author : '@'+s.author), dateText(s.captured), m ? `${m.name} 복구 기록` : (s.near ? `${s.near} 부근` : ''), orbit && s.frames ? `사진 ${s.frames}장` : ''].filter(Boolean).join('  /  ');
-  $('vLink').href = s.url || '#'; $('vLink').hidden = orbit;
   $('viewer').hidden = false; $('vLoad').hidden = false;
   $('vX').focus();
   if(viewer){ viewer.dispose(); viewer = null; }
+  $('vPhoto').hidden = !orbit;
   if(orbit){
-    viewer = makeOrbitViewer($('vRoot'), s); $('vLoad').hidden = true;
-    $('vF').textContent = '좌우로 끌어서 돌려 봅니다. 이 페이지의 카메라로 찍은 기록입니다.';
+    $('vLoad').hidden = true;
+    const rec = await orbitRecord(s); if(openId !== s.id) return;
+    let photo = false;
+    const build = ()=>{ if(viewer) viewer.dispose(); viewer = photo ? makeOrbitViewer($('vRoot'), s) : makeDomeViewer($('vRoot'), rec);
+      $('vPhoto').textContent = photo ? '점구름으로 보기' : '사진으로 보기';
+      $('vF').textContent = photo ? '좌우로 끌어서 한 장씩 넘겨 봅니다.' : (rec.mode==='space' ? '끌어서 둘러봅니다. 찍은 사진을 방향대로 점구름 돔에 펼친 기록입니다.' : '끌어서 돌리고, 휠이나 두 손가락으로 확대합니다. 찍은 방향대로 점구름을 쌓은 기록입니다.'); };
+    $('vPhoto').onclick = ()=>{ photo = !photo; build(); };
+    build();
     return;
   }
   $('vF').textContent = '드래그해서 돌리고, 휠이나 두 손가락으로 확대합니다. 오른쪽 드래그로 이동합니다.';
@@ -1499,7 +1514,7 @@ async function openScan(s){
   }catch(err){
     console.error(err);
     $('vLoad').hidden = false;
-    $('vLoad').textContent = '이 기기에서 3D 기록을 열지 못했습니다. 위의 "Scaniverse에서 보기"로 확인하세요. (' + ((err && err.message) || err) + ')';
+    $('vLoad').textContent = '이 기기에서 3D 기록을 열지 못했습니다. (' + ((err && err.message) || err) + ')';
   }
 }
 function closeScan(){
@@ -1509,12 +1524,12 @@ function closeScan(){
 }
 $('vX').onclick = closeScan;
 
-// ---------- photo-ring viewer: a record is a ring of photos; drag left/right to walk around it ----------
+// ---------- photo viewer: flip through the photos one by one (drag left/right) ----------
 function makeOrbitViewer(root, s){
   const urls = s.urls || Array.from({length:s.frames || 0}, (_,i)=> `${API}/scan/${s.id}/${i}.jpg`);
   const wrap = document.createElement('div'); wrap.className = 'orbit';
   const img = new Image(); img.alt = ''; img.draggable = false; wrap.appendChild(img);
-  const hint = document.createElement('div'); hint.className = 'chint'; hint.textContent = urls.length > 1 ? '좌우로 끌어서 돌려 보세요' : '사진 한 장짜리 기록입니다'; wrap.appendChild(hint);
+  const hint = document.createElement('div'); hint.className = 'chint'; hint.textContent = urls.length > 1 ? '좌우로 끌어서 넘겨 보세요' : '사진 한 장짜리 기록입니다'; wrap.appendChild(hint);
   root.appendChild(wrap);
   const n = urls.length; let idx = 0, spin = n > 1, sx = null, si = 0;
   const show = i => { if(!n) return; idx = ((i % n) + n) % n; img.src = urls[idx]; };
@@ -1527,40 +1542,130 @@ function makeOrbitViewer(root, s){
   return { dispose(){ clearInterval(timer); pre.length = 0; wrap.remove(); } };
 }
 
+// ---------- point-cloud dome: every photo is sprayed as coloured points in the direction it was taken ----------
+// "space" records are looked at from the inside (a dome around the viewer); "object" records are stacked at the centre
+// and looked at from the outside, so each side of the thing shows up when you orbit round to it.
+const CAM_HFOV = 62;                 // assumed horizontal field of view of a tablet rear camera, degrees
+const SAMPLE_W = 96;                 // points per photo = SAMPLE_W x (SAMPLE_W / aspect)
+function loadImg(url){ return new Promise((res, rej)=>{ const im = new Image(); im.onload = ()=>res(im); im.onerror = ()=>rej(new Error('사진을 열지 못했습니다')); im.src = url; }); }
+async function buildCloud(items, mode, onStep){
+  const d = Math.PI/180, R = mode==='space' ? 10 : 3;
+  const pos = [], col = [];
+  const c = document.createElement('canvas'), g = c.getContext('2d', {willReadFrequently:true});
+  const ray = new THREE.Vector3(), tmp = new THREE.Vector3();
+  for(let k=0; k<items.length; k++){
+    const it = items[k]; let im; try{ im = await loadImg(it.url); }catch(e){ continue; }
+    const w = im.naturalWidth || im.width, h = im.naturalHeight || im.height; if(!w || !h) continue;
+    const land = w >= h, hf = (land ? CAM_HFOV : CAM_HFOV*h/w) * d;           // portrait photos cover less sideways
+    const vf = 2*Math.atan(Math.tan(hf/2) * h/w);
+    const sw = land ? SAMPLE_W : Math.round(SAMPLE_W*w/h), sh = Math.round(sw*h/w);
+    c.width = sw; c.height = sh; g.drawImage(im, 0, 0, sw, sh);
+    const px = g.getImageData(0, 0, sw, sh).data;
+    const yaw = (it.yaw || 0)*d, pitch = (it.pitch || 0)*d;
+    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    // where the camera stood (object mode): opposite the direction it looked, R away from the centre
+    const look = tmp.set(sy*cp, sp, -cy*cp), camX = -look.x*R, camY = -look.y*R, camZ = -look.z*R;
+    const tx = Math.tan(hf/2), ty = Math.tan(vf/2);
+    for(let j=0; j<sh; j++) for(let i=0; i<sw; i++){
+      const u = (i+0.5)/sw - 0.5, v = (j+0.5)/sh - 0.5;
+      ray.set(u*2*tx, -v*2*ty, -1).normalize();
+      // tilt (about X) then turn (about Y)
+      const y1 = ray.y*cp - ray.z*sp, z1 = ray.y*sp + ray.z*cp;
+      const x2 = ray.x*cy + z1*sy, z2 = -ray.x*sy + z1*cy;
+      const jx = (Math.random()-0.5)*R*0.012, jy = (Math.random()-0.5)*R*0.012, jz = (Math.random()-0.5)*R*0.012;
+      if(mode==='space') pos.push(x2*R+jx, y1*R+jy, z2*R+jz); else pos.push(camX + x2*R+jx, camY + y1*R+jy, camZ + z2*R+jz);
+      const o = (j*sw+i)*4; col.push(px[o]/255, px[o+1]/255, px[o+2]/255);
+    }
+    if(onStep) onStep(`점구름을 만드는 중입니다 (${k+1} / ${items.length})`);
+    await new Promise(r=> setTimeout(r, 0));
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  return geo;
+}
+function makeDomeViewer(root, rec){
+  const wrap = document.createElement('div'); wrap.className = 'dome';
+  const load = document.createElement('div'); load.className = 'dload'; load.textContent = '점구름을 만드는 중입니다'; wrap.appendChild(load);
+  root.appendChild(wrap);
+  const space = rec.mode==='space';
+  const vr = new THREE.WebGLRenderer({antialias:false}); vr.setPixelRatio(Math.min(devicePixelRatio, 2));
+  vr.setClearColor(new THREE.Color(tok('--viewer')), 1); wrap.appendChild(vr.domElement);
+  const cam = new THREE.PerspectiveCamera(space ? 75 : 50, 1, 0.01, 100);
+  if(space) cam.position.set(0, 0, 0.4); else cam.position.set(0, 1.6, 5.2);
+  const ctl = new OrbitControls(cam, vr.domElement);
+  ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.enablePan = false;
+  if(space){ ctl.enableZoom = false; ctl.rotateSpeed = -0.35; ctl.minDistance = ctl.maxDistance = 0.4; }
+  else { ctl.minDistance = 1.2; ctl.maxDistance = 14; ctl.autoRotate = true; ctl.autoRotateSpeed = 1.2; }
+  ctl.update();
+  const sc = new THREE.Scene(); let pts = null, alive = true, raf = 0;
+  function size(){ const w = root.clientWidth, h = root.clientHeight; if(!w || !h) return; vr.setSize(w, h); cam.aspect = w/h; cam.updateProjectionMatrix(); }
+  const ro = new ResizeObserver(size); ro.observe(root); size();
+  function frame(){ if(!alive) return; raf = requestAnimationFrame(frame); ctl.update(); vr.render(sc, cam); }
+  frame();
+  vr.domElement.addEventListener('pointerdown', ()=>{ ctl.autoRotate = false; }, {once:true});
+  buildCloud(rec.items, rec.mode, t=>{ load.textContent = t; }).then(geo=>{
+    if(!alive){ geo.dispose(); return; }
+    const mat = new THREE.PointsMaterial({size: space ? 0.13 : 0.05, vertexColors:true, sizeAttenuation:true});
+    pts = new THREE.Points(geo, mat); sc.add(pts); load.remove();
+    if(!geo.getAttribute('position').count){ load.textContent = '사진을 열지 못해 점구름을 만들 수 없습니다.'; wrap.appendChild(load); }
+  }).catch(err=>{ console.error(err); load.textContent = '점구름을 만들지 못했습니다: ' + err.message; });
+  return { dispose(){ alive = false; cancelAnimationFrame(raf); ro.disconnect(); ctl.dispose(); if(pts){ pts.geometry.dispose(); pts.material.dispose(); } vr.dispose(); vr.forceContextLoss(); wrap.remove(); } };
+}
+// a saved record: its photos plus the direction each was taken in (meta.json on the server, or in-memory for a fresh capture)
+async function orbitRecord(s){
+  if(s.items) return {items:s.items, mode:s.mode || 'object'};
+  const n = s.frames || 0; let dirs = null, mode = s.mode || 'object';
+  try{ const meta = await (await fetch(`${API}/scan/${s.id}/meta.json`, {cache:'no-store'})).json(); dirs = meta.dirs || (meta.headings || []).map(h=>[h, 0]); mode = meta.mode || mode; }catch(e){}
+  const urls = s.urls || Array.from({length:n}, (_,i)=> `${API}/scan/${s.id}/${i}.jpg`);
+  return {mode, items: urls.map((url,i)=> ({url, yaw: dirs && dirs[i] ? +dirs[i][0] : i*360/Math.max(n,1), pitch: dirs && dirs[i] ? +dirs[i][1] : 0}))};
+}
+
 // =====================================================================
-// ---------- own camera scan: shoot a ring of photos → check → upload (no outside app, nothing public) ----------
-const CAPN = 36;                                         // one photo per 10° of turning
-const cap = {m:null, frames:[], slots:new Set(), stream:null, head:null, base:null, mode:'object', ori:false, lastShot:0, startT:0, raf:0, pos:null, prev:null, busy:false, step:0};
+// ---------- own camera scan: shoot all round (left/right and up/down) → check → upload (no outside app, nothing public) ----------
+// Coverage is a grid of directions: 5 tilt bands (+60 … -60) with 9/16/18/16/9 turning columns = 68 cells, one photo per cell.
+const BANDS = [60, 30, 0, -30, -60], COLS = [9, 16, 18, 16, 9], CAPN = COLS.reduce((a,b)=>a+b, 0);
+const BAND_ORDER = [2, 1, 3, 0, 4];   // horizon first, then a little up, a little down, far up, far down
+const cap = {m:null, frames:[], cells:new Set(), stream:null, dir:null, base:null, mode:'object', ori:false, lastShot:0, startT:0, raf:0, pos:null, prev:null, busy:false, step:0, photo:false, seq:0};
 const capCanvas = document.createElement('canvas');
-{ const R = 44, r = 35; let s = '';
-  for(let i=0;i<CAPN;i++){ const a = (i/CAPN)*Math.PI*2 - Math.PI/2; s += `<line x1="${(50+Math.cos(a)*r).toFixed(2)}" y1="${(50+Math.sin(a)*r).toFixed(2)}" x2="${(50+Math.cos(a)*R).toFixed(2)}" y2="${(50+Math.sin(a)*R).toFixed(2)}"/>`; }
-  $('capRing').innerHTML = s + '<circle class="pt off" id="capPt" r="3.2" cx="50" cy="50"/>'; }
-const ringLines = [...$('capRing').querySelectorAll('line')];
+const MAP_W = 180, MAP_H = 50, cellEls = {};
+{ let s = '';
+  BANDS.forEach((b, r)=>{ const cw = MAP_W/COLS[r]; for(let c=0; c<COLS[r]; c++) s += `<rect data-k="${r}:${c}" x="${(c*cw+0.6).toFixed(2)}" y="${r*10+0.6}" width="${(cw-1.2).toFixed(2)}" height="8.8" rx="1.2"/>`; });
+  $('capMap').innerHTML = s + '<circle class="pt off" id="capPt" r="2.6" cx="90" cy="25"/>';
+  $('capMap').querySelectorAll('rect').forEach(el=> cellEls[el.dataset.k] = el);
+  $('capNt').textContent = `/ ${CAPN}장`; }
 function capStep(n){ ['cs1','cs2','cs3'].forEach((id,i)=> $(id).hidden = i !== n-1); cap.step = n; }
 const capSay = t => { $('capMsg').textContent = t; };
 const ORI_EVT = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+const Q_BACK = new THREE.Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2), Z_AXIS = new THREE.Vector3(0, 0, 1);
+const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _v = new THREE.Vector3();
+function screenAngle(){ try{ if(screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle; }catch(e){} return +window.orientation || 0; }
+// device tilt → where the rear camera points: yaw (0-360, turning) and pitch (-90…90, looking up is +)
 function onOri(e){
-  let h = null;
-  if(typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading;   // iOS
-  else if(e.alpha != null) h = (360 - e.alpha) % 360;                                                            // Android (alpha grows counter-clockwise)
-  if(h == null) return;
-  cap.head = h; cap.ori = true;
+  if(e.alpha == null || e.beta == null || e.gamma == null) return;
+  const d = Math.PI/180;
+  _e.set(e.beta*d, e.alpha*d, -e.gamma*d, 'YXZ');
+  _q.setFromEuler(_e).multiply(Q_BACK).multiply(_q2.setFromAxisAngle(Z_AXIS, -screenAngle()*d));
+  _v.set(0, 0, -1).applyQuaternion(_q);
+  const yaw = ((Math.atan2(_v.x, -_v.z)/d) % 360 + 360) % 360, pitch = Math.asin(Math.max(-1, Math.min(1, _v.y)))/d;
+  cap.dir = {yaw, pitch}; cap.ori = true;
 }
 function stopStream(){ if(cap.stream){ cap.stream.getTracks().forEach(t=>t.stop()); cap.stream = null; } const v = $('capV'); if(v.srcObject) v.srcObject = null; }
-function dropFrames(){ cap.frames.forEach(f=> URL.revokeObjectURL(f.url)); cap.frames = []; cap.slots = new Set(); }
-function modeText(){ return cap.mode==='object' ? '사물을 화면 가운데에 두고, 천천히 한 바퀴 돌며 찍어요' : '제자리에 서서 천천히 한 바퀴 돌며 찍어요'; }
+function dropFrames(){ cap.frames.forEach(f=> URL.revokeObjectURL(f.url)); cap.frames = []; cap.cells = new Set(); cap.seq = 0; }
+const portrait = ()=> innerHeight > innerWidth;
+function modeText(){ return cap.mode==='object' ? '사물을 화면 가운데에 두고 한 바퀴 돌아요. 수평 → 조금 위 → 조금 아래 순서로' : '제자리에 서서 한 바퀴 돌아요. 수평 → 조금 위 → 조금 아래 순서로'; }
 async function openCapture(m){
   if(!m) return;
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저는 카메라를 열 수 없습니다. 휴대폰의 Chrome이나 Safari로 열어 주세요.'); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저는 카메라를 열 수 없습니다. 태블릿의 Chrome이나 Safari로 열어 주세요.'); return; }
   // iOS grants motion access only from inside a tap handler, before anything async
   if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){ try{ DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
   if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
   dropFrames();
-  Object.assign(cap, {m, head:null, base:null, ori:false, lastShot:0, pos:null, busy:false});
-  ringLines.forEach(l=> l.classList.remove('on')); $('capPt').classList.add('off'); $('capN').textContent = '0'; $('capDone').disabled = true;
-  $('capZone').textContent = `${zoneName(m)} · 사진 ${CAPN}장이면 한 바퀴`;
+  Object.assign(cap, {m, dir:null, base:null, ori:false, lastShot:0, pos:null, busy:false, photo:false});
+  Object.values(cellEls).forEach(el=> el.classList.remove('on')); $('capPt').classList.add('off'); $('capN').textContent = '0'; $('capDone').disabled = true;
+  $('capZone').textContent = `${zoneName(m)} · 가로로 들고 상하좌우를 모두 비춰요`;
   lastFocus = document.activeElement;
-  $('cap').hidden = false; capStep(1); $('capX').focus();
+  $('cap').hidden = false; capStep(1); $('capX').focus(); rotCheck();
   capSay('카메라를 여는 중입니다');
   try{ cap.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}}, audio:false}); }
   catch(err){ console.error(err); capSay(location.protocol==='http:' && location.hostname!=='localhost' ? '카메라는 https 주소에서만 열립니다.' : '카메라를 열지 못했습니다. 브라우저의 카메라 권한을 허용한 뒤 다시 눌러 주세요.'); return; }
@@ -1572,63 +1677,91 @@ async function openCapture(m){
   capSay(modeText());
   cancelAnimationFrame(cap.raf); capTick();
 }
-function curSlot(){ if(cap.head == null) return null; if(cap.base == null) cap.base = cap.head; return Math.floor(((((cap.head - cap.base) % 360) + 360) % 360) / (360/CAPN)) % CAPN; }
+// landscape only: in portrait the camera is paused behind a "turn the tablet" card
+function rotCheck(){ const p = portrait(); $('capRot').hidden = !p || cap.step !== 1; return p; }
+addEventListener('resize', ()=>{ if(!$('cap').hidden) rotCheck(); });
+function bandOf(pitch){ return Math.max(0, Math.min(BANDS.length-1, Math.round((BANDS[0] - pitch)/30))); }
+function curCell(){
+  if(!cap.dir) return null;
+  if(cap.base == null) cap.base = cap.dir.yaw;
+  const rel = ((cap.dir.yaw - cap.base) % 360 + 360) % 360, r = bandOf(cap.dir.pitch), c = Math.floor(rel/360*COLS[r]) % COLS[r];
+  return {key:`${r}:${c}`, r, c, rel, yaw: rel, pitch: cap.dir.pitch};
+}
+function nextSeqCell(){   // no sensor: fill the grid in order, horizon first
+  let k = cap.seq++;
+  for(const r of BAND_ORDER){ if(k < COLS[r]) return {key:`${r}:${k}`, r, c:k, yaw:(k+0.5)*360/COLS[r], pitch:BANDS[r]}; k -= COLS[r]; }
+  return null;
+}
+function guide(){
+  if(!cap.ori){ capSay('움직임 센서가 없어 0.8초마다 찍힙니다. 천천히 돌면서 위아래로도 비춰요'); return; }
+  const fill = BANDS.map((b,r)=>{ let n=0; for(let c=0;c<COLS[r];c++) if(cap.cells.has(`${r}:${c}`)) n++; return n/COLS[r]; });
+  const txt = {2:'수평으로 천천히 한 바퀴 돌아요', 1:'이제 조금 위를 보며 한 바퀴', 3:'이제 조금 아래를 보며 한 바퀴', 0:'더 위(하늘·천장 쪽)를 보며 한 바퀴', 4:'더 아래(바닥 쪽)를 보며 한 바퀴'};
+  const r = BAND_ORDER.find(r=> fill[r] < 0.6);
+  capSay(r == null ? '거의 다 됐어요. 남은 칸을 채우거나 완료를 누르세요' : txt[r]);
+}
 function capTick(){
   if($('cap').hidden || cap.step !== 1 || !cap.stream) return;
   cap.raf = requestAnimationFrame(capTick);
+  if(rotCheck()) return;                       // portrait: wait
   const now = performance.now();
   if(cap.ori){
-    const s = curSlot(), pt = $('capPt'), a = (s/CAPN)*Math.PI*2 - Math.PI/2;
-    pt.classList.remove('off'); pt.setAttribute('cx', (50+Math.cos(a)*39.5).toFixed(2)); pt.setAttribute('cy', (50+Math.sin(a)*39.5).toFixed(2));
-    if(!cap.slots.has(s) && now - cap.lastShot > 350 && !cap.busy) shoot(s);
-  } else if(now - cap.startT > 1800 && now - cap.lastShot > 800 && !cap.busy && cap.slots.size < CAPN){
-    // no motion sensor (desktop, or permission refused): one photo per 0.8 s while the student walks around
-    shoot(cap.slots.size);
+    const cell = curCell(); if(!cell) return;
+    const pt = $('capPt'); pt.classList.remove('off');
+    pt.setAttribute('cx', (cell.rel/360*MAP_W).toFixed(1)); pt.setAttribute('cy', ((BANDS[0] - Math.max(-75, Math.min(75, cell.pitch)))/150*MAP_H + 0).toFixed(1));
+    if(!cap.cells.has(cell.key) && now - cap.lastShot > 350 && !cap.busy) shoot(cell);
+  } else if(now - cap.startT > 1800 && now - cap.lastShot > 800 && !cap.busy && cap.cells.size < CAPN){
+    // no motion sensor (desktop, or permission refused): one photo per 0.8 s while the student moves the camera around
+    const cell = nextSeqCell(); if(cell) shoot(cell);
   }
 }
-async function shoot(slot){
-  const v = $('capV'); if(!v.videoWidth || cap.slots.has(slot)) return;
+async function shoot(cell){
+  const v = $('capV'); if(!v.videoWidth || cap.cells.has(cell.key)) return;
   cap.busy = true; cap.lastShot = performance.now();
   try{
     const k = Math.min(1, 1280/Math.max(v.videoWidth, v.videoHeight));
     capCanvas.width = Math.round(v.videoWidth*k); capCanvas.height = Math.round(v.videoHeight*k);
     capCanvas.getContext('2d').drawImage(v, 0, 0, capCanvas.width, capCanvas.height);
-    const blob = await new Promise(r=> capCanvas.toBlob(r, 'image/jpeg', .82));
-    if(!blob || cap.step !== 1 || cap.slots.has(slot)) return;
-    cap.slots.add(slot); cap.frames.push({slot, blob, url:URL.createObjectURL(blob)});
-    ringLines[slot].classList.add('on'); $('capN').textContent = cap.frames.length;
+    const blob = await new Promise(r=> capCanvas.toBlob(r, 'image/jpeg', .8));
+    if(!blob || cap.step !== 1 || cap.cells.has(cell.key)) return;
+    cap.cells.add(cell.key); cap.frames.push({key:cell.key, yaw:Math.round(cell.yaw), pitch:Math.round(cell.pitch), blob, url:URL.createObjectURL(blob)});
+    cellEls[cell.key].classList.add('on'); $('capN').textContent = cap.frames.length;
     try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
     const n = cap.frames.length;
     $('capDone').disabled = n < 8;
-    if(n >= CAPN) finishCapture();
-    else if(n >= 28) capSay('거의 다 됐어요. 남은 칸을 채우거나 완료를 누르세요');
-    else if(n >= 8) capSay('좋아요, 계속 돌아요. 완료는 언제든 누를 수 있어요');
+    if(n >= CAPN) finishCapture(); else guide();
   } finally { cap.busy = false; }
 }
 $('capShot').onclick = ()=>{
-  if(cap.step !== 1 || cap.slots.size >= CAPN) return;
-  let s = cap.ori ? curSlot() : cap.slots.size; if(s == null) s = cap.slots.size;
-  for(let d=0; d<CAPN && cap.slots.has(s); d++) s = (s+1) % CAPN;
-  shoot(s);
+  if(cap.step !== 1 || cap.cells.size >= CAPN || rotCheck()) return;
+  let cell = cap.ori ? curCell() : null;
+  if(!cell || cap.cells.has(cell.key)) cell = nextSeqCell();
+  while(cell && cap.cells.has(cell.key)) cell = nextSeqCell();
+  if(cell) shoot(cell);
 };
 document.querySelectorAll('.cmode button').forEach(b=> b.onclick = ()=>{
   cap.mode = b.dataset.mode; document.querySelectorAll('.cmode button').forEach(x=> x.setAttribute('aria-pressed', x===b));
   if(cap.step === 1 && cap.stream) capSay(modeText());
 });
+function capItems(){ return cap.frames.map(f=> ({url:f.url, yaw:f.yaw, pitch:f.pitch})); }
+function showPreview(){
+  if(cap.prev) cap.prev.dispose();
+  cap.prev = cap.photo ? makeOrbitViewer($('capPrev'), {urls: cap.frames.map(f=>f.url)}) : makeDomeViewer($('capPrev'), {items: capItems(), mode: cap.mode});
+  $('capPhoto').textContent = cap.photo ? '점구름으로 보기' : '사진으로 보기';
+}
 function finishCapture(){
   if(cap.step !== 1 || !cap.frames.length) return;
   cancelAnimationFrame(cap.raf); removeEventListener(ORI_EVT, onOri); stopStream();
-  cap.frames.sort((a,b)=>a.slot-b.slot);
-  capStep(2);
-  const cov = Math.round(cap.slots.size/CAPN*100);
-  $('capStat').textContent = `사진 ${cap.frames.length}장 · ${cap.ori ? `${cov}% 둘러봄` : '움직임 센서 없이 시간 간격으로 찍음'}`;
+  cap.frames.sort((a,b)=> a.pitch - b.pitch || a.yaw - b.yaw);
+  capStep(2); $('capRot').hidden = true;
+  const cov = Math.round(cap.cells.size/CAPN*100);
+  $('capStat').textContent = `사진 ${cap.frames.length}장 · ${cap.ori ? `상하좌우 ${cov}% 채움` : '움직임 센서 없이 시간 간격으로 찍음'}`;
   $('capTeam').value = TEAM || '';
   const help = $('capHelp'); help.dataset.kind = '';
   help.textContent = LOCAL ? '서버 연결 전이라 이 기기에서만 보이고 새로고침하면 사라집니다.' : AUTO ? '올리면 바로 이 구역이 복구됩니다.' : '올리면 운영자가 확인한 뒤 복구됩니다.';
-  if(cap.prev) cap.prev.dispose();
-  cap.prev = makeOrbitViewer($('capPrev'), {urls: cap.frames.map(f=>f.url)});
+  cap.photo = false; showPreview();
 }
 $('capDone').onclick = finishCapture;
+$('capPhoto').onclick = ()=>{ cap.photo = !cap.photo; showPreview(); };
 $('capRetry').onclick = ()=> openCapture(cap.m);
 $('capTeam').onchange = ()=>{ teamSel.value = $('capTeam').value; teamSel.onchange(); };
 async function putJpeg(path, blob){
@@ -1656,11 +1789,13 @@ async function uploadCapture(){
   const m = cap.m, note = $('capNote').value.trim(), help = $('capHelp');
   const say = (t, kind)=>{ help.textContent = t; help.dataset.kind = kind || ''; };
   if(!cap.frames.length) return say('찍은 사진이 없습니다. 다시 찍어 주세요.', 'err');
+  // the photo nearest to straight ahead at the start becomes the thumbnail
+  const cover = cap.frames.slice().sort((a,b)=> Math.abs(a.pitch)+Math.min(a.yaw,360-a.yaw) - Math.abs(b.pitch)-Math.min(b.yaw,360-b.yaw))[0];
   if(LOCAL){
     // no server (opened as a file): keep the record in this tab only
     const id = 'o' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b=> b.toString(16).padStart(2,'0')).join('').slice(0,15);
-    SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), thumb:cap.frames[0].url});
-    cap.frames = []; cap.slots = new Set();           // the object URLs now belong to the record
+    SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), items:capItems(), thumb:cover.url});
+    cap.frames = []; cap.cells = new Set();           // the object URLs now belong to the record
     closeCapture(); refreshSubUI(); toast('이 기기에 기록을 남겼습니다 (서버 연결 전)'); return;
   }
   if(!TEAM) return say('우리 조를 먼저 고르세요.', 'err');
@@ -1669,9 +1804,9 @@ async function uploadCapture(){
   const prog = t=>{ done++; bar.style.width = `${Math.round(done/total*100)}%`; if(t) msg.textContent = t; };
   bar.style.width = '0'; msg.textContent = '기록을 올리는 중입니다';
   try{
-    const {id} = await api('/scan/start', {team:TEAM, mission:m.id, note, count:cap.frames.length, headings:cap.frames.map(f=> Math.round(f.slot*(360/CAPN))), mode:cap.mode, lat:cap.pos && cap.pos.lat, lng:cap.pos && cap.pos.lng});
+    const {id} = await api('/scan/start', {team:TEAM, mission:m.id, note, count:cap.frames.length, dirs:cap.frames.map(f=>[f.yaw, f.pitch]), mode:cap.mode, lat:cap.pos && cap.pos.lat, lng:cap.pos && cap.pos.lng});
     for(let i=0; i<cap.frames.length; i++){ await putJpeg(`/scan/${id}/frame/${i}`, cap.frames[i].blob); prog(`사진을 올리는 중입니다 (${i+1} / ${cap.frames.length})`); }
-    await putJpeg(`/scan/${id}/thumb`, await makeThumb(cap.frames[0].blob)); prog('기록을 마무리하는 중입니다');
+    await putJpeg(`/scan/${id}/thumb`, await makeThumb(cover.blob)); prog('기록을 마무리하는 중입니다');
     let st = await api('/scan/finish', {id, team:TEAM, note});
     if(st.missing){ for(const i of st.missing) await putJpeg(`/scan/${id}/frame/${i}`, cap.frames[i].blob); st = await api('/scan/finish', {id, team:TEAM, note}); }
     if(st.missing) throw new Error('사진 일부가 올라가지 않았습니다');
@@ -1684,7 +1819,7 @@ function closeCapture(){
   cancelAnimationFrame(cap.raf); removeEventListener(ORI_EVT, onOri); stopStream();
   if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
   dropFrames(); cap.step = 0;
-  $('capNote').value = ''; $('cap').hidden = true;
+  $('capNote').value = ''; $('cap').hidden = true; $('capRot').hidden = true;
   lastFocus && lastFocus.focus && lastFocus.focus();
 }
 $('capX').onclick = closeCapture;
@@ -4465,7 +4600,7 @@ const WORLDS = [
   {id:'island', scene:sceneI, M:MI, B:IB, pickables:IB.map(b=>b.mesh), markers:markersI, named:namedI, lblEls:lblI, HOME:HOME_I, CATS:CATS_I, CAT_ORDER:['ride','char','place','shop'], fx:fxI,
    setIntro:setIntroI, update:updateI, info:infoI, paint:()=>{},
    sub:'도로랜드 섬 디지털 트윈', aria:'도로랜드 섬 3D 지도', tabB:'명소', searchL:'명소 · 등장인물 찾기', searchP:'예: 하모니아, 코덱스', lblBtn:'이름 표시',
-   credit:'도로랜드 세계관(웹툰 · 소설 챕터 1~5)으로 재구성한 섬 · 기록은 이 페이지의 카메라로 촬영 · 일부 스캔 <a href="https://scaniverse.com" target="_blank" rel="noopener">Scaniverse</a>',
+   credit:'도로랜드 세계관(웹툰 · 소설 챕터 1~5)으로 재구성한 섬',
    introSmall:'DOROLAND · ISLAND', introTitle:'도로랜드 섬', introSub:'사라진 섬의 기록을 되살리세요'}
 ];
 W = WORLDS[0];

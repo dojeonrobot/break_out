@@ -9,7 +9,7 @@ chapter05/index.html(보이드의 기록)과 chapter05/feed.html(도로그램 �
 - 초기화: 제출 기록을 지우고, 페이지에 이미 3D로 들어가 있는 스캔은 "숨김" 목록에 넣어 구역을 다시 "복구 필요"로 되돌린다.
   (3D 데이터 자체는 페이지에 박혀 있으므로 지우지 않고 숨기기만 한다. "되살리기"로 되돌릴 수 있다.)
 - 썸네일: /api/void/thumb/<scanId> 가 Scaniverse 미리보기 사진을 받아 data/thumbs/ 에 캐시해 준다(핫링크 차단·CSP 회피).
-- 자체 스캔(v2): 페이지 안의 카메라로 사물 주위를 한 바퀴 돌며 찍은 사진 세트(최대 48장)를 data/scans/<id>/ 에 받는다.
+- 자체 스캔(v2): 페이지 안의 카메라로 상하좌우를 돌며 찍은 사진 세트(최대 72장, 방향 dirs 포함)를 data/scans/<id>/ 에 받는다.
   start(JSON) → frame/<n>(JPEG 본문) → finish(JSON) 순서. finish 때 제출 기록에 kind:"orbit"으로 들어가며
   운영자 설정 auto(기본 켬)가 켜져 있으면 바로 status:"ok"(복구됨), 꺼져 있으면 "pend"(운영자가 "복구 확정"을 눌러야 함).
   삭제·초기화된 세트는 지우지 않고 data/scans_trash/ 로 옮긴다.
@@ -46,7 +46,7 @@ ADMIN_KEY = os.environ.get('CH5_ADMIN_KEY', '0101')
 SERVE_STATIC = os.environ.get('VOID_STATIC', '1') == '1'
 
 MAX_TEAM = 12
-MAX_FRAMES = 48                       # 10도마다 한 장이면 36장, 여유를 둔다
+MAX_FRAMES = 72                       # 상하 5단 × 좌우 9/16/18/16/9 = 68칸, 여유를 둔다
 MAX_FRAME_BYTES = 3 * 1024 * 1024
 UPLOAD_TTL_MS = 2 * 60 * 60 * 1000    # 올리다 만 세트는 2시간 뒤 정리
 SCAN_ID = re.compile(r'^[a-z0-9]{6,40}$')
@@ -364,6 +364,13 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError('사진 수가 올바르지 않습니다.')
         heads = b.get('headings') or []
         heads = [max(0, min(359, int(h))) for h in heads[:MAX_FRAMES] if isinstance(h, (int, float))]
+        # 사진마다 찍은 방향 [yaw(0~359), pitch(-90~90)] — 점구름 돔을 펼칠 때 쓴다
+        dirs = []
+        for dv in (b.get('dirs') or [])[:MAX_FRAMES]:
+            try:
+                dirs.append([max(0, min(359, int(dv[0]))), max(-90, min(90, int(dv[1])))])
+            except (TypeError, ValueError, IndexError):
+                dirs.append([0, 0])
         pos = {}
         for k in ('lat', 'lng'):
             try:
@@ -374,7 +381,7 @@ class Handler(BaseHTTPRequestHandler):
         sid = 'o' + uuid.uuid4().hex[:15]
         write_meta(sid, {
             'id': sid, 'team': team, 'mission': mission, 'note': clean_text(b.get('note'), 60), 'count': count,
-            'mode': 'space' if b.get('mode') == 'space' else 'object', 'headings': heads, 'lat': pos['lat'], 'lng': pos['lng'],
+            'mode': 'space' if b.get('mode') == 'space' else 'object', 'headings': heads, 'dirs': dirs, 'lat': pos['lat'], 'lng': pos['lng'],
             'ua': clean_text(self.headers.get('User-Agent'), 160), 'createdAt': now_ms(), 'status': 'uploading',
         })
         self.send_json({'id': sid})
