@@ -2909,6 +2909,9 @@ const safari = new THREE.Group();
   [[-3.8,-3.3],[3.8,-3.3],[-3.8,3.3],[3.8,3.3]].forEach(([a,b])=>{ add(jeep, new THREE.CylinderGeometry(1.6, 1.6, 1.1, 14).rotateX(Math.PI/2), mat(D), a, 1.6, b); add(jeep, new THREE.CylinderGeometry(0.7, 0.7, 1.2, 10).rotateX(Math.PI/2), mat(0xcfcfcf), a, 1.6, b); });
   jeep.scale.setScalar(0.67); safari.add(jeep);
   islAnim.push(t=>{ const a = t*0.25; jeep.position.set(Math.cos(a)*46, 0, Math.sin(a)*32 - 4); jeep.rotation.y = -a - Math.PI/2; fl.rotation.y = Math.sin(t*3)*0.2; });
+  // keep the track clear: anything standing in the dirt ring (ellipse 43–52 × 29.5–36, centred z −4) is nudged outward past it
+  safari.children.forEach(o=>{ if(!o.isGroup || o === jeep || o === arch || o === tower) return; const rx = o.position.x/47, rz = (o.position.z + 4)/32.5, r = Math.hypot(rx, rz); if(r < 0.86 || r > 1.18) return;
+    const k = 1.26/r; o.position.x = rx*k*47; o.position.z = rz*k*32.5 - 4; });
 }
 place(safari, -205, -40); safari.scale.setScalar(1.35);
 mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-205, cz:-40, h:26, r:80,
@@ -2935,6 +2938,21 @@ const harmonia = new THREE.Group();
   const balls = []; for(let i=0;i<7;i++) balls.push(add(harmonia, SPH(1.5,12,10), mat([0x5aa0e6,0xf7c948,0xe2574c,0x58b368][i%4])));
   const sign = add(harmonia, new THREE.PlaneGeometry(26, 5), new THREE.MeshBasicMaterial({map:signTex('HARMONIA', {bg:'#16244a', fg:'#7fd7ff', size:84, w:640, h:128})}), 0, 63, 0, false);
   add(harmonia, BOX(27,6,1), mat(0x16244a), 0, 60, -0.7);
+  // dressing: a water ring round the base, brass capitals and lanterns on the columns, a glass dome over the gears,
+  // organ pipes along the roof with glowing mouths, and a ring of pipes that breathe in time with the machine
+  add(harmonia, new THREE.RingGeometry(30, 34, 48).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x4fb3d4, transparent:true, opacity:0.85}), 0, 1.7, 0, false);
+  for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; add(harmonia, CYL(0.5, 0.5, 2.2, 8), mat(0xffffff), Math.cos(a)*32, 1.6, Math.sin(a)*32); add(harmonia, SPH(0.8, 8, 6), glowMat(0xfff0b8), Math.cos(a)*32, 4.2, Math.sin(a)*32, false); }
+  [[-13,-13],[13,-13],[-13,13],[13,13]].forEach(([x,z])=>{ add(harmonia, BOX(4, 2, 4), mat(C.gold), x, 1.6, z); add(harmonia, BOX(4.2, 2, 4.2), mat(C.gold), x, 55.6, z);
+    for(let y=8; y<54; y+=9) add(harmonia, new THREE.TorusGeometry(1.9, 0.25, 6, 14).rotateX(Math.PI/2), mat(C.gold), x, y, z);
+    add(harmonia, BOX(1.2, 1.6, 1.2), glowMat(0xfff0b8), x, 30, z + (z < 0 ? -1.9 : 1.9), false); });
+  add(harmonia, new THREE.SphereGeometry(21, 24, 12, 0, Math.PI*2, 0, Math.PI/2), new THREE.MeshLambertMaterial({color:0x9fd3f5, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false}), 0, 59.6, 0, false);
+  for(let i=0;i<9;i++){ const h = 9 + Math.abs(i-4)*2.2, x = -12 + i*3; add(harmonia, CYL(1.1, 1.3, h, 10), mat(C.gold), x, 57, -12); add(harmonia, SPH(0.9, 8, 6), glowMat(0x7fd7ff), x, 57 + h + 0.4, -12, false); }
+  const organ = []; for(let i=0;i<8;i++){ const a = i/8*Math.PI*2, pipe = add(harmonia, CYL(1.4, 1.6, 10, 10), mat(0xd9cbb0), Math.cos(a)*25, 1.6, Math.sin(a)*25); add(harmonia, CYL(1.6, 1.6, 0.6, 10), mat(C.gold), Math.cos(a)*25, 11.6, Math.sin(a)*25); organ.push(pipe); }
+  add(harmonia, new THREE.TorusGeometry(25, 0.6, 8, 48).rotateX(Math.PI/2), mat(C.gold), 0, 12.4, 0);
+  islAnim.push(t=>{ organ.forEach((p,i)=>{ p.scale.y = 1 + 0.12*Math.max(0, Math.sin(t*2.4 + i*0.8)); }); });
+  // a big slow wheel on the back face mirrors the front gears
+  const g4 = gear(13, 18, 0xc98b3a); g4.position.set(0, 36, -15.5); g4.rotation.y = Math.PI; harmonia.add(g4);
+  islAnim.push(t=>{ g4.rotation.z = -t*0.3; });
   // circus tent behind with bulbs along the roof
   const tent = new THREE.Group(); tent.position.set(0, 1.6, -26); harmonia.add(tent);
   add(tent, new THREE.CylinderGeometry(15, 15, 12, 20, 1, true).translate(0,6,0), new THREE.MeshLambertMaterial({map:stripeTexI('#f39a3b','#fff3d0',14), side:THREE.DoubleSide}));
@@ -2955,8 +2973,8 @@ const harmonia = new THREE.Group();
     notes.forEach((n,i)=>{ const u = ((t*0.05) + i/6) % 1; n.position.set(-36 + u*72, 56 + Math.sin(u*Math.PI)*22 + (i%5)*2, 15 + Math.sin(u*Math.PI)*-8); });
   });
 }
-place(harmonia, 0, 22); harmonia.position.y = G + 2.4;
-mission(harmonia, 'dl-harmonia', {n:'하모니아', sub:'챕터 2', cx:0, cz:22, base:2.4, h:70, r:40,
+place(harmonia, 0, 67/K); harmonia.position.y = G + 2.4;
+mission(harmonia, 'dl-harmonia', {n:'하모니아', sub:'챕터 2', cx:0, cz:67/K, base:2.4, h:70, r:40,
   desc:'도로랜드 정중앙, 중앙 광장에 선 음악 에너지 장치. 거대한 톱니바퀴가 돌고, 소용돌이 레일 위로 구슬이 굴러가며, 서커스 천막 위로 오선지 빛줄기가 흐릅니다.',
   facts:[['챕터','2 · 멈춰버린 기계의 노래'],['볼거리','톱니바퀴, 마블 레일, 서커스 천막, 오선지 빛줄기']]});
 
@@ -3344,58 +3362,60 @@ pickable(lake, {n:'호수 공원', c:'place', sub:'명소', cx:LAKE[0], cz:LAKE[
   desc:'잔디 아래로 움푹 내려앉은 호수. 아치 다리로 정자 섬에 건너가고, 백조 보트와 오리가 연잎 사이를 떠다닙니다. 남쪽 낚시 데크와 버드나무 아래가 쉬어 가기 좋습니다.',
   facts:[['볼거리','정자, 아치 다리, 백조 보트, 낚시 데크, 스플래시 리버']]});
 
-// flume ride: a lift up the rock, a high winding trough on tall legs, the big drop into the splash pool, a splash bridge and a boarding station
+// flume ride (Splash River): one water channel in a single loop that never crosses itself — boarding station on the near side,
+// a straight conveyor lift up the rock, a short channel across the top, one steep drop into the splash pool, then the water lazily returns to the station.
 const flume = new THREE.Group();
 {
   const F = flume;
-  // the rock the ride climbs, with the trough tunnelling round it
-  add(F, ICO(1, 2).scale(22, 20, 18), flat(0x9c8f7a), 8, 0, 2).rotation.y = 0.6;
-  add(F, ICO(1, 1).scale(10, 9, 9), flat(0x8a7d6a), -4, 4, -12); add(F, ICO(1, 1).scale(8, 7, 7), flat(0xaa9e88), 24, 2, 10);
-  for(let i=0;i<10;i++) add(F, ICO(1.6 + (i%3)*0.5, 1), flat([C.leaf, C.leaf2][i%2]), 8 + Math.cos(i*0.9)*18, 2 + (i%2)*6, 2 + Math.sin(i*0.9)*16);
-  // the water course: station → lift → high loop → the drop → splash pool → back to the station
-  const P = [[-30,1.2,26],[-16,11,18],[-2,25,6],[12,28,-8],[28,27,-2],[34,24,12],[26,22,24],[12,22,26],[0,22,18],[-6,20,6],[0,18,-6],[14,16,-14],[28,13,-10],[38,5,4],[42,1.2,18],[24,1.0,32],[-6,1.0,34],[-30,1.2,26]];
-  const path = new THREE.CatmullRomCurve3(P.map(([x,y,z])=>new THREE.Vector3(x,y,z)), true, 'catmullrom', 0.3);
-  add(F, new THREE.TubeGeometry(path, 200, 2.6, 10, true), new THREE.MeshLambertMaterial({color:0x8fa3b8, side:THREE.DoubleSide}));
-  add(F, new THREE.TubeGeometry(path, 200, 1.9, 8, true), glowMat(0xbfeaff, 0.8), 0, 0.5, 0, false);
-  path.getSpacedPoints(60).forEach((p,i)=>{ if(p.y < 4 || i%2) return; add(F, CYL(0.55, 0.7, p.y - 2.2, 6), mat(0xd9d4c8), p.x, 0, p.z); add(F, BOX(5.2, 0.5, 0.5), mat(0xd9d4c8), p.x, p.y - 2.6, p.z); });
-  // lift: a ribbed conveyor ramp beside the trough, with a frame
-  { const l = new THREE.Group(); l.position.set(-16, 0, 18); l.rotation.y = Math.atan2(26 - 6, -30 + 2) ; F.add(l);
-    add(l, BOX(2, 0.6, 34), mat(0x3a3f4a), 0, 5.5, 0).rotation.x = -0.72; for(let k=0;k<12;k++) add(l, BOX(2.2, 0.2, 0.4), mat(0xffd400), 0, 5.5 + (k-5.5)*2.1, (k-5.5)*2.3, false).rotation.x = -0.72; }
-  // the splash pool at the foot of the drop, and the splash bridge over it
-  add(F, new THREE.CircleGeometry(17, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x4fb3d4, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), 40, 0.3, 18, false);
-  add(F, new THREE.RingGeometry(16.5, 19, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0xd9d4c8, polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4}), 40, 0.32, 18, false);
-  { const br = new THREE.Group(); br.position.set(40, 0, 18); F.add(br);
-    [-20, 20].forEach(x=> [-1.6, 1.6].forEach(z=> add(br, CYL(0.4, 0.4, 5, 6), mat(0x3a3f4a), x, 0, z))); add(br, BOX(42, 0.5, 4), mat(0x9a6b45), 0, 5, 0);
-    [-2.1, 2.1].forEach(z=>{ add(br, BOX(42, 0.1, 0.1), mat(0x3a3f4a), 0, 6.2, z); for(let x=-20; x<=20; x+=4) add(br, BOX(0.12, 1.2, 0.12), mat(0x3a3f4a), x, 5.25, z, false); });
-    for(let i=0;i<7;i++){ const g = new THREE.Group(); g.position.set(-15 + i*5, 5.25, (i%2 ? 1 : -1)*0.9); g.rotation.y = i%2 ? Math.PI : 0; g.scale.setScalar(0.55); br.add(g);
-      add(g, CAP(0.9, 1.6).translate(0, 1.7, 0), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf, 0xffffff, 0x58b368, 0x6a4bc4][i])); add(g, SPH(0.72, 10, 8), mat(0xf1d3b0), 0, 3.5, 0); }
+  // the rock the lift climbs, with greenery
+  add(F, ICO(1, 2).scale(22, 22, 16), flat(0x9c8f7a), 2, -2, -22).rotation.y = 0.4;
+  add(F, ICO(1, 1).scale(9, 8, 8), flat(0x8a7d6a), -16, 2, -28); add(F, ICO(1, 1).scale(8, 7, 7), flat(0xaa9e88), 20, 1, -30);
+  for(let i=0;i<8;i++) add(F, ICO(1.5 + (i%3)*0.5, 1), flat([C.leaf, C.leaf2][i%2]), 2 + Math.cos(i*0.8)*18, 4 + (i%2)*5, -22 + Math.sin(i*0.8)*12);
+  // the course (local units): station → east turn → lift (straight) → top → drop (straight) → splash pool → return. y = water surface.
+  const P = [[-34,1.2,30],[-6,1.2,33],[22,1.2,30],[40,1.2,16],[40,1.2,-2],[32,1.2,-14],[20,12,-22],[8,24,-30],[-8,26,-32],[-22,25,-24],[-28,22,-14],[-36,4,2],[-40,1.2,14],[-42,1.2,24],[-34,1.2,30]];
+  const path = new THREE.CatmullRomCurve3(P.map(([x,y,z])=>new THREE.Vector3(x,y,z)), true, 'catmullrom', 0.15);
+  // trough walls and the water that fills the whole channel
+  add(F, new THREE.TubeGeometry(path, 240, 3.0, 10, true), new THREE.MeshLambertMaterial({color:0x8fa3b8, side:THREE.BackSide}));
+  add(F, new THREE.TubeGeometry(path, 240, 2.2, 8, true), new THREE.MeshLambertMaterial({color:0x4fb3d4, transparent:true, opacity:0.9}), 0, 0.4, 0, false);
+  path.getSpacedPoints(80).forEach((p,i)=>{ if(p.y < 3.5 || i%2) return; add(F, CYL(0.55, 0.7, p.y - 2.6, 6), mat(0xd9d4c8), p.x, 0, p.z); add(F, BOX(6.4, 0.5, 0.5), mat(0xd9d4c8), p.x, p.y - 3.0, p.z); });
+  // lift: conveyor ribs along the straight climb, a frame beside it
+  { const u0 = 5/14, u1 = 7/14; for(let k=0;k<=14;k++){ const q = path.getPointAt(u0 + (u1-u0)*k/14), t = path.getTangentAt(u0 + (u1-u0)*k/14); const rib = add(F, BOX(4.4, 0.3, 0.6), mat(0xffd400), q.x, q.y + 0.6, q.z, false); rib.rotation.y = -Math.atan2(t.z, t.x); rib.rotation.z = Math.atan2(t.y, Math.hypot(t.x, t.z)); } }
+  // splash pool at the foot of the drop, and the splash bridge beside it
+  add(F, new THREE.CircleGeometry(15, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x4fb3d4, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), -40, 0.3, 10, false);
+  add(F, new THREE.RingGeometry(14.5, 17, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0xd9d4c8, polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4}), -40, 0.32, 10, false);
+  { const br = new THREE.Group(); br.position.set(-48, 0, -4); br.rotation.y = 0.55; F.add(br);
+    [-10, 10].forEach(x=> [-1.6, 1.6].forEach(z=> add(br, CYL(0.4, 0.4, 5, 6), mat(0x3a3f4a), x, 0, z))); add(br, BOX(24, 0.5, 4), mat(0x9a6b45), 0, 5, 0);
+    [-2.1, 2.1].forEach(z=>{ add(br, BOX(24, 0.1, 0.1), mat(0x3a3f4a), 0, 6.2, z); for(let x=-10; x<=10; x+=4) add(br, BOX(0.12, 1.2, 0.12), mat(0x3a3f4a), x, 5.25, z, false); });
+    for(let i=0;i<5;i++) rider(br, -8 + i*4, 5.25, (i%2 ? 1 : -1)*0.9, i, 0.55, i%2 ? Math.PI : 0);
     add(br, new THREE.PlaneGeometry(9, 1.3), new THREE.MeshBasicMaterial({map:signTex('물보라 다리', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:70}), side:THREE.DoubleSide}), 0, 8, 0, false); [-5, 5].forEach(x=> add(br, CYL(0.15, 0.15, 3, 5), mat(0x3a3f4a), x, 5, 0)); }
-  // boarding station
-  { const st = new THREE.Group(); st.position.set(-30, 0, 26); st.rotation.y = 0.35; F.add(st);
-    add(st, BOX(26, 1, 12), mat(0xd9cfba), 0, 0, -8); [[-11,-13],[11,-13],[-11,-3],[11,-3]].forEach(([x,z])=> add(st, CYL(0.4, 0.4, 8, 8), mat(0xf4efe4), x, 1, z));
-    add(st, BOX(28, 0.8, 14), mat(C.teal), 0, 9, -8); add(st, CONE(17, 4, 4).rotateY(Math.PI/4), mat(C.teal), 0, 9.8, -8);
-    add(st, new THREE.PlaneGeometry(14, 2), new THREE.MeshBasicMaterial({map:signTex('스플래시 리버', {bg:'#2aa7a0', fg:'#ffffff', size:70, w:512, h:80}), side:THREE.DoubleSide}), 0, 10.2, -1, false);
-    for(let i=0;i<6;i++){ const g = new THREE.Group(); g.position.set(-8 + i*3.2, 1, -11 + (i%2)); g.scale.setScalar(0.55); st.add(g); add(g, CAP(0.9, 1.6).translate(0, 1.7, 0), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf, 0xffffff, 0x58b368][i])); add(g, SPH(0.72, 10, 8), mat(0xf1d3b0), 0, 3.5, 0); } }
-  // three log boats on the course, slow on the lift, fast on the drop, with a splash at the bottom
-  const boatsF = [0, 1, 2].map(i=>{ const b = new THREE.Group(); add(b, BOX(2.4, 1.3, 6.4), mat(0x8a5a36), 0, 0, 0); add(b, SPH(1.2, 8, 6), mat(0x8a5a36), 0, 0.6, 3.2).scale.set(1, 0.9, 1);
-    for(let k=0;k<3;k++){ add(b, BOX(1.8, 0.5, 1), mat(0xffd400), 0, 1.3, -2 + k*1.9); add(b, CAP(0.45, 0.6).translate(0, 1.2, 0), mat([0xe2574c, 0x5aa0e6, 0xff9fcf][(i+k)%3]), -0.5 + (k%2), 1.3, -2 + k*1.9); add(b, SPH(0.4, 8, 6), mat(0xf1d3b0), -0.5 + (k%2), 3.2, -2 + k*1.9); }
+  // boarding station over the home straight
+  { const st = new THREE.Group(); st.position.set(-6, 0, 33); F.add(st);
+    add(st, BOX(30, 1, 7), mat(0xd9cfba), 0, 0, 6); [[-13,3],[13,3],[-13,9],[13,9]].forEach(([x,z])=> add(st, CYL(0.4, 0.4, 8, 8), mat(0xf4efe4), x, 1, z));
+    add(st, BOX(32, 0.8, 16), mat(C.teal), 0, 9, 3); add(st, CONE(19, 4, 4).rotateY(Math.PI/4), mat(C.teal), 0, 9.8, 3);
+    add(st, new THREE.PlaneGeometry(16, 2.2), new THREE.MeshBasicMaterial({map:signTex('스플래시 리버', {bg:'#2aa7a0', fg:'#ffffff', size:70, w:512, h:80}), side:THREE.DoubleSide}), 0, 10.4, 11.2, false);
+    for(let i=0;i<7;i++) rider(st, -11 + i*3.4, 1, 7 + (i%2), i, 0.55, Math.PI); }
+  // log boats: slow on the lift, fast on the drop, a splash at the bottom
+  const boatsF = [0, 1, 2, 3].map(i=>{ const b = new THREE.Group(); add(b, BOX(2.4, 1.3, 6.4), mat(0x8a5a36), 0, 0, 0); add(b, SPH(1.2, 8, 6), mat(0x8a5a36), 0, 0.6, 3.2).scale.set(1, 0.9, 1);
+    for(let k=0;k<3;k++){ add(b, BOX(1.8, 0.5, 1), mat(0xffd400), 0, 1.3, -2 + k*1.9); rider(b, -0.5 + (k%2), 1.3, -2 + k*1.9, i + k, 0.6, Math.PI); }
     F.add(b); return b; });
   const N = 140, SP = new Float32Array(N*3), sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(SP, 3));
   const splash = new THREE.Points(sg, new THREE.PointsMaterial({color:0xe6f7ff, size:1.8, transparent:true, opacity:0})); F.add(splash);
-  const drop = [0.66, 0.78];                                              // where along the loop the drop happens
+  const uDrop = 11/14, uLift0 = 5/14, uLift1 = 7/14;
+  const speedAt = u => (u > uLift0 && u < uLift1) ? 0.35 : (u > 10/14 && u < uDrop) ? 2.6 : 1;
+  const prog = [0, 0.25, 0.5, 0.75];
   islAnim.push(t=>{
-    let s = 0;
-    boatsF.forEach((b, i)=>{ let u = ((t*0.028) + i/3) % 1; const p = path.getPointAt(u), q = path.getPointAt((u + 0.004) % 1);
-      b.position.copy(p).add(new THREE.Vector3(0, 1.1, 0)); b.lookAt(q.x, q.y + 1.1, q.z); b.rotateY(Math.PI);
-      if(u > drop[1] && u < drop[1] + 0.05) s = Math.max(s, 1 - (u - drop[1])/0.05); });
-    splash.material.opacity = s;
-    for(let i=0;i<N;i++){ const a = i*2.4, v = 5 + (i%5)*2, k = 1 - s; SP[i*3] = 40 + Math.cos(a)*v*k*1.6; SP[i*3+1] = 1 + v*2.4*k - 16*k*k; SP[i*3+2] = 16 + Math.sin(a)*v*k*1.6; }
+    let sMax = 0; const dt = 1/60;
+    boatsF.forEach((b, i)=>{ prog[i] = (prog[i] + dt*0.02*speedAt(prog[i])) % 1; const u = prog[i], p = path.getPointAt(u), q = path.getPointAt((u + 0.004) % 1);
+      b.position.copy(p).add(new THREE.Vector3(0, 1.0, 0)); b.lookAt(q.x, q.y + 1.0, q.z); b.rotateY(Math.PI);
+      if(u > uDrop && u < uDrop + 0.04) sMax = Math.max(sMax, 1 - (u - uDrop)/0.04); });
+    splash.material.opacity = sMax;
+    for(let i=0;i<N;i++){ const a = i*2.4, v = 5 + (i%5)*2, k = 1 - sMax; SP[i*3] = -38 + Math.cos(a)*v*k*1.6; SP[i*3+1] = 1 + v*2.4*k - 16*k*k; SP[i*3+2] = 6 + Math.sin(a)*v*k*1.6; }
     sg.attributes.position.needsUpdate = true;
   });
 }
 place(flume, 285, 140); flume.scale.setScalar(0.8);
 pickable(flume, {n:'스플래시 리버', c:'ride', sub:'후룸라이드', cx:285, cz:140, h:34, r:26,
-  desc:'바위산을 오르는 리프트를 타고 높은 수로를 한 바퀴 돈 뒤, 가파른 물미끄럼틀로 쏟아져 내려오는 후룸라이드. 물보라 다리 위에 서면 흠뻑 젖습니다.', facts:[['위치','호수 공원 동쪽'],['특징','리프트 · 고가 수로 · 급강하 · 물보라 다리']]});
+  desc:'통나무 배가 물길을 따라 느긋하게 돌다가 리프트로 바위산을 오르고, 한 번의 가파른 급강하로 물보라 연못에 떨어지는 후룸라이드. 물보라 다리 위에 서면 흠뻑 젖습니다.', facts:[['위치','호수 공원 동쪽'],['특징','물길 한 바퀴 · 리프트 · 급강하 · 물보라 다리']]});
 
 // teacups
 const teacups = new THREE.Group();
@@ -3640,7 +3660,7 @@ const opA = u => OPEN[0] + u*(OPEN[1] - OPEN[0]);
   for(let i=0;i<5;i++) add(islRoot, new THREE.RingGeometry(54 + i*10, 58 + i*10, 72).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:[0xe9d9b6, 0xf0c9a8, 0xd8e3c6, 0xe7cfe0, 0xd9d3ef][i], polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), PC[0], G+0.13, PC[1], false).receiveShadow = true;
   for(let i=0;i<24;i++){ const a = i/24*Math.PI*2; const l = add(islRoot, new THREE.PlaneGeometry(1.2, 46).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0xd9c39a, polygonOffset:true, polygonOffsetFactor:-6, polygonOffsetUnits:-6}), PC[0] + Math.cos(a)*78, G+0.14, PC[1] + Math.sin(a)*78, false); l.rotation.y = -a + Math.PI/2; }
   // stepped dais under Harmonia
-  add(islRoot, CYL(48, 50, 1.2, 48), mat(0xf4ecdc), 0, G, 30); add(islRoot, CYL(42, 44, 1.2, 48), mat(0xe9dfca), 0, G+1.2, 30);
+  add(islRoot, CYL(48, 50, 1.2, 48), mat(0xf4ecdc), 0, G, 67); add(islRoot, CYL(42, 44, 1.2, 48), mat(0xe9dfca), 0, G+1.2, 67);
   // banners in chapter colours around the plaza
   const CH = ['#3f7f1f', '#5a55ad', '#b8457f', '#1f6297', '#1f7a72', '#ffd400'];
   for(let i=0;i<12;i++){
@@ -3926,20 +3946,6 @@ pickable(renDoor, {n:'렌의 지하 연구실', c:'place', sub:'챕터 4', cx:-1
   }
   islAnim.push(t=> drones.forEach((d,i)=>{ const a = t*0.05 + i*Math.PI/2, r = 160 + (i%2)*170; d.position.set(Math.cos(a)*r, 92 + Math.sin(t*0.7 + i)*6, 40 + Math.sin(a)*r*0.9); d.rotation.y = -a; d.rotation.z = Math.sin(t + i)*0.08; }));
 }
-// ILLUA energy: once a chapter zone is restored, light flows from it into Harmonia
-{
-  const flows = [];
-  MI.forEach(m=>{
-    if(isVoid(m)) return;
-    const a = new THREE.Vector3(m.b.cx, G + (m.b.base||0) + 20, m.b.cz), b = new THREE.Vector3(0, G + 60, 30), mid = a.clone().lerp(b, 0.5); mid.y += 60;
-    const c = new THREE.QuadraticBezierCurve3(a, mid, b);
-    const N = 40, P = new Float32Array(N*3), g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3));
-    const pts = new THREE.Points(g, new THREE.PointsMaterial({color:0x9dffd8, size:3, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false}));
-    sceneI.add(pts); flows.push({c, P, g});
-  });
-  islAnim.push(t=> flows.forEach(f=>{ for(let i=0;i<40;i++){ const p = f.c.getPoint(((t*0.12) + i/40) % 1); f.P[i*3] = p.x; f.P[i*3+1] = p.y; f.P[i*3+2] = p.z; } f.g.attributes.position.needsUpdate = true; }));
-}
-
 // ---------- more attractions in the open lawns ----------
 function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g); return g; }
 // open-air arena west of the plaza: shell stage facing tiered seat rows
@@ -4107,6 +4113,22 @@ const course = new THREE.Group();
   const big = new THREE.Group(); big.position.set(0, 0, 50); course.add(big);
   [-7, 7].forEach(x=> add(big, CYL(0.2, 0.2, 6, 6), mat(0xffffff), x, 0, 0)); add(big, BOX(15, 2.6, 0.3), mat(0xffd400), 0, 5.4, 0);
   add(big, new THREE.PlaneGeometry(14.4, 2.2), new THREE.MeshBasicMaterial({map:signTex('DORO 운전면허 시험장', {bg:'#ffd400', fg:'#1d2f55', size:52, w:640, h:100})}), 0, 6.7, 0.16, false);
+  // inner roads: a north–south and an east–west road through the middle, meeting at a signalled crossroads with crosswalks and stop lines
+  { const road = (x, z, w, l, rot)=>{ const m = add(course, BOX(w, 0.08, l), new THREE.MeshLambertMaterial({color:0x50555c, polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}), x, 0.22, z, false); m.rotation.y = rot; m.receiveShadow = true;
+      [-w/2 + 0.3, w/2 - 0.3].forEach(o=>{ const k = add(course, BOX(0.18, 0.04, l), mat(0xffd400), x + Math.cos(rot)*o, 0.31, z - Math.sin(rot)*o, false); k.rotation.y = rot; });
+      for(let d=-l/2 + 2; d<l/2 - 2; d+=4){ const k = add(course, BOX(0.18, 0.04, 2), mat(0xffffff), x + Math.sin(rot)*d, 0.31, z + Math.cos(rot)*d, false); k.rotation.y = rot; } };
+    road(2, -1, 7.2, 74, 0); road(-1, 12, 7.2, 106, Math.PI/2);
+    add(course, BOX(7.6, 0.09, 7.6), mat(0x50555c), 2, 0.23, 12, false);
+    // crosswalks on all four arms, stop lines, traffic lights on the corners
+    [[2, 6.2, 0],[2, 17.8, 0],[-3.8, 12, Math.PI/2],[7.8, 12, Math.PI/2]].forEach(([x,z,r])=>{ for(let k=-3;k<=3;k++){ const st = add(course, BOX(0.6, 0.05, 2.4), mat(0xffffff), x + Math.cos(r)*k*1.0, 0.32, z + Math.sin(r)*k*1.0, false); st.rotation.y = r; }
+      const sl = add(course, BOX(7, 0.05, 0.35), mat(0xffffff), x, 0.32, z + (z < 12 ? -1.8 : z > 12 ? 1.8 : 0) + (r ? 0 : 0), false); sl.rotation.y = r; });
+    [[6.5,7.5],[-2.5,7.5],[6.5,16.5],[-2.5,16.5]].forEach(([x,z],i)=>{ const tl = new THREE.Group(); tl.position.set(x, 0, z); tl.rotation.y = i*Math.PI/2; course.add(tl);
+      add(tl, CYL(0.1, 0.1, 4.2, 6), mat(0x333333)); add(tl, BOX(0.5, 1.4, 0.4), mat(0x222222), 0, 4.2, 0); [0xff4a3b, 0xffd400, 0x4cd96a].forEach((c,k)=> add(tl, SPH(0.15, 6, 5), new THREE.MeshBasicMaterial({color:c}), 0, 5.2 - k*0.45, 0.22, false)); });
+    // parallel-parking bay along the north–south road, and a bus-stop style kerb on the east–west one
+    add(course, BOX(3.2, 0.06, 16), mat(0x5a5f66), 7.4, 0.24, -22, false); for(let k=0;k<3;k++) add(course, BOX(3.0, 0.04, 0.18), mat(0xffffff), 7.4, 0.3, -29 + k*6, false);
+    add(course, new THREE.PlaneGeometry(3.4, 1), new THREE.MeshBasicMaterial({map:signTex('평행 주차', {bg:'#1d2f55', fg:'#ffffff', size:56, w:256, h:70})}), 11, 2, -22, false).rotation.y = -Math.PI/2;
+    const pk = doroCar(0xb07ad8); pk.position.set(7.4, 0.25, -27); pk.rotation.y = Math.PI/2; course.add(pk);
+    for(let k=0;k<6;k++) add(course, CONE(0.25, 0.7, 8), mat(0xf39a3b), -30 + k*4, 0.25, 16.2); }
   const cars = [0xd6a04c, 0xe2574c, 0x5aa0e6].map(c=>{ const k = doroCar(c); course.add(k); return k; });
   islAnim.push(t=>{
     cars.forEach((k,i)=>{ const u = ((t*0.016) + i/3) % 1, p = loop.getPointAt(u), q = loop.getPointAt((u + 0.003) % 1); k.position.set(p.x, 0.25, p.z); k.lookAt(q.x, 0.25, q.z); k.rotateY(-Math.PI/2); });
@@ -4613,13 +4635,13 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
         // every 14 s the gates drop for 7 s (arm level) and lift again (arm up); the light blinks while they are down
         islAnim.push(tm=>{ const ph = tm % 14, down = ph < 7 ? Math.min(1, ph/1.5) : Math.max(0, 1 - (ph-7)/1.5); arm.rotation.z = -s*1.45*(1-down); lt.material.opacity = down > 0.5 && (tm % 1 < 0.5) ? 1 : 0.25; lt.material.transparent = true; }); }); }
     // S-course and T-course pads inside the loop
-    { const sPts = [[8,-24],[18,-20],[22,-12],[16,-4],[20,4],[30,8],[40,4]].map(([x,z])=>new THREE.Vector3(x, 0.24, z)), sC = new THREE.CatmullRomCurve3(sPts);
+    { const sPts = [[14,-30],[24,-26],[28,-18],[22,-10],[26,-2],[36,2],[46,-2]].map(([x,z])=>new THREE.Vector3(x, 0.24, z)), sC = new THREE.CatmullRomCurve3(sPts);
       ribbon(sC, 0, 2.6, 0x50555c, 0.24, 80, false); ribbon(sC, 2.4, 0.16, 0xffd400, 0.3, 80, false); ribbon(sC, -2.4, 0.16, 0xffd400, 0.3, 80, false);
-      add(Cs, new THREE.PlaneGeometry(4, 1.3), new THREE.MeshBasicMaterial({map:signTex('S자 코스', {bg:'#ffffff', fg:'#1d2f55', size:56, w:256, h:90})}), 6, 2.4, -28, false); add(Cs, CYL(0.08, 0.08, 2.2, 5), mat(0x888888), 6, 0.2, -28);
+      add(Cs, new THREE.PlaneGeometry(4, 1.3), new THREE.MeshBasicMaterial({map:signTex('S자 코스', {bg:'#ffffff', fg:'#1d2f55', size:56, w:256, h:90})}), 12, 2.4, -34, false); add(Cs, CYL(0.08, 0.08, 2.2, 5), mat(0x888888), 12, 0.2, -34);
       add(Cs, BOX(22, 0.08, 5), mat(0x50555c), 38, 0.22, -24, false); add(Cs, BOX(5, 0.08, 14), mat(0x50555c), 38, 0.22, -15, false);
       add(Cs, BOX(21, 0.04, 0.16), mat(0xffd400), 38, 0.3, -26.4, false); add(Cs, BOX(21, 0.04, 0.16), mat(0xffd400), 38, 0.3, -21.6, false); add(Cs, BOX(0.16, 0.04, 13), mat(0xffd400), 35.6, 0.3, -14.6, false); add(Cs, BOX(0.16, 0.04, 13), mat(0xffd400), 40.4, 0.3, -14.6, false);
       add(Cs, new THREE.PlaneGeometry(4, 1.3), new THREE.MeshBasicMaterial({map:signTex('T자 코스', {bg:'#ffffff', fg:'#1d2f55', size:56, w:256, h:90})}), 48, 2.4, -30, false); add(Cs, CYL(0.08, 0.08, 2.2, 5), mat(0x888888), 48, 0.2, -30);
-      const s1 = doroCar(0x58b368); s1.position.set(18, 0.25, -20); s1.rotation.y = -0.4; Cs.add(s1); const s2 = doroCar(0xff9fcf); s2.position.set(38, 0.25, -12); s2.rotation.y = Math.PI/2; Cs.add(s2); }
+      const s1 = doroCar(0x58b368); s1.position.set(24, 0.25, -26); s1.rotation.y = -0.4; Cs.add(s1); const s2 = doroCar(0xff9fcf); s2.position.set(38, 0.25, -12); s2.rotation.y = Math.PI/2; Cs.add(s2); }
     // more parked cars, lamp posts, fence, grandstand with spectators, exam hall
     [0xe2574c, 0x5aa0e6, 0xffd400, 0x6a4bc4, 0x58b368].forEach((c,i)=>{ const k = doroCar(c); k.position.set(-30 + i*4, 0.25, -5.6 + (i%2)*0.6); k.rotation.y = Math.PI/2; Cs.add(k); });
     for(let i=0;i<10;i++){ const {p, t} = atU(i/10 + 0.05); lampPost(Cs, p.x - t.z*6.2, p.z + t.x*6.2, 5, 0.75); }
