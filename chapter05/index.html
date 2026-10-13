@@ -1949,13 +1949,17 @@ function mission(group, id, info){
 
 // ---------- terrain, sea, sky ----------
 const islPts = (k=0, n=200) => Array.from({length:n}, (_,i)=>{ const a = i/n*Math.PI*2, r = islR(a)+k; return [Math.cos(a)*r, Math.sin(a)*r]; });
+const LAKE = [215, 205];
+const LAKE_PTS = Array.from({length:48}, (_,i)=>{ const a = i/48*Math.PI*2, r = 50 + 6*Math.sin(a*3+1) + 4*Math.sin(a*5); return [Math.cos(a)*r, Math.sin(a)*r]; });
 function slab(pts, depth, y, topC, sideC, bevel=0, parent=islRoot){
-  const g = new THREE.ExtrudeGeometry(shapeOf(pts), {depth, bevelEnabled:bevel>0, bevelSize:bevel, bevelThickness:bevel, bevelSegments:3, curveSegments:6});
+  const g = new THREE.ExtrudeGeometry(pts instanceof THREE.Shape ? pts : shapeOf(pts), {depth, bevelEnabled:bevel>0, bevelSize:bevel, bevelThickness:bevel, bevelSegments:3, curveSegments:6});
   g.rotateX(-Math.PI/2); g.translate(0, y, 0);
   const m = new THREE.Mesh(g, [mat(topC), mat(sideC)]); m.receiveShadow = true; parent.add(m); return m;
 }
 slab(islPts(30), 4, -4.8, C.sand, C.sandD, 2);                 // beach ring, top ≈ 1.2
-slab(islPts(0), 3, -1, C.grass, C.cliff, 2);                   // grass plateau, top = G
+{ const plateau = shapeOf(islPts(0));                           // grass plateau, top = G — with the lake basin cut out of it
+  plateau.holes.push(new THREE.Path(LAKE_PTS.map(([x,z])=> new THREE.Vector2(LAKE[0]*K + x*1.14, -(LAKE[1]*K + z*1.14)))));
+  slab(plateau, 3, -1, C.grass, C.cliff, 2); }
 // darker meadow patches break up the lawn
 [[-160,60,60],[120,90,55],[-60,-60,45],[260,-90,50],[-300,-90,70],[60,230,50],[-220,-200,60]].forEach(([x,z,r])=>{
   x *= K; z *= K; r *= K;
@@ -2014,27 +2018,27 @@ const PATHS = [
   [[60,0],[100,-60],[118,-100]],                       // → ferris hill path
   [[-55,90],[-110,140],[-150,165]],                    // → coaster
   [[-40,-15],[-55,-100],[-60,-150]],                   // → castle
-  [[-166,-20],[-215,-120],[-205,-205]],                // safari → codex space
+  [[-130,0],[-190,-70],[-215,-120],[-205,-205]],       // → codex space (branches off the safari path)
   [[50,100],[110,150],[130,175]],                      // → drop tower
-  [[215,25],[320,0],[395,-15]],                        // → lighthouse
+  [[150,40],[232,78],[300,45],[320,0],[395,-15]],      // → lighthouse (round the south of the carousel, which is now a dead end)
   [[-130,0],[-200,62],[-292,56]],                      // → warehouse (round the safari)
   [[-212,-110],[-240,-128],[-252,-134]],               // → windmill
   [[0,200],[80,212],[150,240],[170,262]],              // → lake & food court
-  [[70,62],[118,92]],                                  // → teacups
-  [[-9,209],[-40,209]],                                // → bumper cars by the boulevard
+  [[100,40],[118,92]],                                 // → teacups (off the carousel path)
+  [[0,209],[-40,209]],                                 // → bumper cars by the boulevard
   [[100,-60],[132,-38]],                               // → swing ride
-  [[-150,165],[-150,230],[-126,252]],                  // → kids zone
-  [[-166,-20],[-160,-62],[-141,-90]],                  // → 4D theatre
+  [[100,-60],[160,-70],[204,-84]],                     // → disco swing (from the wheel side, not from the lodging)
+  [[-110,140],[-120,200],[-126,252]],                  // → kids zone (branches off the coaster path)
+  [[-130,0],[-140,-50],[-141,-90]],                    // → 4D theatre (branches off the safari path, not from its gate)
   [[20,330],[60,325],[80,312]],                        // → maze
-  [[-205,-205],[-240,-200],[-262,-190]],               // → native village
+  [[-215,-120],[-245,-160],[-262,-190]],               // → native village (branches off the codex path)
   [[-55,-100],[-90,-150],[-120,-185]],                 // → Ren's door
   [[45,-60],[55,-110],[60,-150],[62,-190]],            // → cave & Codex's box
-  [[320,0],[302,-60],[296,-100]],                      // → staff lodging
-  [[62,-190],[0,-215],[-60,-262],[-30,-355]]           // Codex's box → the eye cave on the north shore
+  [[320,0],[302,-60],[296,-100]]                       // → staff lodging
 ];
 PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 { const cv = (a, dr)=>{ const v = coveAt(a, dr); return [v.x, v.z]; };
-  PATHS.push([[0,470],[0,515],cv(PIER_A, 24)], [[-40,466],[-95,482],cv(HARBOUR_A, -22)], [[-202,223],[-245,330],[-205,430],cv(HARBOUR_A, -22)]); }
+  PATHS.push([[0,470],[0,515],cv(PIER_A, 24)], [[-40,466],[-95,482],cv(HARBOUR_A, -22)], [[-148,189],[-245,330],[-205,430],cv(HARBOUR_A, -22)]); }
 const pathSamples = [];
 (function paths(){
   const pos = [], idx = [];
@@ -2058,7 +2062,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-304,-54,104],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,100],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[385,189,24],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-190,-122,22],[-6,-172,30],[-108,176,18],[98,252,5],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-190,-122,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -3088,16 +3092,34 @@ pickable(garden, {noPop:true, abs:true, n:'포시즌스 가든', c:'place', sub:
   facts:[['위치','정문 안쪽 양옆']]});
 
 // lake with a gazebo islet, arched bridge and swan boats
-const LAKE = [215, 205];
 const lake = new THREE.Group();
 {
-  const pts = Array.from({length:48}, (_,i)=>{ const a = i/48*Math.PI*2, r = 50 + 6*Math.sin(a*3+1) + 4*Math.sin(a*5); return [Math.cos(a)*r, Math.sin(a)*r]; });
-  const shore = new THREE.ShapeGeometry(shapeOf(pts.map(([x,z])=>[x*1.1, z*1.1]))); shore.rotateX(-Math.PI/2);
-  add(lake, shore, new THREE.MeshLambertMaterial({color:C.sand, polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}), 0, 0.12, 0, false).receiveShadow = true;
+  const pts = LAKE_PTS, DEEP = -2.6;
+  // banks: a sloped sand-and-mud ring from the lawn edge down to the water, then the lake bed
+  { const n = pts.length, pos = [], idx = [], col = [];
+    const rings = [[1.16, 0.0, 0xa9c47f], [1.08, -0.9, 0xd9c38f], [1.0, -2.0, 0xb9a070], [0.9, DEEP, 0x6f7a5a], [0.0, DEEP - 0.4, 0x5a6650]];
+    rings.forEach(([k, y, c])=> pts.forEach(([x,z])=>{ pos.push(x*k, y, z*k); const cc = new THREE.Color(c); col.push(cc.r, cc.g, cc.b); }));
+    for(let r=0; r<rings.length-1; r++) for(let i=0; i<n; i++){ const j = (i+1)%n, a = r*n+i, b = r*n+j, c = (r+1)*n+i, d = (r+1)*n+j; idx.push(a, c, b, b, c, d); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
+    const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({vertexColors:true, side:THREE.DoubleSide})); m.receiveShadow = true; lake.add(m); }
   const wg = new THREE.ShapeGeometry(shapeOf(pts)); wg.rotateX(-Math.PI/2);
-  add(lake, wg, new THREE.MeshLambertMaterial({color:0x6cc6df, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), 0, 0.22, 0, false);
-  add(lake, CYL(11, 12, 1.4, 20), mat(C.grass), 12, 0, -6);
-  const gz = new THREE.Group(); gz.position.set(12, 1.4, -6); lake.add(gz);
+  add(lake, wg, new THREE.MeshLambertMaterial({color:0x4fb3d4, transparent:true, opacity:0.86, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), 0, -1.9, 0, false);
+  add(lake, new THREE.ShapeGeometry(shapeOf(pts.map(([x,z])=>[x*0.55, z*0.55]))).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x2f8fb8, transparent:true, opacity:0.5, polygonOffset:true, polygonOffsetFactor:-6, polygonOffsetUnits:-6}), 6, -1.85, 4, false);
+  // reeds, rocks and lily pads round the shore, ducks on the water, a willow, a fishing deck, lanterns
+  for(let i=0;i<48;i++){ const [x,z] = pts[i]; if(i%3) continue; for(let k=0;k<5;k++) add(lake, CONE(0.22, 2.2 + (k%3)*0.6, 4), mat(k%2 ? 0x7fae4c : 0x9cbf5a), x*0.98 + (rr()-0.5)*3, -2.0, z*0.98 + (rr()-0.5)*3); }
+  for(let i=0;i<14;i++){ const [x,z] = pts[(i*7)%48]; add(lake, ICO(1 + rr()*1.4, 0), flat(i%2 ? 0x9c9486 : 0xb0a898), x*1.06, -0.6 + rr()*0.4, z*1.06).rotation.set(rr()*3, rr()*3, 0); }
+  for(let i=0;i<22;i++){ const a = rr()*Math.PI*2, r = 20 + rr()*24; const pad = add(lake, new THREE.CircleGeometry(1.1 + rr()*0.8, 10).rotateX(-Math.PI/2), mat(0x4f8a3c), Math.cos(a)*r, -1.84, Math.sin(a)*r, false); if(i%4===0) add(lake, SPH(0.4, 6, 5), mat(0xff9fcf), Math.cos(a)*r, -1.6, Math.sin(a)*r, false); }
+  for(let i=0;i<5;i++){ const d = new THREE.Group(); lake.add(d); const a = rr()*Math.PI*2, r = 10 + rr()*26; d.position.set(Math.cos(a)*r, -1.9, Math.sin(a)*r); d.rotation.y = rr()*6; d.scale.setScalar(0.5);
+    add(d, SPH(1, 10, 8), mat(0x8a6243), 0, 0.6, 0).scale.set(1.8, 1, 1.2); add(d, SPH(0.6, 8, 6), mat(0x2f8a57), 1.6, 1.6, 0); add(d, CONE(0.25, 0.9, 5).rotateZ(-Math.PI/2), mat(0xf39a3b), 2.4, 1.5, 0);
+    islAnim.push(t=>{ d.position.x += Math.cos(d.rotation.y)*0.02; d.position.z -= Math.sin(d.rotation.y)*0.02; if(Math.hypot(d.position.x, d.position.z) > 40) d.rotation.y += Math.PI; d.position.y = -1.9 + Math.sin(t*2 + i)*0.08; }); }
+  { const w = new THREE.Group(); w.position.set(-38, 0.2, -34); lake.add(w); add(w, CYL(1.2, 1.8, 9, 8), mat(0x6e4a2f)); add(w, ICO(6.5, 1), flat(0x7fae4c), 0, 12, 0).scale.set(1.4, 0.8, 1.4);
+    for(let i=0;i<18;i++){ const a = i/18*Math.PI*2; add(w, CYL(0.18, 0.1, 6 + (i%3)*1.5, 4), mat(0x8fbf5a), Math.cos(a)*7.5, 5.5 - (i%3)*0.8, Math.sin(a)*7.5); } }
+  { const dk = new THREE.Group(); dk.position.set(14, 0, 48); dk.rotation.y = Math.PI; lake.add(dk); add(dk, BOX(10, 0.5, 14), mat(C.wood), 0, 0.2, 7); [[-4,2],[4,2],[-4,12],[4,12]].forEach(([x,z])=> add(dk, CYL(0.4, 0.4, 3.4, 6), mat(C.woodD), x, -3, z));
+    [-4.6, 4.6].forEach(x=>{ add(dk, BOX(0.25, 1.1, 14), mat(C.woodD), x, 0.7, 7, false); for(let z=1; z<=13; z+=3) add(dk, BOX(0.25, 1.1, 0.25), mat(C.woodD), x, 0.7, z, false); });
+    add(dk, CYL(0.15, 0.15, 5, 5), mat(0x3a3f4a), 2, 0.7, 13).rotation.x = -0.9; add(dk, SPH(0.5, 8, 6), glowMat(0xffe7a3), -3.5, 4.2, 12, false); add(dk, CYL(0.2, 0.2, 4, 6), mat(0x2f3540), -3.5, 0.7, 12); }
+  [[-44,-6],[-20,-46],[36,-30],[52,10]].forEach(([x,z])=>{ add(lake, CYL(0.25, 0.3, 4.6, 6), mat(0x8a6243), x, 0, z); add(lake, BOX(1.4, 1.6, 1.4), mat(0xffe7a3), x, 4.6, z); add(lake, CONE(1.2, 0.8, 4).rotateY(Math.PI/4), mat(0x2f3540), x, 6.2, z); });
+  add(lake, CYL(11, 13, 4.2, 20), mat(C.grass), 12, -2.6, -6);
+  const gz = new THREE.Group(); gz.position.set(12, 1.6, -6); lake.add(gz);
   add(gz, CYL(7, 7, 0.8, 6), mat(0xf4efe4));
   for(let i=0;i<6;i++){ const a = i/6*Math.PI*2; add(gz, CYL(0.4, 0.4, 7, 6), mat(0xffffff), Math.cos(a)*6, 0.8, Math.sin(a)*6); }
   add(gz, CONE(8.4, 5, 6), mat(0xc0392b), 0, 7.8, 0); add(gz, SPH(0.8, 8, 6), mat(0xffd400), 0, 13.2, 0);
@@ -3113,38 +3135,65 @@ const lake = new THREE.Group();
     add(s, BOX(2.6, 1.4, 3), mat([0xf7a8c4, 0x9fd3f5, 0xffd27a, 0xb9a6f0][i]), -0.6, 2.6, 0);
     s.scale.setScalar(0.45); swans.push(s);
   }
-  islAnim.push(t=> swans.forEach((s,i)=>{ const a = t*0.07*(i%2 ? 1 : -1) + i*1.6, r = 30 + (i%2)*6; s.position.set(Math.cos(a)*r, Math.sin(t*1.4+i)*0.2, Math.sin(a)*r); s.rotation.y = -a + (i%2 ? -Math.PI/2 : Math.PI/2); }));
+  islAnim.push(t=> swans.forEach((s,i)=>{ const a = t*0.07*(i%2 ? 1 : -1) + i*1.6, r = 30 + (i%2)*6; s.position.set(Math.cos(a)*r, -1.9 + Math.sin(t*1.4+i)*0.2, Math.sin(a)*r); s.rotation.y = -a + (i%2 ? -Math.PI/2 : Math.PI/2); }));
 }
 place(lake, LAKE[0], LAKE[1]);
 pickable(lake, {n:'호수 공원', c:'place', sub:'명소', cx:LAKE[0], cz:LAKE[1], h:14, r:52,
-  desc:'붉은 정자가 떠 있는 호수. 아치형 다리를 건너면 정자에 닿고, 백조 보트가 호수를 천천히 돕니다.',
-  facts:[['볼거리','정자, 아치 다리, 백조 보트, 통나무 급류']]});
+  desc:'잔디 아래로 움푹 내려앉은 호수. 아치 다리로 정자 섬에 건너가고, 백조 보트와 오리가 연잎 사이를 떠다닙니다. 남쪽 낚시 데크와 버드나무 아래가 쉬어 가기 좋습니다.',
+  facts:[['볼거리','정자, 아치 다리, 백조 보트, 낚시 데크, 후룸라이드']]});
 
-// log flume splashing down into the lake
+// flume ride: a lift up the rock, a high winding trough on tall legs, the big drop into the splash pool, a splash bridge and a boarding station
 const flume = new THREE.Group();
 {
-  add(flume, new THREE.CylinderGeometry(16, 26, 24, 12).translate(0,12,0), [flat(0xb9a07a), mat(C.grass), mat(C.grass)]);
-  add(flume, BOX(12, 6, 10), mat(0x9a6b45), 4, 24, -4);
-  add(flume, CONE(9, 5, 4).rotateY(Math.PI/4), mat(0x6b4a2c), 4, 30, -4);
-  const path = new THREE.CatmullRomCurve3([[6,27,4],[14,25,10],[8,23,18],[-6,19,20],[-22,12,26],[-38,5,36],[-52,1.4,48],[-60,0.9,54]].map(([x,y,z])=>new THREE.Vector3(x,y,z)));
-  add(flume, new THREE.TubeGeometry(path, 80, 2.4, 10, false), new THREE.MeshLambertMaterial({color:0x2f8acb, side:THREE.DoubleSide}));
-  add(flume, new THREE.TubeGeometry(path, 80, 1.7, 8, false), glowMat(0xbfeaff, 0.75), 0, 0.5, 0, false);
-  path.getSpacedPoints(10).forEach((p,i)=>{ if(i===0 || p.y < 3) return; add(flume, CYL(0.5, 0.6, p.y - 2.4, 6), mat(0x8a6243), p.x, 0, p.z); });
-  const log = new THREE.Group(); add(log, BOX(2.6, 1.6, 6), mat(0x8a5a36)); add(log, BOX(1.8, 0.6, 1.4), mat(0xffd400), 0, 1, 0); flume.add(log);
-  const N = 120, P = new Float32Array(N*3), sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(P,3));
-  const splash = new THREE.Points(sg, new THREE.PointsMaterial({color:0xe6f7ff, size:1.6, transparent:true, opacity:0})); flume.add(splash);
+  const F = flume;
+  // the rock the ride climbs, with the trough tunnelling round it
+  add(F, ICO(1, 2).scale(22, 20, 18), flat(0x9c8f7a), 8, 0, 2).rotation.y = 0.6;
+  add(F, ICO(1, 1).scale(10, 9, 9), flat(0x8a7d6a), -4, 4, -12); add(F, ICO(1, 1).scale(8, 7, 7), flat(0xaa9e88), 24, 2, 10);
+  for(let i=0;i<10;i++) add(F, ICO(1.6 + (i%3)*0.5, 1), flat([C.leaf, C.leaf2][i%2]), 8 + Math.cos(i*0.9)*18, 2 + (i%2)*6, 2 + Math.sin(i*0.9)*16);
+  // the water course: station → lift → high loop → the drop → splash pool → back to the station
+  const P = [[-30,1.2,26],[-16,11,18],[-2,25,6],[12,28,-8],[28,27,-2],[34,24,12],[26,22,24],[12,22,26],[0,22,18],[-6,20,6],[0,18,-6],[14,16,-14],[28,13,-10],[38,5,4],[42,1.2,18],[24,1.0,32],[-6,1.0,34],[-30,1.2,26]];
+  const path = new THREE.CatmullRomCurve3(P.map(([x,y,z])=>new THREE.Vector3(x,y,z)), true, 'catmullrom', 0.3);
+  add(F, new THREE.TubeGeometry(path, 200, 2.6, 10, true), new THREE.MeshLambertMaterial({color:0x8fa3b8, side:THREE.DoubleSide}));
+  add(F, new THREE.TubeGeometry(path, 200, 1.9, 8, true), glowMat(0xbfeaff, 0.8), 0, 0.5, 0, false);
+  path.getSpacedPoints(60).forEach((p,i)=>{ if(p.y < 4 || i%2) return; add(F, CYL(0.55, 0.7, p.y - 2.2, 6), mat(0xd9d4c8), p.x, 0, p.z); add(F, BOX(5.2, 0.5, 0.5), mat(0xd9d4c8), p.x, p.y - 2.6, p.z); });
+  // lift: a ribbed conveyor ramp beside the trough, with a frame
+  { const l = new THREE.Group(); l.position.set(-16, 0, 18); l.rotation.y = Math.atan2(26 - 6, -30 + 2) ; F.add(l);
+    add(l, BOX(2, 0.6, 34), mat(0x3a3f4a), 0, 5.5, 0).rotation.x = -0.72; for(let k=0;k<12;k++) add(l, BOX(2.2, 0.2, 0.4), mat(0xffd400), 0, 5.5 + (k-5.5)*2.1, (k-5.5)*2.3, false).rotation.x = -0.72; }
+  // the splash pool at the foot of the drop, and the splash bridge over it
+  add(F, new THREE.CircleGeometry(17, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x4fb3d4, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5}), 40, 0.3, 18, false);
+  add(F, new THREE.RingGeometry(16.5, 19, 28).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0xd9d4c8, polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4}), 40, 0.32, 18, false);
+  { const br = new THREE.Group(); br.position.set(40, 0, 18); F.add(br);
+    [-20, 20].forEach(x=> [-1.6, 1.6].forEach(z=> add(br, CYL(0.4, 0.4, 5, 6), mat(0x3a3f4a), x, 0, z))); add(br, BOX(42, 0.5, 4), mat(0x9a6b45), 0, 5, 0);
+    [-2.1, 2.1].forEach(z=>{ add(br, BOX(42, 0.1, 0.1), mat(0x3a3f4a), 0, 6.2, z); for(let x=-20; x<=20; x+=4) add(br, BOX(0.12, 1.2, 0.12), mat(0x3a3f4a), x, 5.25, z, false); });
+    for(let i=0;i<7;i++){ const g = new THREE.Group(); g.position.set(-15 + i*5, 5.25, (i%2 ? 1 : -1)*0.9); g.rotation.y = i%2 ? Math.PI : 0; g.scale.setScalar(0.55); br.add(g);
+      add(g, CAP(0.9, 1.6).translate(0, 1.7, 0), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf, 0xffffff, 0x58b368, 0x6a4bc4][i])); add(g, SPH(0.72, 10, 8), mat(0xf1d3b0), 0, 3.5, 0); }
+    add(br, new THREE.PlaneGeometry(9, 1.3), new THREE.MeshBasicMaterial({map:signTex('물보라 다리', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:70}), side:THREE.DoubleSide}), 0, 8, 0, false); [-5, 5].forEach(x=> add(br, CYL(0.15, 0.15, 3, 5), mat(0x3a3f4a), x, 5, 0)); }
+  // boarding station
+  { const st = new THREE.Group(); st.position.set(-30, 0, 26); st.rotation.y = 0.35; F.add(st);
+    add(st, BOX(26, 1, 12), mat(0xd9cfba), 0, 0, -8); [[-11,-13],[11,-13],[-11,-3],[11,-3]].forEach(([x,z])=> add(st, CYL(0.4, 0.4, 8, 8), mat(0xf4efe4), x, 1, z));
+    add(st, BOX(28, 0.8, 14), mat(C.teal), 0, 9, -8); add(st, CONE(17, 4, 4).rotateY(Math.PI/4), mat(C.teal), 0, 9.8, -8);
+    add(st, new THREE.PlaneGeometry(14, 2), new THREE.MeshBasicMaterial({map:signTex('후룸라이드', {bg:'#2aa7a0', fg:'#ffffff', size:70, w:512, h:80}), side:THREE.DoubleSide}), 0, 10.2, -1, false);
+    for(let i=0;i<6;i++){ const g = new THREE.Group(); g.position.set(-8 + i*3.2, 1, -11 + (i%2)); g.scale.setScalar(0.55); st.add(g); add(g, CAP(0.9, 1.6).translate(0, 1.7, 0), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf, 0xffffff, 0x58b368][i])); add(g, SPH(0.72, 10, 8), mat(0xf1d3b0), 0, 3.5, 0); } }
+  // three log boats on the course, slow on the lift, fast on the drop, with a splash at the bottom
+  const boatsF = [0, 1, 2].map(i=>{ const b = new THREE.Group(); add(b, BOX(2.4, 1.3, 6.4), mat(0x8a5a36), 0, 0, 0); add(b, SPH(1.2, 8, 6), mat(0x8a5a36), 0, 0.6, 3.2).scale.set(1, 0.9, 1);
+    for(let k=0;k<3;k++){ add(b, BOX(1.8, 0.5, 1), mat(0xffd400), 0, 1.3, -2 + k*1.9); add(b, CAP(0.45, 0.6).translate(0, 1.2, 0), mat([0xe2574c, 0x5aa0e6, 0xff9fcf][(i+k)%3]), -0.5 + (k%2), 1.3, -2 + k*1.9); add(b, SPH(0.4, 8, 6), mat(0xf1d3b0), -0.5 + (k%2), 3.2, -2 + k*1.9); }
+    F.add(b); return b; });
+  const N = 140, SP = new Float32Array(N*3), sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(SP, 3));
+  const splash = new THREE.Points(sg, new THREE.PointsMaterial({color:0xe6f7ff, size:1.8, transparent:true, opacity:0})); F.add(splash);
+  const drop = [0.66, 0.78];                                              // where along the loop the drop happens
   islAnim.push(t=>{
-    const u = (t*0.09) % 1.3, k = Math.min(u, 1);
-    log.position.copy(path.getPointAt(k)).add(new THREE.Vector3(0, 1.2, 0)); log.lookAt(path.getPointAt(Math.min(k+0.01, 1)).add(new THREE.Vector3(0, 1.2, 0)));
-    const s = u > 0.98 ? Math.min((u-0.98)/0.3, 1) : 0;
-    splash.material.opacity = s > 0 ? 1 - s : 0;
-    for(let i=0;i<N;i++){ const a = i*2.4, v = 6 + (i%5)*2; P[i*3] = -60 + Math.cos(a)*v*s*1.6; P[i*3+1] = 1 + v*2.2*s - 18*s*s; P[i*3+2] = 54 + Math.sin(a)*v*s*1.6; }
+    let s = 0;
+    boatsF.forEach((b, i)=>{ let u = ((t*0.028) + i/3) % 1; const p = path.getPointAt(u), q = path.getPointAt((u + 0.004) % 1);
+      b.position.copy(p).add(new THREE.Vector3(0, 1.1, 0)); b.lookAt(q.x, q.y + 1.1, q.z); b.rotateY(Math.PI);
+      if(u > drop[1] && u < drop[1] + 0.05) s = Math.max(s, 1 - (u - drop[1])/0.05); });
+    splash.material.opacity = s;
+    for(let i=0;i<N;i++){ const a = i*2.4, v = 5 + (i%5)*2, k = 1 - s; SP[i*3] = 40 + Math.cos(a)*v*k*1.6; SP[i*3+1] = 1 + v*2.4*k - 16*k*k; SP[i*3+2] = 16 + Math.sin(a)*v*k*1.6; }
     sg.attributes.position.needsUpdate = true;
   });
 }
 place(flume, 285, 140); flume.scale.setScalar(0.8);
-pickable(flume, {n:'통나무 급류', c:'ride', sub:'놀이기구', cx:285, cz:140, h:34, r:26,
-  desc:'언덕 꼭대기에서 출발한 통나무 보트가 푸른 수로를 타고 호수로 첨벙 떨어지는 급류 놀이기구.', facts:[['위치','호수 공원 동쪽']]});
+pickable(flume, {n:'후룸라이드', c:'ride', sub:'놀이기구', cx:285, cz:140, h:34, r:26,
+  desc:'바위산을 오르는 리프트를 타고 높은 수로를 한 바퀴 돈 뒤, 가파른 물미끄럼틀로 쏟아져 내려오는 후룸라이드. 물보라 다리 위에 서면 흠뻑 젖습니다.', facts:[['위치','호수 공원 동쪽'],['특징','리프트 · 고가 수로 · 급강하 · 물보라 다리']]});
 
 // teacups
 const teacups = new THREE.Group();
@@ -3602,8 +3651,8 @@ const village = new THREE.Group();
   add(village, CYL(5, 5, 0.6, 16), mat(0x8a6243), 6, 0, 8); add(village, CONE(2, 3, 6), glowMat(0xffa53b), 6, 0.6, 8, false);
 }
 place(village, -370/K, -255/K);
-pickable(village, {n:'원류민 마을', c:'place', sub:'숲 속', cx:-370/K, cz:-255/K, h:32, r:34,
-  desc:'섬의 원래 주인인 원류민들이 사는 숲 속 마을. 나무 위 집들이 줄다리로 이어지고, 발밑에는 빛나는 버섯이 자랍니다.', facts:[['등장','챕터 3 · 4'],['특징','나무 위 집, 줄다리, 빛 버섯']]});
+pickable(village, {n:'나무집 마을', c:'place', sub:'숲 속', cx:-370/K, cz:-255/K, h:32, r:34,
+  desc:'숲 속 큰 나무 위에 지은 집들을 줄다리로 이은 마을. 발밑에는 빛나는 버섯이 자랍니다.', facts:[['등장','챕터 3 · 4'],['특징','나무 위 집, 줄다리, 빛 버섯']]});
 
 // ---------- story props ----------
 const codexBox = new THREE.Group();
@@ -3730,21 +3779,14 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   pickable(g, {abs:true, n:'츄러스 하우스', c:'shop', sub:'간식', cx:-108, cz:176, h:26, r:14, desc:'지붕 위 거대한 츄러스가 눈에 띄는 간식 가게. 시나몬 냄새가 롤러코스터 입구까지 퍼집니다.', facts:[['위치','롤러코스터 가는 길']]});
 }
 // giant Naty sculpture photo spot
-{
-  const g = at(98, 252, -0.6); g.scale.setScalar(0.4);
-  add(g, CYL(7, 7.6, 2, 20), mat(0xe9e4f2));
-  const fl = add(g, new THREE.LatheGeometry(Array.from({length:14}, (_,i)=>{ const u = i/13; return new THREE.Vector2(Math.max(0.01, u < 0.45 ? Math.sin(u/0.45*Math.PI/2)*5 : 5*Math.pow(1-(u-0.45)/0.55, 1.4)), u*14); }), 18), new THREE.MeshLambertMaterial({color:0x7cc8f0, emissive:0x2a6a9a, emissiveIntensity:0.4}), 0, 2, 0);
-  const face = add(g, SPH(3.2, 16, 12), mat(0xf6a08a), 0, 6, 1.8); face.scale.set(1, 0.85, 0.55);
-  [-1.1, 1.1].forEach(x=> add(g, BOX(1.2, 0.3, 0.3), mat(0x3a1a1a), x, 6.4, 3.6, false));
-  islAnim.push(t=>{ fl.material.color.setHSL((t*0.04) % 1, 0.65, 0.68); fl.material.emissive.setHSL((t*0.04) % 1, 0.65, 0.25); });
-  pickable(g, {abs:true, n:'네이티 조형물', c:'place', sub:'포토존', cx:98, cz:252, h:18, r:8, desc:'시간에 따라 색이 바뀌는 대형 네이티 조형물. 인기 사진 명소입니다.', facts:[['위치','정문 거리 동쪽']]});
-}
 // disco pendulum ride north-east
 {
-  const g = at(300, -115, 0.3); g.scale.setScalar(0.8);
-  add(g, BOX(26, 1.4, 14), mat(0xe9e2f4));
-  [-1, 1].forEach(s=>{ [-5, 5].forEach(z=>{ const L = Math.hypot(10, 26); const leg = add(g, BOX(1.4, L, 1.4), mat(0xb07ad8), 0, 0, z); leg.position.set(s*10, 1.4, z); leg.rotation.z = s*Math.atan2(10, 26); }); });
-  add(g, new THREE.CylinderGeometry(0.8, 0.8, 12, 10).rotateX(Math.PI/2), mat(0x555a66), 0, 27, 0);
+  const g = at(300, -115, 0.3); g.scale.setScalar(0.95);
+  add(g, BOX(30, 1.4, 38), mat(0xe9e2f4));
+  // A-frame legs stand 15 in front of and behind the pivot, outside the plane the pendulum swings in, so nothing passes through them
+  [-1, 1].forEach(s=>{ [-15, 15].forEach(z=>{ const L = Math.hypot(10, 26); const leg = add(g, BOX(1.6, L, 1.6), mat(0xb07ad8), 0, 0, z); leg.position.set(s*10, 1.4, z); leg.rotation.z = s*Math.atan2(10, 26); }); add(g, BOX(1.2, 1.2, 30), mat(0xb07ad8), s*3.4, 18, 0); });
+  [-15, 15].forEach(z=> add(g, BOX(22, 1.2, 1.2), mat(0xb07ad8), 0, 14, z));
+  add(g, new THREE.CylinderGeometry(0.9, 0.9, 32, 10).rotateX(Math.PI/2), mat(0x555a66), 0, 27, 0);
   const arm = new THREE.Group(); arm.position.y = 27; g.add(arm);
   add(arm, new THREE.BoxGeometry(1, 22, 1).translate(0, -11, 0), mat(0xffd400));
   const disc = new THREE.Group(); disc.position.y = -22; arm.add(disc);
@@ -3935,6 +3977,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     if(d - reach > 1.5 && !NO_SPUR.has(b.label)) spurs.push([[p[0], p[1]], [e.x, e.z]]);
     entries.push(e);
   });
+  islRoot.userData.spurs = spurs;
   // spur strips share the path material and join the path network (so hedges and fillers keep off them)
   const pos = [], idx = [];
   spurs.forEach(([a, b])=>{
@@ -4004,7 +4047,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
 
 // ---------- fillers: small vignettes in every remaining empty patch ----------
 {
-  const used = [[-150,100,34],[262,130,8],[-190,-122,22],[-6,-172,30],[-108,176,18],[98,252,5],[300,-115,16],[258,392,16]];
+  const used = [[-150,100,34],[262,130,8],[-190,-122,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16]];
   const free = (x,z,r)=> !occupied(x,z,r) && !used.some(([a,b,c])=> Math.hypot(x-a,z-b) < c + r) && !nearPath(x,z,r+7) && Math.abs(Math.hypot(x,z) - trackR(Math.atan2(z,x))) > r + 6 && Math.hypot(x,z) < edgeR(x,z) - 26 - r;
   const flowerSpots = [], bushSpots = [], FCOL = [0xe2574c, 0xffd400, 0xff9fcf, 0xb07ad8, 0xffffff, 0xf39a3b].map(c=>new THREE.Color(c));
   let sd2 = 77; const r3 = ()=> (sd2 = (sd2*16807) % 2147483647) / 2147483647;
@@ -4104,16 +4147,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(pos.length/3*2), 2));
     const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})); m.receiveShadow = true; islRoot.add(m); return m;
   }
-  const RING = [
-    [[-141,-90],[-175,-165],[-205,-205]],                        // 4D theatre → Codex space
-    [[-205,-205],[-160,-215],[-120,-185]],                       // Codex space → Ren's door
-    [[-120,-185],[-60,-212],[0,-226],[62,-190]],                 // Ren's door → cave (below the mountain)
-    [[62,-190],[120,-160],[118,-100]],                           // cave → ferris hill
-    [[118,-100],[180,-125],[250,-130],[296,-100]],               // ferris hill → staff lodging
-    [[118,-100],[178,-52],[215,25]],                             // ferris hill → carousel
-    [[215,25],[252,110],[282,170],[262,250],[190,330],[80,312]], // carousel → round the lake → maze
-    [[-150,165],[-230,112],[-292,56]],                           // coaster → warehouse
-  ].map(p=> p.map(([x,z])=>[x*K, z*K]));
+  const RING = [];   // (a loop promenade was tried here; it ran through rides, and every path should end at its ride instead)
   pathMesh(RING); islRoot.userData.ring = RING;
   // bins and lamps along the ring, like the spokes have
   RING.forEach(pts=>{ const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
@@ -4420,19 +4454,33 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
 
   // ----- 2. lamps along every path, lit at night: a warm pool on the ground and a glow on the bulb that fade in as the sun goes down -----
   const lampPost = (x, z, h=7)=>{
-    if(occupied(x, z, 1.2)) return;
+    if(occupied(x, z, 0) || Math.hypot(x, z) > edgeR(x, z) - 12) return;
     const g = new THREE.Group(); g.position.set(x, G, z); islRoot.add(g);
     add(g, CYL(0.22, 0.3, h, 8), mat(0x2f3540)); add(g, BOX(1.6, 0.25, 0.25), mat(0x2f3540), 0.6, h, 0);
     add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), 1.3, h - 0.3, 0, false);
     LAMPS.push([x, z, x + 1.3, G + h - 0.3, z]);
   };
-  const ALL = PATHS.concat(islRoot.userData.ring || []);
+  const ALL = PATHS.concat(islRoot.userData.ring || [], islRoot.userData.spurs || []);
   ALL.forEach((pts, pi)=>{
     const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
-    for(let d=20; d<L-8; d+=44){ const u = d/L, p = c.getPointAt(u), t = c.getTangentAt(u), s = (Math.floor(d/44) + pi) % 2 ? 1 : -1;
-      if(Math.hypot(p.x, p.z-67) < 100) continue;                                   // the plaza has its own lighting
+    for(let d=Math.min(10, L/2); d<L-4; d+=22){ const u = d/L, p = c.getPointAt(u), t = c.getTangentAt(u), s = (Math.floor(d/22) + pi) % 2 ? 1 : -1;
+      if(Math.hypot(p.x, p.z-67) < 62) continue;                                    // the plaza itself has its own lighting
       lampPost(p.x - t.z*s*10.8, p.z + t.x*s*10.8); }
   });
+  // bench rows along every path, on the side the lamps are not: 2–4 seats joined end to end, facing the path
+  { const seat = (g, x)=>{ add(g, BOX(3.2, 0.3, 1.3), mat(0x9a6b45), x, 1.1, 0); add(g, BOX(3.2, 1.1, 0.22), mat(0x9a6b45), x, 1.3, -0.55).rotation.x = -0.14; [-1.35, 1.35].forEach(k=> add(g, BOX(0.3, 1.1, 1.2), mat(0x2f3540), x + k, 0, 0)); };
+    let bi = 0;
+    PATHS.forEach((pts, pi)=>{
+      const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
+      for(let d=34; d<L-10; d+=58){ const u = d/L, p = c.getPointAt(u), t = c.getTangentAt(u), s = (Math.floor(d/22) + pi) % 2 ? -1 : 1;   // lamps alternate with d/22, so this is the other side
+        if(Math.hypot(p.x, p.z-67) < 62 || (Math.abs(p.x) < 40 && p.z > 170 && p.z < 520)) continue;
+        const n = 2 + (bi++ % 3), x = p.x - t.z*s*9.6, z = p.z + t.x*s*9.6;
+        if(occupied(x, z, 2) || Math.hypot(x, z) > edgeR(x, z) - 14) continue;
+        const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = Math.atan2(t.x, t.z) + (s > 0 ? Math.PI/2 : -Math.PI/2); islRoot.add(g);
+        for(let k=0;k<n;k++) seat(g, (k - (n-1)/2)*3.3);
+        add(g, BOX(n*3.3 + 1.6, 0.1, 2.6), mat(0xd9cfba), 0, 0, 0.2, false).receiveShadow = true;
+        OCC.push([x, z, n*1.7 + 1]); clearTreesAt(x, z, n*1.7 + 2); }
+    }); }
   if(LAMPS.length){
     const pool = new THREE.InstancedMesh(new THREE.CircleGeometry(11, 20).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0xffc46a, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false}), LAMPS.length);
     const glow = new THREE.InstancedMesh(SPH(1.9, 10, 8), new THREE.MeshBasicMaterial({color:0xffe9b0, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false}), LAMPS.length);
@@ -4638,7 +4686,7 @@ const CHAR = [
   {g:RICO, n:'리코', desc:'냉철한 분석가. 연보라색 점퍼에 금색 D 배지를 달고, 코딩과 지도 읽기를 맡습니다. 선대 연구자 노아의 핏줄입니다.', facts:[['역할','신입사원 · 분석, 코딩, 지도'],['성격','차분하고 논리적']]},
   {g:ZERO, n:'제로', desc:'호기심 많고 공감을 잘하는 신입사원. 부스스한 주황 머리에 초록 점퍼를 입고 운전과 조립을 맡습니다. 선대 연구자 루나의 핏줄입니다.', facts:[['역할','신입사원 · 운전, 조립'],['성격','다정하고 행동이 빠름']]},
   {g:XYLO, n:'자일로', desc:'은빛 머리에 네모난 안경을 쓴 도로랜드 총책임자. 롤러코스터와 바이킹을 사랑하는 낙천적인 기계 덕후지만, 섬의 비밀을 오랫동안 혼자 품어 왔습니다.', facts:[['역할','총책임자 · 출입증 X-404'],['좋아하는 것','롤러코스터, 바이킹']]},
-  {g:CODEX, n:'코덱스', desc:'섬의 원래 주인인 원류민의 수호자. 나뭇잎 귀와 노란 눈, 눈 문양이 새겨진 초록 망토에 길고 무거운 지팡이를 듭니다. 초대장을 보낸 사람도 코덱스였습니다.', facts:[['역할','원류민 수호자'],['상징','눈 문양, 지팡이']]},
+  {g:CODEX, n:'코덱스', desc:'섬의 수호자. 나뭇잎 귀와 노란 눈, 눈 문양이 새겨진 초록 망토에 길고 무거운 지팡이를 듭니다. 초대장을 보낸 사람도 코덱스였습니다.', facts:[['역할','원류민 수호자'],['상징','눈 문양, 지팡이']]},
   {g:NATY, s:0.08, n:'네이티', desc:'감정에 따라 몸 색이 바뀌는 작은 불꽃 정령. 하늘색은 평온, 초록은 호기심, 노랑은 긴장, 빨강은 분노, 보라는 슬픔, 흰색은 조화. 챕터 5에서 환원된 일루아가 형태를 띤 존재로 밝혀집니다.', facts:[['정체','일루아의 정령'],['특징','감정 따라 색이 변함']]},
   {g:VOID, s:0.15, n:'보이드', desc:'노아와 루나가 섬의 변화를 기록하라고 남긴 하얀 로봇. 원류민의 오해로 분해됐다가 제로와 자일로가 다시 조립했고, 몸속에 응축 이전 일루아의 분포 기록을 품고 있습니다. 이 지도의 이름도 보이드의 기록입니다.', facts:[['역할','섬의 기록자'],['특징','겁먹으면 공처럼 몸을 맒']]},
   {g:DARK, s:0.16, n:'그림자', desc:'광장 나무 뒤, 동굴, 전광판 화면에서 몰래 지켜보던 붉은 뿔의 검은 그림자. 정체를 숨긴 코덱스였습니다.', facts:[['등장','챕터 1~4'],['힌트','붉은 뿔, 붉은 눈']]}
