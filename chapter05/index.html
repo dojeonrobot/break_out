@@ -497,7 +497,7 @@ body.sim #simHud{display:flex}
 
 <div id="bar" class="glass">
   <div class="time">
-    <label for="hr">일조 시각</label>
+    <label for="hr">섬 시각 <small style="font-family:var(--mono)">×20</small></label>
     <input id="hr" type="range" min="6" max="21" step="0.25" value="14">
     <output id="hrO" for="hr">14:00</output>
   </div>
@@ -1394,10 +1394,14 @@ renderer.domElement.addEventListener('pointermove', e=>{
 });
 
 // ---------- bar ----------
-$('hr').addEventListener('input', ()=>{ realClock = false; updateSun(); });
-let realClock = !QS.get('hour');
-{ const h = QS.get('hour') ? +QS.get('hour') : (new Date().getHours() + new Date().getMinutes()/60); $('hr').value = Math.max(6, Math.min(21, Math.round(h*4)/4)); }
-setInterval(()=>{ if(!realClock) return; const d = new Date(), h = d.getHours() + d.getMinutes()/60; $('hr').value = Math.max(6, Math.min(21, Math.round(h*4)/4)); updateSun(); }, 60000);
+// the day runs on its own: 1 real minute = 20 island minutes (a 6:00–21:00 day in 45 minutes), starting from the real clock.
+// Dragging the slider sets the time and the day keeps flowing from there; ?hour=N freezes it.
+const flowing = !QS.get('hour');
+let flowHour = QS.get('hour') ? +QS.get('hour') : (new Date().getHours() + new Date().getMinutes()/60);
+if(flowHour < 6 || flowHour > 21) flowHour = 6;
+$('hr').step = 'any'; $('hr').value = flowHour;
+$('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); });
+setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2; if(flowHour > 21) flowHour = 6; $('hr').value = flowHour; updateSun(); }, 2000);
 function setMode(m){ mode=m; $('mCat').setAttribute('aria-pressed', m==='cat'); $('mLv').setAttribute('aria-pressed', m==='lv'); paint(); }
 $('mCat').onclick=()=>setMode('cat'); $('mLv').onclick=()=>setMode('lv');
 function tgl(id, fn){ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; }
