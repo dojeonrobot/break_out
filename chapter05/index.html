@@ -521,7 +521,7 @@ body.sim #simHud{display:flex}
   <button type="button" class="skip" id="tpSkip">조 없이 둘러보기</button>
 </div></div>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터</button>
-<div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아의 흐름</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
+<div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
 <div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 일루아가 원천에서 옛 물길까지 다시 흐릅니다.<br>섬은 이제 스스로를 받칠 수 있습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
@@ -3079,14 +3079,18 @@ mission(ferris, 'dl-ferris', {n:'관람차', sub:'챕터 4', cx:FERRIS_X, cz:FER
 // chapter 5 · DORO EXPRESS: lift hill, first drop, vertical loop and LED rings, plus the viking ship
 const coaster = new THREE.Group();
 {
+  // layout: station (SW) → chain lift north to a 64-high crest → first drop → vertical loop → three airtime hills down the east side
+  //         → a banked turnaround across the south → a rock tunnel → back into the station. One closed curve, no crossings at grade.
   const ctrl = [
-    [-62,6,32],[-62,6,8],[-60,8,-14],[-52,24,-38],[-36,46,-50],[-18,50,-54],
-    [0,30,-52],[12,10,-46],
-    [22,8,-42],[34,10,-41],[44,22,-40],[44,40,-38],[34,50,-36],[24,40,-34],[24,22,-33],[34,10,-32],[50,8,-30],
-    [62,12,-6],[62,26,18],[46,34,38],[22,24,52],[0,14,56],[-24,20,52],[-46,12,46]
+    [-56,6,50],[-66,6,30],[-68,8,8],
+    [-64,24,-14],[-56,48,-36],[-46,64,-54],
+    [-32,60,-62],[-16,22,-64],[-2,8,-62],
+    [12,8,-60],[26,26,-58],[22,50,-56],[8,42,-54],[8,18,-52],[24,8,-50],
+    [42,26,-42],[58,10,-28],[66,28,-8],[64,10,12],
+    [54,16,32],[36,24,48],[14,14,58],[-10,22,58],[-30,12,54],[-44,8,54]
   ];
   const curve = new THREE.CatmullRomCurve3(ctrl.map(([x,y,z])=>new THREE.Vector3(x,y,z)), true, 'catmullrom', 0.5);
-  const N = 400, P = curve.getSpacedPoints(N); P.pop();
+  const N = 480, P = curve.getSpacedPoints(N); P.pop();
   // parallel-transported frames keep the rails flat on the straights and roll them through the loop
   const T = [], U = [], S = [];
   let up = new THREE.Vector3(0,1,0);
@@ -3095,54 +3099,88 @@ const coaster = new THREE.Group();
     up = new THREE.Vector3().crossVectors(s, t).normalize(); T.push(t); U.push(up.clone()); S.push(s);
   }
   const rail = k => new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(S[i], k)), true);
-  [1.0, -1.0].forEach(k=> add(coaster, new THREE.TubeGeometry(rail(k), 800, 0.32, 6, true), mat(0xe2574c)));
-  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(U[i], -1.2)), true), 800, 0.8, 6, true), mat(0x7b8190));
+  [1.0, -1.0].forEach(k=> add(coaster, new THREE.TubeGeometry(rail(k), 960, 0.32, 6, true), mat(0xe2574c)));
+  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(U[i], -1.2)), true), 960, 0.8, 6, true), mat(0x7b8190));
   const m4 = new THREE.Matrix4();
   for(let i=0;i<N;i+=3){ const tie = add(coaster, new THREE.BoxGeometry(2.6, 0.3, 0.5), mat(0x5d6270), 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); tie.quaternion.setFromRotationMatrix(m4); tie.position.copy(P[i]).addScaledVector(U[i], -0.6); }
-  // supports with cross braces wherever the track runs upright
+  // supports: lattice towers under the high track (two legs, rungs, X braces), single posts where it runs low
+  const white = mat(0xf4f1ea), steel = mat(0xd9d4c8);
+  function tower(p, sdir, h){
+    const g = new THREE.Group(); g.position.set(p.x, 0, p.z); g.rotation.y = -Math.atan2(sdir.z, sdir.x); coaster.add(g);
+    const w = Math.min(3.2, 1.6 + h*0.03);
+    [-w, w].forEach(x=>{ add(g, CYL(0.5, 0.7, h, 8), white, x, 0, 0); add(g, CYL(1.4, 1.6, 0.8, 8), mat(0xb9b4aa), x, 0, 0); });
+    for(let y=6; y<h-2; y+=7){ add(g, BOX(w*2, 0.4, 0.4), steel, 0, y, 0); const d = add(g, BOX(Math.hypot(w*2, 7), 0.3, 0.3), steel, 0, y + 3.5, 0); d.rotation.z = Math.atan2(7, w*2) * ((y/7)%2 ? 1 : -1); }
+    add(g, BOX(w*2 + 1.2, 0.6, 2.4), steel, 0, h - 0.8, 0);
+  }
   let prev = null;
-  for(let i=0;i<N;i+=10){
+  for(let i=0;i<N;i+=8){
     const p = P[i]; if(U[i].y < 0.6 || p.y < 3) { prev = null; continue; }
-    add(coaster, CYL(0.75, 1, p.y - 1.6, 8), mat(0xf4f1ea), p.x, 0, p.z);
-    add(coaster, CYL(1.6, 1.8, 0.8, 8), mat(0xb9b4aa), p.x, 0, p.z);
-    if(prev){ const mid = p.clone().add(prev).multiplyScalar(0.5), h = Math.min(p.y, prev.y)*0.5, L = Math.hypot(p.x-prev.x, p.z-prev.z);
-      const br = add(coaster, BOX(L, 0.5, 0.5), mat(0xd9d4c8), mid.x, h, mid.z, false); br.rotation.y = -Math.atan2(p.z-prev.z, p.x-prev.x); }
+    if(p.y > 14) tower(p, S[i], p.y - 1.8); else { add(coaster, CYL(0.75, 1, p.y - 1.6, 8), white, p.x, 0, p.z); add(coaster, CYL(1.6, 1.8, 0.8, 8), mat(0xb9b4aa), p.x, 0, p.z); }
+    if(prev && p.y <= 14 && prev.y <= 14){ const mid = p.clone().add(prev).multiplyScalar(0.5), h = Math.min(p.y, prev.y)*0.5, L = Math.hypot(p.x-prev.x, p.z-prev.z);
+      const br = add(coaster, BOX(L, 0.5, 0.5), steel, mid.x, h, mid.z, false); br.rotation.y = -Math.atan2(p.z-prev.z, p.x-prev.x); }
     prev = p;
   }
-  // lift-hill chain
-  const lift = []; for(let u=0.06; u<=0.2; u+=0.004) lift.push(curve.getPoint(u));
-  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lift), 80, 0.35, 4), mat(0x222222), 0, 0.3, 0, false);
+  // lift hill: chain, catwalk with handrail, and bulbs up the side
+  const liftU = [0.085, 0.235];
+  const lift = []; for(let u=liftU[0]; u<=liftU[1]; u+=0.003) lift.push(curve.getPoint(u));
+  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lift), 100, 0.35, 4), mat(0x222222), 0, 0.3, 0, false);
+  for(let u=liftU[0]; u<=liftU[1]; u+=0.006){ const i = Math.floor(u*N), q = P[i].clone().addScaledVector(S[i], 2.4).addScaledVector(U[i], -0.5);
+    const step = add(coaster, new THREE.BoxGeometry(1.6, 0.25, 1.8), mat(0x9a6b45), 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); step.quaternion.setFromRotationMatrix(m4); step.position.copy(q);
+    if(Math.round(u*1000) % 18 === 0){ add(coaster, CYL(0.08, 0.08, 2.2, 5), mat(0x3a3f4a), q.x + S[i].x*0.9, q.y, q.z + S[i].z*0.9); add(coaster, SPH(0.35, 6, 5), glowMat(0xfff0b8), q.x + S[i].x*0.9, q.y + 2.4, q.z + S[i].z*0.9, false); } }
+  // crest sign and the first-drop portal
+  { const c = curve.getPoint(0.235); const g = new THREE.Group(); g.position.set(c.x, c.y + 2, c.z); coaster.add(g);
+    [-4, 4].forEach(x=> add(g, CYL(0.3, 0.3, 9, 6), white, x, 0, 0)); add(g, BOX(10, 2.4, 0.4), mat(0x1d2f55), 0, 9, 0);
+    add(g, new THREE.PlaneGeometry(9.4, 2), new THREE.MeshBasicMaterial({map:signTex('64m', {bg:'#1d2f55', fg:'#ffd400', size:80, w:384, h:90}), side:THREE.DoubleSide}), 0, 10.2, 0.25, false); }
+  { const d = curve.getPoint(0.3), t = curve.getTangent(0.3); const g = new THREE.Group(); g.position.set(d.x, 0, d.z); g.rotation.y = -Math.atan2(t.z, t.x) + Math.PI/2; coaster.add(g);
+    [-6, 6].forEach(x=> add(g, BOX(2.2, d.y + 8, 2.2), mat(0x1d2f55), x, 0, 0)); add(g, BOX(14.4, 3, 2.4), mat(0xffd400), 0, d.y + 8, 0);
+    add(g, new THREE.PlaneGeometry(13, 2.4), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#ffd400', fg:'#1d2f55', size:62, w:640, h:100}), side:THREE.DoubleSide}), 0, d.y + 9.5, 1.3, false);
+    for(let i=0;i<10;i++) add(g, SPH(0.4, 6, 5), glowMat(i%2 ? 0xff6b6b : 0xfff0b8), -6 + i*1.33, d.y + 11.2, 0, false); }
+  // rock tunnel on the way home
+  { const q = curve.getPoint(0.975); const r = add(coaster, ICO(1, 1).scale(14, 11, 12), flat(0x9c8f7a), q.x, 1, q.z); r.rotation.y = 0.7;
+    add(coaster, ICO(1, 1).scale(7, 6, 7), flat(0x8a7d6a), q.x + 9, 0, q.z - 6); for(let i=0;i<5;i++) add(coaster, ICO(1.6, 1), flat([C.leaf, C.leaf2][i%2]), q.x - 10 + i*5, 10 + (i%2)*2, q.z + (i%2 ? 5 : -5));
+    [1, -1].forEach(sd=>{ const t = curve.getTangent(0.975); add(coaster, new THREE.TorusGeometry(4.2, 0.6, 8, 16), mat(0x5d6270), q.x + t.x*sd*11, q.y + 1.2, q.z + t.z*sd*11).rotation.y = Math.atan2(t.x, t.z); }); }
   // LED rings that chase round the track
   const leds = [];
   for(let i=0;i<N;i+=12){ const r = add(coaster, new THREE.TorusGeometry(2.8, 0.22, 6, 22), glowMat(0x7fd7ff), 0, 0, 0, false); r.position.copy(P[i]).addScaledVector(U[i], 1.3); r.lookAt(P[i].clone().add(T[i]).addScaledVector(U[i], 1.3)); leds.push(r); }
-  // station
-  const st = new THREE.Group(); st.position.set(-70, 0, 20); coaster.add(st);
-  add(st, BOX(10, 5, 30), mat(0xe6e1d6));
-  [[-4,-14],[4,-14],[-4,14],[4,14]].forEach(([a,b])=> add(st, CYL(0.5, 0.5, 12, 6), mat(0xffffff), a, 5, b));
-  add(st, BOX(18, 1.2, 34), mat(0xe2574c), 3, 17, 0);
-  add(st, new THREE.PlaneGeometry(26, 4), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#1d2f55', fg:'#ffd400', size:66, w:640, h:100}), side:THREE.DoubleSide}), 12.2, 15.2, 0, false).rotation.y = Math.PI/2;
-  for(let i=0;i<5;i++) add(st, BOX(1.4, 1, 4), mat(0x9a6b45), -6, 0.5*i, -10 + i*0.01).position.set(-5.6 - i*1.2, i, 10);
-  // train
-  const cars = [];
-  for(let k=0;k<5;k++){
-    const c = new THREE.Group();
-    add(c, BOX(3.8, 1.6, 4.4), mat(k===0 ? 0xffd400 : 0x5aa0e6), 0, -0.4, 0);
-    add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, -1.6); add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, 0.6);
-    if(k===0) add(c, new THREE.ConeGeometry(2, 2.6, 4).rotateX(Math.PI/2).rotateZ(Math.PI/4), mat(0xffd400), 0, -0.4, 3.4);
-    [[-1.6,-1.6],[1.6,-1.6],[-1.6,1.6],[1.6,1.6]].forEach(([a,b])=> add(c, new THREE.CylinderGeometry(0.5,0.5,0.6,10).rotateZ(Math.PI/2), mat(0x222222), a, -1.3, b, false));
-    c.scale.setScalar(0.6); coaster.add(c); cars.push(c);
-  }
+  // station: a long hall over the home straight with a pitched roof, platform gates, a clock and the big sign
+  { const st = new THREE.Group(); st.position.set(-61, 0, 40); st.rotation.y = -0.45; coaster.add(st);
+    add(st, BOX(26, 1.2, 40), mat(0xd9cfba), 0, 0, 0);
+    [[-11,-18],[11,-18],[-11,0],[11,0],[-11,18],[11,18]].forEach(([x,z])=> add(st, CYL(0.6, 0.6, 14, 8), white, x, 1.2, z));
+    add(st, BOX(28, 1, 42), mat(0x1d2f55), 0, 15, 0);
+    const roof = new THREE.Shape(); roof.moveTo(-14.5, 0); roof.lineTo(0, 6); roof.lineTo(14.5, 0); roof.closePath();
+    add(st, new THREE.ExtrudeGeometry(roof, {depth:42, bevelEnabled:false}).translate(0, 0, -21), mat(0xe2574c), 0, 16, 0);
+    add(st, BOX(8, 5, 0.6), mat(0xffffff), 0, 16.3, 21.2); add(st, new THREE.CylinderGeometry(1.8, 1.8, 0.5, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 18.8, 21.6); add(st, BOX(0.25, 1.3, 0.1), mat(0x1d2f55), 0, 19, 21.9); add(st, BOX(0.9, 0.25, 0.1), mat(0x1d2f55), 0.35, 18.8, 21.9);
+    add(st, new THREE.PlaneGeometry(30, 4.2), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#1d2f55', fg:'#ffd400', size:66, w:640, h:100}), side:THREE.DoubleSide}), 15.3, 12, 0, false).rotation.y = Math.PI/2;
+    add(st, new THREE.PlaneGeometry(30, 4.2), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#1d2f55', fg:'#ffd400', size:66, w:640, h:100}), side:THREE.DoubleSide}), -15.3, 12, 0, false).rotation.y = -Math.PI/2;
+    for(let k=0;k<6;k++){ add(st, BOX(0.3, 2.2, 0.3), mat(0x3a3f4a), 4.5, 1.2, -16 + k*6.4); add(st, BOX(0.15, 0.15, 5), mat(0xffd400), 4.5, 3.2, -13 + k*6.4); }
+    for(let i=0;i<10;i++) rider(st, 7 + (i%2)*2.4, 1.2, -16 + Math.floor(i/2)*7, i, 0.55, -Math.PI/2);
+    for(let i=0;i<8;i++) add(st, SPH(0.4, 6, 5), glowMat(0xfff0b8), -13, 14.4, -17 + i*4.9, false); }
+  // two trains of six cars, riders with their arms up, headlight on the lead car
+  const trains = [0, 0.5].map(off=>{ const cars = [];
+    for(let k=0;k<6;k++){
+      const c = new THREE.Group();
+      add(c, BOX(3.8, 1.6, 4.4), mat(k===0 ? 0xffd400 : (k%2 ? 0x5aa0e6 : 0xe2574c)), 0, -0.4, 0);
+      add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, -1.6); add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, 0.6);
+      [-0.95, 0.95].forEach((x,i)=>{ const r = rider(c, x, 0.6, -0.4, k*2 + i, 0.75, Math.PI); r.children[2].rotation.x = -2.8; r.children[3].rotation.x = -2.8; });
+      if(k===0){ add(c, new THREE.ConeGeometry(2, 2.6, 4).rotateX(Math.PI/2).rotateZ(Math.PI/4), mat(0xffd400), 0, -0.4, 3.4); add(c, SPH(0.4, 6, 5), glowMat(0xfff4c2), 0, 0.2, 4.6, false); }
+      [[-1.6,-1.6],[1.6,-1.6],[-1.6,1.6],[1.6,1.6]].forEach(([a,b])=> add(c, new THREE.CylinderGeometry(0.5,0.5,0.6,10).rotateZ(Math.PI/2), mat(0x222222), a, -1.3, b, false));
+      c.scale.setScalar(0.6); coaster.add(c); cars.push(c);
+    }
+    return {cars, off}; });
+  // speed: a crawl on the lift, fast everywhere else
+  let u0 = 0;
   islAnim.push(t=>{
-    const u0 = (t*0.028) % 1;
-    cars.forEach((c,k)=>{ const u = (u0 - k*0.012 + 1) % 1, i = Math.floor(u*N) % N; c.position.copy(curve.getPointAt(u)).addScaledVector(U[i], 1.0); m4.makeBasis(S[i], U[i], T[i]); c.quaternion.setFromRotationMatrix(m4); });
+    const dt = 1/60; const sp = (u)=> (u > liftU[0] && u < liftU[1]) ? 0.012 : 0.07; u0 = (u0 + dt*sp(u0)) % 1;
+    trains.forEach(tr=>{ const base = (u0 + tr.off) % 1;
+      tr.cars.forEach((c,k)=>{ const u = (base - k*0.010 + 1) % 1, i = Math.floor(u*N) % N; c.position.copy(curve.getPointAt(u)).addScaledVector(U[i], 1.0); m4.makeBasis(S[i], U[i], T[i]); c.quaternion.setFromRotationMatrix(m4); }); });
     const head = Math.floor(u0*leds.length);
     leds.forEach((r,i)=>{ const d = (i - head + leds.length) % leds.length; (r.userData.mat||r.material).color.setHSL(0.55 + d/leds.length*0.4, 0.9, d < 4 ? 0.85 : 0.6); });
   });
 }
 place(coaster, -200, 190);
 mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz:190, h:52, r:84,
-  desc:'리프트 힐을 올라 수직 루프를 통과하는 도로 익스프레스. 레일을 감싼 LED 고리가 밤이면 알록달록 빛납니다.',
-  facts:[['챕터','5 · 코덱스의 선택'],['볼거리','리프트 힐, 수직 루프, LED 고리']]});
+  desc:'64m 리프트 힐을 체인으로 기어올라 첫 낙하, 수직 루프, 에어타임 힐 세 개를 지나 남쪽을 크게 돌고 바위 터널로 돌아오는 도로 익스프레스. 열차 두 편성이 교대로 달리고 밤이면 LED 고리가 레일을 따라 흐릅니다.',
+  facts:[['챕터','5 · 코덱스의 선택'],['볼거리','64m 리프트 힐 · 첫 낙하 · 수직 루프 · 에어타임 힐 · 터널 · 2편성']]});
 
 // viking ship on its own lot in the south-west (chapter 5's rebuilt viking) — pivot ≈ 30 m, ship ≈ 36 m
 const viking = new THREE.Group();
@@ -4897,32 +4935,36 @@ let SIM_LIT = 0;
   // the Ilua flow: from the eye cave through the five chapter zones to the old waterway.
   // The whole course shows as a faint phantom thread; a stretch lights up only when its zone's record is back.
   const NODES = [[-40,-500], ['dl-safari'], ['dl-harmonia'], ['dl-carousel'], ['dl-ferris'], ['dl-coaster'], [290,277]];
-  const at = n => n.length===2 ? new THREE.Vector3(n[0], G + 14, n[1]) : (()=>{ const m = MI.find(x=>x.id===n[0]); return new THREE.Vector3(m.b.cx, G + 14 + (m.b.h||20)*0.5, m.b.cz); })();
+  const FLOW_Y = G - 26;   // the vein runs through the crust under the island
+  const at = n => n.length===2 ? new THREE.Vector3(n[0], FLOW_Y, n[1]) : (()=>{ const m = MI.find(x=>x.id===n[0]); return new THREE.Vector3(m.b.cx, FLOW_Y, m.b.cz); })();
   const pts = NODES.map(at), curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.4);
   const nodeU = (()=>{ const N = 600, out = new Array(pts.length).fill(0), best = new Array(pts.length).fill(Infinity);
     for(let i=0;i<=N;i++){ const u = i/N, q = curve.getPointAt(u); pts.forEach((p,k)=>{ const d = q.distanceToSquared(p); if(d < best[k]){ best[k] = d; out[k] = u; } }); } return out; })();
-  const ghostLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(400)), new THREE.LineDashedMaterial({color:0x9b7bff, dashSize:6, gapSize:5, transparent:true, opacity:0.45}));
+  const ghostLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(400)), new THREE.LineDashedMaterial({color:0x9b7bff, dashSize:6, gapSize:5, transparent:true, opacity:0.5, depthTest:false})); ghostLine.renderOrder = 6;
   ghostLine.computeLineDistances(); simRoot.add(ghostLine);
   const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(8, 1);
-  const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false});
+  const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
+  const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.renderOrder = order; return o; };
   NODES.forEach((n,k)=>{
     if(n.length!==1) return; const m = MI.find(x=>x.id===n[0]);
     // every node gets a marker ring; restored ones glow, the rest stay as faint phantom rings
-    const ring = add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(m.scans.length ? 0x9ff6ff : 0x9b7bff, m.scans.length ? 0.9 : 0.3, true), pts[k].x, pts[k].y, pts[k].z, false);
+    const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(m.scans.length ? 0x9ff6ff : 0x9b7bff, m.scans.length ? 0.9 : 0.3, true), pts[k].x, pts[k].y, pts[k].z, false));
+    // a shaft of light from the vein up to the zone on the surface
+    xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(m.scans.length ? 0x9ff6ff : 0x9b7bff, m.scans.length ? 0.35 : 0.12, true), pts[k].x, FLOW_Y, pts[k].z, false));
     islAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
     if(!m.scans.length) return;
     SIM_LIT++;
     const u0 = (nodeU[k-1] + nodeU[k])/2, u1 = (nodeU[k] + nodeU[k+1])/2;
     const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(u0 + (u1-u0)*i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, 120, 2.4, 8, false), flowMat); tube.renderOrder = 3; simRoot.add(tube);
-    const spark = new THREE.InstancedMesh(SPH(0.6, 6, 5), glowMat(0xdff6ff, 0.9, true), 24), o = new THREE.Object3D(); simRoot.add(spark);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, 120, 3.2, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
+    const spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), 24), 7), o = new THREE.Object3D(); simRoot.add(spark);
     islAnim.push(t=>{ for(let i=0;i<24;i++){ const q = sub.getPointAt(((t*0.08) + i/24) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
   });
   islAnim.push(t=>{ flowTex.offset.x = -t*0.5; });
   // source and mouth
-  add(simRoot, CYL(1.4, 1.4, 90, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -40, G, -500, false);
-  if(SIM_LIT === 5){ add(simRoot, CYL(2.2, 2.2, 140, 12), glowMat(0x9ff6ff, 0.35, true), 290, G, 277, false);
-    const full = new THREE.Mesh(new THREE.TubeGeometry(curve, 400, 3.2, 8, false), new THREE.MeshBasicMaterial({color:0x9ff6ff, transparent:true, opacity:0.18, blending:THREE.AdditiveBlending, depthWrite:false})); simRoot.add(full); }
+  xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -40, FLOW_Y, -500, false));
+  if(SIM_LIT === 5){ xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), 290, FLOW_Y, 277, false));
+    const full = new THREE.Mesh(new THREE.TubeGeometry(curve, 400, 4, 8, false), new THREE.MeshBasicMaterial({color:0x9ff6ff, transparent:true, opacity:0.2, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false})); full.renderOrder = 6; simRoot.add(full); }
 }
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
 let simOn = false;
