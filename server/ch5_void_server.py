@@ -381,7 +381,7 @@ class Handler(BaseHTTPRequestHandler):
         sid = 'o' + uuid.uuid4().hex[:15]
         write_meta(sid, {
             'id': sid, 'team': team, 'mission': mission, 'note': clean_text(b.get('note'), 60), 'count': count,
-            'mode': 'space' if b.get('mode') == 'space' else 'object', 'headings': heads, 'dirs': dirs, 'lat': pos['lat'], 'lng': pos['lng'],
+            'mode': 'space' if b.get('mode') == 'space' else 'object', 'sensor': bool(b.get('sensor', True)), 'headings': heads, 'dirs': dirs, 'lat': pos['lat'], 'lng': pos['lng'],
             'ua': clean_text(self.headers.get('User-Agent'), 160), 'createdAt': now_ms(), 'status': 'uploading',
         })
         self.send_json({'id': sid})

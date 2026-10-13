@@ -556,7 +556,7 @@ const SCANS = SCANS_ALL.filter(s=>!HIDDEN.has(s.id));
 // Once the server marks one restored it joins the scans before the map is built, so the zone renders restored like a splat would.
 const orbitThumb = s => s.thumb || `${API}/scan/${s.scanId || s.id}/thumb.jpg`;
 const orbitScan = s => ({id:s.scanId, kind:'orbit', caption:s.note || '이름 없는 기록', author:s.team ? s.team+'조' : '', captured:s.createdAt,
-  frames:s.frames || 0, mode:s.mode, urls:s.urls || null, items:s.items || null, thumb:orbitThumb(s), mission:s.mission, url:''});
+  frames:s.frames || 0, mode:s.mode, sensor:s.sensor, urls:s.urls || null, items:s.items || null, thumb:orbitThumb(s), mission:s.mission, url:''});
 const orbitOk = list => (list || []).filter(s=>s.kind==='orbit' && s.status==='ok');
 const orbitSig = list => orbitOk(list).map(s=>s.scanId).sort().join(',');
 orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
@@ -1497,7 +1497,7 @@ async function openScan(s){
   if(orbit){
     $('vLoad').hidden = true;
     const rec = await orbitRecord(s); if(openId !== s.id) return;
-    let photo = false;
+    let photo = !rec.sensor || rec.mode !== 'space'; $('vPhoto').hidden = !rec.sensor;
     const build = ()=>{ if(viewer) viewer.dispose(); viewer = photo ? makeOrbitViewer($('vRoot'), s) : makeDomeViewer($('vRoot'), rec);
       $('vPhoto').textContent = photo ? '점구름으로 보기' : '사진으로 보기';
       $('vF').textContent = photo ? '좌우로 끌어서 한 장씩 넘겨 봅니다.' : (rec.mode==='space' ? '끌어서 둘러봅니다. 찍은 사진을 방향대로 점구름 돔에 펼친 기록입니다.' : '끌어서 돌리고, 휠이나 두 손가락으로 확대합니다. 찍은 방향대로 점구름을 쌓은 기록입니다.'); };
@@ -1614,11 +1614,11 @@ function makeDomeViewer(root, rec){
 }
 // a saved record: its photos plus the direction each was taken in (meta.json on the server, or in-memory for a fresh capture)
 async function orbitRecord(s){
-  if(s.items) return {items:s.items, mode:s.mode || 'object'};
-  const n = s.frames || 0; let dirs = null, mode = s.mode || 'object';
-  try{ const meta = await (await fetch(`${API}/scan/${s.id}/meta.json`, {cache:'no-store'})).json(); dirs = meta.dirs || (meta.headings || []).map(h=>[h, 0]); mode = meta.mode || mode; }catch(e){}
+  if(s.items) return {items:s.items, mode:s.mode || 'object', sensor:s.sensor !== false};
+  const n = s.frames || 0; let dirs = null, mode = s.mode || 'object', sensor = true;
+  try{ const meta = await (await fetch(`${API}/scan/${s.id}/meta.json`, {cache:'no-store'})).json(); dirs = meta.dirs || (meta.headings || []).map(h=>[h, 0]); mode = meta.mode || mode; sensor = meta.sensor !== false; }catch(e){}
   const urls = s.urls || Array.from({length:n}, (_,i)=> `${API}/scan/${s.id}/${i}.jpg`);
-  return {mode, items: urls.map((url,i)=> ({url, yaw: dirs && dirs[i] ? +dirs[i][0] : i*360/Math.max(n,1), pitch: dirs && dirs[i] ? +dirs[i][1] : 0}))};
+  return {mode, sensor, items: urls.map((url,i)=> ({url, yaw: dirs && dirs[i] ? +dirs[i][0] : i*360/Math.max(n,1), pitch: dirs && dirs[i] ? +dirs[i][1] : 0}))};
 }
 
 // =====================================================================
@@ -1626,6 +1626,7 @@ async function orbitRecord(s){
 // Coverage is a grid of directions: 5 tilt bands (+60 … -60) with 9/16/18/16/9 turning columns = 68 cells, one photo per cell.
 const BANDS = [60, 30, 0, -30, -60], COLS = [9, 16, 18, 16, 9], CAPN = COLS.reduce((a,b)=>a+b, 0);
 const BAND_ORDER = [2, 1, 3, 0, 4];   // horizon first, then a little up, a little down, far up, far down
+const NOSENSOR_N = 24;                // without a motion sensor we only know the order the photos were taken in, so fewer, timed frames
 const cap = {m:null, frames:[], cells:new Set(), stream:null, dir:null, base:null, mode:'object', ori:false, lastShot:0, startT:0, raf:0, pos:null, prev:null, busy:false, step:0, photo:false, seq:0};
 const capCanvas = document.createElement('canvas');
 const MAP_W = 180, MAP_H = 50, cellEls = {};
@@ -1709,8 +1710,9 @@ function capTick(){
     const pt = $('capPt'); pt.classList.remove('off');
     pt.setAttribute('cx', (cell.rel/360*MAP_W).toFixed(1)); pt.setAttribute('cy', ((BANDS[0] - Math.max(-75, Math.min(75, cell.pitch)))/150*MAP_H + 0).toFixed(1));
     if(!cap.cells.has(cell.key) && now - cap.lastShot > 350 && !cap.busy) shoot(cell);
-  } else if(now - cap.startT > 1800 && now - cap.lastShot > 800 && !cap.busy && cap.cells.size < CAPN){
+  } else if(now - cap.startT > 1800 && now - cap.lastShot > 800 && !cap.busy && cap.cells.size < NOSENSOR_N){
     // no motion sensor (desktop, or permission refused): one photo per 0.8 s while the student moves the camera around
+    if($('capNt').textContent !== `/ ${NOSENSOR_N}장`) $('capNt').textContent = `/ ${NOSENSOR_N}장`;
     const cell = nextSeqCell(); if(cell) shoot(cell);
   }
 }
@@ -1728,7 +1730,7 @@ async function shoot(cell){
     try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
     const n = cap.frames.length;
     $('capDone').disabled = n < 8;
-    if(n >= CAPN) finishCapture(); else guide();
+    if(n >= (cap.ori ? CAPN : NOSENSOR_N)) finishCapture(); else guide();
   } finally { cap.busy = false; }
 }
 $('capShot').onclick = ()=>{
@@ -1754,11 +1756,12 @@ function finishCapture(){
   cap.frames.sort((a,b)=> a.pitch - b.pitch || a.yaw - b.yaw);
   capStep(2); $('capRot').hidden = true;
   const cov = Math.round(cap.cells.size/CAPN*100);
-  $('capStat').textContent = `사진 ${cap.frames.length}장 · ${cap.ori ? `상하좌우 ${cov}% 채움` : '움직임 센서 없이 시간 간격으로 찍음'}`;
+  $('capStat').textContent = cap.ori ? `사진 ${cap.frames.length}장 · 상하좌우 ${cov}% 채움` : `사진 ${cap.frames.length}장 · 이 기기에는 움직임 센서가 없어 방향을 알 수 없습니다. 사진 기록으로 저장됩니다 (점구름은 태블릿에서 만들어집니다)`;
+  $('capPhoto').hidden = !cap.ori;
   $('capTeam').value = TEAM || '';
   const help = $('capHelp'); help.dataset.kind = '';
   help.textContent = LOCAL ? '서버 연결 전이라 이 기기에서만 보이고 새로고침하면 사라집니다.' : AUTO ? '올리면 바로 이 구역이 복구됩니다.' : '올리면 운영자가 확인한 뒤 복구됩니다.';
-  cap.photo = false; showPreview();
+  cap.photo = !cap.ori || cap.mode !== 'space'; showPreview();   // the dome needs real directions; for an object the photo turntable reads better
 }
 $('capDone').onclick = finishCapture;
 $('capPhoto').onclick = ()=>{ cap.photo = !cap.photo; showPreview(); };
@@ -1794,7 +1797,7 @@ async function uploadCapture(){
   if(LOCAL){
     // no server (opened as a file): keep the record in this tab only
     const id = 'o' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b=> b.toString(16).padStart(2,'0')).join('').slice(0,15);
-    SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), items:capItems(), thumb:cover.url});
+    SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, sensor:cap.ori, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), items:capItems(), thumb:cover.url});
     cap.frames = []; cap.cells = new Set();           // the object URLs now belong to the record
     closeCapture(); refreshSubUI(); toast('이 기기에 기록을 남겼습니다 (서버 연결 전)'); return;
   }
@@ -1804,7 +1807,7 @@ async function uploadCapture(){
   const prog = t=>{ done++; bar.style.width = `${Math.round(done/total*100)}%`; if(t) msg.textContent = t; };
   bar.style.width = '0'; msg.textContent = '기록을 올리는 중입니다';
   try{
-    const {id} = await api('/scan/start', {team:TEAM, mission:m.id, note, count:cap.frames.length, dirs:cap.frames.map(f=>[f.yaw, f.pitch]), mode:cap.mode, lat:cap.pos && cap.pos.lat, lng:cap.pos && cap.pos.lng});
+    const {id} = await api('/scan/start', {team:TEAM, mission:m.id, note, count:cap.frames.length, dirs:cap.frames.map(f=>[f.yaw, f.pitch]), mode:cap.mode, sensor:cap.ori, lat:cap.pos && cap.pos.lat, lng:cap.pos && cap.pos.lng});
     for(let i=0; i<cap.frames.length; i++){ await putJpeg(`/scan/${id}/frame/${i}`, cap.frames[i].blob); prog(`사진을 올리는 중입니다 (${i+1} / ${cap.frames.length})`); }
     await putJpeg(`/scan/${id}/thumb`, await makeThumb(cover.blob)); prog('기록을 마무리하는 중입니다');
     let st = await api('/scan/finish', {id, team:TEAM, note});
