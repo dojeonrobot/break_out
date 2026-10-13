@@ -510,7 +510,7 @@ body.sim #simHud{display:flex}
   <div class="layers" role="group" aria-label="레이어">
     <button id="lLbl" aria-pressed="false">건물 이름</button>
     <button id="lCtx" class="erica-only" aria-pressed="true">주변 건물</button>
-    <button id="lChr" class="island-only" aria-pressed="true" hidden>캐릭터</button>
+    <button id="lChr" class="island-only" aria-pressed="true" hidden>등장인물</button>
     <button id="lHome">처음 시점</button>
   </div>
 </div>
@@ -962,6 +962,8 @@ function updateSun(){
   sun.intensity = up>0 ? 0.2 + 0.45*k : 0;
   sun.color.setHSL(0.09, 0.6*(1-k), 0.5+0.5*k);
   hemi.intensity = (dark?0.45:0.55) + 0.15*k;
+  if(typeof W !== 'undefined' && W && W.id==='island'){ const night = 1 - k; if(night > 0) hemi.intensity = Math.max(hemi.intensity, 0.42 + night*0.22);
+    if(typeof simOn !== 'undefined' && simOn){ hemi.intensity = 0.22; sun.intensity = 0.04; } }
   sun.position.copy(s.v.clone().multiplyScalar(2400)).add(controls.target.clone().setY(0));
   sun.target.position.copy(controls.target).setY(0);
 }
@@ -4769,8 +4771,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     pool.renderOrder = 2; glow.renderOrder = 2; islRoot.add(pool, glow);
     // night follows the sun slider: dusk from about 17:30, full dark at 19:00
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
-      pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02;
-      if(night > 0 && W && W.id==='island' && !(typeof simOn !== 'undefined' && simOn)) hemi.intensity = Math.max(hemi.intensity, 0.42 + night*0.22); });
+      pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
@@ -4927,13 +4928,12 @@ let SIM_LIT = 0;
 let simOn = false;
 function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on);
-  if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); hemi.intensity = 0.22; sun.intensity = 0.04; caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
+  if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
     $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
     let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
     if(SIM_LIT === 5 && !seen){ $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} } }
   else { islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
-islAnim.push(()=>{ if(simOn){ hemi.intensity = 0.22; sun.intensity = 0.04; } });
 $('simBtn').onclick = ()=> setSim(!simOn);
 $('simDoneX').onclick = ()=>{ delete $('simDone').dataset.on; };
 // ---------- characters ----------
@@ -5449,7 +5449,7 @@ const WORLDS = [
    credit:$('credit').innerHTML, introSmall:'DOROLAND · CHAPTER 5', introTitle:'보이드의 기록', introSub:'사라진 캠퍼스의 기록을 되살리세요'},
   {id:'island', scene:sceneI, M:MI, B:IB, pickables:IB.map(b=>b.mesh), markers:markersI, named:namedI, lblEls:lblI, HOME:HOME_I, CATS:CATS_I, CAT_ORDER:['ride','char','place','shop'], fx:fxI,
    setIntro:setIntroI, update:updateI, info:infoI, paint:()=>{},
-   sub:'도로랜드 섬 디지털 트윈', aria:'도로랜드 섬 3D 지도', tabB:'명소', searchL:'명소 · 등장인물 찾기', searchP:'예: 하모니아, 코덱스', lblBtn:'이름 표시',
+   sub:'도로랜드 섬 디지털 트윈', aria:'도로랜드 섬 3D 지도', tabB:'명소', searchL:'명소 · 등장인물 찾기', searchP:'예: 하모니아, 코덱스', lblBtn:'위치 표시',
    credit:'도로랜드 세계관(웹툰 · 소설 챕터 1~5)으로 재구성한 섬',
    introSmall:'DOROLAND · ISLAND', introTitle:'도로랜드 섬', introSub:'다섯 챕터의 이야기가 잠든 섬'}
 ];
