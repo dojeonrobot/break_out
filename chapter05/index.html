@@ -1637,13 +1637,36 @@ const MAP_W = 180, MAP_H = 50, cellEls = {};
   $('capNt').textContent = `/ ${CAPN}장`; }
 function capStep(n){ ['cs1','cs2','cs3'].forEach((id,i)=> $(id).hidden = i !== n-1); cap.step = n; }
 const capSay = t => { $('capMsg').textContent = t; };
-const ORI_EVT = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+// Three ways to learn where the camera points, best first: the Generic Sensor API (gyro quaternion, Chrome on Android, no compass needed),
+// the absolute orientation event (needs a magnetometer — many tablets never fire it), then the plain relative orientation event.
+const ORI_EVTS = ['deviceorientationabsolute', 'deviceorientation'];
+const ORI_PRI = {sensor:3, deviceorientationabsolute:2, deviceorientation:1};
+let oriSensor = null;
+function startOri(){
+  cap.src = '';
+  try{
+    const S = window.RelativeOrientationSensor || window.AbsoluteOrientationSensor;
+    if(S){ oriSensor = new S({frequency:30, referenceFrame:'device'});
+      oriSensor.addEventListener('reading', ()=>{ const q = oriSensor.quaternion; if(!q) return;
+        _q.set(q[0], q[1], q[2], q[3]); _v.set(0, 0, -1).applyQuaternion(_q);                    // the rear camera looks out of the device's -z
+        const d = 180/Math.PI, yaw = ((Math.atan2(_v.x, _v.y)*d) % 360 + 360) % 360, pitch = Math.asin(Math.max(-1, Math.min(1, _v.z)))*d;   // sensor frame: x east, y north, z up
+        cap.dir = {yaw, pitch}; cap.ori = true; cap.src = 'sensor'; });
+      oriSensor.addEventListener('error', ()=>{ oriSensor = null; });
+      oriSensor.start(); }
+  }catch(e){ oriSensor = null; }
+  ORI_EVTS.forEach(ev=> addEventListener(ev, onOri));
+}
+function stopOri(){ ORI_EVTS.forEach(ev=> removeEventListener(ev, onOri)); if(oriSensor){ try{ oriSensor.stop(); }catch(e){} oriSensor = null; } }
+const oriName = ()=> ({sensor:'자이로 센서', deviceorientationabsolute:'나침반 방향', deviceorientation:'기기 방향'})[cap.src] || '없음';
+window.__capdbg = ()=> ({ori:cap.ori, src:cap.src, cells:[...cap.cells], dir:cap.dir, base:cap.base, frames:cap.frames.length, busy:cap.busy, step:cap.step, lastShot:cap.lastShot, now:performance.now()});
 const Q_BACK = new THREE.Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2), Z_AXIS = new THREE.Vector3(0, 0, 1);
 const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _v = new THREE.Vector3();
 function screenAngle(){ try{ if(screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle; }catch(e){} return +window.orientation || 0; }
 // device tilt → where the rear camera points: yaw (0-360, turning) and pitch (-90…90, looking up is +)
 function onOri(e){
   if(e.alpha == null || e.beta == null || e.gamma == null) return;
+  if(cap.src && cap.src !== e.type && ORI_PRI[cap.src] > ORI_PRI[e.type]) return;   // a better source is already feeding us
+  cap.src = e.type;
   const d = Math.PI/180;
   _e.set(e.beta*d, e.alpha*d, -e.gamma*d, 'YXZ');
   _q.setFromEuler(_e).multiply(Q_BACK).multiply(_q2.setFromAxisAngle(Z_AXIS, -screenAngle()*d));
@@ -1662,9 +1685,10 @@ async function openCapture(m){
   if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){ try{ DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
   if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
   dropFrames();
-  Object.assign(cap, {m, dir:null, base:null, ori:false, lastShot:0, pos:null, busy:false, photo:false});
+  Object.assign(cap, {m, dir:null, base:null, ori:false, src:'', srcShown:false, lastShot:0, pos:null, busy:false, photo:false});
   Object.values(cellEls).forEach(el=> el.classList.remove('on')); $('capPt').classList.add('off'); $('capN').textContent = '0'; $('capDone').disabled = true;
   $('capZone').textContent = `${zoneName(m)} · 가로로 들고 상하좌우를 모두 비춰요`;
+  try{ if(navigator.xr && navigator.xr.isSessionSupported) navigator.xr.isSessionSupported('immersive-ar').then(ok=>{ $('capZone').textContent += ok ? ' · AR 지원 기기' : ' · AR 미지원 기기'; }).catch(()=>{}); }catch(e){}
   lastFocus = document.activeElement;
   $('cap').hidden = false; capStep(1); $('capX').focus(); rotCheck();
   capSay('카메라를 여는 중입니다');
@@ -1672,7 +1696,7 @@ async function openCapture(m){
   catch(err){ console.error(err); capSay(location.protocol==='http:' && location.hostname!=='localhost' ? '카메라는 https 주소에서만 열립니다.' : '카메라를 열지 못했습니다. 브라우저의 카메라 권한을 허용한 뒤 다시 눌러 주세요.'); return; }
   if($('cap').hidden){ stopStream(); return; }   // closed while the permission prompt was up
   const v = $('capV'); v.srcObject = cap.stream; try{ await v.play(); }catch(e){}
-  addEventListener(ORI_EVT, onOri);
+  startOri();
   if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>{ cap.pos = {lat:p.coords.latitude, lng:p.coords.longitude}; }, ()=>{}, {timeout:8000, maximumAge:60000});
   cap.startT = performance.now();
   capSay(modeText());
@@ -1706,6 +1730,7 @@ function capTick(){
   if(rotCheck()) return;                       // portrait: wait
   const now = performance.now();
   if(cap.ori){
+    if(!cap.srcShown){ cap.srcShown = true; $('capZone').textContent += ` · 센서: ${oriName()}`; $('capNt').textContent = `/ ${CAPN}장`; }
     const cell = curCell(); if(!cell) return;
     const pt = $('capPt'); pt.classList.remove('off');
     pt.setAttribute('cx', (cell.rel/360*MAP_W).toFixed(1)); pt.setAttribute('cy', ((BANDS[0] - Math.max(-75, Math.min(75, cell.pitch)))/150*MAP_H + 0).toFixed(1));
@@ -1752,11 +1777,11 @@ function showPreview(){
 }
 function finishCapture(){
   if(cap.step !== 1 || !cap.frames.length) return;
-  cancelAnimationFrame(cap.raf); removeEventListener(ORI_EVT, onOri); stopStream();
+  cancelAnimationFrame(cap.raf); stopOri(); stopStream();
   cap.frames.sort((a,b)=> a.pitch - b.pitch || a.yaw - b.yaw);
   capStep(2); $('capRot').hidden = true;
   const cov = Math.round(cap.cells.size/CAPN*100);
-  $('capStat').textContent = cap.ori ? `사진 ${cap.frames.length}장 · 상하좌우 ${cov}% 채움` : `사진 ${cap.frames.length}장 · 이 기기에는 움직임 센서가 없어 방향을 알 수 없습니다. 사진 기록으로 저장됩니다 (점구름은 태블릿에서 만들어집니다)`;
+  $('capStat').textContent = cap.ori ? `사진 ${cap.frames.length}장 · 상하좌우 ${cov}% 채움 · 센서: ${oriName()}` : `사진 ${cap.frames.length}장 · 이 기기에는 움직임 센서가 없어 방향을 알 수 없습니다. 사진 기록으로 저장됩니다 (점구름은 태블릿에서 만들어집니다)`;
   $('capPhoto').hidden = !cap.ori;
   $('capTeam').value = TEAM || '';
   const help = $('capHelp'); help.dataset.kind = '';
@@ -1819,7 +1844,7 @@ async function uploadCapture(){
 }
 $('capUp').onclick = uploadCapture;
 function closeCapture(){
-  cancelAnimationFrame(cap.raf); removeEventListener(ORI_EVT, onOri); stopStream();
+  cancelAnimationFrame(cap.raf); stopOri(); stopStream();
   if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
   dropFrames(); cap.step = 0;
   $('capNote').value = ''; $('cap').hidden = true; $('capRot').hidden = true;
