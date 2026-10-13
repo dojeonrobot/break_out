@@ -443,7 +443,7 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 <div id="bar" class="glass">
   <div class="time">
     <label for="hr">일조 시각</label>
-    <input id="hr" type="range" min="6" max="19" step="0.25" value="14">
+    <input id="hr" type="range" min="6" max="21" step="0.25" value="14">
     <output id="hrO" for="hr">14:00</output>
   </div>
   <span class="sep erica-only"></span>
@@ -2017,19 +2017,20 @@ const PATHS = [
   [[-166,-20],[-215,-120],[-205,-205]],                // safari → codex space
   [[50,100],[110,150],[130,175]],                      // → drop tower
   [[215,25],[320,0],[395,-15]],                        // → lighthouse
-  [[-130,0],[-230,30],[-292,56]],                      // → warehouse
+  [[-130,0],[-200,62],[-292,56]],                      // → warehouse (round the safari)
   [[-212,-110],[-240,-128],[-252,-134]],               // → windmill
   [[0,200],[80,212],[150,240],[170,262]],              // → lake & food court
   [[70,62],[118,92]],                                  // → teacups
   [[-9,209],[-40,209]],                                // → bumper cars by the boulevard
   [[100,-60],[132,-38]],                               // → swing ride
   [[-150,165],[-150,230],[-126,252]],                  // → kids zone
-  [[-166,-20],[-160,-90],[-150,-122]],                 // → observation tower
+  [[-166,-20],[-160,-62],[-141,-90]],                  // → 4D theatre
   [[20,330],[60,325],[80,312]],                        // → maze
   [[-205,-205],[-240,-200],[-262,-190]],               // → native village
   [[-55,-100],[-90,-150],[-120,-185]],                 // → Ren's door
   [[45,-60],[55,-110],[60,-150],[62,-190]],            // → cave & Codex's box
-  [[320,0],[302,-60],[296,-100]]                       // → staff lodging
+  [[320,0],[302,-60],[296,-100]],                      // → staff lodging
+  [[62,-190],[0,-215],[-60,-262],[-30,-355]]           // Codex's box → the eye cave on the north shore
 ];
 PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 { const cv = (a, dr)=>{ const v = coveAt(a, dr); return [v.x, v.z]; };
@@ -2055,9 +2056,9 @@ const pathSamples = [];
 const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(pz-z) < d*d);
 
 // keep-out circles so trees stay off attractions
-const OCC = [[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-338,-54,62],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,100],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
+const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-304,-54,104],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,100],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[385,189,24],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [125,420,40],[-170,340,22],[-300,420,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-190,-122,22],[-6,-172,30],[-108,176,18],[98,252,5],[300,-115,16],[258,392,16],[-236,-223,20],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-190,-122,22],[-6,-172,30],[-108,176,18],[98,252,5],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -2086,10 +2087,10 @@ add(cave, new THREE.TorusGeometry(14, 4.2, 8, 18, Math.PI), flat(C.rock), 0, 0, 
 add(cave, new THREE.CircleGeometry(12.5, 24, 0, Math.PI), glowMat(0x0d0f14), 0, 0, -0.6, false);
 const caveEye = add(cave, new THREE.PlaneGeometry(26, 26), new THREE.MeshBasicMaterial({map:eyeTex('#ffd84a'), transparent:true, depthWrite:false, side:THREE.DoubleSide}), 0, 30, 2, false);
 for(let i=0;i<4;i++) add(cave, ICO(4+i,0), flat(C.rock), -20+i*13, 1, 4+(i%2)*3);
-place(cave, 40, -214, 0);
+place(cave, -30, -370, 0.35);
 islAnim.push(t=>{ caveEye.material.opacity = 0.65 + 0.35*Math.sin(t*1.6); caveEye.position.y = 30 + Math.sin(t*0.9)*1.5; });
-pickable(cave, {n:'눈 문양 동굴', c:'place', sub:'챕터 1', cx:40, cz:-214, h:40, r:24,
-  desc:'산 아래 눈 문양이 새겨진 동굴. 철창 우리와 아래로 내려가는 계단, 손을 대면 초록빛을 내는 덩굴 벽화가 숨어 있습니다.',
+pickable(cave, {n:'눈 문양 동굴', c:'place', sub:'챕터 1', cx:-30, cz:-370, h:40, r:24,
+  desc:'섬 북쪽 끝 숲 너머 바닷가에 눈 문양이 새겨진 동굴. 철창 우리와 아래로 내려가는 계단, 손을 대면 초록빛을 내는 덩굴 벽화가 숨어 있습니다.',
   facts:[['등장','챕터 1 · 신비한 초대'],['상징','코덱스 가문의 눈 문양']]});
 
 // trees: round broadleaf and stacked pines, densest in the north-west forest
@@ -2338,9 +2339,9 @@ const harbour = new THREE.Group();
   const b2 = boat(0xffffff, C.red); b2.position.set(-20, -4, -20); b2.rotation.y = Math.PI; harbour.add(b2); boats.push(b2);
 }
 { const a = HARBOUR_A, r = islR(a) + 10; harbour.position.set(Math.cos(a)*r, G, Math.sin(a)*r); harbour.rotation.y = -a + Math.PI; islRoot.add(harbour);
-  pickable(harbour, {abs:true, n:'항구', c:'place', sub:'챕터 5', cx:harbour.position.x, cz:harbour.position.z, h:20, r:40,
-    desc:'절벽 사이로 유일하게 열린 남서쪽 만의 항구. 환원이 끝난 뒤에도 옛 물길 통로를 따라 들어오는 배만은 도로랜드에 닿을 수 있습니다.',
-    facts:[['등장','챕터 5 · 코덱스의 선택'],['특징','옛 물길 통로, 정비 창고']]}); }
+  pickable(harbour, {abs:true, n:'항구', c:'place', sub:'명소', cx:harbour.position.x, cz:harbour.position.z, h:20, r:40,
+    desc:'절벽 사이로 유일하게 열린 남서쪽 만의 항구. 섬으로 들어오는 배가 정박하고 짐을 내리는 곳으로, 부두와 정비 창고가 있습니다.',
+    facts:[['용도','배 정박 · 짐 하역'],['시설','부두, 정비 창고']]}); }
 islAnim.push(t=> boats.forEach((b,i)=>{ b.position.y = (b.parent===sceneI ? -1.5 : -4) + Math.sin(t*1.2+i)*0.6; b.rotation.z = Math.sin(t*0.9+i)*0.03; }));
 
 // lighthouse on the east point
@@ -2703,8 +2704,8 @@ const safari = new THREE.Group();
   jeep.scale.setScalar(0.67); safari.add(jeep);
   islAnim.push(t=>{ const a = t*0.25; jeep.position.set(Math.cos(a)*46, 0, Math.sin(a)*32 - 4); jeep.rotation.y = -a - Math.PI/2; fl.rotation.y = Math.sin(t*3)*0.2; });
 }
-place(safari, -250, -40); safari.scale.setScalar(0.6);
-mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-250, cz:-40, h:26, r:80,
+place(safari, -225, -40); safari.scale.setScalar(1.05);
+mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-225, cz:-40, h:26, r:80,
   desc:'초원과 물웅덩이, 아카시아 나무 사이로 기린 · 코끼리 · 얼룩말 · 사자 · 플라밍고가 사는 사파리. 신입사원들은 카메라를 단 호랑이 무늬 도로 카로 운전면허 코스(동물 횡단 STOP, 체크무늬 결승 깃발)를 달렸습니다.',
   facts:[['챕터','1 · 신비한 초대'],['볼거리','동물, 전망대, 운전면허 코스, 도로 카']]});
 
@@ -2910,7 +2911,7 @@ const coaster = new THREE.Group();
 }
 place(coaster, -200, 190);
 mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz:190, h:52, r:84,
-  desc:'리프트 힐과 수직 루프를 지나는 도로 익스프레스. 환원이 이뤄지는 동안 레일을 감싼 LED 고리가 진행 상황을 비춥니다.',
+  desc:'리프트 힐을 올라 수직 루프를 통과하는 도로 익스프레스. 레일을 감싼 LED 고리가 밤이면 알록달록 빛납니다.',
   facts:[['챕터','5 · 코덱스의 선택'],['볼거리','리프트 힐, 수직 루프, LED 고리']]});
 
 // viking ship on its own lot in the south-west (chapter 5's rebuilt viking) — pivot ≈ 30 m, ship ≈ 36 m
@@ -2951,10 +2952,10 @@ const viking = new THREE.Group();
   add(ship, new THREE.TorusGeometry(3, 0.9, 8, 20, Math.PI*1.4), mat(0x2f9d63), -26.5, 19.5, 0).rotation.z = 0.4;
   islAnim.push(t=>{ swing.rotation.z = Math.sin(t*0.75)*0.95; });
 }
-place(viking, -300/K, 420/K, 0.5); viking.scale.setScalar(0.85);
-pickable(viking, {n:'바이킹', c:'ride', sub:'챕터 5', cx:-300/K, cz:420/K,
-  desc:'용머리를 단 거대한 배가 하늘 높이 흔들리는 바이킹. 챕터 5에서 무너졌다가 다시 세워졌습니다.',
-  facts:[['챕터','5 · 코덱스의 선택'],['특징','용머리 · 방패 장식 · 최대 각도 약 55°']]});
+place(viking, 62, 150, 0.5); viking.scale.setScalar(0.85);
+pickable(viking, {n:'바이킹', c:'ride', sub:'놀이기구', cx:62, cz:150,
+  desc:'용머리를 단 거대한 배가 하늘 높이 흔들리는 바이킹. 배의 양 끝자리에 앉을수록 더 아찔합니다.',
+  facts:[['위치','정문 거리 동쪽'],['특징','용머리 · 방패 장식 · 최대 각도 약 55°']]});
 
 // ---------- theme-park life: main street, entrance garden, lake, rides, cable car, visitors ----------
 // entrance boulevard between the gate and the fountain: open market stalls (churros, cotton candy, popcorn...) under string lights
@@ -3053,9 +3054,9 @@ const dorm = new THREE.Group();
   add(sg, new THREE.PlaneGeometry(9.4, 2.2), new THREE.MeshBasicMaterial({map:signTex('직원 숙소', {bg:'#9a6b45', fg:'#fff7d6', size:64, w:384, h:90})}), 0, 7.3, 0.21, false);
 }
 place(dorm, 400/K, -150/K, 0.35);
-pickable(dorm, {n:'직원 숙소', c:'place', sub:'챕터 5', cx:400/K, cz:-150/K, h:20, r:44,
-  desc:'정문에서 멀리 떨어진 북동쪽 숲 속의 숙소 구역. 신입사원과 직원들이 지내는 곳으로, 챕터 5에서 자일로가 숨겨 온 이야기가 시작되는 무대이기도 합니다.',
-  facts:[['위치','섬 북동쪽 숲'],['등장','챕터 5 · 코덱스의 선택']]});
+pickable(dorm, {n:'직원 숙소', c:'place', sub:'명소', cx:400/K, cz:-150/K, h:20, r:44,
+  desc:'정문에서 멀리 떨어진 북동쪽 숲 속의 숙소 마을. 신입사원과 직원들이 지내는 코티지와 2층 본관, 식당이 모여 있습니다.',
+  facts:[['위치','섬 북동쪽 숲'],['시설','코티지 · 본관 · 식당']]});
 
 // four-seasons flower garden just inside the gate: striped beds, low hedges and topiary
 const garden = new THREE.Group();
@@ -3499,8 +3500,8 @@ const obsTower = new THREE.Group();
   add(cab, CYL(11.4, 11.4, 1, 24), mat(0x6a4bc4), 0, -3, 0); add(cab, CYL(11.4, 11.4, 1, 24), mat(0x6a4bc4), 0, 2.6, 0);
   islAnim.push(t=>{ const ph = (t % 40)/40, h = ph < 0.4 ? ph/0.4 : ph < 0.6 ? 1 : 1 - (ph - 0.6)/0.4; cab.position.y = 8 + easeIO(clamp01(h))*76; cab.rotation.y = t*0.15; });
 }
-place(obsTower, -175, -165);
-pickable(obsTower, {n:'구름 전망대', c:'ride', sub:'놀이기구', cx:-175, cz:-165, h:100, r:12, desc:'둥근 유리 전망실이 천천히 돌며 90m 높이까지 올라가는 타워. 꼭대기에서는 섬과 바다가 한눈에 보입니다.', facts:[['높이','약 100m']]});
+place(obsTower, -105, -62);
+pickable(obsTower, {n:'구름 전망대', c:'ride', sub:'놀이기구', cx:-105, cz:-62, h:100, r:12, desc:'둥근 유리 전망실이 천천히 돌며 90m 높이까지 올라가는 타워. 꼭대기에서는 섬과 바다가 한눈에 보입니다.', facts:[['높이','약 100m']]});
 
 // hedge maze
 const maze = new THREE.Group();
@@ -3891,7 +3892,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   for(let i=0;i<4;i++) add(g, BOX(1.2, 1.2, 1.2), mat(0x9a6b45), 2, i < 2 ? 0 : 1.2, 16 + (i%2)*1.3);
   add(g, BOX(0.6, 14, 0.6), mat(0xffd400), -2, 0, -10); const arm = add(g, BOX(12, 0.5, 0.5), mat(0xffd400), 3, 14, -10); add(g, CYL(0.04, 0.04, 6, 4), mat(0x333333), 8.6, 8, -10, false);
   islAnim.push(t=>{ lift.position.y = 1.2 + Math.max(0, Math.sin(t*0.4))*1.4; });
-  pickable(g, {abs:true, n:'관리동 · 정비동', c:'place', sub:'챕터 5', cx:-380, cz:180, h:14, r:26, desc:'롤러코스터 차량을 손보는 정비동과 관리동, 작업실이 모인 구역. 챕터 5에서 보이드를 다시 조립한 곳입니다.', facts:[['챕터','5 · 코덱스의 선택']]});
+  pickable(g, {abs:true, n:'관리동 · 정비동', c:'place', sub:'챕터 5', cx:-380, cz:180, h:14, r:26, desc:'롤러코스터 차량을 손보는 정비동과 관리동, 작업실이 모인 구역입니다.', facts:[['용도','차량 정비 · 관리']]});
 }
 // chapter 5 · the old waterway from the lake out through the cliffs to the sea
 {
@@ -3904,7 +3905,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   add(portal, new THREE.TorusGeometry(7, 2, 8, 20, Math.PI), flat(0x9c8468), 0, 0, 0);
   add(portal, new THREE.CircleGeometry(6.2, 20, 0, Math.PI), glowMat(0x0d0f14), 0, 0, -0.4, false);
   add(portal, new THREE.PlaneGeometry(8, 1.4), new THREE.MeshBasicMaterial({map:signTex('옛 물길 통로', {bg:'#5a3e28', fg:'#fff7d6', size:56, w:384, h:80})}), 0, 9.8, 1.2, false);
-  pickable(portal, {abs:true, n:'옛 물길 통로', c:'place', sub:'챕터 5', cx:e.x, cz:e.z, h:12, r:9, desc:'호수에서 절벽 아래로 이어지는 옛 물길. 환원 뒤 섬이 바깥에서 사라져도, 이 통로로 들어오는 배만은 섬에 닿을 수 있습니다.', facts:[['챕터','5 · 코덱스의 선택']]});
+  pickable(portal, {abs:true, n:'옛 물길 통로', c:'place', sub:'챕터 5', cx:e.x, cz:e.z, h:12, r:9, desc:'호수에서 절벽 아래 바다로 이어지는 옛 물길. 작은 배가 지나다니던 수로입니다.', facts:[['위치','호수 → 절벽 아래']]});
 }
 // white capsule robots drifting over the plaza
 {
@@ -4070,12 +4071,14 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     roundSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ roundTree.setMatrixAt(i, ZERO_M); trunkI.setMatrixAt(i, ZERO_M); treesDirty = true; } });
     pineSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ pineTree.setMatrixAt(i*2, ZERO_M); pineTree.setMatrixAt(i*2+1, ZERO_M); trunkI.setMatrixAt(roundSpots.length + i, ZERO_M); treesDirty = true; } });
   };
-  OCC.push([400,-150,108], [472,75,92], [0,405,112], [-338,-54,66]);   // the enlarged dorm, course, gate and safari
+  OCC.push([400,-150,108], [472,75,92], [0,405,112], [-304,-54,108]);   // the enlarged dorm, course, gate and safari
   const pill = (parent, x, z, c, s=1, rot=0)=>{ const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot; g.scale.setScalar(s); parent.add(g);
     add(g, CAP(0.9, 1.6).translate(0, 1.7, 0), mat(c)); add(g, SPH(0.72, 10, 8), mat([0xf1d3b0, 0xe8c39e, 0xd9b08a][(x*3+z) & 1 ? 1 : (x & 1) ? 2 : 0]), 0, 3.5, 0); return g; };
   const lampPost = (parent, x, z, h=7, s=1)=>{ const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); parent.add(g);
     add(g, CYL(0.22, 0.3, h, 8), mat(0x2f3540)); add(g, BOX(1.6, 0.25, 0.25), mat(0x2f3540), 0.6, h, 0);
-    add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), 1.3, h - 0.3, 0, false); return g; };
+    add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), 1.3, h - 0.3, 0, false);
+    g.updateWorldMatrix(true, false); const fw = g.getWorldPosition(new THREE.Vector3()), hw = new THREE.Vector3(1.3, h - 0.3, 0).applyMatrix4(g.matrixWorld);
+    (islRoot.userData.lamps ||= []).push([fw.x, fw.z, hw.x, hw.y, hw.z]); return g; };
   const bench = (parent, x, z, rot=0)=>{ const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rot; parent.add(g);
     add(g, BOX(3.2, 0.25, 1.1), mat(0x9a6b45), 0, 1, 0); add(g, BOX(3.2, 1, 0.2), mat(0x9a6b45), 0, 1.2, -0.5).rotation.x = -0.15;
     [-1.3, 1.3].forEach(x=> add(g, BOX(0.25, 1, 1), mat(0x2f3540), x, 0, 0)); return g; };
@@ -4102,7 +4105,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({color, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})); m.receiveShadow = true; islRoot.add(m); return m;
   }
   const RING = [
-    [[-150,-122],[-175,-165],[-205,-205]],                       // observation tower → Codex space
+    [[-141,-90],[-175,-165],[-205,-205]],                        // 4D theatre → Codex space
     [[-205,-205],[-160,-215],[-120,-185]],                       // Codex space → Ren's door
     [[-120,-185],[-60,-212],[0,-226],[62,-190]],                 // Ren's door → cave (below the mountain)
     [[62,-190],[120,-160],[118,-100]],                           // cave → ferris hill
@@ -4110,9 +4113,8 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     [[118,-100],[178,-52],[215,25]],                             // ferris hill → carousel
     [[215,25],[252,110],[282,170],[262,250],[190,330],[80,312]], // carousel → round the lake → maze
     [[-150,165],[-230,112],[-292,56]],                           // coaster → warehouse
-    [[-292,56],[-304,-40],[-252,-134]],                          // warehouse → windmill
   ].map(p=> p.map(([x,z])=>[x*K, z*K]));
-  pathMesh(RING);
+  pathMesh(RING); islRoot.userData.ring = RING;
   // bins and lamps along the ring, like the spokes have
   RING.forEach(pts=>{ const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
     for(let d=30; d<L; d+=70){ const p = c.getPointAt(d/L), t = c.getTangentAt(d/L); lampPost(islRoot, p.x + t.z*9.5, p.z - t.x*9.5, 7, 0.9).position.y = G; } });
@@ -4347,6 +4349,187 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   }
 
   if(treesDirty){ roundTree.instanceMatrix.needsUpdate = true; pineTree.instanceMatrix.needsUpdate = true; trunkI.instanceMatrix.needsUpdate = true; }
+}
+
+// =====================================================================
+// ---------- island develop 2 (2026-10-13): every ride fenced like the safari with its own gate sign and service yard,
+// lamps along every path that light up at night, hedges that no longer cross each other, fuller flower beds ----------
+{
+  const ZERO_M = new THREE.Matrix4().makeScale(0, 0, 0);
+  const clearTreesAt = (x, z, r)=>{
+    roundSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ roundTree.setMatrixAt(i, ZERO_M); trunkI.setMatrixAt(i, ZERO_M); } });
+    pineSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ pineTree.setMatrixAt(i*2, ZERO_M); pineTree.setMatrixAt(i*2+1, ZERO_M); trunkI.setMatrixAt(roundSpots.length + i, ZERO_M); } });
+  };
+  const nearestPath = (x, z)=>{ let best = null, bd = Infinity; pathSamples.forEach(([px,pz])=>{ const d = (px-x)*(px-x) + (pz-z)*(pz-z); if(d < bd){ bd = d; best = [px, pz]; } }); return [best, Math.sqrt(bd)]; };
+  const LAMPS = islRoot.userData.lamps || (islRoot.userData.lamps = []);
+  const o = new THREE.Object3D();
+
+  // ----- 1. ride zones: a wooden fence round each free-standing ride (open at the queue), a gate arch with the ride's name, a service yard behind -----
+  function woodFence(cx, cz, R, gapA, gapHalf){
+    const N = Math.max(12, Math.round(2*Math.PI*R/4.2)), posts = new THREE.InstancedMesh(CYL(0.3, 0.36, 3.2, 6), mat(0x8a6243), N), rails = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.34, 0.3), mat(0x9a6b45), N*2);
+    let k = 0, pc = 0;
+    for(let i=0;i<N;i++){
+      const a = i/N*Math.PI*2, b = (i+1)/N*Math.PI*2;
+      const da = Math.atan2(Math.sin(a - gapA), Math.cos(a - gapA)), db = Math.atan2(Math.sin(b - gapA), Math.cos(b - gapA));
+      if(Math.abs(da) < gapHalf || Math.abs(db) < gapHalf) continue;
+      const x = cx + Math.cos(a)*R, z = cz + Math.sin(a)*R, x2 = cx + Math.cos(b)*R, z2 = cz + Math.sin(b)*R;
+      o.position.set(x, G, z); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); o.updateMatrix(); posts.setMatrixAt(pc++, o.matrix);
+      [1.3, 2.5].forEach(h=>{ o.position.set((x+x2)/2, G + h, (z+z2)/2); o.rotation.set(0, -Math.atan2(z2-z, x2-x), 0); o.scale.set(Math.hypot(x2-x, z2-z), 1, 1); o.updateMatrix(); rails.setMatrixAt(k++, o.matrix); });
+    }
+    posts.count = pc; rails.count = k; posts.castShadow = rails.castShadow = true; islRoot.add(posts, rails);
+  }
+  function gateSign(x, z, rot, name){
+    const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g);
+    [-6, 6].forEach(px=>{ add(g, CYL(0.5, 0.6, 7.5, 8), mat(0x8a6243), px, 0, 0); add(g, ICO(1.6, 1), flat(px < 0 ? C.leaf : C.leaf2), px, 8, 0); });
+    add(g, BOX(13.4, 1.8, 0.7), mat(0x9a6b45), 0, 6.6, 0);
+    add(g, new THREE.PlaneGeometry(12.6, 1.5), new THREE.MeshBasicMaterial({map:signTex(name, {bg:'#9a6b45', fg:'#fff7d6', size:64, w:512, h:70}), side:THREE.DoubleSide}), 0, 6.75, 0.4, false);
+    for(let i=0;i<7;i++) add(g, new THREE.ConeGeometry(0.45, 1.1, 3).rotateX(Math.PI), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf][i%4]), -5.4 + i*1.8, 5.6, 0.35, false);
+    return g;
+  }
+  const corrMat = new THREE.MeshLambertMaterial({map:stripeTexI('#9aa3ad', '#b9c0c8', 24)});
+  function serviceYard(x, z, rot){
+    const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g);
+    add(g, BOX(26, 0.12, 17), mat(0xd9cfba), 0, 0, 0, false).receiveShadow = true;                       // yard pad
+    add(g, BOX(13, 5.5, 8), corrMat, -5, 0, -2); add(g, BOX(13.6, 0.6, 8.6), mat(0x4a5058), -5, 5.5, -2);  // workshop
+    add(g, BOX(4.6, 4, 0.2), mat(0x1a1d22), -5, 0, 2.05, false); add(g, BOX(5, 0.3, 0.3), mat(0xffd400), -5, 4.1, 2.1);
+    add(g, new THREE.PlaneGeometry(5.6, 1.2), new THREE.MeshBasicMaterial({map:signTex('정비동', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:80})}), -5, 4.5, 2.12, false);
+    add(g, BOX(6.5, 4.6, 6), mat(0xe6e1d6), 6.5, 0, -2.5); add(g, CONE(4.8, 2.4, 4).rotateY(Math.PI/4), mat(0x6e4a2f), 6.5, 4.6, -2.5);   // office
+    add(g, BOX(1.8, 2.8, 0.2), mat(0x5a3e28), 6.5, 0, 0.55, false); add(g, BOX(1.6, 1.4, 0.2), mat(0x9fd3f5), 4.4, 2, 0.55, false);
+    add(g, new THREE.PlaneGeometry(4.2, 1), new THREE.MeshBasicMaterial({map:signTex('관리동', {bg:'#ffffff', fg:'#1d2f55', size:60, w:384, h:80})}), 6.5, 3.4, 0.6, false);
+    for(let i=0;i<3;i++) add(g, BOX(1.3, 1.3, 1.3), mat(0x9a6b45), -11 + i*1.5, i===2 ? 1.3 : 0, 5 + (i%2)*0.8);
+    [0, 1].forEach(i=> add(g, CYL(0.5, 0.5, 1.2, 10), mat([0x2f62b8, 0xe2574c][i]), 1 + i*1.2, 0, 5.6));
+    const cart = new THREE.Group(); cart.position.set(-1, 0, 4.2); cart.rotation.y = 0.4; g.add(cart);
+    add(cart, BOX(2.4, 0.8, 1.4), mat(0xffd400), 0, 0.5, 0); add(cart, BOX(1, 0.9, 1.3), mat(0x5aa0e6), -0.6, 1.3, 0); [[-0.8,-0.75],[0.8,-0.75],[-0.8,0.75],[0.8,0.75]].forEach(([a,b])=> add(cart, new THREE.CylinderGeometry(0.32, 0.32, 0.25, 10).rotateX(Math.PI/2), mat(0x2b2420), a, 0.32, b));
+    add(g, BOX(0.4, 9, 0.4), mat(0xffd400), 10.5, 0, 5); add(g, BOX(8, 0.4, 0.4), mat(0xffd400), 7, 9, 5); add(g, CYL(0.04, 0.04, 4, 4), mat(0x333333), 4.5, 5, 5, false);   // small crane
+    add(g, BOX(0.2, 5, 0.2), mat(0x9aa3ad), 12, 0, -7); add(g, new THREE.PlaneGeometry(2.4, 1.5), new THREE.MeshLambertMaterial({color:0x1d2f55, side:THREE.DoubleSide}), 13.2, 4, -7, false);
+    return g;
+  }
+  const SKIP = new Set(['사파리', '롤러코스터', '관람차', '스카이 크루즈', '도로 운전면허 시험장', '귀신의 집', '하모니아']);
+  const yards = [];
+  IB.filter(b=> b.c==='ride' && !SKIP.has(b.label)).forEach(b=>{
+    const [p] = nearestPath(b.cx, b.cz); if(!p) return;
+    const ea = Math.atan2(p[1]-b.cz, p[0]-b.cx), R = b.r + 9;
+    woodFence(b.cx, b.cz, R, ea, 13/R);
+    gateSign(b.cx + Math.cos(ea)*(R + 4), b.cz + Math.sin(ea)*(R + 4), Math.PI/2 - ea, b.label);
+    for(const off of [Math.PI, Math.PI - 0.9, Math.PI + 0.9, Math.PI - 1.7, Math.PI + 1.7, Math.PI/2, -Math.PI/2]){
+      const a = ea + off, x = b.cx + Math.cos(a)*(R + 15), z = b.cz + Math.sin(a)*(R + 15);
+      if(Math.hypot(x, z) > edgeR(x, z) - 32 || occupied(x, z, 11) || nearPath(x, z, 12) || Math.abs(Math.hypot(x,z) - trackR(Math.atan2(z,x))) < 15 || yards.some(([yx,yz])=> Math.hypot(yx-x, yz-z) < 30)) continue;
+      serviceYard(x, z, Math.atan2(b.cx - x, b.cz - z)); yards.push([x, z]); OCC.push([x, z, 14]); clearTreesAt(x, z, 15); break;
+    }
+  });
+
+  // ----- 2. lamps along every path, lit at night: a warm pool on the ground and a glow on the bulb that fade in as the sun goes down -----
+  const lampPost = (x, z, h=7)=>{
+    if(occupied(x, z, 1.2)) return;
+    const g = new THREE.Group(); g.position.set(x, G, z); islRoot.add(g);
+    add(g, CYL(0.22, 0.3, h, 8), mat(0x2f3540)); add(g, BOX(1.6, 0.25, 0.25), mat(0x2f3540), 0.6, h, 0);
+    add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), 1.3, h - 0.3, 0, false);
+    LAMPS.push([x, z, x + 1.3, G + h - 0.3, z]);
+  };
+  const ALL = PATHS.concat(islRoot.userData.ring || []);
+  ALL.forEach((pts, pi)=>{
+    const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
+    for(let d=20; d<L-8; d+=44){ const u = d/L, p = c.getPointAt(u), t = c.getTangentAt(u), s = (Math.floor(d/44) + pi) % 2 ? 1 : -1;
+      if(Math.hypot(p.x, p.z-67) < 100) continue;                                   // the plaza has its own lighting
+      lampPost(p.x - t.z*s*10.8, p.z + t.x*s*10.8); }
+  });
+  if(LAMPS.length){
+    const pool = new THREE.InstancedMesh(new THREE.CircleGeometry(11, 20).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0xffc46a, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false}), LAMPS.length);
+    const glow = new THREE.InstancedMesh(SPH(1.9, 10, 8), new THREE.MeshBasicMaterial({color:0xffe9b0, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false}), LAMPS.length);
+    LAMPS.forEach(([x, z, hx, hy, hz], i)=>{ o.position.set(x, G + 0.14, z); o.rotation.set(0,0,0); o.scale.set(1,1,1); o.updateMatrix(); pool.setMatrixAt(i, o.matrix); o.position.set(hx, hy, hz); o.updateMatrix(); glow.setMatrixAt(i, o.matrix); });
+    pool.renderOrder = 2; glow.renderOrder = 2; islRoot.add(pool, glow);
+    // night follows the sun slider: dusk from about 17:30, full dark at 19:00
+    islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
+      pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02;
+      if(night > 0 && W && W.id==='island') hemi.intensity = Math.max(hemi.intensity, 0.42 + night*0.22); });
+    // camera helper for screenshots: window.__islandCam(x, z, distance)
+    window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
+  }
+
+  // ----- 3. hedges: drop any hedge that sits on another path, crosses another hedge, or ended up inside a ride lot or yard -----
+  { const hg = islRoot.children.find(c=> c.isInstancedMesh && c.geometry.parameters && c.geometry.parameters.depth === 7.4 && c.geometry.parameters.width === 1.6);
+    if(hg){ const m = new THREE.Matrix4(), list = [];
+      for(let i=0;i<hg.count;i++){ hg.getMatrixAt(i, m); const e = m.elements; list.push([e[12], e[14], Math.atan2(e[8], e[10]), i, e[0] === 0 && e[5] === 0]); }
+      let dropped = 0;
+      list.forEach(([x, z, r, i, gone])=>{
+        if(gone) return;
+        let drop = occupied(x, z, 0.5) || pathSamples.some(([px,pz])=> (px-x)*(px-x) + (pz-z)*(pz-z) < 30);
+        if(!drop) drop = list.some(([x2, z2, r2, j, g2])=> j !== i && !g2 && Math.hypot(x2-x, z2-z) < 6.5 && Math.abs(Math.atan2(Math.sin(r2-r), Math.cos(r2-r))) > 0.35);
+        if(drop){ hg.setMatrixAt(i, ZERO_M); dropped++; }
+      });
+      hg.instanceMatrix.needsUpdate = true; }
+  }
+
+  // ----- 4. flower beds: a proper bloom (centre + petals on a stem) and twice as many of them -----
+  { const fl = islRoot.children.find(c=> c.isInstancedMesh && c.geometry.parameters && c.geometry.parameters.radius === 0.9 && c.geometry.parameters.detail === 0);
+    if(fl){
+      const petals = []; for(let i=0;i<6;i++){ const a = i/6*Math.PI*2; petals.push(new THREE.SphereGeometry(0.5, 7, 5).scale(1, 0.45, 1).translate(Math.cos(a)*0.72, 0, Math.sin(a)*0.72)); }
+      petals.push(new THREE.SphereGeometry(0.42, 8, 6).translate(0, 0.12, 0));
+      const bloom = mergeGeometries(petals, false); bloom.translate(0, 0.4, 0);
+      const n = fl.count, m = new THREE.Matrix4(), col = new THREE.Color();
+      const stems = new THREE.InstancedMesh(CYL(0.08, 0.11, 1.5, 5), mat(0x4f8a3c), n*2), more = new THREE.InstancedMesh(bloom, fl.material, n), cen = new THREE.InstancedMesh(SPH(0.26, 7, 5), mat(0xffe08a), n*2);
+      let sd3 = 31; const r4 = ()=> (sd3 = (sd3*16807) % 2147483647) / 2147483647;
+      for(let i=0;i<n;i++){
+        fl.getMatrixAt(i, m); const e = m.elements, x = e[12], z = e[14];
+        o.position.set(x, G, z); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); o.updateMatrix(); stems.setMatrixAt(i*2, o.matrix);
+        o.position.set(x, G + 1.9, z); o.updateMatrix(); cen.setMatrixAt(i*2, o.matrix);
+        const x2 = x + (r4()-0.5)*2.6, z2 = z + (r4()-0.5)*2.6;
+        o.position.set(x2, G + 1.1, z2); o.rotation.set(0, r4()*3, 0); o.updateMatrix(); more.setMatrixAt(i, o.matrix);
+        o.position.set(x2, G, z2); o.rotation.set(0,0,0); o.updateMatrix(); stems.setMatrixAt(i*2+1, o.matrix);
+        o.position.set(x2, G + 1.9, z2); o.updateMatrix(); cen.setMatrixAt(i*2+1, o.matrix);
+        if(fl.instanceColor){ fl.getColorAt(i, col); more.setColorAt(i, col.clone().offsetHSL(0.08, 0, 0.05)); }
+      }
+      fl.geometry = bloom; fl.castShadow = more.castShadow = true; islRoot.add(stems, more, cen);
+    }
+  }
+
+  // ----- 5. the pier: a real landing stage — terminal pavilion, lamps, benches, bollards and life rings, flags, a docked ferry with a gangway, buoys -----
+  // The pier group is squeezed sideways (scale.x) at the cove, so the dressing lives in its own group at the same place, in plain world units.
+  {
+    pier.scale.x = 0.8;                                          // a wider deck (17.6) than the narrow footbridge it was
+    const P = new THREE.Group(); P.position.copy(pier.position); P.rotation.y = pier.rotation.y; islRoot.add(P);
+    const DY = 3.8, HW = 8.4;                                    // deck top, half width of the deck
+    const toWorld = (x, z)=>{ const v = new THREE.Vector3(x, 0, z).applyMatrix4(P.matrixWorld); return [v.x, v.z]; };
+    P.updateMatrixWorld(true);
+    const lampL = (x, z)=>{ const g = new THREE.Group(); g.position.set(x, DY, z); P.add(g); const s = x < 0 ? 1 : -1;
+      add(g, CYL(0.22, 0.3, 7, 8), mat(0x2f3540)); add(g, BOX(1.6, 0.25, 0.25), mat(0x2f3540), s*0.6, 7, 0); add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), s*1.3, 6.7, 0, false);
+      const [fx, fz] = toWorld(x, z), [hx, hz] = toWorld(x + s*1.3, z); LAMPS.push([fx, fz, hx, DY + 6.7, hz]); };
+    for(let z=16; z<=184; z+=16){ lampL(-HW + 0.9, z); lampL(HW - 0.9, z); }
+    for(let z=28; z<=172; z+=24) [-HW + 2.4, HW - 2.4].forEach(x=>{ const g = new THREE.Group(); g.position.set(x, DY, z); g.rotation.y = x < 0 ? Math.PI/2 : -Math.PI/2; P.add(g);
+      add(g, BOX(3.2, 0.25, 1.1), mat(0x9a6b45), 0, 1, 0); add(g, BOX(3.2, 1, 0.2), mat(0x9a6b45), 0, 1.2, -0.5).rotation.x = -0.15; [-1.3, 1.3].forEach(k=> add(g, BOX(0.25, 1, 1), mat(0x2f3540), k, 0, 0)); });
+    for(let z=8; z<=196; z+=16) [-HW, HW].forEach(x=>{ add(P, CYL(0.5, 0.6, 1.4, 8), mat(0x3a3f4a), x, DY, z); add(P, CYL(0.7, 0.7, 0.3, 8), mat(0x3a3f4a), x, DY + 1.4, z);
+      if(z < 196) add(P, new THREE.CylinderGeometry(0.12, 0.12, 16, 5).rotateX(Math.PI/2), mat(0xc9b48a), x, DY + 0.9, z + 8); });
+    for(let z=40; z<=180; z+=28) [-HW - 0.5, HW + 0.5].forEach(x=>{ add(P, new THREE.TorusGeometry(0.9, 0.25, 8, 16), new THREE.MeshLambertMaterial({map:stripeTexI('#f39a3b', '#ffffff', 4)}), x, DY + 4.2, z).rotation.y = Math.PI/2; });
+    [44, 104, 164].forEach((z, i)=> [-HW + 0.9, HW - 0.9].forEach((x, k)=>{ add(P, CYL(0.18, 0.22, 11, 6), mat(0xf4efe4), x, DY, z); const f = add(P, new THREE.PlaneGeometry(4.5, 2.8), new THREE.MeshLambertMaterial({color:[0xe2574c, 0xffd400, 0x5aa0e6, 0x58b368][(i*2 + k) % 4], side:THREE.DoubleSide}), x + (x < 0 ? 2.2 : -2.2), DY + 9.2, z, false); islAnim.push(t=>{ f.rotation.y = Math.sin(t*2.5 + z + k)*0.35; }); }));
+    // terminal pavilion at the far end
+    { const g = new THREE.Group(); g.position.set(0, DY, 190); P.add(g);
+      add(g, BOX(15, 7, 11), mat(0xf7f7f2)); add(g, BOX(16, 0.8, 12), mat(C.navy), 0, 7, 0); add(g, CONE(11, 4.6, 4).rotateY(Math.PI/4), mat(C.navy), 0, 7.8, 0);
+      [-4.5, 0, 4.5].forEach(x=> add(g, BOX(3, 3, 0.3), mat(0x9fd3f5), x, 2.2, -5.6, false)); add(g, BOX(4.4, 5.2, 0.3), mat(0x2b3a4a), 0, 0, 5.6, false);
+      [-4.8, 4.8].forEach(x=> add(g, BOX(2.6, 3, 0.3), mat(0x9fd3f5), x, 2.4, 5.6, false));
+      const signM = new THREE.MeshBasicMaterial({map:signTex('DOROLAND 선착장', {bg:'#1d2f55', fg:'#ffd400', size:60, w:640, h:90}), side:THREE.DoubleSide});
+      add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 7.4, 6.1, false); add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 7.4, -6.1, false);
+      add(g, new THREE.CylinderGeometry(1.5, 1.5, 0.4, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 5, 5.8); add(g, BOX(0.2, 1.1, 0.1), mat(C.navy), 0, 5.2, 6.05); add(g, BOX(0.8, 0.2, 0.1), mat(C.navy), 0.3, 5, 6.05);
+      add(g, CYL(0.3, 0.3, 6, 6), mat(0x3a3f4a), 0, 12.4, 0); add(g, new THREE.ConeGeometry(0.9, 1.6, 10).rotateX(Math.PI), mat(0xd9a441), 0, 13.6, 0);
+      [-5, -1.7, 1.7, 5].forEach(x=>{ const b = new THREE.Group(); b.position.set(x, DY, 181); P.add(b); add(b, BOX(3, 0.25, 1.1), mat(0x9a6b45), 0, 1, 0); add(b, BOX(3, 1, 0.2), mat(0x9a6b45), 0, 1.2, 0.5).rotation.x = 0.15; [-1.2, 1.2].forEach(k=> add(b, BOX(0.25, 1, 1), mat(0x2f3540), k, 0, 0)); }); }
+    // boarding gate where the pier leaves the beach, and a ticket kiosk on the sand beside it
+    { const g = new THREE.Group(); g.position.set(0, DY, 5); P.add(g);
+      [-HW - 0.3, HW + 0.3].forEach(x=> add(g, CYL(0.5, 0.6, 9, 8), mat(0xf4efe4), x, 0, 0)); add(g, BOX(HW*2 + 1.6, 1.8, 0.6), mat(C.navy), 0, 9, 0);
+      add(g, new THREE.PlaneGeometry(HW*2 - 1, 1.5), new THREE.MeshBasicMaterial({map:signTex('선착장 · 배 타는 곳', {bg:'#1d2f55', fg:'#ffffff', size:62, w:768, h:70}), side:THREE.DoubleSide}), 0, 9.15, 0.4, false);
+      for(let i=0;i<8;i++) add(g, new THREE.ConeGeometry(0.5, 1.2, 3).rotateX(Math.PI), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf][i%4]), -7.4 + i*2.1, 7.9, 0.35, false); }
+    { const g = new THREE.Group(); g.position.set(-15, 1.2, -4); g.rotation.y = 0.35; P.add(g);
+      add(g, BOX(6, 5.5, 5), mat(0xf4efe4)); add(g, BOX(6.6, 0.4, 5.6), mat(C.navy), 0, 5.5, 0); add(g, BOX(5.4, 1.6, 0.1), mat(0x9fd3f5), 0, 2.3, 2.55, false);
+      add(g, new THREE.PlaneGeometry(5.4, 1.2), new THREE.MeshBasicMaterial({map:signTex('승선권', {bg:'#ffffff', fg:'#1d2f55', size:64, w:384, h:90})}), 0, 4, 2.6, false); }
+    // the ferry alongside, a gangway onto the deck, buoys out in the water
+    { const ferry = boat(0xf7f7f2, C.navy); ferry.scale.setScalar(1.6); ferry.position.set(HW + 9.5, -1.5, 150); ferry.rotation.y = Math.PI/2; P.add(ferry); boats.push(ferry);
+      add(ferry, BOX(12, 0.4, 7), mat(C.navy), 2, 8.4, 0); [[-3,-3],[7,-3],[-3,3],[7,3]].forEach(([x,z])=> add(ferry, CYL(0.15, 0.15, 3, 6), mat(0xffffff), x, 5.4, z));
+      add(ferry, new THREE.PlaneGeometry(5, 1.1), new THREE.MeshBasicMaterial({map:signTex('DORO FERRY', {bg:'#1d2f55', fg:'#ffd400', size:60, w:384, h:80}), side:THREE.DoubleSide}), 3.5, 3.4, -4.2, false);
+      for(let i=0;i<6;i++) add(ferry, new THREE.TorusGeometry(0.5, 0.14, 6, 12), mat(0xf39a3b), -8 + i*4, 3.2, -4.15, false);
+      const gw = add(P, BOX(7, 0.3, 2.6), mat(0x9a6b45), HW + 3, DY + 0.3, 150); gw.rotation.z = -0.1; [-1.2, 1.2].forEach(z=> add(P, BOX(7, 0.06, 0.06), mat(0xc9b48a), HW + 3, DY + 1.4, 150 + z).rotation.z = -0.1);
+      [[-26, 215],[30, 226],[-40, 190],[46, 176]].forEach(([x,z],i)=>{ const b = new THREE.Group(); b.position.set(x, 0.2, z); P.add(b); add(b, SPH(1.6, 10, 8), mat(i%2 ? 0xe2574c : 0xffd400)); add(b, CYL(0.1, 0.1, 3.2, 5), mat(0x3a3f4a), 0, 1.4, 0); add(b, new THREE.PlaneGeometry(1.4, 0.9), new THREE.MeshLambertMaterial({color:0xffffff, side:THREE.DoubleSide}), 0.7, 4.2, 0, false);
+        islAnim.push(t=>{ b.position.y = 0.2 + Math.sin(t*1.4 + i)*0.5; b.rotation.z = Math.sin(t*1.1 + i)*0.08; }); }); }
+  }
+  clearTreesAt(-40, -500, 44);                                  // the eye cave moved to the north shore
+  roundTree.instanceMatrix.needsUpdate = pineTree.instanceMatrix.needsUpdate = trunkI.instanceMatrix.needsUpdate = true;
 }
 
 // ---------- characters ----------
