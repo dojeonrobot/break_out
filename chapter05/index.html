@@ -2220,7 +2220,7 @@ const PATHS = [
   [[50,100],[110,150],[130,175]],                      // → drop tower
   [[150,40],[232,78],[300,120],[400,118],[432,48],[395,-15]],   // → lighthouse (south of the carousel and the licence course)
   [[-100,10],[-200,62],[-292,56]],                     // → warehouse (round the safari)
-  [[0,200],[80,212],[150,240],[170,262]],              // → lake & food court
+  [[0,200],[80,212],[150,240],[170,262]],              // → lake
   [[100,40],[118,92]],                                 // → teacups (off the carousel path)
   [[0,209],[-40,209]],                                 // → bumper cars by the boulevard
   [[100,-60],[132,-38]],                               // → swing ride
@@ -2259,7 +2259,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[385,189,24],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -2652,9 +2652,9 @@ const shop = new THREE.Group();
   add(shop, SPH(2.6,12,10), mat(0xffc4dc), 0, 25, 0);
   add(shop, new THREE.PlaneGeometry(14, 3.4), new THREE.MeshBasicMaterial({map:signTex('ICE CREAM', {bg:'#fff7d6', fg:'#8a5a36', size:62, w:512, h:128})}), 0, 9, 7.1, false);
 }
-place(shop, -110, 180, 0.5); shop.scale.setScalar(0.55);
-pickable(shop, {n:'아이스크림 가게', c:'shop', sub:'상점', cx:-110, cz:180, h:26, r:14,
-  desc:'통나무로 지은 아이스크림 가게. 캠프 쉬는 시간이면 신입사원들이 줄을 서는 곳입니다.', facts:[['위치','분수 광장 서쪽']]});
+place(shop, 240, -175, 0.9); shop.scale.setScalar(0.55);
+pickable(shop, {n:'스위트 스쿱', c:'shop', sub:'상점', cx:240, cz:-175, h:26, r:14,
+  desc:'통나무로 지은 아이스크림 가게. 숙소에서 나오면 바로 앞이라 쉬는 시간마다 신입사원들이 줄을 섭니다.', facts:[['위치','직원 숙소 서쪽']]});
 function cart(c1, c2, x, z, r){
   const g = new THREE.Group();
   add(g, BOX(9,5,5), mat(c1), 0, 1.5, 0);
@@ -3406,7 +3406,7 @@ const lake = new THREE.Group();
   islAnim.push(t=> swans.forEach((s,i)=>{ const a = t*0.07*(i%2 ? 1 : -1) + i*1.6, r = 30 + (i%2)*6; s.position.set(Math.cos(a)*r, -1.9 + Math.sin(t*1.4+i)*0.2, Math.sin(a)*r); s.rotation.y = -a + (i%2 ? -Math.PI/2 : Math.PI/2); }));
 }
 place(lake, LAKE[0], LAKE[1]);
-pickable(lake, {n:'호수 공원', c:'place', sub:'명소', cx:LAKE[0], cz:LAKE[1], h:14, r:52,
+pickable(lake, {n:'미러 레이크', c:'place', sub:'명소', cx:LAKE[0], cz:LAKE[1], h:14, r:52,
   desc:'잔디 아래로 움푹 내려앉은 호수. 아치 다리로 정자 섬에 건너가고, 백조 보트와 오리가 연잎 사이를 떠다닙니다. 남쪽 낚시 데크와 버드나무 아래가 쉬어 가기 좋습니다.',
   facts:[['볼거리','정자, 아치 다리, 백조 보트, 낚시 데크, 스플래시 리버']]});
 
@@ -3552,7 +3552,7 @@ const food = new THREE.Group();
 {
   add(food, BOX(22, 10, 10), mat(0xfff3d6), 0, 0, -12);
   add(food, BOX(23, 1.4, 11), mat(0xf39a3b), 0, 10, -12);
-  add(food, new THREE.PlaneGeometry(16, 3), new THREE.MeshBasicMaterial({map:signTex('FOOD COURT', {bg:'#f39a3b', fg:'#ffffff', size:70, w:512, h:96})}), 0, 8, -6.9, false);
+  add(food, new THREE.PlaneGeometry(16, 3), new THREE.MeshBasicMaterial({map:signTex('DORO FOOD COURT', {bg:'#f39a3b', fg:'#ffffff', size:70, w:512, h:96})}), 0, 8, -6.9, false);
   for(let i=0;i<8;i++){
     const x = -12 + (i%4)*8, z = 2 + Math.floor(i/4)*10, g = new THREE.Group(); g.position.set(x, 0, z); food.add(g);
     add(g, CYL(1.6, 1.6, 2.6, 12), mat(0xffffff)); [0,1,2,3].forEach(k=> add(g, CYL(0.6, 0.6, 1.6, 8), mat(0xe9e2d0), Math.cos(k*Math.PI/2)*2.8, 0, Math.sin(k*Math.PI/2)*2.8));
@@ -3560,8 +3560,8 @@ const food = new THREE.Group();
     add(g, new THREE.ConeGeometry(4.2, 1.8, 10, 1, true).translate(0,0.9,0), new THREE.MeshLambertMaterial({map:stripeTexI(['#e2574c','#5aa0e6','#ffd400','#58b368'][i%4], '#ffffff', 10), side:THREE.DoubleSide}), 0, 8.4, 0);
   }
 }
-place(food, 140, 262, 0.4); food.scale.setScalar(0.6);
-pickable(food, {n:'푸드코트', c:'shop', sub:'식당', cx:140, cz:262, h:14, r:20, desc:'호수 옆 푸드코트. 파라솔 아래에서 도로치킨과 츄러스를 먹으며 쉬어 갈 수 있습니다.', facts:[['위치','호수 공원 남쪽']]});
+place(food, 330, -50, -0.6); food.scale.setScalar(0.6);
+pickable(food, {n:'도로 푸드코트', c:'shop', sub:'식당', cx:330, cz:-50, h:14, r:20, desc:'직원 숙소 옆 푸드코트. 파라솔 아래에서 도로치킨과 츄러스를 먹으며 쉬어 갈 수 있습니다.', facts:[['위치','직원 숙소 남쪽']]});
 
 // sky cable car from the plaza up to the ferris-wheel hill
 const cable = new THREE.Group();
@@ -3949,7 +3949,7 @@ const village = new THREE.Group();
   add(village, CYL(5, 5, 0.6, 16), mat(0x8a6243), 6, 0, 8); add(village, CONE(2, 3, 6), glowMat(0xffa53b), 6, 0.6, 8, false);
 }
 place(village, -370/K, -255/K);
-pickable(village, {n:'나무집 마을', c:'place', sub:'숲 속', cx:-370/K, cz:-255/K, h:32, r:34,
+pickable(village, {n:'트리하우스 빌리지', c:'place', sub:'숲 속', cx:-370/K, cz:-255/K, h:32, r:34,
   desc:'숲 속 큰 나무 위에 지은 집들을 줄다리로 이은 마을. 발밑에는 빛나는 버섯이 자랍니다.', facts:[['등장','챕터 3 · 4'],['특징','나무 위 집, 줄다리, 빛 버섯']]});
 
 // ---------- story props ----------
@@ -3996,22 +3996,42 @@ pickable(renDoor, {n:'렌의 지하 연구실', c:'place', sub:'챕터 4', cx:-1
 }
 // ---------- more attractions in the open lawns ----------
 function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g); return g; }
-// open-air arena west of the plaza: shell stage facing tiered seat rows
+// open-air amphitheatre west of the plaza: a proscenium stage with an LED wall, lighting truss and speaker stacks, nine curved rows with an audience
 {
   const g = at(-150, 100, Math.PI/2 + 0.35);
-  add(g, CYL(30, 31, 0.6, 40), mat(0xd9cfba));
-  add(g, CYL(10, 10.4, 2.4, 28), mat(0x2b3a5a), 0, 0, -10);
-  add(g, new THREE.CylinderGeometry(11.5, 11.5, 13, 28, 1, true, Math.PI*0.55, Math.PI*0.9).translate(0, 6.5, 0), new THREE.MeshLambertMaterial({color:0xb8457f, side:THREE.DoubleSide}), 0, 2.4, -10);
-  add(g, new THREE.SphereGeometry(11.8, 28, 8, -Math.PI*0.95, Math.PI*0.9, 0, Math.PI/2), new THREE.MeshLambertMaterial({color:0xffd400, side:THREE.DoubleSide}), 0, 15.4, -10);
-  for(let i=0;i<5;i++) add(g, SPH(0.6, 8, 6), glowMat([0xff9fcf, 0x7fd7ff, 0xffffff][i%3]), -6 + i*3, 14, -3, false);
-  for(let r=0;r<5;r++){
-    const R = 15 + r*3.4, n = 9 + r*2;
-    for(let k=0;k<n;k++){ const a = -0.62 + 1.24*k/(n-1), x = Math.sin(a)*R, z = -10 + Math.cos(a)*R;
-      const st = add(g, BOX(3.6, 0.9 + r*0.9, 2.8), mat(0xe2dccd), x, 0, z); st.rotation.y = a;
-      const seat = add(g, BOX(3.2, 0.5, 1.4), mat(r%2 ? 0x5aa0e6 : 0xe2574c), x, 0.9 + r*0.9, z); seat.rotation.y = a; }
+  add(g, CYL(44, 45, 0.6, 48), mat(0xd9cfba));
+  add(g, BOX(40, 3, 18), mat(0x2b3a5a), 0, 0, -14); add(g, BOX(40, 0.3, 18), mat(0x9a6b45), 0, 3, -14);
+  add(g, BOX(44, 22, 2), mat(0x1d2f55), 0, 3, -23.5);
+  const ledTex = canvasTex(512, 256, c=>{ const gr = c.createLinearGradient(0,0,512,256); gr.addColorStop(0,'#6a4bc4'); gr.addColorStop(0.5,'#e8622c'); gr.addColorStop(1,'#1f6297'); c.fillStyle = gr; c.fillRect(0,0,512,256); c.fillStyle = '#ffffff'; c.font = 'bold 72px sans-serif'; c.textAlign = 'center'; c.fillText('DOROLAND LIVE', 256, 150); });
+  add(g, new THREE.PlaneGeometry(30, 12), new THREE.MeshBasicMaterial({map:ledTex}), 0, 12, -22.4, false);
+  [-21, 21].forEach(x=>{ add(g, BOX(3, 26, 3), mat(0xb8457f), x, 3, -6); add(g, BOX(3.4, 1.2, 3.4), mat(C.gold), x, 29, -6); });
+  add(g, BOX(46, 3, 3.4), mat(0xb8457f), 0, 29, -6);
+  add(g, new THREE.PlaneGeometry(26, 2.6), new THREE.MeshBasicMaterial({map:signTex('DORO GRAND STAGE', {bg:'#b8457f', fg:'#ffd400', size:60, w:768, h:100}), side:THREE.DoubleSide}), 0, 30.5, -4.2, false);
+  add(g, new THREE.CylinderGeometry(24, 24, 22, 32, 1, true, Math.PI*1.0, Math.PI*0.5).rotateZ(Math.PI/2), new THREE.MeshLambertMaterial({color:0xffd400, side:THREE.DoubleSide}), 0, 29, -14);
+  add(g, BOX(40, 1, 1), mat(0x555a66), 0, 26, -2); [-18, 18].forEach(x=> add(g, BOX(1, 23, 1), mat(0x555a66), x, 3, -2));
+  const heads = [];
+  for(let i=0;i<7;i++){ const col = [0xff9fcf, 0x7fd7ff, 0xffd400, 0x9dffd8][i%4];
+    const h = new THREE.Group(); h.position.set(-15 + i*5, 25, -2); g.add(h); add(h, CYL(0.8, 1.1, 1.8, 8).rotateX(Math.PI), glowMat(col), 0, 0, 0, false);
+    add(h, new THREE.ConeGeometry(4, 22, 12, 1, true).translate(0, -11, 0), new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:0.12, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide}), 0, 0, 0, false); heads.push(h); }
+  [-24, 24].forEach(x=>{ for(let k=0;k<3;k++) add(g, BOX(3.6, 2.6, 3), mat(0x1d1d22), x, 3 + k*2.7, -10 + k*0.4); add(g, BOX(5, 3, 4), mat(0x1d1d22), x, 0, -6); });
+  for(let i=0;i<5;i++) rider(g, -8 + i*4, 3.3, -14 + (i%2)*3, i, 0.9, Math.PI);
+  add(g, CYL(0.15, 0.15, 3, 5), mat(0x3a3f4a), 0, 3.3, -8); add(g, SPH(0.35, 6, 5), mat(0x222222), 0, 6.3, -8);
+  const SC = [0x5aa0e6, 0xe2574c, 0xffd400, 0x58b368];
+  for(let r=0;r<9;r++){
+    const R = 16 + r*3.1, n = 14 + r*3, h = 0.6 + r*0.85;
+    for(let k=0;k<n;k++){ const a = -0.78 + 1.56*k/(n-1), x = Math.sin(a)*R, z = -14 + Math.cos(a)*R;
+      if(Math.abs(a) < 0.06 || Math.abs(Math.abs(a) - 0.42) < 0.05) continue;
+      const st = add(g, BOX(2.6, h, 2.6), mat(0xe2dccd), x, 0, z); st.rotation.y = a;
+      const seat = add(g, BOX(2.2, 0.5, 1.2), mat(SC[r%4]), x, h, z); seat.rotation.y = a;
+      const back = add(g, BOX(2.2, 1.2, 0.3), mat(SC[r%4]), x + Math.sin(a)*0.5, h + 0.5, z + Math.cos(a)*0.5); back.rotation.y = a;
+      if((k + r) % 3) rider(g, x, h + 0.5, z, k + r, 0.6, a + Math.PI); }
+    if(r % 3 === 2) for(let k=0;k<=n;k+=2){ const a = -0.78 + 1.56*k/n, x = Math.sin(a)*(R + 1.5), z = -14 + Math.cos(a)*(R + 1.5); add(g, CYL(0.08, 0.08, 1, 5), mat(0x3a3f4a), x, h + 0.85, z); }
   }
-  add(g, new THREE.PlaneGeometry(14, 3), new THREE.MeshBasicMaterial({map:signTex('DORO ARENA', {bg:'#1d2f55', fg:'#ffd400', size:66, w:512, h:100}), side:THREE.DoubleSide}), 0, 28.5, -10, false);
-  pickable(g, {abs:true, n:'도로 아레나', c:'place', sub:'공연장', cx:-150, cz:100, h:28, r:30, desc:'계단식 객석이 무대를 감싸는 야외 공연장. 밤에는 도로랜드 송 공연이 열립니다.', facts:[['위치','중앙 광장 서쪽']]});
+  for(let i=0;i<9;i++){ const a = -0.9 + 1.8*i/8, x = Math.sin(a)*44, z = -14 + Math.cos(a)*44; add(g, CYL(0.2, 0.25, 7, 8), mat(0x2f3540), x, 0, z); add(g, SPH(0.55, 8, 6), glowMat(0xfff0b8), x, 7.2, z, false); }
+  add(g, BOX(6, 5, 5), mat(0xf4efe4), 0, 0, 33); add(g, BOX(6.6, 0.4, 5.6), mat(0xb8457f), 0, 5, 33);
+  add(g, new THREE.PlaneGeometry(5.4, 1.2), new THREE.MeshBasicMaterial({map:signTex('입장권', {bg:'#ffffff', fg:'#b8457f', size:64, w:384, h:90})}), 0, 3.6, 35.6, false);
+  islAnim.push(t=>{ heads.forEach((h,i)=>{ h.rotation.z = Math.sin(t*0.9 + i)*0.5; h.rotation.x = Math.cos(t*0.7 + i)*0.3; }); });
+  pickable(g, {abs:true, n:'도로 그랜드 스테이지', c:'place', sub:'공연장', cx:-150, cz:100, h:32, r:44, desc:'LED 월과 조명 트러스를 갖춘 야외 원형 공연장. 아홉 줄 객석이 무대를 감싸고, 밤마다 도로랜드 라이브 공연이 열립니다.', facts:[['위치','중앙 광장 서쪽'],['시설','LED 월 · 조명 트러스 · 스피커 · 객석 9단']]});
 }
 // rotating planes east of the plaza
 {
@@ -4043,8 +4063,8 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   add(g, new THREE.SphereGeometry(16.6, 32, 16, 0, Math.PI*2, 0, Math.PI/2), mat(0x8fb8e8), 0, 6, 0);
   for(let i=0;i<6;i++) add(g, new THREE.TorusGeometry(16.7, 0.25, 4, 48, Math.PI).rotateY(i/6*Math.PI), mat(0xffffff), 0, 6, 0, false);
   add(g, BOX(12, 9, 6), mat(0x1d2f55), 0, 0, 17);
-  add(g, new THREE.PlaneGeometry(11, 3), new THREE.MeshBasicMaterial({map:signTex('4D 영상관', {bg:'#1d2f55', fg:'#7fd7ff', size:70, w:384, h:100})}), 0, 6.6, 20.05, false);
-  pickable(g, {abs:true, n:'4D 영상관', c:'place', sub:'명소', cx:-150, cz:-160, h:24, r:18, desc:'돔 스크린에서 도로랜드의 옛 이야기를 바람과 물보라까지 느끼며 보는 영상관.', facts:[['위치','사파리와 보랏빛 성 사이']]});
+  add(g, new THREE.PlaneGeometry(11, 3), new THREE.MeshBasicMaterial({map:signTex('4D 시네마 돔', {bg:'#1d2f55', fg:'#7fd7ff', size:70, w:384, h:100})}), 0, 6.6, 20.05, false);
+  pickable(g, {abs:true, n:'4D 시네마 돔', c:'place', sub:'명소', cx:-150, cz:-160, h:24, r:18, desc:'돔 스크린에서 도로랜드의 옛 이야기를 바람과 물보라까지 느끼며 보는 영상관.', facts:[['위치','사파리와 보랏빛 성 사이']]});
 }
 // musical fountain garden behind Harmonia
 {
@@ -4056,7 +4076,7 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   for(let i=0;i<16;i++){ const a = i/16*Math.PI*2; add(g, ICO(1.6, 1), flat(i%2 ? 0x5d9e48 : 0xff9fcf), Math.cos(a)*27, 1.2, Math.sin(a)*27); }
   islAnim.push(t=>{ for(let i=0;i<N;i++){ const j = i%12, a = j/12*Math.PI*2, ph = (t*0.7 + i/N*5) % 1, h = (6 + 8*Math.abs(Math.sin(t*0.8 + j*0.6)))*4*ph*(1-ph);
     P[i*3] = Math.cos(a)*(14 - ph*3); P[i*3+1] = 1.6 + h; P[i*3+2] = Math.sin(a)*(14 - ph*3); } geo.attributes.position.needsUpdate = true; });
-  pickable(g, {abs:true, n:'음악 분수 정원', c:'place', sub:'공통', cx:-6, cz:-172, h:16, r:26, desc:'하모니아의 노래에 맞춰 물줄기 열두 개가 춤추는 분수 정원.', facts:[['위치','하모니아 북쪽']]});
+  pickable(g, {abs:true, n:'하모니 파운틴', c:'place', sub:'공통', cx:-6, cz:-172, h:16, r:26, desc:'하모니아의 노래에 맞춰 물줄기 열두 개가 춤추는 분수 정원.', facts:[['위치','하모니아 북쪽']]});
 }
 // churros house by the coaster path
 {
@@ -4091,7 +4111,7 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   [[-12,-8,0xe2574c],[8,-12,0x5aa0e6],[14,8,0xffd400],[-6,12,0x58b368]].forEach(([x,z,c],i)=>{ const tent = add(g, new THREE.ConeGeometry(4.4, 5.4, 4).translate(0, 2.7, 0), mat(c), x, 0, z); tent.rotation.y = i; tent.scale.z = 1.4; });
   add(g, CYL(2, 2, 0.6, 10), flat(0x8a7560)); add(g, CONE(1.4, 2.4, 6), glowMat(0xffa53b), 0, 0.6, 0, false);
   for(let i=0;i<5;i++){ const a = i/5*Math.PI*2; add(g, new THREE.CylinderGeometry(0.8, 0.8, 4, 8).rotateZ(Math.PI/2), mat(0x8a5a36), Math.cos(a)*5, 0.8, Math.sin(a)*5).rotation.y = -a; }
-  pickable(g, {abs:true, n:'캠핑 피크닉장', c:'place', sub:'휴식', cx:258, cz:392, h:8, r:24, desc:'텐트를 치고 모닥불 곁에서 쉬어 가는 남동쪽 잔디 캠핑장.', facts:[['위치','호수 공원 남쪽']]});
+  pickable(g, {abs:true, n:'포레스트 캠프', c:'place', sub:'휴식', cx:258, cz:392, h:8, r:24, desc:'텐트를 치고 모닥불 곁에서 쉬어 가는 남동쪽 잔디 캠핑장.', facts:[['위치','호수 공원 남쪽']]});
 }
 
 // ---------- story places from the webtoon ----------
@@ -4132,10 +4152,6 @@ const course = new THREE.Group();
     for(let i=0;i<3;i++){ const d = new THREE.Group(), s = i ? 0.7 : 1; d.position.set(p.x + t.z*(i*2.2 - 1), 0, p.z - t.x*(i*2.2 - 1)); d.rotation.y = Math.atan2(-t.z, t.x); d.scale.setScalar(s); course.add(d);
       add(d, SPH(1, 12, 8), mat(0xb07a4a), 0, 1.15, 0).scale.set(0.75, 0.38, 0.32); [[-0.45,-0.15],[0.45,-0.15],[-0.45,0.15],[0.45,0.15]].forEach(([a,b])=> add(d, CYL(0.05, 0.05, 1, 5), mat(0x8a5a36), a, 0, b));
       add(d, CYL(0.1, 0.14, 0.6, 6), mat(0xb07a4a), 0.65, 1.3, 0).rotation.z = -0.5; add(d, SPH(0.18, 8, 6), mat(0xb07a4a), 0.9, 1.6, 0); if(!i){ add(d, CYL(0.03, 0.03, 0.5, 4), mat(0x5a3e28), 0.85, 1.95, 0.1).rotation.x = 0.4; add(d, CYL(0.03, 0.03, 0.5, 4), mat(0x5a3e28), 0.85, 1.95, -0.1).rotation.x = -0.4; } } }
-  // grassland stretch: tall grass along both sides
-  { const g = new THREE.InstancedMesh(new THREE.ConeGeometry(0.25, 1.4, 4).translate(0, 0.7, 0), new THREE.MeshLambertMaterial({color:0xb5b04f, flatShading:true}), 360), o = new THREE.Object3D(); let k = 0;
-    for(let i=0;i<360;i++){ const u = 0.32 + (i/360)*0.18, {p, t} = at_(u), sd = i%2 ? 1 : -1, off = 5 + (i*7 % 9); o.position.set(p.x - t.z*sd*off, 0, p.z + t.x*sd*off); o.rotation.y = i; o.scale.setScalar(0.8 + (i%5)*0.15); o.updateMatrix(); g.setMatrixAt(k++, o.matrix); }
-    course.add(g); }
   // tree tunnel
   for(let i=0;i<9;i++){ const {p, t} = at_(0.62 + i*0.018), r = Math.atan2(t.x, t.z);
     const a = new THREE.Group(); a.position.copy(p).setY(0); a.rotation.y = r; course.add(a);
@@ -4165,7 +4181,9 @@ const course = new THREE.Group();
   { const road = (x, z, w, l, rot)=>{ const m = add(course, BOX(w, 0.08, l), new THREE.MeshLambertMaterial({color:0x50555c, polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}), x, 0.22, z, false); m.rotation.y = rot; m.receiveShadow = true;
       [-w/2 + 0.3, w/2 - 0.3].forEach(o=>{ const k = add(course, BOX(0.18, 0.04, l), mat(0xffd400), x + Math.cos(rot)*o, 0.31, z - Math.sin(rot)*o, false); k.rotation.y = rot; });
       for(let d=-l/2 + 2; d<l/2 - 2; d+=4){ const k = add(course, BOX(0.18, 0.04, 2), mat(0xffffff), x + Math.sin(rot)*d, 0.31, z + Math.cos(rot)*d, false); k.rotation.y = rot; } };
-    road(2, -1, 7.2, 74, 0); road(-1, 12, 7.2, 106, Math.PI/2);
+    road(2, -1, 7.2, 84, 0); road(-1, 12, 7.2, 116, Math.PI/2);
+    // junction pads where the inner roads meet the outer loop
+    [[2,-41],[2,41],[-55,12],[53,12]].forEach(([x,z])=> add(course, BOX(10, 0.09, 10), mat(0x50555c), x, 0.23, z, false));
     add(course, BOX(7.6, 0.09, 7.6), mat(0x50555c), 2, 0.23, 12, false);
     // crosswalks on all four arms, stop lines, traffic lights on the corners
     [[2, 6.2, 0],[2, 17.8, 0],[-3.8, 12, Math.PI/2],[7.8, 12, Math.PI/2]].forEach(([x,z,r])=>{ for(let k=-3;k<=3;k++){ const st = add(course, BOX(0.6, 0.05, 2.4), mat(0xffffff), x + Math.cos(r)*k*1.0, 0.32, z + Math.sin(r)*k*1.0, false); st.rotation.y = r; }
@@ -4179,7 +4197,7 @@ const course = new THREE.Group();
     for(let k=0;k<6;k++) add(course, CONE(0.25, 0.7, 8), mat(0xf39a3b), -30 + k*4, 0.25, 16.2); }
   const cars = [0xd6a04c, 0xe2574c, 0x5aa0e6].map(c=>{ const k = doroCar(c); course.add(k); return k; });
   islAnim.push(t=>{
-    cars.forEach((k,i)=>{ const u = ((t*0.016) + i/3) % 1, p = loop.getPointAt(u), q = loop.getPointAt((u + 0.003) % 1); k.position.set(p.x, 0.25, p.z); k.lookAt(q.x, 0.25, q.z); k.rotateY(-Math.PI/2); });
+    cars.forEach((k,i)=>{ const u = ((t*0.016) + i/3) % 1, p = loop.getPointAt(u), q = loop.getPointAt((u + 0.003) % 1); k.position.set(p.x, 0.25, p.z); k.rotation.y = Math.atan2(-(q.z - p.z), q.x - p.x); });
     const ph = Math.floor(t/3) % 3; lamps.forEach((l,i)=> l.material.color.setHex(i===ph ? [0xff4a3b, 0xffd400, 0x4cd96a][i] : 0x333333));
     board.visible = (t % 4) < 3;
   });
@@ -4353,7 +4371,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
 
 // ---------- fillers: small vignettes in every remaining empty patch ----------
 {
-  const used = [[-150,100,34],[262,130,8],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16]];
+  const used = [[-150,100,48],[262,130,8],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16]];
   const free = (x,z,r)=> !occupied(x,z,r) && !used.some(([a,b,c])=> Math.hypot(x-a,z-b) < c + r) && !nearPath(x,z,r+7) && Math.abs(Math.hypot(x,z) - trackR(Math.atan2(z,x))) > r + 6 && Math.hypot(x,z) < edgeR(x,z) - 26 - r;
   const flowerSpots = [], bushSpots = [], FCOL = [0xe2574c, 0xffd400, 0xff9fcf, 0xb07ad8, 0xffffff, 0xf39a3b].map(c=>new THREE.Color(c));
   let sd2 = 77; const r3 = ()=> (sd2 = (sd2*16807) % 2147483647) / 2147483647;
@@ -5254,7 +5272,7 @@ const INTERIORS = {
       update:t=>{ arms.forEach((a,i)=>{ if(i<4) a.rotation.y = t*(0.6 - i*0.12); else a.rotation.z = t*(i%2 ? 0.3 : -0.4); });
         for(let i=0;i<N;i++){ P[i*3] = -4 + ((i*1.7 + t*0.05) % 8); P[i*3+1] = 0.4 + ((i*0.61 + t*0.08) % 4.6); P[i*3+2] = -3 + ((i*2.3) % 6); } pg.attributes.position.needsUpdate = true; }};
   },
-  '4D 영상관': ()=>{
+  '4D 시네마 돔': ()=>{
     const sc = new THREE.Scene(); sc.background = new THREE.Color(0x05060a);
     lightUp(sc, 0x334466, 0x050505, 0.4);
     const U = {uTime:{value:0}};
