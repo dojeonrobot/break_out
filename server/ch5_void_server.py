@@ -18,7 +18,13 @@ chapter05/index.html(보이드의 기록)과 chapter05/feed.html(도로그램 �
     python server/ch5_void_server.py           # http://localhost:8096/chapter05/index.html
 환경변수:
     VOID_PORT=8096  VOID_HOST=127.0.0.1  CH5_ADMIN_KEY=0101  VOID_STATIC=1 (저장소 파일도 서빙, 로컬 확인용)
+- 링크 자동 변환(v3, 2026-10-13): Scaniverse 링크가 제출되면 백그라운드 스레드가 스캔 페이지의 __NEXT_DATA__에서 가우시안 SPZ 주소·카메라 정보를 읽어
+  내려받고 spz2splat.py(numpy)로 .splat(32B/점)로 바꾼 뒤 gzip+base64 텍스트 data/splats/<id>.splat.txt 로 둔다(페이지의 loadSplat이 그대로 읽음).
+  제출 기록에 splat:{center,radius,yaw,pitch,points,...}가 붙고 auto면 status ok(복구됨), 아니면 pend(운영자 확정). 실패하면 error 문구.
+- 조별 위치(v3): POST /api/void/pos {team,lat,lng,acc} → 메모리(POS)에 최근 위치, state()의 pos로 내려감(3분 지나면 빠짐).
 """
+import base64
+import gzip
 import json
 import os
 import re
@@ -36,6 +42,13 @@ ROOT = os.path.dirname(HERE)
 DATA_DIR = os.path.join(HERE, 'data')
 THUMB_DIR = os.path.join(DATA_DIR, 'thumbs')
 SCAN_DIR = os.path.join(DATA_DIR, 'scans')
+SPLAT_DIR = os.path.join(DATA_DIR, 'splats')
+try:
+    from spz2splat import convert as spz_convert
+except Exception:          # numpy 없는 환경: 링크는 받되 변환은 못 한다
+    spz_convert = None
+POS = {}                   # team -> {'lat','lng','acc','t'}
+POS_TTL_MS = 3 * 60 * 1000
 TRASH_DIR = os.path.join(DATA_DIR, 'scans_trash')
 DB_PATH = os.path.join(DATA_DIR, 'ch5_void.json')
 PAIRS_PATH = os.path.join(HERE, 'ch5_void_pairs.json')
@@ -108,8 +121,8 @@ def clean_text(v, limit):
 
 
 def is_done(s):
-    """자체 스캔은 운영자 확정(또는 자동)으로 ok가 되면 복구된 것으로 본다."""
-    return s.get('kind') == 'orbit' and s.get('status') == 'ok'
+    """카메라 세트든 변환된 Scaniverse 스캔이든, status ok면 복구된 것으로 본다."""
+    return s.get('status') == 'ok' and (s.get('kind') == 'orbit' or bool(s.get('splat')))
 
 
 def pair_status():
@@ -130,9 +143,71 @@ def pair_status():
     return out
 
 
+def live_pos():
+    now = now_ms()
+    return {str(t): v for t, v in POS.items() if now - v['t'] < POS_TTL_MS}
+
+
 def state():
     return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)),
-            'pairs': pair_status()}
+            'pairs': pair_status(), 'pos': live_pos(), 'now': now_ms()}
+
+
+# ---------- Scaniverse 링크 → 스플랫 자동 변환 ----------
+def scan_page(scan_id):
+    """Scaniverse 공유 페이지의 __NEXT_DATA__: 미디어 주소와 카메라 시작 시점."""
+    req = urllib.request.Request(f'https://scaniverse.com/scan/{scan_id}', headers={'User-Agent': UA})
+    html = urllib.request.urlopen(req, timeout=20).read(3_000_000).decode('utf-8', 'ignore')
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S)
+    if not m:
+        raise ValueError('스캔 페이지를 읽지 못했습니다')
+    nd = json.loads(m.group(1))['props']['pageProps']
+    return nd['scan'], nd.get('user') or {}
+
+
+def set_sub(sub_id, **fields):
+    with lock:
+        for sb in DB['subs']:
+            if sb['id'] == sub_id:
+                sb.update(fields)
+                save()
+                return True
+    return False
+
+
+def convert_scan(sub_id, scan_id):
+    """백그라운드: SPZ를 받아 .splat로 바꾸고 gzip+base64 텍스트로 저장한 뒤 제출 기록에 splat 정보를 붙인다."""
+    try:
+        if spz_convert is None:
+            raise ValueError('서버에 변환 모듈(numpy)이 없습니다')
+        sc, user = scan_page(scan_id)
+        if sc.get('modelType') != 'gaussians':
+            raise ValueError('가우시안 스플랫 스캔이 아닙니다 (Scaniverse에서 Splat으로 처리한 스캔만 됩니다)')
+        os.makedirs(SPLAT_DIR, exist_ok=True)
+        spz = os.path.join(SPLAT_DIR, scan_id + '.spz')
+        splat = os.path.join(SPLAT_DIR, scan_id + '.splat')
+        raw = urllib.request.urlopen(urllib.request.Request(sc['media']['gaussians'], headers={'User-Agent': UA}), timeout=180).read()
+        with open(spz, 'wb') as f:
+            f.write(raw)
+        info = spz_convert(spz, splat)
+        with open(splat, 'rb') as f:
+            txt = base64.b64encode(gzip.compress(f.read(), mtime=0)).decode('ascii')
+        with open(os.path.join(SPLAT_DIR, scan_id + '.splat.txt'), 'w') as f:
+            f.write(txt)
+        for fp in (spz, splat):
+            try:
+                os.remove(fp)
+            except OSError:
+                pass
+        md, loc = sc.get('metadata') or {}, sc.get('location') or {}
+        meta = {'center': md.get('center'), 'radius': (md.get('radius') or {}).get('start'), 'yaw': (md.get('yaw') or {}).get('start'),
+                'pitch': (md.get('pitch') or {}).get('start'), 'points': int(info.get('points', 0)), 'captured': md.get('capturedAt') or sc.get('createdAt'),
+                'lat': loc.get('lat'), 'lng': loc.get('lng'), 'caption': clean_text(sc.get('caption'), 60), 'author': clean_text(user.get('username'), 40)}
+        with lock:
+            auto = bool(DB.get('auto', True))
+        set_sub(sub_id, splat=meta, error='', status='ok' if auto else 'pend')
+    except Exception as e:
+        set_sub(sub_id, error=clean_text(str(e), 140)[:140], status='pend')
 
 
 # ---------- 자체 카메라 스캔(사진 세트) ----------
@@ -209,7 +284,7 @@ def fetch_thumb(scan_id):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'VoidRecordServer/2.0'
+    server_version = 'VoidRecordServer/3.0'
 
     def send_json(self, obj, code=200):
         body = json.dumps(obj, ensure_ascii=False).encode()
@@ -257,6 +332,12 @@ class Handler(BaseHTTPRequestHandler):
             if not fp:
                 return self.fail('미리보기를 가져오지 못했습니다.', 404)
             return self.send_bytes(open(fp, 'rb').read(), 'image/jpeg', cache=True)
+        m = re.fullmatch(r'/api/void/splat/([a-z0-9]{6,40})\.txt', path)
+        if m:
+            fp = os.path.join(SPLAT_DIR, m.group(1) + '.splat.txt')
+            if not os.path.isfile(fp):
+                return self.fail('아직 변환되지 않은 스캔입니다.', 404)
+            return self.send_bytes(open(fp, 'rb').read(), 'text/plain; charset=us-ascii', cache=True)
         # 자체 스캔 사진 세트: /api/void/scan/<id>/<n>.jpg, thumb.jpg, meta.json
         m = re.fullmatch(r'/api/void/scan/(o[a-f0-9]{15})/(\d{1,2}\.jpg|thumb\.jpg|meta\.json)', path)
         if m:
@@ -305,7 +386,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.fail('요청 형식이 올바르지 않습니다.')
         routes = {
             '/api/void/submit': self.submit, '/api/void/unsubmit': self.unsubmit,
-            '/api/void/scan/start': self.scan_start, '/api/void/scan/finish': self.scan_finish,
+            '/api/void/scan/start': self.scan_start, '/api/void/scan/finish': self.scan_finish, '/api/void/pos': self.pos,
+            '/api/void/admin/convert': self.admin_convert,
             '/api/void/admin/delete': self.admin_delete, '/api/void/admin/reset': self.admin_reset,
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto,
@@ -339,14 +421,44 @@ class Handler(BaseHTTPRequestHandler):
         with lock:
             if any(s['scanId'] == scan_id for s in DB['subs']):
                 raise ValueError('이미 제출된 링크입니다.')
+            sub_id = uuid.uuid4().hex[:12]
             DB['subs'].append({
-                'id': uuid.uuid4().hex[:12], 'scanId': scan_id, 'url': f'https://scaniverse.com/scan/{scan_id}',
+                'id': sub_id, 'scanId': scan_id, 'kind': 'link', 'url': f'https://scaniverse.com/scan/{scan_id}',
                 'mission': mission, 'team': team, 'note': clean_text(b.get('note'), 60),
-                'caption': caption, 'author': author, 'createdAt': now_ms(),
+                'caption': caption, 'author': author, 'status': 'pend', 'createdAt': now_ms(),
             })
             save()
             self.send_json(state())
         threading.Thread(target=fetch_thumb, args=(scan_id,), daemon=True).start()
+        threading.Thread(target=convert_scan, args=(sub_id, scan_id), daemon=True).start()
+
+    # 학생: 조별 현재 위치 (캠퍼스 트윈에 점으로 표시)
+    def pos(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조를 먼저 고르세요.')
+        try:
+            lat, lng = float(b.get('lat')), float(b.get('lng'))
+        except (TypeError, ValueError):
+            raise ValueError('위치 값이 없습니다.')
+        if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+            raise ValueError('위치 값이 이상합니다.')
+        try:
+            acc = max(0.0, min(9999.0, float(b.get('acc') or 0)))
+        except (TypeError, ValueError):
+            acc = 0.0
+        POS[team] = {'lat': round(lat, 6), 'lng': round(lng, 6), 'acc': round(acc, 1), 't': now_ms()}
+        self.send_json({'ok': True, 'pos': live_pos(), 'now': now_ms()})
+
+    # 운영자: 링크 변환 다시 시도
+    def admin_convert(self, b):
+        sid = str(b.get('id') or '')
+        with lock:
+            hit = next((s for s in DB['subs'] if s['id'] == sid and s.get('kind', 'link') == 'link'), None)
+        if not hit:
+            raise ValueError('그 제출이 없습니다.')
+        threading.Thread(target=convert_scan, args=(sid, hit['scanId']), daemon=True).start()
+        self.send_json({'ok': True})
 
     # 학생: 자체 스캔 1단계 — 어느 구역에 몇 장을 올릴지 알리고 id를 받는다
     def scan_start(self, b):
@@ -463,7 +575,7 @@ class Handler(BaseHTTPRequestHandler):
         sid = str(b.get('id') or '')
         ok = b.get('ok', True) is not False
         with lock:
-            hit = [s for s in DB['subs'] if s['id'] == sid and s.get('kind') == 'orbit']
+            hit = [s for s in DB['subs'] if s['id'] == sid and (s.get('kind') == 'orbit' or s.get('splat'))]
             if not hit:
                 raise ValueError('그 기록이 없습니다.')
             for s in hit:
