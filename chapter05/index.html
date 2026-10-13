@@ -659,7 +659,7 @@ stage.appendChild(renderer.domElement);
 const sceneE = new THREE.Scene();
 let scene = sceneE;
 let W = {id:'erica'};            // the world on screen; replaced by the real world objects further down
-const camera = new THREE.PerspectiveCamera(38, 1, 2, 9000);
+const camera = new THREE.PerspectiveCamera(38, 1, 6, 9000);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.maxPolarAngle = Math.PI*0.47; controls.minDistance = 40; controls.maxDistance = 3200;
@@ -3004,6 +3004,7 @@ const carousel = new THREE.Group();
     const head = add(h, BOX(1.4,3,1.6), mat(col), 0, 1.8, 2.8); head.rotation.x = 0.4;
     [[-0.6,-1.8],[0.6,-1.8],[-0.6,1.8],[0.6,1.8]].forEach(([a2,b2])=> add(h, BOX(0.4,2.4,0.4), mat(col), a2, -2.2, b2));
     add(h, BOX(1.9,0.5,2), mat(0xe2574c), 0, 2.4, -0.3);
+    if(i%3) rider(h, 0, 2.8, -0.6, i, 0.8, 0);
     horses.push(h);
   }
   const cubes = [];
@@ -3062,6 +3063,7 @@ const ferris = new THREE.Group();
     add(gg, new THREE.CylinderGeometry(3.2, 3, 4.4, 14), mat(GC[i%4]), 0, -7.6, 0);
     add(gg, new THREE.CylinderGeometry(3.25, 3.25, 1.6, 14), mat(0x2b3a5a), 0, -6.8, 0, false);
     add(gg, new THREE.SphereGeometry(3.3, 14, 8, 0, Math.PI*2, 0, Math.PI/2), mat(0xffffff), 0, -5.4, 0);
+    [[-1.3,0.8],[1.3,0.8],[0,-1.5]].forEach(([x,z],k)=>{ if((i+k)%4) rider(gg, x, -9.6, z, i+k, 0.75, Math.atan2(x, z)); });
     gond.push(gg);
   }
   const booth = add(ferris, BOX(8, 7, 6), mat(0xf3a6c4), 22, 1.6, 26); add(ferris, CONE(6, 3, 4).rotateY(Math.PI/4), mat(0x7b6ad8), 22, 8.6, 26);
@@ -3213,7 +3215,8 @@ const viking = new THREE.Group();
   [-5.6, 5.6].forEach(z=>{ const tb = add(ship, new THREE.TubeGeometry(rim, 40, 0.6, 6), mat(0xffd400), 0, 0, z); });
   const SH = [0xe2574c, 0xffffff, 0x2f62b8, 0xffd400];
   for(let i=0;i<7;i++) [-1, 1].forEach(sd=>{ const x = -12 + i*4; add(ship, new THREE.CylinderGeometry(1.6, 1.6, 0.4, 14).rotateX(Math.PI/2), mat(SH[i%4]), x, 1.6, sd*5.9); add(ship, SPH(0.45, 8, 6), mat(0xd9a441), x, 1.6, sd*6.15, false); });
-  for(let i=0;i<7;i++){ add(ship, BOX(1.6, 1.2, 9), mat(0x2f62b8), -12 + i*4, 2.6, 0); add(ship, BOX(0.4, 2.4, 9), mat(0x2f62b8), -12.6 + i*4, 3.6, 0); }
+  for(let i=0;i<7;i++){ add(ship, BOX(1.6, 1.2, 9), mat(0x2f62b8), -12 + i*4, 2.6, 0); add(ship, BOX(0.4, 2.4, 9), mat(0x2f62b8), -12.6 + i*4, 3.6, 0);
+    [-3, -1, 1, 3].forEach((z,k)=>{ if((i+k)%3) { const r = rider(ship, -11.2 + i*4, 3.8, z, i*4 + k, 1.0, -Math.PI/2); r.children[2].rotation.x = -2.6; r.children[3].rotation.x = -2.6; } }); }
   const neck = new THREE.CatmullRomCurve3([new THREE.Vector3(25,15,0), new THREE.Vector3(27,20,0), new THREE.Vector3(26,25,0)]);
   add(ship, new THREE.TubeGeometry(neck, 16, 1.3, 8), mat(0x2f9d63));
   const dragon = new THREE.Group(); dragon.position.set(27, 26, 0); ship.add(dragon);
@@ -3541,7 +3544,7 @@ const bumper = new THREE.Group();
   add(bumper, new THREE.PlaneGeometry(16, 4), new THREE.MeshBasicMaterial({map:signTex('범퍼 아레나', {bg:'#e2574c', fg:'#ffffff', size:84, w:384, h:96})}), 0, 18.2, 15.3, false);
   add(bumper, BOX(16, 4.4, 0.6), mat(0xe2574c), 0, 16, 15);
   const cars = [];
-  for(let i=0;i<9;i++){ const c = new THREE.Group(); add(c, BOX(3.6, 1.4, 2.6), mat([0xe2574c, 0x5aa0e6, 0xffd400, 0x58b368, 0xb07ad8][i%5])); add(c, new THREE.TorusGeometry(2.2, 0.4, 6, 18).rotateX(Math.PI/2).scale(1, 1, 0.8), mat(0x222222), 0, 0.4, 0); add(c, CYL(0.12, 0.12, 12, 4), mat(0x888888), -1, 1.4, 0, false); bumper.add(c); cars.push(c); }
+  for(let i=0;i<9;i++){ const c = new THREE.Group(); add(c, BOX(3.6, 1.4, 2.6), mat([0xe2574c, 0x5aa0e6, 0xffd400, 0x58b368, 0xb07ad8][i%5])); add(c, new THREE.TorusGeometry(2.2, 0.4, 6, 18).rotateX(Math.PI/2).scale(1, 1, 0.8), mat(0x222222), 0, 0.4, 0); add(c, CYL(0.12, 0.12, 12, 4), mat(0x888888), -1, 1.4, 0, false); rider(c, 0.3, 1.2, 0, i, 0.75, -Math.PI/2); bumper.add(c); cars.push(c); }
   islAnim.push(t=> cars.forEach((c,i)=>{ const a = t*(0.4 + (i%3)*0.13) + i*1.7; c.position.set(Math.sin(a)*13 + Math.cos(a*1.7+i)*2, 0.8, Math.cos(a*1.3)*9); c.rotation.y = a*1.6; }));
 }
 place(bumper, -78/K, 282/K, Math.PI/2); bumper.scale.setScalar(0.7);
@@ -3845,6 +3848,7 @@ const obsTower = new THREE.Group();
   const cab = new THREE.Group(); obsTower.add(cab);
   add(cab, new THREE.CylinderGeometry(11, 11, 5, 24, 1, true), new THREE.MeshLambertMaterial({color:0x9fd3f5, transparent:true, opacity:0.75, side:THREE.DoubleSide, depthWrite:false}));
   add(cab, CYL(11.4, 11.4, 1, 24), mat(0x6a4bc4), 0, -3, 0); add(cab, CYL(11.4, 11.4, 1, 24), mat(0x6a4bc4), 0, 2.6, 0);
+  for(let i=0;i<10;i++){ const a = i/10*Math.PI*2; rider(cab, Math.cos(a)*8.5, -2, Math.sin(a)*8.5, i, 0.85, -a + Math.PI/2); }
   islAnim.push(t=>{ const ph = (t % 40)/40, h = ph < 0.4 ? ph/0.4 : ph < 0.6 ? 1 : 1 - (ph - 0.6)/0.4; cab.position.y = 8 + easeIO(clamp01(h))*76; cab.rotation.y = t*0.15; });
 }
 place(obsTower, -105, -62);
@@ -4100,7 +4104,7 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   const arm = new THREE.Group(); arm.position.y = 27; g.add(arm);
   add(arm, new THREE.BoxGeometry(1, 22, 1).translate(0, -11, 0), mat(0xffd400));
   const disc = new THREE.Group(); disc.position.y = -22; arm.add(disc);
-  add(disc, CYL(7, 7, 1, 24), mat(0xb07ad8)); for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; add(disc, BOX(1.4, 1.6, 1.4), mat(i%2 ? 0xffd400 : 0xff9fcf), Math.cos(a)*6, 1, Math.sin(a)*6); }
+  add(disc, CYL(7, 7, 1, 24), mat(0xb07ad8)); for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; add(disc, BOX(1.4, 1.6, 1.4), mat(i%2 ? 0xffd400 : 0xff9fcf), Math.cos(a)*6, 1, Math.sin(a)*6); if(i%4) rider(disc, Math.cos(a)*6, 2.6, Math.sin(a)*6, i, 0.8, -a - Math.PI/2); }
   islAnim.push(t=>{ arm.rotation.z = Math.sin(t*0.7)*1.1; disc.rotation.y = t*1.2; });
   pickable(g, {abs:true, n:'갤럭시 스윙', c:'ride', sub:'디스코 스윙', cx:300, cz:-115, h:30, r:16, desc:'거대한 추처럼 흔들리며 원판이 빙글빙글 도는 스릴 놀이기구.', facts:[['위치','관람차 언덕 동쪽']]});
 }
@@ -4335,7 +4339,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     const px = -e.dz, pz = e.dx, cx = e.x + e.dx*7.5 + px*6.5, cz = e.z + e.dz*7.5 + pz*6.5;
     const th = Math.atan2(e.dx, e.dz), g = new THREE.Group(); g.position.set(cx, G, cz); g.rotation.y = th; islRoot.add(g);
     const lanes = 4, W = 1.3, Lz = 8, X0 = -lanes*W/2;
-    add(g, BOX(lanes*W + 0.8, 0.12, Lz + 0.8), mat(0xd9cfba), 0, 0, 0, false).receiveShadow = true;
+    add(g, BOX(lanes*W + 0.8, 0.3, Lz + 0.8), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0, false).receiveShadow = true;
     for(let k=0;k<=lanes;k++){
       const x = X0 + k*W, inner = k > 0 && k < lanes, gapAtFar = k % 2 === 1;
       const z0 = -Lz/2 + (inner && !gapAtFar ? 1.4 : 0), z1 = Lz/2 - (inner && gapAtFar ? 1.4 : 0), n = Math.max(1, Math.round((z1-z0)/2));
@@ -4766,7 +4770,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   const corrMat = new THREE.MeshLambertMaterial({map:stripeTexI('#9aa3ad', '#b9c0c8', 24)});
   function serviceYard(x, z, rot){
     const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g);
-    add(g, BOX(26, 0.12, 17), mat(0xd9cfba), 0, 0, 0, false).receiveShadow = true;                       // yard pad
+    add(g, BOX(26, 0.3, 17), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0, false).receiveShadow = true;   // yard pad
     add(g, BOX(13, 5.5, 8), corrMat, -5, 0, -2); add(g, BOX(13.6, 0.6, 8.6), mat(0x4a5058), -5, 5.5, -2);  // workshop
     add(g, BOX(4.6, 4, 0.2), mat(0x1a1d22), -5, 0, 2.05, false); add(g, BOX(5, 0.3, 0.3), mat(0xffd400), -5, 4.1, 2.1);
     add(g, new THREE.PlaneGeometry(5.6, 1.2), new THREE.MeshBasicMaterial({map:signTex('정비동', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:80})}), -5, 4.5, 2.12, false);
@@ -4821,7 +4825,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
         if(occupied(x, z, 2) || Math.hypot(x, z) > edgeR(x, z) - 14) continue;
         const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = Math.atan2(t.x, t.z) + (s > 0 ? Math.PI/2 : -Math.PI/2); islRoot.add(g);
         for(let k=0;k<n;k++) seat(g, (k - (n-1)/2)*3.3);
-        add(g, BOX(n*3.3 + 1.6, 0.1, 2.6), mat(0xd9cfba), 0, 0, 0.2, false).receiveShadow = true;
+        add(g, BOX(n*3.3 + 1.6, 0.3, 2.6), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0.2, false).receiveShadow = true;
         OCC.push([x, z, n*1.7 + 1]); clearTreesAt(x, z, n*1.7 + 2); }
     }); }
   if(LAMPS.length){
