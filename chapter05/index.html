@@ -2235,7 +2235,7 @@ const PATHS = [
 ];
 PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 { const cv = (a, dr)=>{ const v = coveAt(a, dr); return [v.x, v.z]; };
-  PATHS.push([[0,470],[0,515],cv(PIER_A, 24)], [[-40,466],[-95,482],cv(HARBOUR_A, -22)], [[-148,189],[-245,330],[-205,430],cv(HARBOUR_A, -22)]); }
+  PATHS.push([[0,470],[0,515],cv(PIER_A, 24)], [[-40,466],[-95,482],cv(HARBOUR_A, -22)], [[-110,140],[-120,250],[-180,340],[-205,430],cv(HARBOUR_A, -22)]); }
 const pathSamples = [];
 (function paths(){
   const pos = [], idx = [];
@@ -2257,7 +2257,7 @@ const pathSamples = [];
 const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(pz-z) < d*d);
 
 // keep-out circles so trees stay off attractions
-const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,100],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
+const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[385,189,24],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
   [125,420,40],[-170,340,22],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,34],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-380,180,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
@@ -3079,87 +3079,92 @@ mission(ferris, 'dl-ferris', {n:'관람차', sub:'챕터 4', cx:FERRIS_X, cz:FER
 // chapter 5 · DORO EXPRESS: lift hill, first drop, vertical loop and LED rings, plus the viking ship
 const coaster = new THREE.Group();
 {
-  // layout: station (SW) → chain lift north to a 64-high crest → first drop → vertical loop → three airtime hills down the east side
-  //         → a banked turnaround across the south → a rock tunnel → back into the station. One closed curve, no crossings at grade.
+  // DORO EXPRESS, in the spirit of a big wooden out-and-back: a timber lattice everywhere, a 78-high lift, a steep first drop,
+  // then hill after hill (airtime), an overbanked turn at the far end, a double-up, bunny hops down the east side and a wooden tunnel home.
   const ctrl = [
-    [-56,6,50],[-66,6,30],[-68,8,8],
-    [-64,24,-14],[-56,48,-36],[-46,64,-54],
-    [-32,60,-62],[-16,22,-64],[-2,8,-62],
-    [12,8,-60],[26,26,-58],[22,50,-56],[8,42,-54],[8,18,-52],[24,8,-50],
-    [42,26,-42],[58,10,-28],[66,28,-8],[64,10,12],
-    [54,16,32],[36,24,48],[14,14,58],[-10,22,58],[-30,12,54],[-44,8,54]
+    [60,6,-50],[60,6,-18],[56,8,4],[40,10,22],[16,12,30],                 // station → turn west
+    [-16,34,32],[-56,60,32],[-92,78,30],                                   // lift hill (78 high)
+    [-114,40,16],[-124,12,-4],[-126,14,-28],                               // first drop, turn north
+    [-118,42,-50],[-104,12,-72],                                           // hill 1
+    [-76,22,-92],[-40,32,-98],[-6,20,-96],[20,12,-88],                     // north turn with a hump
+    [40,38,-74],[54,14,-58],[76,30,-78],[100,24,-84],                      // hill 2 and the swing out east
+    [112,10,-56],[110,32,-28],[112,10,2],[106,30,30],                      // bunny hops down the east side
+    [92,14,54],[72,24,76],[50,12,96],[26,30,110],[0,12,116],[-26,28,110],[-50,12,96],[-70,26,76],[-84,12,54],   // the long southern run of hills
+    [-74,24,34],[-56,10,20],[-36,22,8],[-14,8,0],                          // double-up back under the lift
+    [14,8,-16],[38,8,-38],[52,6,-54]                                       // wooden tunnel and the brake run into the station
   ];
   const curve = new THREE.CatmullRomCurve3(ctrl.map(([x,y,z])=>new THREE.Vector3(x,y,z)), true, 'catmullrom', 0.5);
-  const N = 480, P = curve.getSpacedPoints(N); P.pop();
-  // parallel-transported frames keep the rails flat on the straights and roll them through the loop
+  const N = 1100, P = curve.getSpacedPoints(N); P.pop();
   const T = [], U = [], S = [];
   let up = new THREE.Vector3(0,1,0);
   for(let i=0;i<N;i++){
     const t = curve.getTangentAt(i/N).normalize(), s = new THREE.Vector3().crossVectors(t, up).normalize();
     up = new THREE.Vector3().crossVectors(s, t).normalize(); T.push(t); U.push(up.clone()); S.push(s);
   }
-  const rail = k => new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(S[i], k)), true);
-  [1.0, -1.0].forEach(k=> add(coaster, new THREE.TubeGeometry(rail(k), 960, 0.32, 6, true), mat(0xe2574c)));
-  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(U[i], -1.2)), true), 960, 0.8, 6, true), mat(0x7b8190));
   const m4 = new THREE.Matrix4();
-  for(let i=0;i<N;i+=3){ const tie = add(coaster, new THREE.BoxGeometry(2.6, 0.3, 0.5), mat(0x5d6270), 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); tie.quaternion.setFromRotationMatrix(m4); tie.position.copy(P[i]).addScaledVector(U[i], -0.6); }
-  // supports: lattice towers under the high track (two legs, rungs, X braces), single posts where it runs low
-  const white = mat(0xf4f1ea), steel = mat(0xd9d4c8);
-  function tower(p, sdir, h){
+  const timber = mat(0xb08a5a), timberD = mat(0x8a6a45), steel = mat(0x5d6270);
+  // track: laminated wood bed (two stacks) with steel strap rails on top, ties underneath
+  const rail = k => new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(S[i], k)), true);
+  [1.05, -1.05].forEach(k=>{ add(coaster, new THREE.TubeGeometry(rail(k), 1400, 0.42, 6, true), timberD); add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P.map((p,i)=> p.clone().addScaledVector(S[i], k).addScaledVector(U[i], 0.42)), true), 2000, 0.14, 5, true), mat(0xc9ced6)); });
+  for(let i=0;i<N;i+=3){ const tie = add(coaster, new THREE.BoxGeometry(3.4, 0.28, 0.6), timber, 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); tie.quaternion.setFromRotationMatrix(m4); tie.position.copy(P[i]).addScaledVector(U[i], -0.5); }
+  // the wooden structure: a timber bent (two posts, ledgers, X braces) under the track every few metres, joined by longitudinal stringers
+  function bent(p, sdir, h){
     const g = new THREE.Group(); g.position.set(p.x, 0, p.z); g.rotation.y = -Math.atan2(sdir.z, sdir.x); coaster.add(g);
-    const w = Math.min(3.2, 1.6 + h*0.03);
-    [-w, w].forEach(x=>{ add(g, CYL(0.5, 0.7, h, 8), white, x, 0, 0); add(g, CYL(1.4, 1.6, 0.8, 8), mat(0xb9b4aa), x, 0, 0); });
-    for(let y=6; y<h-2; y+=7){ add(g, BOX(w*2, 0.4, 0.4), steel, 0, y, 0); const d = add(g, BOX(Math.hypot(w*2, 7), 0.3, 0.3), steel, 0, y + 3.5, 0); d.rotation.z = Math.atan2(7, w*2) * ((y/7)%2 ? 1 : -1); }
-    add(g, BOX(w*2 + 1.2, 0.6, 2.4), steel, 0, h - 0.8, 0);
+    const w = Math.min(4.2, 2.0 + h*0.03);
+    [-w, w].forEach(x=>{ add(g, BOX(0.7, h, 0.7), timber, x*0.9, 0, 0).rotation.z = -x*0.012; });
+    for(let y=4; y<h-1.5; y+=5.5){ add(g, BOX(w*2 + 0.8, 0.45, 0.5), timberD, 0, y, 0); if(h > 12){ const d = add(g, BOX(Math.hypot(w*1.8, 5.5), 0.3, 0.3), timberD, 0, y + 2.75, 0); d.rotation.z = Math.atan2(5.5, w*1.8) * ((y/5.5)%2 ? 1 : -1); } }
+    add(g, BOX(w*2 + 1.6, 0.6, 1.2), timberD, 0, h - 0.8, 0);
+    return g;
   }
   let prev = null;
-  for(let i=0;i<N;i+=8){
-    const p = P[i]; if(U[i].y < 0.6 || p.y < 3) { prev = null; continue; }
-    if(p.y > 14) tower(p, S[i], p.y - 1.8); else { add(coaster, CYL(0.75, 1, p.y - 1.6, 8), white, p.x, 0, p.z); add(coaster, CYL(1.6, 1.8, 0.8, 8), mat(0xb9b4aa), p.x, 0, p.z); }
-    if(prev && p.y <= 14 && prev.y <= 14){ const mid = p.clone().add(prev).multiplyScalar(0.5), h = Math.min(p.y, prev.y)*0.5, L = Math.hypot(p.x-prev.x, p.z-prev.z);
-      const br = add(coaster, BOX(L, 0.5, 0.5), steel, mid.x, h, mid.z, false); br.rotation.y = -Math.atan2(p.z-prev.z, p.x-prev.x); }
+  for(let i=0;i<N;i+=6){
+    const p = P[i]; if(p.y < 2.5){ prev = null; continue; }
+    const h = p.y - 1.4; bent(p, S[i], h);
+    if(prev){ const L = p.distanceTo(prev); [0.3, 0.75].forEach(f=>{ const y1 = prev.y*f, y2 = p.y*f; const st = add(coaster, BOX(L, 0.35, 0.35), timberD, (p.x+prev.x)/2, (y1+y2)/2, (p.z+prev.z)/2, false); st.rotation.y = -Math.atan2(p.z-prev.z, p.x-prev.x); st.rotation.z = Math.atan2(y2-y1, Math.hypot(p.x-prev.x, p.z-prev.z)); }); }
     prev = p;
   }
-  // lift hill: chain, catwalk with handrail, and bulbs up the side
-  const liftU = [0.085, 0.235];
-  const lift = []; for(let u=liftU[0]; u<=liftU[1]; u+=0.003) lift.push(curve.getPoint(u));
-  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lift), 100, 0.35, 4), mat(0x222222), 0, 0.3, 0, false);
-  for(let u=liftU[0]; u<=liftU[1]; u+=0.006){ const i = Math.floor(u*N), q = P[i].clone().addScaledVector(S[i], 2.4).addScaledVector(U[i], -0.5);
-    const step = add(coaster, new THREE.BoxGeometry(1.6, 0.25, 1.8), mat(0x9a6b45), 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); step.quaternion.setFromRotationMatrix(m4); step.position.copy(q);
-    if(Math.round(u*1000) % 18 === 0){ add(coaster, CYL(0.08, 0.08, 2.2, 5), mat(0x3a3f4a), q.x + S[i].x*0.9, q.y, q.z + S[i].z*0.9); add(coaster, SPH(0.35, 6, 5), glowMat(0xfff0b8), q.x + S[i].x*0.9, q.y + 2.4, q.z + S[i].z*0.9, false); } }
-  // crest sign and the first-drop portal
-  { const c = curve.getPoint(0.235); const g = new THREE.Group(); g.position.set(c.x, c.y + 2, c.z); coaster.add(g);
-    [-4, 4].forEach(x=> add(g, CYL(0.3, 0.3, 9, 6), white, x, 0, 0)); add(g, BOX(10, 2.4, 0.4), mat(0x1d2f55), 0, 9, 0);
-    add(g, new THREE.PlaneGeometry(9.4, 2), new THREE.MeshBasicMaterial({map:signTex('64m', {bg:'#1d2f55', fg:'#ffd400', size:80, w:384, h:90}), side:THREE.DoubleSide}), 0, 10.2, 0.25, false); }
-  { const d = curve.getPoint(0.3), t = curve.getTangent(0.3); const g = new THREE.Group(); g.position.set(d.x, 0, d.z); g.rotation.y = -Math.atan2(t.z, t.x) + Math.PI/2; coaster.add(g);
-    [-6, 6].forEach(x=> add(g, BOX(2.2, d.y + 8, 2.2), mat(0x1d2f55), x, 0, 0)); add(g, BOX(14.4, 3, 2.4), mat(0xffd400), 0, d.y + 8, 0);
-    add(g, new THREE.PlaneGeometry(13, 2.4), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#ffd400', fg:'#1d2f55', size:62, w:640, h:100}), side:THREE.DoubleSide}), 0, d.y + 9.5, 1.3, false);
-    for(let i=0;i<10;i++) add(g, SPH(0.4, 6, 5), glowMat(i%2 ? 0xff6b6b : 0xfff0b8), -6 + i*1.33, d.y + 11.2, 0, false); }
-  // rock tunnel on the way home
-  { const q = curve.getPoint(0.975); const r = add(coaster, ICO(1, 1).scale(14, 11, 12), flat(0x9c8f7a), q.x, 1, q.z); r.rotation.y = 0.7;
-    add(coaster, ICO(1, 1).scale(7, 6, 7), flat(0x8a7d6a), q.x + 9, 0, q.z - 6); for(let i=0;i<5;i++) add(coaster, ICO(1.6, 1), flat([C.leaf, C.leaf2][i%2]), q.x - 10 + i*5, 10 + (i%2)*2, q.z + (i%2 ? 5 : -5));
-    [1, -1].forEach(sd=>{ const t = curve.getTangent(0.975); add(coaster, new THREE.TorusGeometry(4.2, 0.6, 8, 16), mat(0x5d6270), q.x + t.x*sd*11, q.y + 1.2, q.z + t.z*sd*11).rotation.y = Math.atan2(t.x, t.z); }); }
-  // LED rings that chase round the track
+  // footings for the whole yard
+  for(let i=0;i<N;i+=6){ const p = P[i]; if(p.y < 2.5) continue; add(coaster, BOX(5, 0.5, 1.4), mat(0xb9b4aa), p.x, 0, p.z).rotation.y = -Math.atan2(S[i].z, S[i].x); }
+  // lift hill: chain, a catwalk with handrail and bulbs on both sides
+  let imax = 0; for(let i=0;i<N;i++) if(P[i].y > P[imax].y) imax = i;
+  const liftU = [Math.max(0, (imax - 150)/N), imax/N];
+  const lift = []; for(let u=liftU[0]; u<=liftU[1]; u+=0.002) lift.push(curve.getPoint(u));
+  add(coaster, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lift), 120, 0.3, 4), mat(0x222222), 0, 0.3, 0, false);
+  for(let u=liftU[0]; u<=liftU[1]; u+=0.004){ const i = Math.floor(u*N); [2.4, -2.4].forEach(side=>{ const q = P[i].clone().addScaledVector(S[i], side).addScaledVector(U[i], -0.4);
+      const step = add(coaster, new THREE.BoxGeometry(1.6, 0.25, 2.2), timber, 0, 0, 0, false); m4.makeBasis(S[i], U[i], T[i]); step.quaternion.setFromRotationMatrix(m4); step.position.copy(q);
+      if(Math.round(u*1000) % 16 === 0){ add(coaster, CYL(0.08, 0.08, 2.2, 5), steel, q.x + S[i].x*Math.sign(side)*0.9, q.y, q.z + S[i].z*Math.sign(side)*0.9); add(coaster, SPH(0.35, 6, 5), glowMat(0xfff0b8), q.x + S[i].x*Math.sign(side)*0.9, q.y + 2.4, q.z + S[i].z*Math.sign(side)*0.9, false); } }); }
+  // crest sign tower and the first-drop portal
+  { const c = P[imax]; const g = new THREE.Group(); g.position.set(c.x, c.y + 1.6, c.z); g.rotation.y = -Math.atan2(T[imax].z, T[imax].x); coaster.add(g);
+    [-4.5, 4.5].forEach(z=> add(g, BOX(0.6, 10, 0.6), timberD, 0, 0, z)); add(g, BOX(0.6, 2.8, 11), mat(0x1d2f55), 0, 10, 0);
+    add(g, new THREE.PlaneGeometry(10.4, 2.4), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS · 78m', {bg:'#1d2f55', fg:'#ffd400', size:60, w:640, h:100}), side:THREE.DoubleSide}), 0.35, 11.4, 0, false).rotation.y = Math.PI/2;
+    for(let i=0;i<8;i++) add(g, SPH(0.4, 6, 5), glowMat(i%2 ? 0xff6b6b : 0xfff0b8), 0, 13, -4.2 + i*1.2, false); }
+  // wooden tunnel shed on the way home, and the brake-run shed
+  { const q = curve.getPoint(0.935), t = curve.getTangent(0.935); const g = new THREE.Group(); g.position.set(q.x, 0, q.z); g.rotation.y = -Math.atan2(t.z, t.x); coaster.add(g);
+    add(g, BOX(26, 0.4, 7), timberD, 0, q.y + 4.6, 0); [-3.4, 3.4].forEach(z=>{ for(let x=-11; x<=11; x+=5.5) add(g, BOX(0.6, q.y + 4.6, 0.6), timber, x, 0, z); add(g, BOX(26, 2.2, 0.3), timber, 0, q.y + 1.2, z); });
+    const roof = new THREE.Shape(); roof.moveTo(-4.2, 0); roof.lineTo(0, 2.6); roof.lineTo(4.2, 0); roof.closePath();
+    add(g, new THREE.ExtrudeGeometry(roof, {depth:26, bevelEnabled:false}).translate(0, 0, -13).rotateY(Math.PI/2), mat(0x8a3a3a), 0, q.y + 5, 0);
+    add(g, new THREE.PlaneGeometry(6, 1.4), new THREE.MeshBasicMaterial({map:signTex('TUNNEL', {bg:'#1d2f55', fg:'#ffd400', size:70, w:384, h:90}), side:THREE.DoubleSide}), -13.2, q.y + 5.4, 0, false).rotation.y = Math.PI/2; }
+  // LED strips that chase round the track
   const leds = [];
-  for(let i=0;i<N;i+=12){ const r = add(coaster, new THREE.TorusGeometry(2.8, 0.22, 6, 22), glowMat(0x7fd7ff), 0, 0, 0, false); r.position.copy(P[i]).addScaledVector(U[i], 1.3); r.lookAt(P[i].clone().add(T[i]).addScaledVector(U[i], 1.3)); leds.push(r); }
-  // station: a long hall over the home straight with a pitched roof, platform gates, a clock and the big sign
-  { const st = new THREE.Group(); st.position.set(-61, 0, 40); st.rotation.y = -0.45; coaster.add(st);
-    add(st, BOX(26, 1.2, 40), mat(0xd9cfba), 0, 0, 0);
-    [[-11,-18],[11,-18],[-11,0],[11,0],[-11,18],[11,18]].forEach(([x,z])=> add(st, CYL(0.6, 0.6, 14, 8), white, x, 1.2, z));
-    add(st, BOX(28, 1, 42), mat(0x1d2f55), 0, 15, 0);
-    const roof = new THREE.Shape(); roof.moveTo(-14.5, 0); roof.lineTo(0, 6); roof.lineTo(14.5, 0); roof.closePath();
-    add(st, new THREE.ExtrudeGeometry(roof, {depth:42, bevelEnabled:false}).translate(0, 0, -21), mat(0xe2574c), 0, 16, 0);
-    add(st, BOX(8, 5, 0.6), mat(0xffffff), 0, 16.3, 21.2); add(st, new THREE.CylinderGeometry(1.8, 1.8, 0.5, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 18.8, 21.6); add(st, BOX(0.25, 1.3, 0.1), mat(0x1d2f55), 0, 19, 21.9); add(st, BOX(0.9, 0.25, 0.1), mat(0x1d2f55), 0.35, 18.8, 21.9);
-    add(st, new THREE.PlaneGeometry(30, 4.2), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#1d2f55', fg:'#ffd400', size:66, w:640, h:100}), side:THREE.DoubleSide}), 15.3, 12, 0, false).rotation.y = Math.PI/2;
-    add(st, new THREE.PlaneGeometry(30, 4.2), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#1d2f55', fg:'#ffd400', size:66, w:640, h:100}), side:THREE.DoubleSide}), -15.3, 12, 0, false).rotation.y = -Math.PI/2;
-    for(let k=0;k<6;k++){ add(st, BOX(0.3, 2.2, 0.3), mat(0x3a3f4a), 4.5, 1.2, -16 + k*6.4); add(st, BOX(0.15, 0.15, 5), mat(0xffd400), 4.5, 3.2, -13 + k*6.4); }
-    for(let i=0;i<10;i++) rider(st, 7 + (i%2)*2.4, 1.2, -16 + Math.floor(i/2)*7, i, 0.55, -Math.PI/2);
-    for(let i=0;i<8;i++) add(st, SPH(0.4, 6, 5), glowMat(0xfff0b8), -13, 14.4, -17 + i*4.9, false); }
-  // two trains of six cars, riders with their arms up, headlight on the lead car
+  for(let i=0;i<N;i+=16){ const r = add(coaster, new THREE.TorusGeometry(3, 0.2, 6, 22), glowMat(0x7fd7ff), 0, 0, 0, false); r.position.copy(P[i]).addScaledVector(U[i], 1.3); r.lookAt(P[i].clone().add(T[i]).addScaledVector(U[i], 1.3)); leds.push(r); }
+  // station: a timber lodge over the home straight — pitched shingle roof, lanterns, gates, waiting riders, the big sign
+  { const st = new THREE.Group(); st.position.set(60, 0, -34); coaster.add(st);
+    add(st, BOX(26, 1.2, 44), mat(0xd9cfba), 0, 0, 0);
+    [[-11,-20],[11,-20],[-11,-7],[11,-7],[-11,7],[11,7],[-11,20],[11,20]].forEach(([x,z])=>{ add(st, BOX(1, 14, 1), timber, x, 1.2, z); add(st, BOX(1.2, 1.2, 1.2), timberD, x, 14.6, z); });
+    [-11, 11].forEach(x=>{ add(st, BOX(0.5, 0.5, 44), timberD, x, 14.8, 0); add(st, BOX(0.5, 0.5, 44), timberD, x, 8, 0); });
+    const roof = new THREE.Shape(); roof.moveTo(-15, 0); roof.lineTo(0, 7); roof.lineTo(15, 0); roof.closePath();
+    add(st, new THREE.ExtrudeGeometry(roof, {depth:46, bevelEnabled:false}).translate(0, 0, -23), mat(0x7a4a2c), 0, 15.2, 0);
+    for(let k=0;k<9;k++) add(st, BOX(30.4, 0.3, 0.4), mat(0x6b3f24), 0, 15.3 + Math.abs(k-4)*0.0, -22 + k*5.5);
+    add(st, BOX(10, 6, 0.6), mat(0xf4efe4), 0, 15.6, 23.2); add(st, new THREE.CylinderGeometry(2, 2, 0.5, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 18.6, 23.6); add(st, BOX(0.25, 1.4, 0.1), mat(0x1d2f55), 0, 18.8, 23.9); add(st, BOX(1, 0.25, 0.1), mat(0x1d2f55), 0.4, 18.6, 23.9);
+    [1, -1].forEach(sd=> add(st, new THREE.PlaneGeometry(34, 4.6), new THREE.MeshBasicMaterial({map:signTex('DORO EXPRESS', {bg:'#7a4a2c', fg:'#ffd400', size:68, w:640, h:100}), side:THREE.DoubleSide}), sd*11.3, 11.5, 0, false).rotation.y = sd*Math.PI/2);
+    for(let k=0;k<7;k++){ add(st, BOX(0.3, 2.2, 0.3), steel, 4.6, 1.2, -19 + k*6.2); add(st, BOX(0.15, 0.15, 5), mat(0xffd400), 4.6, 3.2, -16 + k*6.2); }
+    for(let i=0;i<14;i++) rider(st, 7 + (i%2)*2.4, 1.2, -19 + Math.floor(i/2)*6.2, i, 0.55, -Math.PI/2);
+    for(let i=0;i<8;i++){ add(st, CYL(0.12, 0.12, 2, 5), steel, -9, 1.2, -19 + i*5.4); add(st, SPH(0.45, 6, 5), glowMat(0xfff0b8), -9, 3.6, -19 + i*5.4, false); } }
+  // two trains of seven cars with riders, arms up; headlight on the lead car
   const trains = [0, 0.5].map(off=>{ const cars = [];
-    for(let k=0;k<6;k++){
+    for(let k=0;k<7;k++){
       const c = new THREE.Group();
-      add(c, BOX(3.8, 1.6, 4.4), mat(k===0 ? 0xffd400 : (k%2 ? 0x5aa0e6 : 0xe2574c)), 0, -0.4, 0);
+      add(c, BOX(3.8, 1.6, 4.4), mat(k===0 ? 0xffd400 : (k%2 ? 0xe2574c : 0xf4efe4)), 0, -0.4, 0);
       add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, -1.6); add(c, BOX(3, 1.4, 0.6), mat(0x1d2f55), 0, 1, 0.6);
       [-0.95, 0.95].forEach((x,i)=>{ const r = rider(c, x, 0.6, -0.4, k*2 + i, 0.75, Math.PI); r.children[2].rotation.x = -2.8; r.children[3].rotation.x = -2.8; });
       if(k===0){ add(c, new THREE.ConeGeometry(2, 2.6, 4).rotateX(Math.PI/2).rotateZ(Math.PI/4), mat(0xffd400), 0, -0.4, 3.4); add(c, SPH(0.4, 6, 5), glowMat(0xfff4c2), 0, 0.2, 4.6, false); }
@@ -3167,20 +3172,19 @@ const coaster = new THREE.Group();
       c.scale.setScalar(0.6); coaster.add(c); cars.push(c);
     }
     return {cars, off}; });
-  // speed: a crawl on the lift, fast everywhere else
   let u0 = 0;
   islAnim.push(t=>{
-    const dt = 1/60; const sp = (u)=> (u > liftU[0] && u < liftU[1]) ? 0.012 : 0.07; u0 = (u0 + dt*sp(u0)) % 1;
+    const dt = 1/60; const sp = (u)=> (u > liftU[0] && u < liftU[1]) ? 0.009 : 0.045; u0 = (u0 + dt*sp(u0)) % 1;
     trains.forEach(tr=>{ const base = (u0 + tr.off) % 1;
-      tr.cars.forEach((c,k)=>{ const u = (base - k*0.010 + 1) % 1, i = Math.floor(u*N) % N; c.position.copy(curve.getPointAt(u)).addScaledVector(U[i], 1.0); m4.makeBasis(S[i], U[i], T[i]); c.quaternion.setFromRotationMatrix(m4); }); });
+      tr.cars.forEach((c,k)=>{ const u = (base - k*0.0055 + 1) % 1, i = Math.floor(u*N) % N; c.position.copy(curve.getPointAt(u)).addScaledVector(U[i], 1.0); m4.makeBasis(S[i], U[i], T[i]); c.quaternion.setFromRotationMatrix(m4); }); });
     const head = Math.floor(u0*leds.length);
     leds.forEach((r,i)=>{ const d = (i - head + leds.length) % leds.length; (r.userData.mat||r.material).color.setHSL(0.55 + d/leds.length*0.4, 0.9, d < 4 ? 0.85 : 0.6); });
   });
 }
 place(coaster, -200, 190);
-mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz:190, h:52, r:84,
-  desc:'64m 리프트 힐을 체인으로 기어올라 첫 낙하, 수직 루프, 에어타임 힐 세 개를 지나 남쪽을 크게 돌고 바위 터널로 돌아오는 도로 익스프레스. 열차 두 편성이 교대로 달리고 밤이면 LED 고리가 레일을 따라 흐릅니다.',
-  facts:[['챕터','5 · 코덱스의 선택'],['볼거리','64m 리프트 힐 · 첫 낙하 · 수직 루프 · 에어타임 힐 · 터널 · 2편성']]});
+mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz:190, h:80, r:132,
+  desc:'나무 트러스로 지은 대형 우든 코스터. 78m 리프트 힐을 체인으로 기어올라 가파른 첫 낙하 뒤 언덕을 연달아 넘고(에어타임), 동쪽 끝을 크게 돌아 토끼뜀 언덕과 나무 터널을 지나 역사로 돌아옵니다. 열차 두 편성이 교대로 달리고 밤이면 LED가 레일을 따라 흐릅니다.',
+  facts:[['챕터','5 · 코덱스의 선택'],['볼거리','78m 리프트 힐 · 첫 낙하 · 에어타임 힐 · 오버뱅크 턴 · 나무 터널 · 2편성 7량']]});
 
 // viking ship on its own lot in the south-west (chapter 5's rebuilt viking) — pivot ≈ 30 m, ship ≈ 36 m
 const viking = new THREE.Group();
