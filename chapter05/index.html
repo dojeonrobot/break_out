@@ -517,6 +517,13 @@ body.sim #simHud{display:flex}
     <button id="lLbl" aria-pressed="false">건물 이름</button>
     <button id="lCtx" class="erica-only" aria-pressed="true">주변 건물</button>
     <button id="lMe" class="erica-only" type="button" aria-pressed="false">내 시점</button>
+  </div>
+  <div class="seg erica-only" id="navSeg" role="group" aria-label="시점 방식" hidden>
+    <button type="button" data-nav="head" aria-pressed="true">진행 방향</button>
+    <button type="button" data-nav="north" aria-pressed="false">북쪽 고정</button>
+    <button type="button" data-nav="free" aria-pressed="false">시점 고정</button>
+  </div>
+  <div class="layers" role="group">
     <button id="lFull" type="button" aria-pressed="false">전체 화면</button>
   </div>
 </div>
@@ -1470,23 +1477,75 @@ SCANS.filter(s=>!s.mission && s.x!=null).forEach(s=>{
 const KX = Math.cos(DATA.origin[0]*Math.PI/180)*111320, KZ = 110540;
 const toLocal = (lat, lng) => [(lng - DATA.origin[1])*KX, -(lat - DATA.origin[0])*KZ];
 const teamMk = {};
-var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', follow = false, navDir = {x:0, z:-1}, prevPos = null, followFirst = false, geoErrAt = 0;
+var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', follow = false, navDir = {x:0, z:-1}, prevPos = null, geoErrAt = 0;
+var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, compassAt = 0, orientOn = false;
 // accuracy circle under my own dot (campus scene only)
 const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.55, depthWrite:false, side:THREE.DoubleSide}));
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
-function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); prevPos = null; followFirst = on; }
-// navigation view: the camera sits behind my position, looking the way I am walking, and moves with every fix
-function followMe(){
+const meArrow = new THREE.Mesh(new THREE.ConeGeometry(4, 10, 3).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.95, depthTest:false}));
+meArrow.visible = false; meArrow.renderOrder = 4; sceneE.add(meArrow);
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; meArrow.visible = on && !!myPos; if(on) startOrient(); }
+function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
+document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
+// which way am I facing: GPS course while walking, the compass when standing, the last movement otherwise
+function headingDir(){
+  if(myPos && Number.isFinite(myPos.heading) && (myPos.speed || 0) > 1.0){ const th = myPos.heading*Math.PI/180; return {x:Math.sin(th), z:-Math.cos(th)}; }
+  if(compassDeg != null && Date.now() - compassAt < 4000){ const th = compassDeg*Math.PI/180; return {x:Math.sin(th), z:-Math.cos(th)}; }
+  return navDir;
+}
+// compass: absolute orientation (Android Chrome) or webkitCompassHeading (iOS); the screen rotation is folded in so "forward" is the top of the screen
+function onOrient(e){
+  let h = null;
+  if(e.webkitCompassHeading != null) h = e.webkitCompassHeading;
+  else if(e.alpha != null && (e.absolute || e.type === 'deviceorientationabsolute')) h = 360 - e.alpha;
+  if(h == null) return;
+  const sa = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+  compassDeg = ((h + sa) % 360 + 360) % 360; compassAt = Date.now();
+}
+async function startOrient(){
+  if(orientOn) return; orientOn = true;
+  try{ if(typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission){ const r = await DeviceOrientationEvent.requestPermission(); if(r !== 'granted') return; } }catch(e){ return; }
+  if('ondeviceorientationabsolute' in window) addEventListener('deviceorientationabsolute', onOrient);
+  else addEventListener('deviceorientation', onOrient);
+}
+function navTargetXZ(){ const [x, z] = toLocal(myPos.lat, myPos.lng); return {x, z}; }
+// the first jump when 내 시점 turns on or the mode changes; after that navTick() follows every frame
+function navJump(){
   if(!myPos || !follow) return;
-  const [x, z] = toLocal(myPos.lat, myPos.lng), far = Math.hypot(x, z);
+  const {x, z} = navTargetXZ(), far = Math.hypot(x, z);
   if(far > 2500){ toast(`캠퍼스에서 약 ${(far/1000).toFixed(1)}km 떨어져 있어 내 시점을 쓸 수 없습니다`); setFollow(false); return; }
   if(W.id !== 'erica') setWorld('erica', true);
+  select(-1); const d = 150, dir = navMode === 'north' ? {x:0, z:-1} : headingDir(); navDirS = {x:dir.x, z:dir.z}; navAt = {x, z};
+  flyTo(navCam(x, z, dir, d), new THREE.Vector3(x, 0, z), 900);
+}
+// camera for a navigation view: high and close behind me (so buildings do not block the view), looking the way I face; raised further if a building still sits in the line of sight
+const navRay = new THREE.Raycaster();
+function navCam(x, z, dir, d){
+  const cam = new THREE.Vector3(x - dir.x*d*0.5, d*0.86, z - dir.z*d*0.5), tgt = new THREE.Vector3(x, 2, z);
+  for(let k=0;k<4;k++){
+    const v = cam.clone().sub(tgt), L = v.length(); navRay.set(tgt, v.normalize()); navRay.far = L;
+    const hit = W.id === 'erica' && navRay.intersectObjects(pickables, false).length; if(!hit) break;
+    cam.y += d*0.25;
+  }
+  return cam;
+}
+function followMe(){
+  if(!myPos || !follow) return;
+  const {x, z} = navTargetXZ();
   if(prevPos){ const dx = x - prevPos[0], dz = z - prevPos[1], L = Math.hypot(dx, dz); if(L > 4) navDir = {x:dx/L, z:dz/L}; }
-  else if(Number.isFinite(myPos.heading)){ const th = myPos.heading*Math.PI/180; navDir = {x:Math.sin(th), z:-Math.cos(th)}; }   // compass heading → local (x east, z south)
-  prevPos = [x, z];
-  const d = followFirst ? 150 : Math.max(60, Math.min(420, camera.position.distanceTo(controls.target)));   // keep the zoom the viewer chose
-  followFirst = false; select(-1);
-  flyTo(new THREE.Vector3(x - navDir.x*d*0.74, d*0.6, z - navDir.z*d*0.74), new THREE.Vector3(x, 0, z), 900);
+  prevPos = [x, z]; navAt = {x, z};
+  if(navMode !== 'free' && Math.hypot(controls.target.x - x, controls.target.z - z) > 600) navJump();   // far away (first fix, or a jump): fly instead of drifting
+}
+function navTick(){
+  if(!follow || !myPos || W.id !== 'erica' || fly) return;
+  const {x, z} = navAt || navTargetXZ();
+  const want = navMode === 'north' ? {x:0, z:-1} : headingDir();
+  navDirS.x += (want.x - navDirS.x)*0.08; navDirS.z += (want.z - navDirS.z)*0.08; const L = Math.hypot(navDirS.x, navDirS.z) || 1; navDirS.x /= L; navDirS.z /= L;
+  meArrow.visible = true; meArrow.position.set(x, 3, z); meArrow.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
+  const d = Math.max(45, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
+  const cam = navCam(x, z, navDirS, d);
+  controls.target.lerp(new THREE.Vector3(x, 0, z), 0.1); camera.position.lerp(cam, 0.1);
 }
 function updateTeamDots(pos, now){
   const list = Object.assign({}, pos || {}); if(myPos) list[TEAM || 'me'] = Object.assign({}, myPos, {mine:true});
@@ -1502,7 +1561,7 @@ function updateTeamDots(pos, now){
   refreshZones();
 }
 function onGeo(p){
-  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, t:Date.now()};
+  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()};
   updateTeamDots(LAST_POS, Date.now());
   if(follow) followMe();
   // close to an empty record's coordinates? say so once per zone
@@ -1525,7 +1584,7 @@ $('lMe').onclick = ()=>{
   if(!navigator.geolocation){ toast('이 브라우저는 위치를 지원하지 않습니다'); return; }
   if(!window.isSecureContext){ toast('https 주소로 열어야 위치를 쓸 수 있습니다'); return; }
   setFollow(true); startGeo();
-  if(myPos && Date.now() - myPos.t < 15000) followMe(); else toast('위치를 찾는 중입니다. 잡히면 화면이 내 위치를 따라갑니다');
+  if(myPos && Date.now() - myPos.t < 15000){ followMe(); navJump(); } else toast('위치를 찾는 중입니다. 잡히면 화면이 내 위치를 따라갑니다');
 };
 var LAST_POS = {};
 // zone markers, beacons and rings follow the zone state and the open tab
@@ -5048,7 +5107,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meArrow};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5746,7 +5805,7 @@ function setWorld(id, instant){
   scene = w.scene; scene.add(sun, sun.target, hemi);
   document.querySelectorAll('#worlds button').forEach(b=> b.setAttribute('aria-pressed', b.dataset.w===id));
   document.body.classList.toggle('island', id==='island'); if(id!=='island' && typeof simOn !== 'undefined' && simOn) setSim(false);
-  if(id!=='erica' && follow) setFollow(false);
+  if(id!=='erica' && follow) setFollow(false); meArrow.visible = false;
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
@@ -5777,6 +5836,7 @@ function tick(now){
     if(t>3.3) document.body.classList.remove('intro');
     if(t>4.6) endIntro();
   }
+  if(follow) navTick();
   if(fly){
     const t = Math.min((now-fly.s)/fly.ms,1), k=ease(t);
     camera.position.lerpVectors(fly.p0, fly.p1, k); controls.target.lerpVectors(fly.t0, fly.t1, k);
