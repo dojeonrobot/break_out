@@ -319,6 +319,9 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 #simBtn{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid color-mix(in srgb,var(--void-edge) 60%,transparent);background:var(--void);color:var(--void-fg);font:600 13px var(--sans);box-shadow:0 0 0 3px color-mix(in srgb,var(--void-edge) 22%,transparent)}
 #simBtn i{width:10px;height:10px;border-radius:50%;background:var(--void-edge);box-shadow:0 0 10px var(--void-edge)}
 #simBtn[aria-pressed=true]{background:var(--void-edge);color:#fff}
+#simBtn em{font:700 10.5px var(--mono);font-style:normal;letter-spacing:.12em;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,var(--void-fg) 14%,transparent);color:color-mix(in srgb,var(--void-fg) 70%,transparent)}
+#simBtn[aria-pressed=true] em{background:#9ff6ff;color:#06111a}
+#simBtn[aria-pressed=true] i{background:#9ff6ff;box-shadow:0 0 10px #9ff6ff}
 body.island #simBtn{display:flex}
 body.sim #credit,body.sim #bar{display:none}
 #simHud{position:fixed;left:0;right:0;top:calc(68px + env(safe-area-inset-top,0px));margin-inline:auto;width:fit-content;max-width:calc(100% - 32px);z-index:21;display:none;align-items:center;gap:14px;padding:10px 18px;border-radius:14px;background:color-mix(in srgb,var(--void) 86%,transparent);color:var(--void-fg);border:1px solid color-mix(in srgb,var(--void-edge) 55%,transparent);backdrop-filter:blur(8px)}
@@ -547,9 +550,9 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="grid" id="tpGrid"></div>
   <button type="button" class="skip" id="tpSkip">조 없이 둘러보기</button>
 </div></div>
-<button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터</button>
+<button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
-<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문의 눈 문양과 같습니다. 문양은 처음부터 이 흐름을 본떠 만든 것이었습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
+<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
@@ -1023,12 +1026,12 @@ const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾
 // the five zones are the five gaps in it, and the glyph the family has worn for generations was copied from the flow.
 // World coordinates (island x, z): upper chevron source → safari / source → ferris → carousel, the eye round the plaza, lower chevron harbour → coaster / harbour → old waterway.
 const GLYPH_SEGS = [
-  {id:'dl-safari',   n:1, part:'윗선 서쪽',  clue:'원천에서 초원으로 내려오는 흐름',       pts:[[-42,-528],[-170,-300],[-277,-54]], spike:[[-178,-315],[-236,-395]]},
-  {id:'dl-ferris',   n:2, part:'윗선 동쪽',  clue:'원천에서 관람차 언덕으로 오르는 흐름',   pts:[[-42,-528],[88,-392],[216,-243]],   spike:[[96,-398],[150,-480]]},
-  {id:'dl-carousel', n:3, part:'동쪽 끝',    clue:'언덕을 넘어 회전목마까지 이어지는 흐름', pts:[[216,-243],[292,-112],[338,27]]},
-  {id:'dl-harmonia', n:4, part:'가운데 눈',  clue:'광장을 한 바퀴 도는 흐름, 눈동자는 메인 스트리트', pts:[[-140,67],[-104,-2],[0,-36],[104,-2],[140,67],[0,182],[-140,67]], bar:[[0,-36],[0,182]]},
-  {id:'dl-coaster',  n:5, part:'아랫선 서쪽', clue:'롤러코스터에서 항구로 내려가는 흐름',    pts:[[-270,257],[-150,352],[0,450]],     spike:[[-150,352],[-190,432]]},
-  {id:null, final:true, part:'아랫선 동쪽', clue:'항구에서 옛 물길로 — 다섯 흐름이 모두 돌아오면 이어진다', pts:[[0,450],[152,358],[290,277]], spike:[[152,358],[194,438]]}
+  {id:'dl-safari',   n:1, part:'윗선 서쪽',  clue:'원천에서 초원으로 내려온다',       pts:[[-42,-528],[-170,-300],[-277,-54]], spike:[[-178,-315],[-236,-395]]},
+  {id:'dl-ferris',   n:2, part:'윗선 동쪽',  clue:'원천에서 관람차 언덕으로 오른다',   pts:[[-42,-528],[88,-392],[216,-243]],   spike:[[96,-398],[150,-480]]},
+  {id:'dl-carousel', n:3, part:'동쪽 끝',    clue:'언덕을 넘어 회전목마까지 이어진다', pts:[[216,-243],[292,-112],[338,27]]},
+  {id:'dl-harmonia', n:4, part:'가운데 눈',  clue:'광장을 한 바퀴 돌고 메인 스트리트를 가로지른다', pts:[[-140,67],[-104,-2],[0,-36],[104,-2],[140,67],[0,182],[-140,67]], bar:[[0,-36],[0,182]]},
+  {id:'dl-coaster',  n:5, part:'아랫선 서쪽', clue:'롤러코스터에서 항구로 내려간다',    pts:[[-270,257],[-150,352],[0,450]],     spike:[[-150,352],[-190,432]]},
+  {id:null, final:true, part:'아랫선 동쪽', clue:'항구에서 옛 물길로 이어진다 (다섯 흐름이 모두 돌아온 뒤)', pts:[[0,450],[152,358],[290,277]], spike:[[152,358],[194,438]]}
 ];
 const glyphId = m => m ? (GLYPH_SEGS.some(s=> s.id === m.id) ? m.id : (m.twin && GLYPH_SEGS.some(s=> s.id === m.twin) ? m.twin : null)) : null;
 const glyphHave = ()=> GLYPH_SEGS.filter(s=> s.id && (scansFor(s.id) || []).length).map(s=> s.id);
@@ -1036,16 +1039,17 @@ const glyphHave = ()=> GLYPH_SEGS.filter(s=> s.id && (scansFor(s.id) || []).leng
 function glyphSVG(have, size=150){
   const X = x => (x + 400)/800*200, Z = z => (z + 560)/1040*200, P = pts => pts.map(([x,z], i)=> `${i ? 'L' : 'M'}${X(x).toFixed(1)} ${Z(z).toFixed(1)}`).join(' ');
   const all = have.length === 5;
-  const seg = s => { const on = s.final ? all : have.includes(s.id), cls = on ? 'on' : 'off';
-    return `<path class="${cls}" d="${P(s.pts)}"/>${s.spike ? `<path class="${cls}" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="${cls}" d="${P(s.bar)}"/>` : ''}`; };
-  return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="코덱스 문양 ${have.length}/5">${GLYPH_SEGS.map(seg).join('')}</svg>`;
+  // only the stretches that have come back are drawn: the shape must not give itself away before the fifth
+  const seg = s => { const on = s.final ? all : have.includes(s.id); if(!on) return '';
+    return `<path class="on" d="${P(s.pts)}"/>${s.spike ? `<path class="on" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="on" d="${P(s.bar)}"/>` : ''}`; };
+  return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="일루아의 흐름 ${have.length}/5">${GLYPH_SEGS.map(seg).join('')}</svg>`;
 }
-function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_SEGS.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>문양 조각 ${s.n} · ${esc(s.part)}</b> · ${esc(s.clue)}</div></div></div>`; }
+function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_SEGS.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>돌아온 흐름 ${s.n}</b> · ${esc(s.clue)}</div></div></div>`; }
 function iluaHTML(){
   const have = glyphHave(), n = have.length;
-  return `<div class="ilua"><div class="ih2"><span>코덱스 문양</span><b>${n} / 5</b></div>
-    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_SEGS.filter(s=> s.id).map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>${esc(s.part)}</b> · ${esc(s.clue)}` : `${esc(s.part)} · 아직 비어 있는 흐름`}</div></div>`; }).join('')}</div></div>
-    ${n===5 ? `<div class="done">다섯 흐름이 모두 돌아왔습니다. 섬 아래 일루아의 흐름은 코덱스 가문의 눈 문양과 같은 모양입니다. 문양은 이 흐름을 본떠 만든 것이었습니다.</div>` : ''}</div>`;
+  return `<div class="ilua"><div class="ih2"><span>${n===5 ? '일루아의 흐름 · 코덱스 문양' : '일루아의 흐름'}</span><b>${n} / 5</b></div>
+    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_SEGS.filter(s=> s.id).map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>흐름 ${s.n}</b> · ${esc(s.clue)}` : `흐름 ${s.n} · 아직 비어 있음`}</div></div>`; }).join('')}</div></div>
+    ${n===5 ? `<div class="done">다섯 흐름이 모두 돌아왔습니다. 섬 아래 일루아의 흐름은 코덱스 가문이 대대로 써 온 눈 문양과 같은 모양입니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 그 사실은 몰랐습니다.</div>` : ''}</div>`;
 }
 function updateProgress(){
   const isl = W && W.id==='island';
@@ -4069,12 +4073,13 @@ place(kids, -150/K, 412/K, 0.3); kids.scale.setScalar(0.6);
 pickable(kids, {n:'키즈 라군', c:'ride', sub:'어린이 구역', cx:-150/K, cz:412/K, h:12, r:30, desc:'범퍼보트가 떠다니는 작은 물놀이장과 미끄럼틀 놀이터가 있는 어린이 구역.', facts:[['위치','정문 광장 서쪽']]});
 
 // ---------- waterfall and valley stream from the mountain to the sea (the chapter 5 "valley → seashore" flow) ----------
-const flowU = {uTime:{value:0}};
+const flowU = {uTime:{value:0}, uDim:{value:1}};   // uDim → 0.1 while the restoration simulator is on
+const SIM_DIM = [];                                      // objects hidden while the simulator is on
 const flowMat = new THREE.ShaderMaterial({uniforms:flowU, transparent:true, depthWrite:false, side:THREE.DoubleSide,
   vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-  fragmentShader:`uniform float uTime; varying vec2 vUv;
+  fragmentShader:`uniform float uTime, uDim; varying vec2 vUv;
     void main(){ float s = sin(vUv.x*40.0 - uTime*6.0 + sin(vUv.y*9.0)*2.0)*0.5 + 0.5; vec3 c = mix(vec3(0.42,0.78,0.92), vec3(0.95,0.99,1.0), smoothstep(0.55, 1.0, s));
-      float edge = smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.85, vUv.y); gl_FragColor = vec4(c, 0.88*edge); }`});
+      float edge = smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.85, vUv.y); gl_FragColor = vec4(c*uDim, 0.88*edge*uDim); }`});
 function ribbon(points, width, yOff=0){
   const curve = new THREE.CatmullRomCurve3(points), N = 120, pos = [], uv = [], idx = [];
   for(let i=0;i<=N;i++){ const u = i/N, p = curve.getPointAt(u), t = curve.getTangentAt(u), s = new THREE.Vector3(-t.z, 0, t.x).normalize().multiplyScalar(width/2);
@@ -4092,7 +4097,7 @@ function ribbon(points, width, yOff=0){
   add(islRoot, new THREE.CircleGeometry(16, 24).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x5fb6d6, polygonOffset:true, polygonOffsetFactor:-6, polygonOffsetUnits:-6}), fx, G+0.25, fz + 6, false);
   for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; add(islRoot, ICO(1.6 + (i%3)*0.8, 0), flat(0x9c9486), fx + Math.cos(a)*17, G+0.5, fz + 6 + Math.sin(a)*17); }
   const mist = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(80*3), 3)), new THREE.PointsMaterial({color:0xffffff, size:2, transparent:true, opacity:0.6}));
-  islRoot.add(mist);
+  islRoot.add(mist); SIM_DIM.push(mist);
   const R = islR(STREAM_A);
   const streamPts = [[fx, fz + 14], [200, -350], [290, -345], [Math.cos(STREAM_A)*(R-40), Math.sin(STREAM_A)*(R-40)], [Math.cos(STREAM_A)*(R+40), Math.sin(STREAM_A)*(R+40)]].map(([x,z])=>new THREE.Vector3(x, G + 0.3, z));
   ribbon(streamPts, 9);
@@ -5294,10 +5299,12 @@ let SIM_LIT = 0;
   const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(8, 1);
   const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
   const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.renderOrder = order; return o; };
-  const ghost = pts3 => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts3), ghostMat); l.renderOrder = 6; l.computeLineDistances(); simRoot.add(l); return l; };
+  const ghostTubeMat = new THREE.MeshBasicMaterial({color:0x8a6cff, transparent:true, opacity:0.42, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
+  const ghost = pts3 => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts3), ghostMat); l.renderOrder = 6; l.computeLineDistances(); simRoot.add(l);
+    const c = new THREE.CatmullRomCurve3(pts3, false, 'catmullrom', 0.35), tube = new THREE.Mesh(new THREE.TubeGeometry(c, Math.max(12, pts3.length*4), 2.6, 6, false), ghostTubeMat); tube.renderOrder = 5; simRoot.add(tube); return l; };
   const lit = (curve, len)=>{
     const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 3.2, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 4.6, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
     const n = Math.max(8, Math.round(len/14)), spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(spark);
     islAnim.push(t=>{ for(let i=0;i<n;i++){ const q = sub.getPointAt(((t*0.06) + i/n) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
   };
@@ -5305,9 +5312,8 @@ let SIM_LIT = 0;
   SEGS.forEach(s=>{
     const on = s.final ? litIds.size === 5 : litIds.has(s.id);
     const curve = segCurve(s), L = curve.getLength();
-    ghost(curve.getPoints(Math.max(24, Math.round(L/8))));
-    if(s.spike) ghost(s.spike.map(([x,z])=> V(x, z)));
-    if(on){ lit(curve, L); if(s.spike){ const sc = new THREE.CatmullRomCurve3(s.spike.map(([x,z])=> V(x, z))); lit(sc, sc.getLength()); } }
+    if(!on) return;                                                  // a stretch that has not come back is not drawn: the shape stays a secret until the fifth
+    if(on){ lit(curve, L); [s.spike, s.bar].forEach(e=>{ if(!e) return; const sc = new THREE.CatmullRomCurve3(e.map(([x,z])=> V(x, z))); lit(sc, sc.getLength()); }); }
   });
   // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
   MI.forEach((m, k)=>{
@@ -5327,7 +5333,8 @@ let SIM_LIT = 0;
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
 let simOn = false;
 function setSim(on){
-  simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on);
+  simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
+  flowU.uDim.value = on ? 0.1 : 1; SIM_DIM.forEach(o=> o.visible = !on);
   if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
     $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
     let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
