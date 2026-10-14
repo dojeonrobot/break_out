@@ -510,7 +510,6 @@ body.sim #simHud{display:flex}
     <button id="lLbl" aria-pressed="false">건물 이름</button>
     <button id="lCtx" class="erica-only" aria-pressed="true">주변 건물</button>
     <button id="lMe" class="erica-only" type="button" aria-pressed="false">내 시점</button>
-    <button id="lChr" class="island-only" aria-pressed="true" hidden>등장인물</button>
   </div>
 </div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
@@ -5746,7 +5745,6 @@ function setWorld(id, instant){
   if(!instant) startIntro(true);
 }
 document.querySelectorAll('#worlds button').forEach(b=> b.onclick = ()=> setWorld(b.dataset.w));
-tgl('lChr', v=> charGroups.forEach(g=> g.visible = v));
 
 const lastT = new THREE.Vector3();
 function tick(now){
