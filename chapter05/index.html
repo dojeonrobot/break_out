@@ -177,6 +177,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .arow{display:flex;flex-wrap:wrap;gap:6px}
 .mini.danger{border-color:var(--c-hub);color:var(--c-hub)}
 .adm .subline{margin-top:6px}
+.adm .demo{display:grid;gap:6px;padding:10px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--accent) 50%,transparent);font-size:12.5px}
+.adm .demo>span{color:var(--muted);font-size:12px}
+.adm .demo small{color:var(--muted)}
 .subline.done{background:color-mix(in srgb,var(--restored) 12%,transparent)}
 .subline.done span{color:var(--restored)}
 .subhelp[data-kind=ok]{color:var(--restored)}
@@ -663,6 +666,12 @@ const subDone = s => s.status==='ok' && (s.kind==='orbit' || !!s.splat);
 const orbitOk = list => (list || []).filter(subDone);
 const orbitSig = list => orbitOk(list).map(s=>s.scanId).sort().join(',');
 orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
+// Preview records (admin, this device only): zones ticked under "복구 미리보기" count as restored with a stand-in record,
+// so the island, the flow and the 5/5 ending can be checked without submitting five real links. Stored in localStorage 'void-demo'.
+const DEMO = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem('void-demo') || '[]')); }catch(e){ return new Set(); } })();
+if(DEMO.size){ const base = SCANS_ALL[0] || {};
+  DEMO.forEach((id, k)=>{ if(SCANS.some(s=> s.mission === id)) return;
+    SCANS.push({...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'운영자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}); }); }
 const ORBIT_SIG = orbitSig(BOOT && BOOT.subs);
 let AUTO = BOOT ? BOOT.auto !== false : true;
 const FLOOR_H = 3.6;
@@ -1055,7 +1064,7 @@ function updateProgress(){
   const isl = W && W.id==='island';
   $('pN').textContent = `${M.filter(m=>m.scans.length).length} / ${M.length}`;
   $('pCells').innerHTML = M.map(m=>`<i class="${m.scans.length?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
-  const box = $('iluaBox'); if(box) box.innerHTML = iluaHTML();
+  const box = $('iluaBox'); if(box) box.innerHTML = (DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 탭에서 끔)</span></div>` : '') + iluaHTML();
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
 updateProgress();
@@ -1218,6 +1227,9 @@ function adminHTML(){
   return `<div class="adm">
     <p class="subhelp">조별 제출 ${n}건 · 복구됨 ${done}건${wait ? ` · 확인 대기 ${wait}건` : ''}${HIDDEN.size ? ` · 숨긴 스캔 ${HIDDEN.size}건` : ''}</p>
     <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 운영자가 "복구 확정"을 눌러야 함)</label>
+    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 링크 없이 구역을 복구된 것으로 보기 (확인용)</span>
+      ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
+      <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button><button type="button" class="mini" data-aact="demoApply">적용 (새로고침)</button></div></div>
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
@@ -1246,6 +1258,8 @@ async function adminAct(act){
       if(!confirm(`숨긴 스캔 ${HIDDEN.size}건을 다시 3D에 보이게 합니다. 계속할까요?`)) return;
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
+    if(act==='demoAll' || act==='demoNone'){ document.querySelectorAll('[data-demo]').forEach(c=> c.checked = act==='demoAll'); return; }
+    if(act==='demoApply'){ const ids = [...document.querySelectorAll('[data-demo]')].filter(c=> c.checked).map(c=> c.dataset.demo); try{ localStorage.setItem('void-demo', JSON.stringify(ids)); }catch(e){} location.reload(); return; }
     if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '운영자가 확정해야 복구됩니다'); return; }
   }catch(err){ toast(err.message); }
 }
