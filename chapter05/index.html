@@ -350,7 +350,7 @@ body.sim #simHud{display:flex}
 .glyphwrap .frag{padding:4px 7px;font-size:11.5px;line-height:1.35}
 svg.glyph{display:block;border-radius:12px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:6px;box-sizing:border-box}
 svg.glyph path{fill:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
-svg.glyph path.off{stroke:color-mix(in srgb,var(--void-edge) 28%,transparent)}
+svg.glyph path.off{stroke:color-mix(in srgb,var(--void-edge) 45%,transparent);stroke-dasharray:6 7}
 svg.glyph path.on{stroke:#9ff6ff;filter:drop-shadow(0 0 4px #9ff6ff)}
 svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9ff6ff 45%,transparent)}
 .ilua .frag{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--void-edge) 10%,transparent);line-height:1.45}
@@ -1040,8 +1040,8 @@ function glyphSVG(have, size=150){
   const X = x => (x + 400)/800*200, Z = z => (z + 560)/1040*200, P = pts => pts.map(([x,z], i)=> `${i ? 'L' : 'M'}${X(x).toFixed(1)} ${Z(z).toFixed(1)}`).join(' ');
   const all = have.length === 5;
   // only the stretches that have come back are drawn: the shape must not give itself away before the fifth
-  const seg = s => { const on = s.final ? all : have.includes(s.id); if(!on) return '';
-    return `<path class="on" d="${P(s.pts)}"/>${s.spike ? `<path class="on" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="on" d="${P(s.bar)}"/>` : ''}`; };
+  const seg = s => { const on = s.final ? all : have.includes(s.id), cls = on ? 'on' : 'off';
+    return `<path class="${cls}" d="${P(s.pts)}"/>${s.spike ? `<path class="${cls}" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="${cls}" d="${P(s.bar)}"/>` : ''}`; };
   return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="일루아의 흐름 ${have.length}/5">${GLYPH_SEGS.map(seg).join('')}</svg>`;
 }
 function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_SEGS.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>돌아온 흐름 ${s.n}</b> · ${esc(s.clue)}</div></div></div>`; }
@@ -5304,16 +5304,26 @@ let SIM_LIT = 0;
     const c = new THREE.CatmullRomCurve3(pts3, false, 'catmullrom', 0.35), tube = new THREE.Mesh(new THREE.TubeGeometry(c, Math.max(12, pts3.length*4), 2.6, 6, false), ghostTubeMat); tube.renderOrder = 5; simRoot.add(tube); return l; };
   const lit = (curve, len)=>{
     const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 4.6, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 5.4, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
     const n = Math.max(8, Math.round(len/14)), spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(spark);
     islAnim.push(t=>{ for(let i=0;i<n;i++){ const q = sub.getPointAt(((t*0.06) + i/n) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
   };
   const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
+  // The whole flow is always there. A stretch whose record is still empty shows as a broken flow: many short flickering pieces
+  // with dark gaps between them. Restoring the record joins the pieces into one continuous running stretch.
+  const broken = (curve, L)=>{
+    const n = Math.max(6, Math.round(L/20)), pieces = [];
+    for(let i=0;i<n;i++){ const u0 = (i + 0.12)/n, u1 = (i + 0.62)/n, pts = Array.from({length:6}, (_,k)=> curve.getPointAt(u0 + (u1-u0)*k/5).add(new THREE.Vector3((Math.sin(i*7.3)+Math.cos(k*2.1))*1.2, Math.sin(i*3.1)*1.2, (Math.cos(i*5.7)+Math.sin(k*1.7))*1.2)));
+      const m = new THREE.MeshBasicMaterial({color:0xc4b4ff, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
+      const t = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 12, 4.2, 6, false), m); t.renderOrder = 6; simRoot.add(t); pieces.push({m, ph:i*1.9}); }
+    islAnim.push(t=> pieces.forEach(p=>{ p.m.opacity = 0.65 + 0.35*Math.max(0, Math.sin(t*2.6 + p.ph)) * (Math.sin(t*9 + p.ph*3) > -0.6 ? 1 : 0.3); }));
+  };
   SEGS.forEach(s=>{
     const on = s.final ? litIds.size === 5 : litIds.has(s.id);
     const curve = segCurve(s), L = curve.getLength();
-    if(!on) return;                                                  // a stretch that has not come back is not drawn: the shape stays a secret until the fifth
-    if(on){ lit(curve, L); [s.spike, s.bar].forEach(e=>{ if(!e) return; const sc = new THREE.CatmullRomCurve3(e.map(([x,z])=> V(x, z))); lit(sc, sc.getLength()); }); }
+    const extras = [s.spike, s.bar].filter(Boolean).map(e=> new THREE.CatmullRomCurve3(e.map(([x,z])=> V(x, z))));
+    if(on){ lit(curve, L); extras.forEach(c=> lit(c, c.getLength())); }
+    else { broken(curve, L); extras.forEach(c=> broken(c, c.getLength())); }
   });
   // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
   MI.forEach((m, k)=>{
