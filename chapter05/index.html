@@ -1484,7 +1484,7 @@ const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
 // my avatar on the campus: Void, the little white robot (built on first use, since its builders live further down)
 let meAvatar = null;
-function ensureAvatar(){ if(meAvatar) return meAvatar; meAvatar = voidBot(); meAvatar.scale.setScalar(0.75); meAvatar.visible = false; sceneE.add(meAvatar); return meAvatar; }
+function ensureAvatar(){ if(meAvatar) return meAvatar; meAvatar = voidBot(); meAvatar.scale.setScalar(1.15); meAvatar.visible = false; sceneE.add(meAvatar); return meAvatar; }
 function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; ensureAvatar().visible = on && !!myPos; if(on) startOrient(); }
 function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
 document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
