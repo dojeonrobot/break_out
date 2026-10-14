@@ -1478,14 +1478,14 @@ const KX = Math.cos(DATA.origin[0]*Math.PI/180)*111320, KZ = 110540;
 const toLocal = (lat, lng) => [(lng - DATA.origin[1])*KX, -(lat - DATA.origin[0])*KZ];
 const teamMk = {};
 var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', follow = false, navDir = {x:0, z:-1}, prevPos = null, geoErrAt = 0;
-var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, compassAt = 0, orientOn = false;
+var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, compassAt = 0, orientOn = false, navMovedAt = 0;
 // accuracy circle under my own dot (campus scene only)
 const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.55, depthWrite:false, side:THREE.DoubleSide}));
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
 // my avatar on the campus: Void, the little white robot (built on first use, since its builders live further down)
 let meAvatar = null;
 function ensureAvatar(){ if(meAvatar) return meAvatar; meAvatar = voidBot(); meAvatar.scale.setScalar(1.15); meAvatar.visible = false; sceneE.add(meAvatar); return meAvatar; }
-function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; ensureAvatar().visible = on && !!myPos; if(on) startOrient(); }
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; ensureAvatar().visible = on && !!myPos; if(on) startOrient(); if(myPos) updateTeamDots(LAST_POS, Date.now()); }
 function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
 document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
 // which way am I facing: GPS course while walking, the compass when standing, the last movement otherwise
@@ -1533,7 +1533,7 @@ function navCam(x, z, dir, d){
 function followMe(){
   if(!myPos || !follow) return;
   const {x, z} = navTargetXZ();
-  if(prevPos){ const dx = x - prevPos[0], dz = z - prevPos[1], L = Math.hypot(dx, dz); if(L > 4) navDir = {x:dx/L, z:dz/L}; }
+  if(prevPos){ const dx = x - prevPos[0], dz = z - prevPos[1], L = Math.hypot(dx, dz); if(L > 1.5) navMovedAt = Date.now(); if(L > 4) navDir = {x:dx/L, z:dz/L}; }
   prevPos = [x, z]; navAt = {x, z};
   if(navMode !== 'free' && Math.hypot(controls.target.x - x, controls.target.z - z) > 600) navJump();   // far away (first fix, or a jump): fly instead of drifting
 }
@@ -1542,7 +1542,9 @@ function navTick(){
   const {x, z} = navAt || navTargetXZ();
   const want = navMode === 'north' ? {x:0, z:-1} : headingDir();
   navDirS.x += (want.x - navDirS.x)*0.08; navDirS.z += (want.z - navDirS.z)*0.08; const L = Math.hypot(navDirS.x, navDirS.z) || 1; navDirS.x /= L; navDirS.z /= L;
-  const av = ensureAvatar(), tt = performance.now()/1000; av.visible = true; av.position.set(x, 0.6 + Math.sin(tt*2)*0.35, z); av.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  const av = ensureAvatar(), tt = performance.now()/1000, walking = Date.now() - navMovedAt < 2500; av.visible = true;
+  av.position.set(x, walking ? Math.abs(Math.sin(tt*5))*0.25 : 0, z); av.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  av.userData.legs.forEach((l,i)=>{ const want = walking ? Math.sin(tt*5 + i*Math.PI)*0.5 : 0; l.rotation.x += (want - l.rotation.x)*0.2; });
   av.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(tt*3); const blink = (tt % 4) < 0.12 ? 0.15 : 1; av.userData.eyes.forEach(e=> e.scale.y = blink);
   if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
   const d = Math.max(45, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
@@ -1554,7 +1556,7 @@ function updateTeamDots(pos, now){
   Object.keys(list).forEach(t=>{ const v = list[t], [x, z] = toLocal(v.lat, v.lng);
     let mk = teamMk[t];
     if(!mk){ const el = document.createElement('div'); el.className = 'mk team'; LBL.appendChild(el); mk = teamMk[t] = {el, x, y:8, z, team:+t, show:false}; markers.push(mk); }
-    mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM;
+    mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? 19 : 8;
     mk.el.className = 'mk team' + (mine ? ' me' : '') + (age > 90000 ? ' old' : '');
     mk.el.innerHTML = `<i></i>${t === 'me' ? '내 위치' : mine ? `${t}조 · 내 위치` : `${t}조`}${v.acc ? `<small>±${Math.round(v.acc)}m</small>` : ''}`;
     if(mine){ meRing.visible = true; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
@@ -5352,19 +5354,33 @@ function naty(){
   return g;
 }
 const NATY = naty();
-// Void: white round robot with blue ear-cups and a black screen face
+// Void, after the real robot (chapter 3 workbook render): a white dome head with two black eyes and an antenna,
+// a glossy indigo rounded-box body with "void" on the front, two white servo legs on flat white feet. Faces +z, feet at y 0.
+function roundedBox(w, h, d, r){
+  const sh = new THREE.Shape(), x = -w/2, y = -h/2;
+  sh.moveTo(x + r, y); sh.lineTo(x + w - r, y); sh.quadraticCurveTo(x + w, y, x + w, y + r); sh.lineTo(x + w, y + h - r); sh.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  sh.lineTo(x + r, y + h); sh.quadraticCurveTo(x, y + h, x, y + h - r); sh.lineTo(x, y + r); sh.quadraticCurveTo(x, y, x + r, y);
+  const g = new THREE.ExtrudeGeometry(sh, {depth:d - 2*r, bevelEnabled:true, bevelSize:r, bevelThickness:r, bevelSegments:5, curveSegments:10});
+  g.translate(0, 0, -(d - 2*r)/2); return g;
+}
 function voidBot(){
   const g = new THREE.Group();
-  add(g, SPH(3,20,16), mat(0xf7f7f7), 0, 6, 0);
-  const screen = add(g, new THREE.SphereGeometry(3.05, 20, 14, -Math.PI*0.32, Math.PI*0.64, Math.PI*0.3, Math.PI*0.4), mat(0x15171c), 0, 6, 0, false);
-  screen.rotation.y = Math.PI/2; screen.rotation.y = 0;
-  const em = glowMat(0xffd84a);
-  const eyes = [-1, 1].map(x=> add(g, new THREE.CircleGeometry(0.55, 14), em, x, 6.4, 3.06, false));
-  [-1, 1].forEach(s=>{ add(g, new THREE.CylinderGeometry(1.5,1.5,1.2,18).rotateZ(Math.PI/2), mat(0x3d7be0), s*3.2, 6, 0); add(g, CYL(0.2,0.2,4.4,6), mat(0x3d7be0), s*2.4, 6.4, 0).rotation.z = -s*0.55; });
-  add(g, CAP(1.6, 1.4), mat(0xf7f7f7), 0, 1.8, 0);
-  add(g, new THREE.PlaneGeometry(2.4, 0.9), new THREE.MeshBasicMaterial({map:signTex('void', {bg:null, fg:'#3d7be0', size:84, w:256, h:96}), transparent:true}), 0, 2, 1.62, false);
-  const ring = add(g, new THREE.RingGeometry(2.2, 3, 24).rotateX(-Math.PI/2), glowMat(0x7fd7ff, 0.5, true), 0, -2, 0, false);
-  g.userData = {eyes, ring};
+  const INDIGO = 0x2c2f80, white = new THREE.MeshPhongMaterial({color:0xf7f7f7, shininess:70}), navy = new THREE.MeshPhongMaterial({color:INDIGO, shininess:90});
+  // legs: a white servo block on a flat white foot, each hung from a hip so it can swing
+  const legs = [-1.35, 1.35].map(x=>{ const leg = new THREE.Group(); leg.position.set(x, 3.7, 0); g.add(leg);
+    add(leg, BOX(1.05, 3.0, 1.15), white, 0, -3.0, 0); add(leg, BOX(0.5, 0.6, 0.1), navy, 0, -2.0, 0.6, false);
+    add(leg, roundedBox(2.3, 0.75, 3.1, 0.25), white, 0, -3.35, 0.35);
+    return leg; });
+  // body
+  add(g, roundedBox(5.8, 5.3, 4.7, 1.3), navy, 0, 6.1, 0);
+  add(g, new THREE.PlaneGeometry(2.4, 0.85), new THREE.MeshBasicMaterial({map:signTex('void', {bg:null, fg:'#5a5fb8', size:84, w:256, h:96}), transparent:true}), 0, 4.05, 2.37, false);
+  // head: white dome on a thin rim, two black eyes, antenna with an indigo tip
+  add(g, new THREE.CylinderGeometry(3.15, 3.15, 0.35, 28), white, 0, 8.75, 0);
+  add(g, new THREE.SphereGeometry(3.15, 28, 16, 0, Math.PI*2, 0, Math.PI/2), white, 0, 8.9, 0);
+  const eyes = [-1.05, 1.05].map(x=> add(g, SPH(0.46, 14, 10), mat(0x15171c), x, 10.0, 2.72, false)); eyes.forEach(e=> e.scale.set(1, 1.3, 0.55));
+  add(g, CYL(0.11, 0.11, 2.6, 8), white, 0, 12.0, 0); add(g, SPH(0.36, 12, 10), navy, 0, 14.6, 0);
+  const ring = add(g, new THREE.RingGeometry(2.6, 3.4, 28).rotateX(-Math.PI/2), glowMat(0x7fd7ff, 0.5, true), 0, -0.3, 0, false);
+  g.userData = {eyes, ring, legs};
   return g;
 }
 const VOID = voidBot();
@@ -5399,7 +5415,7 @@ islAnim.push(t=>{
   // Rico and Zero stroll round the plaza side by side, Void hovering just behind them
   const sw = (t*0.018) % 2, fw = sw < 1 ? sw : 2 - sw, dirw = sw < 1 ? 1 : -1, zw = 196 + fw*124;
   [[RICO, -6], [ZERO, -7.3]].forEach(([p, x])=>{ p.position.set(x, G, zw); p.rotation.y = dirw > 0 ? 0 : Math.PI; walkPose(p, t, 5); });
-  VOID.position.set(-6.6, G + 0.5 + Math.sin(t*2)*0.15, zw - dirw*1.8); VOID.rotation.y = dirw > 0 ? 0 : Math.PI;
+  VOID.position.set(-6.6, G + 0.2 + Math.abs(Math.sin(t*5))*0.12, zw - dirw*1.8); VOID.rotation.y = dirw > 0 ? 0 : Math.PI; VOID.userData.legs.forEach((l,i)=> l.rotation.x = Math.sin(t*5 + i*Math.PI)*0.5);
   VOID.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(t*3);
   const blink = (t % 4) < 0.12 ? 0.15 : 1; VOID.userData.eyes.forEach(e=> e.scale.y = blink);
   // Xylo cheers the coaster on
