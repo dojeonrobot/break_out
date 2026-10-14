@@ -1482,9 +1482,10 @@ var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, co
 // accuracy circle under my own dot (campus scene only)
 const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.55, depthWrite:false, side:THREE.DoubleSide}));
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
-const meArrow = new THREE.Mesh(new THREE.ConeGeometry(4, 10, 3).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.95, depthTest:false}));
-meArrow.visible = false; meArrow.renderOrder = 4; sceneE.add(meArrow);
-function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; meArrow.visible = on && !!myPos; if(on) startOrient(); }
+// my avatar on the campus: Void, the little white robot (built on first use, since its builders live further down)
+let meAvatar = null;
+function ensureAvatar(){ if(meAvatar) return meAvatar; meAvatar = voidBot(); meAvatar.scale.setScalar(0.75); meAvatar.visible = false; sceneE.add(meAvatar); return meAvatar; }
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; prevPos = null; ensureAvatar().visible = on && !!myPos; if(on) startOrient(); }
 function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
 document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
 // which way am I facing: GPS course while walking, the compass when standing, the last movement otherwise
@@ -1541,7 +1542,8 @@ function navTick(){
   const {x, z} = navAt || navTargetXZ();
   const want = navMode === 'north' ? {x:0, z:-1} : headingDir();
   navDirS.x += (want.x - navDirS.x)*0.08; navDirS.z += (want.z - navDirS.z)*0.08; const L = Math.hypot(navDirS.x, navDirS.z) || 1; navDirS.x /= L; navDirS.z /= L;
-  meArrow.visible = true; meArrow.position.set(x, 3, z); meArrow.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  const av = ensureAvatar(), tt = performance.now()/1000; av.visible = true; av.position.set(x, 0.6 + Math.sin(tt*2)*0.35, z); av.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  av.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(tt*3); const blink = (tt % 4) < 0.12 ? 0.15 : 1; av.userData.eyes.forEach(e=> e.scale.y = blink);
   if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
   const d = Math.max(45, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
   const cam = navCam(x, z, navDirS, d);
@@ -5107,7 +5109,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meArrow};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5805,7 +5807,7 @@ function setWorld(id, instant){
   scene = w.scene; scene.add(sun, sun.target, hemi);
   document.querySelectorAll('#worlds button').forEach(b=> b.setAttribute('aria-pressed', b.dataset.w===id));
   document.body.classList.toggle('island', id==='island'); if(id!=='island' && typeof simOn !== 'undefined' && simOn) setSim(false);
-  if(id!=='erica' && follow) setFollow(false); meArrow.visible = false;
+  if(id!=='erica' && follow) setFollow(false); if(meAvatar) meAvatar.visible = false;
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
