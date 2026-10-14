@@ -77,7 +77,7 @@ def now_ms():
 
 
 def fresh_db():
-    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True}
+    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True, 'reset': 0}
 
 
 def read_db():
@@ -149,7 +149,7 @@ def live_pos():
 
 
 def state():
-    return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)),
+    return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)), 'reset': int(DB.get('reset', 0)),
             'pairs': pair_status(), 'pos': live_pos(), 'now': now_ms()}
 
 
@@ -599,6 +599,7 @@ class Handler(BaseHTTPRequestHandler):
             gone = [s for s in DB['subs'] if s.get('kind') == 'orbit']
             DB['subs'] = []
             DB['hidden'] = sorted(set(DB['hidden']) | set(hide))
+            DB['reset'] = now_ms()   # every tablet forgets its team when it sees a newer reset
             save()
             self.send_json(state())
         for s in gone:

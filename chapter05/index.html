@@ -419,7 +419,7 @@ body.sim #simHud{display:flex}
   #board{display:none}
   #info.off{transform:translateY(12px)}
   #bar{bottom:calc(12px + env(safe-area-inset-bottom,0px));gap:10px;padding:10px}
-  #bar .sep,#bar .seg{display:none}
+  #bar .sep{display:none}
   input[type=range]{width:120px}
   #credit{display:none}
   .vh{flex-wrap:wrap}
@@ -496,23 +496,21 @@ body.sim #simHud{display:flex}
 </section>
 
 <div id="bar" class="glass">
-  <div class="time">
+  <div class="time island-only" hidden>
     <label for="hr">시간 설정</label>
     <input id="hr" type="range" min="6" max="21" step="0.25" value="14">
     <output id="hrO" for="hr">14:00</output>
   </div>
-  <span class="sep erica-only"></span>
-  <div class="seg erica-only" role="group" aria-label="색상 기준">
-    <button id="mCat" aria-pressed="true">용도별</button>
-    <button id="mLv" aria-pressed="false">층수별</button>
+  <div class="seg erica-only" role="group" aria-label="화면 모드">
+    <button id="tLight" type="button" aria-pressed="false">라이트</button>
+    <button id="tDark" type="button" aria-pressed="false">다크</button>
   </div>
-  <span class="sep"></span>
+  <span class="sep erica-only"></span>
   <div class="layers" role="group" aria-label="레이어">
     <button id="lLbl" aria-pressed="false">건물 이름</button>
     <button id="lCtx" class="erica-only" aria-pressed="true">주변 건물</button>
-    <button id="lMe" class="erica-only" type="button">내 위치</button>
+    <button id="lMe" class="erica-only" type="button" aria-pressed="false">내 시점</button>
     <button id="lChr" class="island-only" aria-pressed="true" hidden>등장인물</button>
-    <button id="lHome">처음 시점</button>
   </div>
 </div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
@@ -955,7 +953,8 @@ function sunDir(hour){
   return {el, v:new THREE.Vector3(Math.cos(el)*Math.sin(az), Math.sin(el), -Math.cos(el)*Math.cos(az))};
 }
 function updateSun(){
-  const h = +$('hr').value, s = sunDir(h);
+  const onCampus = typeof W !== 'undefined' && W && W.id === 'erica';
+  const h = onCampus ? (()=>{ const d = new Date(), r = d.getHours() + d.getMinutes()/60; return (r >= 7 && r <= 18) ? r : 14; })() : +$('hr').value, s = sunDir(h);
   const hh = Math.floor(h), mm = Math.round((h-hh)*60);
   $('hrO').textContent = String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
   const up = Math.max(Math.sin(s.el),0), k = Math.min(up*2.2,1);
@@ -1030,7 +1029,20 @@ async function api(path, body, admin){
   if(!r.ok) throw new Error(j.error || `서버 오류 (${r.status})`);
   return j;
 }
+// the admin's reset carries a timestamp; a device that has not seen it yet forgets its team and asks again
+function checkReset(st){
+  const rs = +st.reset || 0; if(!rs) return;
+  let seen = 0; try{ seen = +localStorage.getItem('void-reset') || 0; }catch(e){}
+  if(rs <= seen) return;
+  try{ localStorage.setItem('void-reset', String(rs)); }catch(e){}
+  if(!TEAM) return;
+  TEAM = 0; try{ localStorage.removeItem('void-team'); localStorage.removeItem('dorogram-team'); }catch(e){}
+  const sel = $('teamSel'); if(sel) sel.value = '';
+  if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
+  toast('운영자가 초기화했습니다. 조를 다시 골라 주세요');
+}
 function applyState(st){
+  checkReset(st);
   if(st.version === STATE_VER) return; STATE_VER = st.version;
   SUBS = st.subs || [];
   AUTO = st.auto !== false;
@@ -1405,13 +1417,15 @@ if(flowHour < 6 || flowHour > 21) flowHour = 6;
 $('hr').step = 'any'; $('hr').value = flowHour;
 $('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); });
 setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2; if(flowHour > 21) flowHour = 6; $('hr').value = flowHour; updateSun(); }, 2000);
-function setMode(m){ mode=m; $('mCat').setAttribute('aria-pressed', m==='cat'); $('mLv').setAttribute('aria-pressed', m==='lv'); paint(); }
-$('mCat').onclick=()=>setMode('cat'); $('mLv').onclick=()=>setMode('lv');
 function tgl(id, fn){ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; }
 let showLabels = false;
 tgl('lLbl', v=>{ showLabels=v; });
 tgl('lCtx', v=>{ ctxMesh.visible=v; });
-$('lHome').onclick = ()=>{ select(-1); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1100); };
+// light / dark switch (campus): remembered on this device; with nothing saved the page follows the system setting
+function setTheme(t, save=true){ if(t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; if(save){ try{ t ? localStorage.setItem('void-theme', t) : localStorage.removeItem('void-theme'); }catch(e){} } syncThemeBtns(); }
+function syncThemeBtns(){ const dark = getComputedStyle(document.documentElement).colorScheme === 'dark'; $('tLight').setAttribute('aria-pressed', !dark); $('tDark').setAttribute('aria-pressed', dark); }
+$('tLight').onclick = ()=> setTheme('light'); $('tDark').onclick = ()=> setTheme('dark');
+try{ const t = localStorage.getItem('void-theme'); if(t === 'light' || t === 'dark') setTheme(t, false); }catch(e){} syncThemeBtns();
 function closePanel(){ $('panel').classList.add('closed'); $('toggle').setAttribute('aria-expanded','false'); $('toggle').textContent='구역 목록'; }
 $('toggle').onclick = ()=>{
   const open = $('panel').classList.toggle('closed')===false;
@@ -1439,16 +1453,23 @@ SCANS.filter(s=>!s.mission && s.x!=null).forEach(s=>{
 const KX = Math.cos(DATA.origin[0]*Math.PI/180)*111320, KZ = 110540;
 const toLocal = (lat, lng) => [(lng - DATA.origin[1])*KX, -(lat - DATA.origin[0])*KZ];
 const teamMk = {};
-var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', meFly = false;
+var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', follow = false, navDir = {x:0, z:-1}, prevPos = null, followFirst = false, geoErrAt = 0;
 // accuracy circle under my own dot (campus scene only)
 const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.55, depthWrite:false, side:THREE.DoubleSide}));
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
-function goToMe(){
-  if(!myPos) return; meFly = false;
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); prevPos = null; followFirst = on; }
+// navigation view: the camera sits behind my position, looking the way I am walking, and moves with every fix
+function followMe(){
+  if(!myPos || !follow) return;
   const [x, z] = toLocal(myPos.lat, myPos.lng), far = Math.hypot(x, z);
-  if(far > 2500){ toast(`캠퍼스에서 약 ${(far/1000).toFixed(1)}km 떨어져 있습니다 (오차 ±${Math.round(myPos.acc || 0)}m)`); return; }
+  if(far > 2500){ toast(`캠퍼스에서 약 ${(far/1000).toFixed(1)}km 떨어져 있어 내 시점을 쓸 수 없습니다`); setFollow(false); return; }
   if(W.id !== 'erica') setWorld('erica', true);
-  select(-1); flyTo(new THREE.Vector3(x + 80, 110, z + 120), new THREE.Vector3(x, 0, z), 1000); toast(`내 위치 · 오차 ±${Math.round(myPos.acc || 0)}m`);
+  if(prevPos){ const dx = x - prevPos[0], dz = z - prevPos[1], L = Math.hypot(dx, dz); if(L > 4) navDir = {x:dx/L, z:dz/L}; }
+  else if(Number.isFinite(myPos.heading)){ const th = myPos.heading*Math.PI/180; navDir = {x:Math.sin(th), z:-Math.cos(th)}; }   // compass heading → local (x east, z south)
+  prevPos = [x, z];
+  const d = followFirst ? 150 : Math.max(60, Math.min(420, camera.position.distanceTo(controls.target)));   // keep the zoom the viewer chose
+  followFirst = false; select(-1);
+  flyTo(new THREE.Vector3(x - navDir.x*d*0.74, d*0.6, z - navDir.z*d*0.74), new THREE.Vector3(x, 0, z), 900);
 }
 function updateTeamDots(pos, now){
   const list = Object.assign({}, pos || {}); if(myPos) list[TEAM || 'me'] = Object.assign({}, myPos, {mine:true});
@@ -1464,9 +1485,9 @@ function updateTeamDots(pos, now){
   refreshZones();
 }
 function onGeo(p){
-  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, t:Date.now()};
+  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, t:Date.now()};
   updateTeamDots(LAST_POS, Date.now());
-  if(meFly) goToMe();
+  if(follow) followMe();
   // close to an empty record's coordinates? say so once per zone
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   const near = MISSION_E.find(m=> m.lat != null && !m.scans.length && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
@@ -1475,14 +1496,19 @@ function onGeo(p){
 }
 function startGeo(){
   if(!navigator.geolocation || geoWatch != null) return;
-  geoWatch = navigator.geolocation.watchPosition(onGeo, err=>{ geoWatch = null; meFly = false; toast(err.code === 1 ? '위치 사용을 허용하지 않아 내 위치는 표시되지 않습니다' : err.code === 3 ? '위치를 찾지 못했습니다 (시간 초과). 야외에서 다시 눌러 주세요' : '지금은 위치를 알 수 없습니다'); }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
+  geoWatch = navigator.geolocation.watchPosition(onGeo, err=>{
+    // a timeout (code 3) just means no new fix for a while (indoors, tunnel): keep watching and keep following; only a refusal ends it
+    if(err.code === 1){ geoWatch = null; if(follow) setFollow(false); toast('위치 사용을 허용하지 않아 내 위치는 표시되지 않습니다'); return; }
+    if(Date.now() - geoErrAt > 60000){ geoErrAt = Date.now(); toast(err.code === 3 ? (myPos ? '위치 신호가 약합니다. 건물 밖으로 나가면 다시 잡힙니다' : '위치를 찾는 중입니다. 야외에서 더 잘 잡힙니다') : '지금은 위치를 알 수 없습니다'); }
+  }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
 }
-// "내 위치" button: ask for the position (if not already watching) and fly the campus camera to it
+// "내 시점" button (campus): toggle the navigation view
 $('lMe').onclick = ()=>{
+  if(follow){ setFollow(false); toast('내 시점을 껐습니다'); return; }
   if(!navigator.geolocation){ toast('이 브라우저는 위치를 지원하지 않습니다'); return; }
   if(!window.isSecureContext){ toast('https 주소로 열어야 위치를 쓸 수 있습니다'); return; }
-  if(myPos && Date.now() - myPos.t < 15000){ goToMe(); return; }
-  meFly = true; toast('위치를 찾는 중입니다'); startGeo();
+  setFollow(true); startGeo();
+  if(myPos && Date.now() - myPos.t < 15000) followMe(); else toast('위치를 찾는 중입니다. 잡히면 화면이 내 위치를 따라갑니다');
 };
 var LAST_POS = {};
 // zone markers, beacons and rings follow the zone state and the open tab
@@ -5005,7 +5031,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5703,6 +5729,7 @@ function setWorld(id, instant){
   scene = w.scene; scene.add(sun, sun.target, hemi);
   document.querySelectorAll('#worlds button').forEach(b=> b.setAttribute('aria-pressed', b.dataset.w===id));
   document.body.classList.toggle('island', id==='island'); if(id!=='island' && typeof simOn !== 'undefined' && simOn) setSim(false);
+  if(id!=='erica' && follow) setFollow(false);
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
@@ -5767,7 +5794,7 @@ function tick(now){
 }
 
 const mq = matchMedia('(prefers-color-scheme: dark)');
-mq.addEventListener('change', applyTheme);
+mq.addEventListener('change', ()=>{ applyTheme(); syncThemeBtns(); });
 new MutationObserver(applyTheme).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
 
 const h0 = today.getHours()+today.getMinutes()/60;
