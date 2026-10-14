@@ -2258,7 +2258,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-40,-500,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,16],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],[Math.cos(-0.05)*(islR(-0.05)+12),Math.sin(-0.05)*(islR(-0.05)+12),18],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[358,173,30],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [165,420,40],[-150,412,24],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-330,400,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [165,420,40],[-150,412,24],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-330,400,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-108,176,18],[300,-115,16],[-215,-225,46],[258,392,16],[-142,-84,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -4116,6 +4116,72 @@ function at(x, z, rot=0){ const g = new THREE.Group(); g.position.set(x, G, z); 
   add(disc, CYL(7, 7, 1, 24), mat(0xb07ad8)); for(let i=0;i<12;i++){ const a = i/12*Math.PI*2; add(disc, BOX(1.4, 1.6, 1.4), mat(i%2 ? 0xffd400 : 0xff9fcf), Math.cos(a)*6, 1, Math.sin(a)*6); if(i%4) rider(disc, Math.cos(a)*6, 2.6, Math.sin(a)*6, i, 0.8, -a - Math.PI/2); }
   islAnim.push(t=>{ arm.rotation.z = Math.sin(t*0.7)*1.1; disc.rotation.y = t*1.2; });
   pickable(g, {abs:true, n:'갤럭시 스윙', c:'ride', sub:'디스코 스윙', cx:300, cz:-115, h:34, r:30, keepSize:true, desc:'거대한 추처럼 흔들리며 원판이 빙글빙글 도는 스릴 놀이기구.', facts:[['위치','관람차 언덕 동쪽']]});
+}
+// canopy rope course between the safari and the haunted house: seven tree towers joined by sagging rope bridges, a cargo net, a zip line down to a landing deck
+{
+  const g = at(-215, -225, 0.3);
+  const WOOD = mat(0x8a5a36), PLANK = mat(0xb08a5a), ROPE = mat(0xd9c7a3), LEAF = [flat(0x4f8a3c), flat(0x5d9e48), flat(0x6aa452)];
+  add(g, new THREE.CircleGeometry(36, 36).rotateX(-Math.PI/2), new THREE.MeshLambertMaterial({color:0x9a7a55, polygonOffset:true, polygonOffsetFactor:-6, polygonOffsetUnits:-6}), 0, 0.12, 0, false).receiveShadow = true;   // bark-chip ground (above the ride-lot pad that is laid later)
+  for(let i=0;i<40;i++){ const a = i/40*Math.PI*2; add(g, ICO(0.7 + (i%3)*0.2, 0), flat(0x7a5a3a), Math.cos(a)*35.2, 0.2, Math.sin(a)*35.2, false); }
+  // towers: [x, z, platform height]
+  const T = [[0,-26,15],[22,-13,13],[22,13,17],[0,26,12],[-22,13,14],[-22,-13,16],[0,0,11]];
+  const top = i => new THREE.Vector3(T[i][0], T[i][2] + 0.5, T[i][1]);
+  const up = new THREE.Vector3(0, 1, 0);
+  const strut = (P, Q, r, m)=>{ const d = Q.clone().sub(P), L = d.length(); const c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, L, 4), m); c.position.copy(P).lerp(Q, 0.5); c.quaternion.setFromUnitVectors(up, d.normalize()); c.castShadow = true; g.add(c); return c; };
+  T.forEach(([x, z, h], i)=>{
+    add(g, CYL(1.3, 1.9, h, 9), WOOD, x, 0, z);
+    add(g, BOX(6.4, 0.5, 6.4), PLANK, x, h, z);
+    [[-2.9,-2.9],[2.9,-2.9],[-2.9,2.9],[2.9,2.9]].forEach(([ox,oz])=> add(g, CYL(0.12, 0.14, 1.3, 5), WOOD, x + ox, h + 0.5, z + oz));
+    [[0,-2.9,5.8,0],[0,2.9,5.8,0],[-2.9,0,0,5.8],[2.9,0,0,5.8]].forEach(([ox,oz,w,d])=> add(g, BOX(w || 0.1, 0.1, d || 0.1), ROPE, x + ox, h + 1.6, z + oz));
+    add(g, CYL(0.9, 1.2, 6, 7), WOOD, x, h, z);   // the trunk carries on above the platform into the crown
+    add(g, ICO(5.6, 1), LEAF[i%3], x, h + 9.2, z); add(g, ICO(3.6, 1), LEAF[(i+1)%3], x + 2.6, h + 12.2, z - 1.6); add(g, ICO(2.8, 1), LEAF[(i+2)%3], x - 2.8, h + 11.6, z + 2.2);
+    // two guy ropes to the ground
+    for(let k=0;k<2;k++){ const a = Math.atan2(z, x) + (k ? 0.7 : -0.7), gx = x + Math.cos(a)*7, gz = z + Math.sin(a)*7; add(g, CYL(0.25, 0.35, 0.8, 6), mat(0x5a5a5a), gx, 0, gz); strut(new THREE.Vector3(x, h, z), new THREE.Vector3(gx, 0.6, gz), 0.05, ROPE); }
+  });
+  // start tower: a wooden stair with hand rails, a harness/briefing shelter beside it
+  { const x = T[0][0], z = T[0][1], h = T[0][2], n = 11; for(let i=0;i<n;i++){ add(g, BOX(2.2, 0.25, 1.1), PLANK, x + 3.6 + i*0.9 - 4.5, (i + 1)/n*h - 0.3, z - 3.9).rotation.y = 0; } [-1, 1].forEach(k=> strut(new THREE.Vector3(x - 1, 0.9, z - 3.9 + k*1.1), new THREE.Vector3(x + 8.1, h + 0.9, z - 3.9 + k*1.1), 0.06, ROPE)); for(let i=0;i<4;i++) add(g, CYL(0.1, 0.12, 1.1, 5), WOOD, x - 1 + i*3, (i*3 + 0.5)/9.1*h, z - 5);
+    const sh = new THREE.Group(); sh.position.set(14, 0, -30); sh.rotation.y = -0.4; g.add(sh);
+    [[-3.5,-2.5],[3.5,-2.5],[-3.5,2.5],[3.5,2.5]].forEach(([ox,oz])=> add(sh, CYL(0.18, 0.2, 3.6, 6), WOOD, ox, 0, oz)); add(sh, BOX(8.4, 0.4, 6.4), new THREE.MeshLambertMaterial({map:stripeTexI('#58b368', '#ffffff', 8)}), 0, 3.6, 0);
+    add(sh, BOX(5, 1, 0.3), WOOD, 0, 1.2, -2.2); for(let i=0;i<6;i++) add(sh, SPH(0.42, 8, 6), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xf39a3b, 0xff9fcf, 0x58b368][i]), -2.1 + i*0.84, 2.3, -2.2);   // helmet rack
+    add(sh, new THREE.PlaneGeometry(5.6, 1.1), new THREE.MeshBasicMaterial({map:signTex('SAFETY CHECK', {bg:'#1d2f55', fg:'#ffd400', size:60, w:512, h:100}), side:THREE.DoubleSide}), 0, 4.1, 3.3, false);
+    rider(sh, -1.6, 0, 1, 2, 0.95, 0.4); rider(sh, 1.4, 0, 0.6, 5, 0.95, -0.5); rider(sh, 0, 0, -1.2, 7, 0.95, Math.PI); }
+  // bridges: plank bridges round the ring, a cargo net on the last span, spokes to the centre tower
+  const walkers = [];
+  const bridge = (i, j, kind)=>{
+    const A = top(i), B = top(j), mid = A.clone().lerp(B, 0.5); mid.y -= 1.6;
+    const c = new THREE.QuadraticBezierCurve3(A, mid, B), L = c.getLength(), d = B.clone().sub(A); d.y = 0; d.normalize(); const nx = -d.z, nz = d.x, yaw = Math.atan2(d.x, d.z);
+    [-0.7, 0.7].forEach(k=>{ const pts = c.getPoints(14).map(p=> new THREE.Vector3(p.x + nx*k, p.y + 1.1, p.z + nz*k)); add(g, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 14, 0.06, 4), ROPE, 0, 0, 0, false); });
+    if(kind === 'net'){
+      [-0.6, 0, 0.6].forEach(k=>{ const pts = c.getPoints(14).map(p=> new THREE.Vector3(p.x + nx*k, p.y, p.z + nz*k)); add(g, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 14, 0.05, 4), ROPE, 0, 0, 0, false); });
+      for(let u=0.08; u<0.97; u+=0.09){ const p = c.getPointAt(u); add(g, BOX(1.5, 0.08, 0.08), ROPE, p.x, p.y - 0.04, p.z, false).rotation.y = yaw; for(const k of [-0.7, 0.7]) strut(new THREE.Vector3(p.x + nx*k, p.y, p.z + nz*k), new THREE.Vector3(p.x + nx*k, p.y + 1.1, p.z + nz*k), 0.03, ROPE); }
+    } else {
+      const n = Math.max(6, Math.round(L/1.25));
+      for(let k=0;k<=n;k++){ const u = k/n, p = c.getPointAt(u), t = c.getTangentAt(u), pitch = -Math.atan2(t.y, Math.hypot(t.x, t.z)); const pl = add(g, new THREE.BoxGeometry(1.4, 0.14, 0.6), PLANK, p.x, p.y, p.z); pl.rotation.set(pitch, yaw, 0, 'YXZ'); if(k % 3 === 1) for(const s of [-0.7, 0.7]) strut(new THREE.Vector3(p.x + nx*s, p.y, p.z + nz*s), new THREE.Vector3(p.x + nx*s, p.y + 1.1, p.z + nz*s), 0.03, ROPE); }
+    }
+    walkers.push({c, yaw, off: walkers.length*0.23, speed: kind === 'net' ? 0.035 : 0.05});
+  };
+  bridge(0, 1); bridge(1, 2); bridge(2, 3); bridge(3, 4); bridge(4, 5); bridge(5, 0, 'net'); bridge(6, 1); bridge(6, 4);
+  // walkers with helmets on the bridges
+  const W = walkers.map((w, i)=>{ const r = rider(g, 0, 0, 0, i + 1, 0.95, 0); add(r, SPH(0.62, 8, 6), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xf39a3b][i%4]), 0, 2.45, 0); return r; });
+  // zip line from the tallest tower to a landing deck, with a rider sliding down and a brake spring at the end
+  const Z0 = top(2).clone().setY(T[2][2] + 1.4), Z1 = new THREE.Vector3(-28, 3.2, 28);
+  add(g, CYL(1.1, 1.4, 3, 8), WOOD, Z1.x, 0, Z1.z); add(g, BOX(7, 0.5, 5), PLANK, Z1.x, 2.4, Z1.z); add(g, BOX(1.2, 1.2, 4.2), mat(0xe2574c), Z1.x - 2.6, 2.9, Z1.z);   // landing deck + brake block
+  for(let i=0;i<4;i++) add(g, CYL(0.9, 0.9, 1.6, 8).rotateZ(Math.PI/2), mat(0xf2d27a), Z1.x + 4.2, 0, Z1.z - 2.2 + i*1.4);   // hay bales
+  strut(Z0, Z1.clone().add(new THREE.Vector3(0, 1.6, 0)), 0.06, mat(0x444a55));
+  const trolley = new THREE.Group(); g.add(trolley); add(trolley, BOX(0.9, 0.5, 0.4), mat(0x444a55), 0, -0.5, 0); add(trolley, CYL(0.03, 0.03, 1.4, 4), ROPE, 0, -1.9, 0); const zr = rider(trolley, 0, -4.3, 0, 3, 0.95, 0); add(zr, SPH(0.62, 8, 6), mat(0xffd400), 0, 2.45, 0); zr.children[2].rotation.x = -2.2; zr.children[3].rotation.x = -2.2;
+  const zd = Z1.clone().add(new THREE.Vector3(0, 1.6, 0)).sub(Z0);
+  trolley.rotation.y = Math.atan2(zd.x, zd.z);
+  // ground level: balance logs, tyre steps and a low kids' rope walk
+  [[-10,-6,0.4],[-4,-2,1.3],[3,-5,0.2]].forEach(([x,z,r])=> add(g, new THREE.CylinderGeometry(0.55, 0.55, 5, 8).rotateZ(Math.PI/2), WOOD, x, 0.55, z).rotation.y = r);
+  for(let i=0;i<5;i++) add(g, new THREE.TorusGeometry(0.9, 0.3, 6, 12).rotateX(Math.PI/2), mat(0x2b2b2b), 8 + i*2.1, 0.3, 4 + (i%2)*1.4);
+  { const P = [[-8,8],[-2,12],[4,10],[8,14]]; P.forEach(([x,z])=> add(g, CYL(0.16, 0.2, 2.2, 5), WOOD, x, 0, z)); for(let i=0;i<P.length-1;i++){ const [ax,az] = P[i], [bx,bz] = P[i+1]; strut(new THREE.Vector3(ax, 0.5, az), new THREE.Vector3(bx, 0.5, bz), 0.05, ROPE); strut(new THREE.Vector3(ax, 1.9, az), new THREE.Vector3(bx, 1.9, bz), 0.04, ROPE); } rider(g, -5, 0.55, 10, 6, 0.75, 1.2); }
+  rider(g, -6, 0, -14, 8, 0.95, 0.8); rider(g, 10, 0, 16, 4, 0.95, 2.6);
+  islAnim.push(t=>{
+    walkers.forEach((w, i)=>{ const u = (t*w.speed + w.off) % 1, p = w.c.getPointAt(u); W[i].position.set(p.x, p.y + 0.1 + Math.abs(Math.sin(t*6 + i))*0.08, p.z); W[i].rotation.y = w.yaw + Math.sin(t*2 + i)*0.1; });
+    const ph = (t*0.11) % 1, u = ph < 0.8 ? Math.pow(ph/0.8, 1.6) : 1; trolley.position.copy(Z0).lerp(Z1.clone().add(new THREE.Vector3(0, 1.6, 0)), u); trolley.rotation.z = Math.sin(t*3)*0.08*(u < 1 ? 1 : 0.3);
+  });
+  pickable(g, {abs:true, n:'캐노피 어드벤처', c:'ride', sub:'로프 코스', cx:-215, cz:-225, h:24, r:38, keepSize:true, desc:'나무 위 전망대 일곱 개를 출렁다리와 그물로 이어 건너는 공중 로프 코스. 마지막에는 짚라인을 타고 착지 데크까지 단숨에 내려옵니다. 안전모와 하네스를 착용해야 입장할 수 있습니다.',
+    facts:[['높이','최대 17m'],['코스','출렁다리 7 · 그물 다리 1 · 짚라인 1'],['위치','사파리 북동쪽 · 팬텀 하우스 서쪽']]});
 }
 // camping picnic ground in the south-east: A-frame tents, a campfire circle with log seats, picnic tables, lanterns, string lights and a hammock
 {
