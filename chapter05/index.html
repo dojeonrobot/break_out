@@ -2367,7 +2367,7 @@ for(let i=0;i<40;i++){
   const f = new THREE.InstancedMesh(ICO(0.9,0), new THREE.MeshLambertMaterial({color:0xffffff}), spots.length);
   const o = new THREE.Object3D(), FC = [0xffffff, 0xfff0a0, 0xffb7d0, 0xc7b8ff].map(c=>new THREE.Color(c));
   spots.forEach(([x,z,k],i)=>{ o.position.set(x, G+0.5, z); o.updateMatrix(); f.setMatrixAt(i, o.matrix); f.setColorAt(i, FC[(k+i)%4]); });
-  islRoot.add(f);
+  islRoot.add(f); islRoot.userData.flowerClusters = {mesh:f, spots};   // the spur paths are laid later and clear these too
 }
 
 // lamps and benches along paths (instanced)
@@ -3726,16 +3726,7 @@ const opA = u => OPEN[0] + u*(OPEN[1] - OPEN[0]);
     const ban = add(islRoot, new THREE.PlaneGeometry(4, 9), new THREE.MeshLambertMaterial({color:new THREE.Color(CH[i%6]).getHex(), side:THREE.DoubleSide}), x, G+14, z, false); ban.rotation.y = -a;
     islAnim.push(t=>{ ban.rotation.y = -a + Math.sin(t*1.8 + i)*0.12; });
   }
-  // performance stage with a lighting truss, speakers and bench rows
-  const stage = new THREE.Group(); stage.position.set(-82, G, 82); stage.rotation.y = Math.PI*0.62; islRoot.add(stage);
-  add(stage, BOX(30, 3, 16), mat(0x2b3a5a)); add(stage, BOX(30, 0.3, 16), mat(0x9a6b45), 0, 3, 0);
-  [[-15,-8],[15,-8],[-15,6],[15,6]].forEach(([x,z])=> add(stage, BOX(1, 18, 1), mat(0x555a66), x, 3, z));
-  add(stage, BOX(31, 1, 1), mat(0x555a66), 0, 21, -8); add(stage, BOX(31, 1, 1), mat(0x555a66), 0, 21, 6);
-  add(stage, BOX(30, 14, 0.4), new THREE.MeshLambertMaterial({map:stripeTexI('#5a55ad', '#7b6ad8', 10)}), 0, 3, -7.8);
-  const spots = []; for(let i=0;i<6;i++) spots.push(add(stage, CYL(0.8, 1.2, 2, 8).rotateX(Math.PI/2), glowMat([0xff9fcf, 0x7fd7ff, 0xffd400][i%3]), -12 + i*4.8, 20, 6.4, false));
-  [-17, 17].forEach(x=>{ add(stage, BOX(3.4, 7, 3), mat(0x1d1d22), x, 3, 4); add(stage, CYL(1, 1, 0.3, 12).rotateX(Math.PI/2), mat(0x555555), x, 7.6, 5.6, false); });
-  for(let r=0;r<3;r++) for(let c=0;c<4;c++) add(stage, BOX(7, 1, 1.6), mat(0x9a6b45), -12 + c*8, 1, 18 + r*5);
-  islAnim.push(t=> spots.forEach((s,i)=> s.rotation.y = Math.sin(t*0.8 + i)*0.4));
+  // (the small plaza stage that stood here was removed on 2026-10-14: it doubled the Grand Stage and sat on the safari path)
   // two small fountains flanking Harmonia
   [-64, 64].forEach(x=>{
     add(islRoot, CYL(7, 7.4, 1.6, 24), mat(C.stone), x, G, 44);
@@ -4333,7 +4324,9 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   const NO_SPUR = new Set(['관람차']);
   const nearest = (x, z)=>{ let best = null, bd = Infinity; pathSamples.forEach(([px,pz])=>{ const d = (px-x)*(px-x) + (pz-z)*(pz-z); if(d < bd){ bd = d; best = [px, pz]; } }); return [best, Math.sqrt(bd)]; };
   const zero = new THREE.Matrix4().makeScale(0, 0, 0);
+  const fc = islRoot.userData.flowerClusters; let fcDirty = false;
   const clearTrees = (x, z, r)=>{
+    if(fc) fc.spots.forEach(([fx,fz],i)=>{ if(Math.hypot(fx-x, fz-z) < r){ fc.mesh.setMatrixAt(i, zero); fcDirty = true; } });
     roundSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ roundTree.setMatrixAt(i, zero); trunkI.setMatrixAt(i, zero); } });
     pineSpots.forEach(([tx,tz],i)=>{ if(Math.hypot(tx-x, tz-z) < r){ pineTree.setMatrixAt(i*2, zero); pineTree.setMatrixAt(i*2+1, zero); trunkI.setMatrixAt(roundSpots.length + i, zero); } });
   };
@@ -4377,7 +4370,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
   // queues: four switchback lanes of rope and posts beside the entrance, filled with waiting visitors
   const people = [], postM = mat(0xc9ced6), ropeM = mat(0xd63a2f);
   entries.filter(e=> e.b.c==='ride').forEach((e, qi)=>{
-    const px = -e.dz, pz = e.dx, cx = e.x + e.dx*7.5 + px*6.5, cz = e.z + e.dz*7.5 + pz*6.5;
+    const px = -e.dz, pz = e.dx, cx = e.x + e.dx*7.5 + px*10.5, cz = e.z + e.dz*7.5 + pz*10.5;   // 10.5 aside: the 5.2-wide lanes clear the 6.5 half-width path
     const th = Math.atan2(e.dx, e.dz), g = new THREE.Group(); g.position.set(cx, G, cz); g.rotation.y = th; islRoot.add(g);
     const lanes = 4, W = 1.3, Lz = 8, X0 = -lanes*W/2;
     add(g, BOX(lanes*W + 0.8, 0.3, Lz + 0.8), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0, false).receiveShadow = true;
@@ -4402,7 +4395,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     }
     OCC.push([cx, cz, 7]); clearTrees(cx, cz, 7);
   });
-  roundTree.instanceMatrix.needsUpdate = pineTree.instanceMatrix.needsUpdate = trunkI.instanceMatrix.needsUpdate = true;
+  roundTree.instanceMatrix.needsUpdate = pineTree.instanceMatrix.needsUpdate = trunkI.instanceMatrix.needsUpdate = true; if(fcDirty) fc.mesh.instanceMatrix.needsUpdate = true;
   const body = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.85, 1.8, 3, 8).translate(0, 1.75, 0), new THREE.MeshLambertMaterial({color:0xffffff}), people.length);
   const head = new THREE.InstancedMesh(SPH(0.75, 8, 6).translate(0, 4.05, 0), mat(0xf8d5bd), people.length);
   const PC = [0xe2574c, 0x5aa0e6, 0xffd400, 0x58b368, 0xb07ad8, 0xff9fcf, 0xf39a3b, 0xffffff, 0x1d2f55].map(c=>new THREE.Color(c)), o = new THREE.Object3D();
@@ -4463,6 +4456,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
         [-1, 1].forEach(sd=>{
           const bx = p.x - t.z*sd*17, bz = p.z + t.x*sd*17;
           if(occupied(bx, bz, 7) || Math.hypot(bx, bz) > edgeR(bx, bz) - 30 || Math.abs(Math.hypot(bx,bz) - trackR(Math.atan2(bz,bx))) < 12) return;
+          if([[-4.4,-11.4],[4.4,-11.4],[-4.4,11.4],[4.4,11.4],[0,0]].some(([ox,oz])=> nearPath(bx + Math.cos(th)*ox + Math.sin(th)*oz, bz - Math.sin(th)*ox + Math.cos(th)*oz, 9))) return;   // never on a crossing path or a spur
           const g = new THREE.Group(); g.position.set(bx, G, bz); g.rotation.y = th; islRoot.add(g);
           add(g, BOX(8, 0.7, 22), mat(0x8a6a4a)); add(g, BOX(8.8, 0.9, 22.8), mat(0x4f8a3c), 0, 0.7, 0);        // soil + hedge rim
           add(g, BOX(7.2, 0.3, 21.2), mat(0x6a4a2a), 0, 1.6, 0);
@@ -4543,7 +4537,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
 
   // ----- 2. rolling ground: low grassy mounds wherever nothing stands, a few taller wooded hills at the forest edges -----
   const mounds = [];
-  const freeSpot = (x, z, r)=> Math.hypot(x,z) < edgeR(x,z) - r - 34 && !occupied(x, z, r + 4) && !nearPath(x, z, r + 9)
+  const freeSpot = (x, z, r)=> Math.hypot(x,z) < edgeR(x,z) - r - 34 && !occupied(x, z, r + 4) && !nearPath(x, z, r*1.45 + 7)   // the hill mesh spreads to ~1.44r (depth scale up to 1.2 × noise 1.2)
     && Math.abs(Math.hypot(x,z) - trackR(Math.atan2(z,x))) > r + 8 && !mounds.some(m=> Math.hypot(m[0]-x, m[1]-z) < m[2] + r + 6);
   for(let i=0;i<9000 && mounds.length<34;i++){
     const x = (-420 + rr()*840)*K, z = (-420 + rr()*840)*K;
@@ -4843,7 +4837,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
 
   // ----- 2. lamps along every path, lit at night: a warm pool on the ground and a glow on the bulb that fade in as the sun goes down -----
   const lampPost = (x, z, h=7)=>{
-    if(occupied(x, z, 0) || Math.hypot(x, z) > edgeR(x, z) - 12) return;
+    if(occupied(x, z, 0) || Math.hypot(x, z) > edgeR(x, z) - 12 || nearPath(x, z, 8)) return;   // its own path is 10.8 away; anything closer is another path or a junction
     const g = new THREE.Group(); g.position.set(x, G, z); islRoot.add(g);
     add(g, CYL(0.22, 0.3, h, 8), mat(0x2f3540)); add(g, BOX(1.6, 0.25, 0.25), mat(0x2f3540), 0.6, h, 0);
     add(g, SPH(0.55, 10, 8), glowMat(0xfff0b8), 1.3, h - 0.3, 0, false);
@@ -4863,8 +4857,9 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
       const c = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z))), L = c.getLength();
       for(let d=34; d<L-10; d+=58){ const u = d/L, p = c.getPointAt(u), t = c.getTangentAt(u), s = (Math.floor(d/22) + pi) % 2 ? -1 : 1;   // lamps alternate with d/22, so this is the other side
         if(Math.hypot(p.x, p.z-67) < 62 || (Math.abs(p.x) < 40 && p.z > 170 && p.z < 520)) continue;
-        const n = 2 + (bi++ % 3), x = p.x - t.z*s*9.6, z = p.z + t.x*s*9.6;
+        const n = 2 + (bi++ % 3), x = p.x - t.z*s*9.6, z = p.z + t.x*s*9.6, hl = n*1.65 + 0.8;
         if(occupied(x, z, 2) || Math.hypot(x, z) > edgeR(x, z) - 14) continue;
+        if([-hl, 0, hl].some(k=> nearPath(x + t.x*k, z + t.z*k, 8))) continue;   // the row's ends must not reach into a crossing path (own path is 9.6 away)
         const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = Math.atan2(t.x, t.z) + (s > 0 ? Math.PI/2 : -Math.PI/2); islRoot.add(g);
         for(let k=0;k<n;k++) seat(g, (k - (n-1)/2)*3.3);
         add(g, BOX(n*3.3 + 1.6, 0.3, 2.6), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0.2, false).receiveShadow = true;
@@ -4879,6 +4874,7 @@ pickable(course, {n:'도로 운전면허 시험장', c:'ride', sub:'챕터 1', c
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K};   // for the overlap audit script
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5645,7 +5641,7 @@ new MutationObserver(applyTheme).observe(document.documentElement, {attributes:t
 
 const h0 = today.getHours()+today.getMinutes()/60;
 if(h0>=7 && h0<=18) $('hr').value = Math.round(h0*4)/4;
-batchIsland();
+if(!/[?&]nobatch/.test(location.search)) batchIsland();   // ?nobatch=1 keeps every mesh separate (overlap audit)
 let startWorld = 'erica'; try{ if(localStorage.getItem('void-world')==='island') startWorld = 'island'; }catch(e){}
 if(startWorld==='island') setWorld('island', true);
 renderList(); applyTheme();
