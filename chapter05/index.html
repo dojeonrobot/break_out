@@ -342,8 +342,17 @@ body.sim #simHud{display:flex}
 .ilua .ih2{display:flex;justify-content:space-between;align-items:baseline}
 .ilua .ih2 b{font-family:var(--mono);font-size:18px;font-weight:500}
 .ilua .ih2 span{color:var(--muted);font-size:12px}
+.glyphwrap{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.glyphwrap .frags{display:grid;gap:4px;min-width:0}
+.glyphwrap .frag{padding:4px 7px;font-size:11.5px;line-height:1.35}
+svg.glyph{display:block;border-radius:12px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:6px;box-sizing:border-box}
+svg.glyph path{fill:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+svg.glyph path.off{stroke:color-mix(in srgb,var(--void-edge) 28%,transparent)}
+svg.glyph path.on{stroke:#9ff6ff;filter:drop-shadow(0 0 4px #9ff6ff)}
+svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9ff6ff 45%,transparent)}
 .ilua .frag{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--void-edge) 10%,transparent);line-height:1.45}
 .ilua .frag i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--void-edge);box-shadow:0 0 10px var(--void-edge);margin-top:1px}
+.ilua .frag b{font:600 12.5px var(--sans);color:var(--fg)}
 .ilua .frag.off{opacity:.35}
 .ilua .frag.off i{background:var(--line);box-shadow:none}
 .ilua .done{padding:8px 10px;border-radius:8px;background:color-mix(in srgb,var(--restored) 14%,transparent);font-weight:600;line-height:1.5}
@@ -540,7 +549,7 @@ body.sim #simHud{display:flex}
 </div></div>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터</button>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
-<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 일루아가 원천에서 옛 물길까지 다시 흐릅니다.<br>섬은 이제 스스로를 받칠 수 있습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
+<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문의 눈 문양과 같습니다. 문양은 처음부터 이 흐름을 본떠 만든 것이었습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
@@ -1010,21 +1019,33 @@ const hiddenZone = m => !!m && m.lat != null && !m.scans.length;
 const zoneName = m => hiddenZone(m) ? `미확인 구역 ${'ABCDEFGHIJ'[MISSION_E.indexOf(m)] || ''}` : m.name;
 const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾아가세요. 그곳의 사물이나 공간을 휴대폰 카메라로 스캔하면 기록이 되살아납니다.' : (m.brief || '');
 // Ilua: the energy that once flowed through the whole island. Each restored record gives back one fragment of its course.
-const ILUA = {
-  'dl-safari':   {n:1, clue:'일루아는 초원 아래 물웅덩이에서 솟아올랐다.'},
-  'dl-harmonia': {n:2, clue:'솟아오른 일루아가 하모니아의 톱니를 돌렸다.'},
-  'dl-carousel': {n:3, clue:'응축된 일루아는 파란 큐브에 담겨 회전목마 위에 떠 있었다.'},
-  'dl-ferris':   {n:4, clue:'언덕 꼭대기에서 흐름이 둘로 갈라졌다.'},
-  'dl-coaster':  {n:5, clue:'마지막 흐름은 롤러코스터 레일을 따라 옛 물길로 빠져나갔다.'}
-};
-const iluaId = m => m ? (ILUA[m.id] ? m.id : (m.twin && ILUA[m.twin] ? m.twin : null)) : null;
-const iluaHave = ()=> Object.keys(ILUA).filter(id=> (scansFor(id) || []).length);
-function iluaLine(m){ const id = iluaId(m); if(!id || !m.scans.length) return ''; return `<div class="ilua"><div class="frag"><i></i><div><b>일루아 조각 ${ILUA[id].n}</b> · ${esc(ILUA[id].clue)}</div></div></div>`; }
+// The Codex glyph, piece by piece. The Ilua flow under the island runs in this exact shape (see the simulator);
+// the five zones are the five gaps in it, and the glyph the family has worn for generations was copied from the flow.
+// World coordinates (island x, z): upper chevron source → safari / source → ferris → carousel, the eye round the plaza, lower chevron harbour → coaster / harbour → old waterway.
+const GLYPH_SEGS = [
+  {id:'dl-safari',   n:1, part:'윗선 서쪽',  clue:'원천에서 초원으로 내려오는 흐름',       pts:[[-42,-528],[-170,-300],[-277,-54]], spike:[[-178,-315],[-236,-395]]},
+  {id:'dl-ferris',   n:2, part:'윗선 동쪽',  clue:'원천에서 관람차 언덕으로 오르는 흐름',   pts:[[-42,-528],[88,-392],[216,-243]],   spike:[[96,-398],[150,-480]]},
+  {id:'dl-carousel', n:3, part:'동쪽 끝',    clue:'언덕을 넘어 회전목마까지 이어지는 흐름', pts:[[216,-243],[292,-112],[338,27]]},
+  {id:'dl-harmonia', n:4, part:'가운데 눈',  clue:'광장을 한 바퀴 도는 흐름, 눈동자는 메인 스트리트', pts:[[-140,67],[-104,-2],[0,-36],[104,-2],[140,67],[0,182],[-140,67]], bar:[[0,-36],[0,182]]},
+  {id:'dl-coaster',  n:5, part:'아랫선 서쪽', clue:'롤러코스터에서 항구로 내려가는 흐름',    pts:[[-270,257],[-150,352],[0,450]],     spike:[[-150,352],[-190,432]]},
+  {id:null, final:true, part:'아랫선 동쪽', clue:'항구에서 옛 물길로 — 다섯 흐름이 모두 돌아오면 이어진다', pts:[[0,450],[152,358],[290,277]], spike:[[152,358],[194,438]]}
+];
+const glyphId = m => m ? (GLYPH_SEGS.some(s=> s.id === m.id) ? m.id : (m.twin && GLYPH_SEGS.some(s=> s.id === m.twin) ? m.twin : null)) : null;
+const glyphHave = ()=> GLYPH_SEGS.filter(s=> s.id && (scansFor(s.id) || []).length).map(s=> s.id);
+// the glyph as an inline SVG, pieces coloured as their zones come back (world x -400..400 → 0..200, z -560..480 → 0..200)
+function glyphSVG(have, size=150){
+  const X = x => (x + 400)/800*200, Z = z => (z + 560)/1040*200, P = pts => pts.map(([x,z], i)=> `${i ? 'L' : 'M'}${X(x).toFixed(1)} ${Z(z).toFixed(1)}`).join(' ');
+  const all = have.length === 5;
+  const seg = s => { const on = s.final ? all : have.includes(s.id), cls = on ? 'on' : 'off';
+    return `<path class="${cls}" d="${P(s.pts)}"/>${s.spike ? `<path class="${cls}" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="${cls}" d="${P(s.bar)}"/>` : ''}`; };
+  return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="코덱스 문양 ${have.length}/5">${GLYPH_SEGS.map(seg).join('')}</svg>`;
+}
+function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_SEGS.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>문양 조각 ${s.n} · ${esc(s.part)}</b> · ${esc(s.clue)}</div></div></div>`; }
 function iluaHTML(){
-  const have = iluaHave(), n = have.length, all = Object.keys(ILUA);
-  return `<div class="ilua"><div class="ih2"><span>일루아 조각</span><b>${n} / ${all.length}</b></div>
-    ${all.map(id=>{ const on = have.includes(id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>조각 ${ILUA[id].n}</b> · ${esc(ILUA[id].clue)}` : `조각 ${ILUA[id].n} · 아직 돌아오지 않은 흐름`}</div></div>`; }).join('')}
-    ${n===all.length ? `<div class="done">다섯 조각이 모였습니다. 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.</div>` : ''}</div>`;
+  const have = glyphHave(), n = have.length;
+  return `<div class="ilua"><div class="ih2"><span>코덱스 문양</span><b>${n} / 5</b></div>
+    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_SEGS.filter(s=> s.id).map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>${esc(s.part)}</b> · ${esc(s.clue)}` : `${esc(s.part)} · 아직 비어 있는 흐름`}</div></div>`; }).join('')}</div></div>
+    ${n===5 ? `<div class="done">다섯 흐름이 모두 돌아왔습니다. 섬 아래 일루아의 흐름은 코덱스 가문의 눈 문양과 같은 모양입니다. 문양은 이 흐름을 본떠 만든 것이었습니다.</div>` : ''}</div>`;
 }
 function updateProgress(){
   const isl = W && W.id==='island';
@@ -5138,7 +5159,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5261,39 +5282,47 @@ let SIM_LIT = 0;
     const R = (b.r || 20) + 14;
     monument(simRoot, b.cx + d.x*R, G, b.cz + d.y*R, m.scans[0], t ? `ERICA ${t.name}에서 돌아온 기록` : '돌아온 기록');
   });
-  // the Ilua flow: from the eye cave through the five chapter zones to the old waterway.
-  // The whole course shows as a faint phantom thread; a stretch lights up only when its zone's record is back.
-  const NODES = [[-42,-528], ['dl-safari'], ['dl-harmonia'], ['dl-carousel'], ['dl-ferris'], ['dl-coaster'], [290,277]];
+  // The Ilua flow under the island is drawn in the shape of the Codex family's eye glyph (chapter 3's pattern):
+  // an upper chevron from the source cave down to the safari and the carousel, the eye round the central plaza,
+  // and a lower chevron from the harbour up to the coaster and the old waterway. Five stretches belong to the five zones;
+  // each lights when its record is back, and the last stretch (harbour → old waterway) lights only when all five are lit.
   const FLOW_Y = G - 26;   // the vein runs through the crust under the island
-  const at = n => n.length===2 ? new THREE.Vector3(n[0], FLOW_Y, n[1]) : (()=>{ const m = MI.find(x=>x.id===n[0]); return new THREE.Vector3(m.b.cx, FLOW_Y, m.b.cz); })();
-  const pts = NODES.map(at), curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.4);
-  const nodeU = (()=>{ const N = 600, out = new Array(pts.length).fill(0), best = new Array(pts.length).fill(Infinity);
-    for(let i=0;i<=N;i++){ const u = i/N, q = curve.getPointAt(u); pts.forEach((p,k)=>{ const d = q.distanceToSquared(p); if(d < best[k]){ best[k] = d; out[k] = u; } }); } return out; })();
-  const ghostLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(400)), new THREE.LineDashedMaterial({color:0x9b7bff, dashSize:6, gapSize:5, transparent:true, opacity:0.5, depthTest:false})); ghostLine.renderOrder = 6;
-  ghostLine.computeLineDistances(); simRoot.add(ghostLine);
+  const SEGS = GLYPH_SEGS;
+  const V = (x, z, y=FLOW_Y)=> new THREE.Vector3(x, y, z);
+  const segCurve = s => new THREE.CatmullRomCurve3(s.pts.map(([x,z])=> V(x, z)), false, 'catmullrom', 0.35);
+  const ghostMat = new THREE.LineDashedMaterial({color:0x9b7bff, dashSize:6, gapSize:5, transparent:true, opacity:0.5, depthTest:false});
   const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(8, 1);
   const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
   const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.renderOrder = order; return o; };
-  NODES.forEach((n,k)=>{
-    if(n.length!==1) return; const m = MI.find(x=>x.id===n[0]);
-    // every node gets a marker ring; restored ones glow, the rest stay as faint phantom rings
-    const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(m.scans.length ? 0x9ff6ff : 0x9b7bff, m.scans.length ? 0.9 : 0.3, true), pts[k].x, pts[k].y, pts[k].z, false));
-    // a shaft of light from the vein up to the zone on the surface
-    xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(m.scans.length ? 0x9ff6ff : 0x9b7bff, m.scans.length ? 0.35 : 0.12, true), pts[k].x, FLOW_Y, pts[k].z, false));
+  const ghost = pts3 => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts3), ghostMat); l.renderOrder = 6; l.computeLineDistances(); simRoot.add(l); return l; };
+  const lit = (curve, len)=>{
+    const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 3.2, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
+    const n = Math.max(8, Math.round(len/14)), spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(spark);
+    islAnim.push(t=>{ for(let i=0;i<n;i++){ const q = sub.getPointAt(((t*0.06) + i/n) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
+  };
+  const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
+  SEGS.forEach(s=>{
+    const on = s.final ? litIds.size === 5 : litIds.has(s.id);
+    const curve = segCurve(s), L = curve.getLength();
+    ghost(curve.getPoints(Math.max(24, Math.round(L/8))));
+    if(s.spike) ghost(s.spike.map(([x,z])=> V(x, z)));
+    if(on){ lit(curve, L); if(s.spike){ const sc = new THREE.CatmullRomCurve3(s.spike.map(([x,z])=> V(x, z))); lit(sc, sc.getLength()); } }
+  });
+  // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
+  MI.forEach((m, k)=>{
+    if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz;
+    const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.9 : 0.3, true), x, FLOW_Y, z, false));
+    xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.35 : 0.12, true), x, FLOW_Y, z, false));
     islAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
-    if(!m.scans.length) return;
-    SIM_LIT++;
-    const u0 = (nodeU[k-1] + nodeU[k])/2, u1 = (nodeU[k] + nodeU[k+1])/2;
-    const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(u0 + (u1-u0)*i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, 120, 3.2, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
-    const spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), 24), 7), o = new THREE.Object3D(); simRoot.add(spark);
-    islAnim.push(t=>{ for(let i=0;i<24;i++){ const q = sub.getPointAt(((t*0.08) + i/24) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
+    if(on) SIM_LIT++;
   });
   islAnim.push(t=>{ flowTex.offset.x = -t*0.5; });
   // source and mouth
-  xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -40, FLOW_Y, -500, false));
+  xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -42, FLOW_Y, -528, false));
   if(SIM_LIT === 5){ xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), 290, FLOW_Y, 277, false));
-    const full = new THREE.Mesh(new THREE.TubeGeometry(curve, 400, 4, 8, false), new THREE.MeshBasicMaterial({color:0x9ff6ff, transparent:true, opacity:0.2, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false})); full.renderOrder = 6; simRoot.add(full); }
+    // the whole glyph glows softly once every stretch is lit
+    SEGS.forEach(s=>{ const c = segCurve(s); const full = new THREE.Mesh(new THREE.TubeGeometry(c, 200, 4.2, 8, false), new THREE.MeshBasicMaterial({color:0x9ff6ff, transparent:true, opacity:0.18, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false})); full.renderOrder = 6; simRoot.add(full); }); }
 }
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
 let simOn = false;
