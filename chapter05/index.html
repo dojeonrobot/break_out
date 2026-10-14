@@ -352,9 +352,9 @@ body.sim #simHud{display:flex}
 .glyphwrap .frags{display:grid;gap:4px;min-width:0}
 .glyphwrap .frag{padding:4px 7px;font-size:11.5px;line-height:1.35}
 svg.glyph{display:block;border-radius:12px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:6px;box-sizing:border-box}
-svg.glyph path{fill:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
-svg.glyph path.off{stroke:color-mix(in srgb,var(--void-edge) 45%,transparent);stroke-dasharray:6 7}
-svg.glyph path.on{stroke:#9ff6ff;filter:drop-shadow(0 0 4px #9ff6ff)}
+svg.glyph polygon{stroke:none}
+svg.glyph polygon.off{fill:color-mix(in srgb,var(--void-edge) 55%,transparent)}
+svg.glyph polygon.on{fill:#9ff6ff;filter:drop-shadow(0 0 4px #9ff6ff)}
 svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9ff6ff 45%,transparent)}
 .ilua .frag{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--void-edge) 10%,transparent);line-height:1.45}
 .ilua .frag i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--void-edge);box-shadow:0 0 10px var(--void-edge);margin-top:1px}
@@ -1034,30 +1034,78 @@ const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾
 // The Codex glyph, piece by piece. The Ilua flow under the island runs in this exact shape (see the simulator);
 // the five zones are the five gaps in it, and the glyph the family has worn for generations was copied from the flow.
 // World coordinates (island x, z): upper chevron source → safari / source → ferris → carousel, the eye round the plaza, lower chevron harbour → coaster / harbour → old waterway.
-const GLYPH_SEGS = [
-  {id:'dl-safari',   n:1, part:'윗선 서쪽',  clue:'원천에서 초원으로 내려온다',       pts:[[-42,-528],[-170,-300],[-277,-54]], spike:[[-178,-315],[-236,-395]]},
-  {id:'dl-ferris',   n:2, part:'윗선 동쪽',  clue:'원천에서 관람차 언덕으로 오른다',   pts:[[-42,-528],[88,-392],[216,-243]],   spike:[[96,-398],[150,-480]]},
-  {id:'dl-carousel', n:3, part:'동쪽 끝',    clue:'언덕을 넘어 회전목마까지 이어진다', pts:[[216,-243],[292,-112],[338,27]]},
-  {id:'dl-harmonia', n:4, part:'가운데 눈',  clue:'광장을 한 바퀴 돌고 메인 스트리트를 가로지른다', pts:[[-140,67],[-104,-2],[0,-36],[104,-2],[140,67],[0,182],[-140,67]], bar:[[0,-36],[0,182]]},
-  {id:'dl-coaster',  n:5, part:'아랫선 서쪽', clue:'롤러코스터에서 항구로 내려간다',    pts:[[-270,257],[-150,352],[0,450]],     spike:[[-150,352],[-190,432]]},
-  {id:null, final:true, part:'아랫선 동쪽', clue:'항구에서 옛 물길로 이어진다 (다섯 흐름이 모두 돌아온 뒤)', pts:[[0,450],[152,358],[290,277]], spike:[[152,358],[194,438]]}
+// The Ilua flow under the island, built as thick bands in the exact shape of the Codex eye glyph (chapter 3's pattern):
+// an upper chevron with two thorns, the eye with its pupil, a lower chevron with two thorns. Island coordinates (x, z).
+// The five zones own five stretches of it; each is a gap until its record comes back. Shared by the 3D layer and the panel SVG.
+const GLYPH_ZONES = [
+  {id:'dl-safari',   n:1, clue:'원천에서 초원으로 내려온다'},
+  {id:'dl-ferris',   n:2, clue:'원천에서 관람차 언덕으로 오른다'},
+  {id:'dl-carousel', n:3, clue:'언덕을 넘어 회전목마까지 이어진다'},
+  {id:'dl-harmonia', n:4, clue:'광장을 한 바퀴 돌고 메인 스트리트를 가로지른다'},
+  {id:'dl-coaster',  n:5, clue:'롤러코스터에서 항구로 내려간다'}
 ];
-const glyphId = m => m ? (GLYPH_SEGS.some(s=> s.id === m.id) ? m.id : (m.twin && GLYPH_SEGS.some(s=> s.id === m.twin) ? m.twin : null)) : null;
-const glyphHave = ()=> GLYPH_SEGS.filter(s=> s.id && (scansFor(s.id) || []).length).map(s=> s.id);
-// the glyph as an inline SVG, pieces coloured as their zones come back (world x -400..400 → 0..200, z -560..480 → 0..200)
+const GLYPH = (()=>{
+  const A = [30,-470], TW = [-300,-30], TE = [360,-30], B = [30,440], BW = [-300,240], BE = [360,240], E = [10,78], W = 34;
+  const sub = (p,q)=>[p[0]-q[0],p[1]-q[1]], add = (p,q)=>[p[0]+q[0],p[1]+q[1]], mul = (p,k)=>[p[0]*k,p[1]*k], len = p=>Math.hypot(p[0],p[1]), nrm = p=>{ const l = len(p)||1; return [p[0]/l,p[1]/l]; }, perp = p=>[-p[1],p[0]];
+  // a band along a polyline: dense cross-sections {c, n, hw, u, s}; corners are mitred, ends can taper to a point
+  function band(poly, w, {taperStart=false, taperEnd=false, closed=false}={}){
+    const P = closed ? poly.concat([poly[0]]) : poly, segs = [];
+    for(let i=0;i<P.length-1;i++){ const d = sub(P[i+1],P[i]); segs.push({d:nrm(d), L:len(d)}); }
+    const total = segs.reduce((a,b)=>a+b.L,0), tl = Math.min(80, total*0.22), secs = [];
+    const width = s => { let hw = w/2; if(taperStart && s < tl) hw *= Math.max(0.02, s/tl); if(taperEnd && s > total-tl) hw *= Math.max(0.02, (total-s)/tl); return hw; };
+    let s = 0;
+    for(let i=0;i<P.length;i++){
+      const prev = segs[i-1] || (closed ? segs[segs.length-1] : null), next = segs[i] || (closed ? segs[0] : null);
+      let n, k = 1;
+      if(prev && next){ const n1 = perp(prev.d), n2 = perp(next.d), m = nrm(add(n1,n2)); k = Math.max(0.35, m[0]*n1[0]+m[1]*n1[1]); n = m; } else n = perp((next||prev).d);
+      secs.push({c:P[i], n, hw:width(s)/k, u:s/total, s});
+      if(next && i < P.length-1){ const m = Math.max(2, Math.ceil(next.L/8)); for(let j=1;j<m;j++){ const ss = s + next.L*j/m; secs.push({c:add(P[i], mul(next.d, next.L*j/m)), n:perp(next.d), hw:width(ss), u:ss/total, s:ss}); } s += next.L; }
+    }
+    return {secs, total};
+  }
+  const thorn = (apex, tip, frac)=>{ const d = nrm(sub(tip, apex)), L = len(sub(tip, apex)), C = add(apex, mul(d, L*frac)); let n = perp(d); if((n[0]*(C[0]-E[0]) + n[1]*(C[1]-E[1])) < 0) n = mul(n, -1);
+    return [add(add(C, mul(d, 16)), mul(n, W/2 - 3)), add(add(C, mul(d, -16)), mul(n, W/2 - 3)), add(add(C, mul(n, W/2 + 72)), mul(d, -48))]; };
+  const top = band([TW, A, TE], W, {taperStart:true, taperEnd:true}), bot = band([BW, B, BE], W, {taperStart:true, taperEnd:true});
+  const arc = []; for(let i=0;i<=24;i++){ const a = Math.PI - Math.PI*i/24; arc.push([E[0] + Math.cos(a)*150, E[1] - Math.sin(a)*96]); }
+  const eye = band(arc.concat([[E[0], E[1] + 112]]), 26, {closed:true});
+  const bar = band([[E[0], E[1] - 86], [E[0], E[1] + 94]], 20);
+  const uf = 0.5 + 0.5*(227/440);   // the ferris wheel sits this far along the upper band (z = -243 on the east arm)
+  // pieces: a band slice [u0,u1] of a band, or a triangle; each belongs to a zone (or 'final', lit only when all five are back)
+  return [
+    {zone:'dl-safari',   kind:'band', band:top, u0:0,   u1:0.5},  {zone:'dl-safari',   kind:'tri', tri:thorn(A, TW, 0.45)},
+    {zone:'dl-ferris',   kind:'band', band:top, u0:0.5, u1:uf},   {zone:'dl-ferris',   kind:'tri', tri:thorn(A, TE, 0.45)},
+    {zone:'dl-carousel', kind:'band', band:top, u0:uf,  u1:1},
+    {zone:'dl-harmonia', kind:'band', band:eye, u0:0,   u1:1},    {zone:'dl-harmonia', kind:'band', band:bar, u0:0, u1:1},
+    {zone:'dl-harmonia', kind:'tri', tri:[[E[0]-20, E[1]-48], [E[0]-20, E[1]+58], [E[0]-96, E[1]+6]]}, {zone:'dl-harmonia', kind:'tri', tri:[[E[0]+20, E[1]-48], [E[0]+20, E[1]+58], [E[0]+96, E[1]+6]]},
+    {zone:'dl-coaster',  kind:'band', band:bot, u0:0,   u1:0.5},  {zone:'dl-coaster',  kind:'tri', tri:thorn(B, BW, 0.45)},
+    {zone:'final',       kind:'band', band:bot, u0:0.5, u1:1},    {zone:'final',       kind:'tri', tri:thorn(B, BE, 0.45)}
+  ];
+})();
+// outline polygon (x,z list) of a band slice, for the SVG and for the 3D mesh
+function glyphSlice(piece, u0=piece.u0, u1=piece.u1){ const secs = piece.band.secs.filter(sc=> sc.u >= u0 - 1e-6 && sc.u <= u1 + 1e-6); return secs.length > 1 ? secs : piece.band.secs.filter(sc=> sc.u >= u0 - 0.02 && sc.u <= u1 + 0.02); }
+function glyphOutline(secs){ const L = secs.map(s=> [s.c[0] + s.n[0]*s.hw, s.c[1] + s.n[1]*s.hw]), R = secs.map(s=> [s.c[0] - s.n[0]*s.hw, s.c[1] - s.n[1]*s.hw]); return L.concat(R.reverse()); }
+// scattered bits of an empty stretch: a few short slices, so the shape stays unreadable until the record is back
+function glyphBits(piece, seed){ let sd = seed; const r = ()=> (sd = (sd*16807) % 2147483647) / 2147483647; const span = piece.u1 - piece.u0, n = span > 0.4 ? 5 : 3, out = [];
+  for(let i=0;i<n;i++){ const a = piece.u0 + span*((i + 0.15 + r()*0.7)/n), w = span*(0.05 + r()*0.04); out.push([a, Math.min(piece.u1, a + w)]); } return out; }
+const glyphId = m => m ? (GLYPH_ZONES.some(z=> z.id === m.id) ? m.id : (m.twin && GLYPH_ZONES.some(z=> z.id === m.twin) ? m.twin : null)) : null;
+const glyphHave = ()=> GLYPH_ZONES.filter(z=> (scansFor(z.id) || []).length).map(z=> z.id);
+// the glyph as an inline SVG: restored pieces filled, empty ones as scattered bits (world x -400..440 → 0..200, z -560..520 → 0..200 with the same scale)
 function glyphSVG(have, size=150){
-  const X = x => (x + 400)/800*200, Z = z => (z + 560)/1040*200, P = pts => pts.map(([x,z], i)=> `${i ? 'L' : 'M'}${X(x).toFixed(1)} ${Z(z).toFixed(1)}`).join(' ');
-  const all = have.length === 5;
-  // only the stretches that have come back are drawn: the shape must not give itself away before the fifth
-  const seg = s => { const on = s.final ? all : have.includes(s.id), cls = on ? 'on' : 'off';
-    return `<path class="${cls}" d="${P(s.pts)}"/>${s.spike ? `<path class="${cls}" d="${P(s.spike)}"/>` : ''}${s.bar ? `<path class="${cls}" d="${P(s.bar)}"/>` : ''}`; };
-  return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="일루아의 흐름 ${have.length}/5">${GLYPH_SEGS.map(seg).join('')}</svg>`;
+  const X = x => (x + 400)/1080*200 + 22, Z = z => (z + 560)/1080*200, pt = p=> `${X(p[0]).toFixed(1)},${Z(p[1]).toFixed(1)}`;
+  const all = have.length === 5, out = [];
+  GLYPH.forEach((pc, i)=>{
+    const on = pc.zone === 'final' ? all : have.includes(pc.zone);
+    if(pc.kind === 'tri'){ if(on) out.push(`<polygon class="on" points="${pc.tri.map(pt).join(' ')}"/>`); return; }
+    if(on) out.push(`<polygon class="on" points="${glyphOutline(glyphSlice(pc)).map(pt).join(' ')}"/>`);
+    else if(pc.zone !== 'final') glyphBits(pc, 7 + i*13).forEach(([a,b])=>{ const sc = glyphSlice(pc, a, b); if(sc.length > 1) out.push(`<polygon class="off" points="${glyphOutline(sc).map(pt).join(' ')}"/>`); });
+  });
+  return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="일루아의 흐름 ${have.length}/5">${out.join('')}</svg>`;
 }
-function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_SEGS.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>돌아온 흐름 ${s.n}</b> · ${esc(s.clue)}</div></div></div>`; }
+function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_ZONES.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>돌아온 흐름 ${s.n}</b> · ${esc(s.clue)}</div></div></div>`; }
 function iluaHTML(){
   const have = glyphHave(), n = have.length;
   return `<div class="ilua"><div class="ih2"><span>${n===5 ? '일루아의 흐름 · 코덱스 문양' : '일루아의 흐름'}</span><b>${n} / 5</b></div>
-    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_SEGS.filter(s=> s.id).map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>흐름 ${s.n}</b> · ${esc(s.clue)}` : `흐름 ${s.n} · 아직 비어 있음`}</div></div>`; }).join('')}</div></div>
+    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_ZONES.map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>흐름 ${s.n}</b> · ${esc(s.clue)}` : `흐름 ${s.n} · 아직 비어 있음`}</div></div>`; }).join('')}</div></div>
     ${n===5 ? `<div class="done">다섯 흐름이 모두 돌아왔습니다. 섬 아래 일루아의 흐름은 코덱스 가문이 대대로 써 온 눈 문양과 같은 모양입니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 그 사실은 몰랐습니다.</div>` : ''}</div>`;
 }
 function updateProgress(){
@@ -5178,7 +5226,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.55; glow.material.opacity = night*0.9; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5301,64 +5349,69 @@ let SIM_LIT = 0;
     const R = (b.r || 20) + 14;
     monument(simRoot, b.cx + d.x*R, G, b.cz + d.y*R, m.scans[0], t ? `ERICA ${t.name}에서 돌아온 기록` : '돌아온 기록');
   });
-  // The Ilua flow under the island is drawn in the shape of the Codex family's eye glyph (chapter 3's pattern):
-  // an upper chevron from the source cave down to the safari and the carousel, the eye round the central plaza,
-  // and a lower chevron from the harbour up to the coaster and the old waterway. Five stretches belong to the five zones;
-  // each lights when its record is back, and the last stretch (harbour → old waterway) lights only when all five are lit.
+  // The Ilua flow under the island: thick glowing bands in the shape of the Codex eye glyph (geometry in GLYPH, shared with the panel).
+  // A zone's stretch is a gap (only scattered bits of flow) until its record is back; then it sweeps in as one running band.
   const FLOW_Y = G - 26;   // the vein runs through the crust under the island
-  const SEGS = GLYPH_SEGS;
-  const V = (x, z, y=FLOW_Y)=> new THREE.Vector3(x, y, z);
-  const segCurve = s => new THREE.CatmullRomCurve3(s.pts.map(([x,z])=> V(x, z)), false, 'catmullrom', 0.35);
-  const ghostMat = new THREE.LineDashedMaterial({color:0x9b7bff, dashSize:6, gapSize:5, transparent:true, opacity:0.5, depthTest:false});
-  const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(8, 1);
-  const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
+  const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(1, 1);
+  const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.95, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
+  const baseMat = new THREE.MeshBasicMaterial({color:0x2a7fa8, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
   const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.renderOrder = order; return o; };
-  const ghostTubeMat = new THREE.MeshBasicMaterial({color:0x8a6cff, transparent:true, opacity:0.42, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
-  const ghost = pts3 => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts3), ghostMat); l.renderOrder = 6; l.computeLineDistances(); simRoot.add(l);
-    const c = new THREE.CatmullRomCurve3(pts3, false, 'catmullrom', 0.35), tube = new THREE.Mesh(new THREE.TubeGeometry(c, Math.max(12, pts3.length*4), 2.6, 6, false), ghostTubeMat); tube.renderOrder = 5; simRoot.add(tube); return l; };
-  const lit = (curve, len)=>{
-    const sub = new THREE.CatmullRomCurve3(Array.from({length:40}, (_,i)=> curve.getPointAt(i/39).add(new THREE.Vector3(0, Math.sin(i*0.7)*1.5, 0))));
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(sub, Math.max(40, Math.round(len/3)), 5.4, 8, false), flowMat); tube.renderOrder = 6; simRoot.add(tube);
-    const n = Math.max(8, Math.round(len/14)), spark = xray(new THREE.InstancedMesh(SPH(0.7, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(spark);
-    islAnim.push(t=>{ for(let i=0;i<n;i++){ const q = sub.getPointAt(((t*0.06) + i/n) % 1); o.position.copy(q).add(new THREE.Vector3(Math.sin(t*3+i)*2, Math.cos(t*2.3+i)*2, Math.cos(t*2.7+i)*2)); o.updateMatrix(); spark.setMatrixAt(i, o.matrix); } spark.instanceMatrix.needsUpdate = true; });
-  };
+  // flat band geometry from cross-sections: uv.u runs along the band (one stripe every 60 m), indices ordered along it so drawRange can sweep it in
+  const bandGeo = secs=>{ const pos = [], uv = [], idx = [];
+    secs.forEach((sc, i)=>{ pos.push(sc.c[0] + sc.n[0]*sc.hw, FLOW_Y, sc.c[1] + sc.n[1]*sc.hw, sc.c[0] - sc.n[0]*sc.hw, FLOW_Y, sc.c[1] - sc.n[1]*sc.hw); uv.push(sc.s/60, 0, sc.s/60, 1);
+      if(i){ const k = (i-1)*2; idx.push(k, k+2, k+1, k+1, k+2, k+3); } });
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); return g; };
+  const triGeo = tri=>{ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tri.flatMap(p=> [p[0], FLOW_Y, p[1]]), 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute([0,0, 0,1, 1,0.5], 2)); g.setIndex([0,1,2]); return g; };
+  const REVEALS = [];   // pieces still to sweep in; SIM_REVEAL_T is set the first time the simulator opens
+  const lit = (geo, len, reveal, delay)=>{
+    const under = new THREE.Mesh(geo, baseMat); under.renderOrder = 5; simRoot.add(under);
+    const over = new THREE.Mesh(geo.clone(), flowMat); over.renderOrder = 6; simRoot.add(over);
+    if(reveal){ geo.setDrawRange(0, 0); over.geometry.setDrawRange(0, 0); REVEALS.push({geos:[geo, over.geometry], total:geo.index.count, delay, len}); } };
+  const sparks = secs=>{ const n = Math.max(6, Math.round(secs[secs.length-1].s/16)), sp = xray(new THREE.InstancedMesh(SPH(1.1, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(sp);
+    islAnim.push(t=>{ for(let i=0;i<n;i++){ const u = ((t*0.05) + i/n) % 1, k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = (Math.sin(t*2.1 + i*2.3))*sc.hw*0.7;
+        o.position.set(sc.c[0] + sc.n[0]*w, FLOW_Y + 2 + Math.sin(t*3 + i)*2, sc.c[1] + sc.n[1]*w); o.updateMatrix(); sp.setMatrixAt(i, o.matrix); } sp.instanceMatrix.needsUpdate = true; }); };
   const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
-  // The whole flow is always there. A stretch whose record is still empty shows as a broken flow: many short flickering pieces
-  // with dark gaps between them. Restoring the record joins the pieces into one continuous running stretch.
-  const broken = (curve, L)=>{
-    const n = Math.max(6, Math.round(L/20)), pieces = [];
-    for(let i=0;i<n;i++){ const u0 = (i + 0.12)/n, u1 = (i + 0.62)/n, pts = Array.from({length:6}, (_,k)=> curve.getPointAt(u0 + (u1-u0)*k/5).add(new THREE.Vector3((Math.sin(i*7.3)+Math.cos(k*2.1))*1.2, Math.sin(i*3.1)*1.2, (Math.cos(i*5.7)+Math.sin(k*1.7))*1.2)));
-      const m = new THREE.MeshBasicMaterial({color:0xc4b4ff, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false});
-      const t = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 12, 4.2, 6, false), m); t.renderOrder = 6; simRoot.add(t); pieces.push({m, ph:i*1.9}); }
-    islAnim.push(t=> pieces.forEach(p=>{ p.m.opacity = 0.65 + 0.35*Math.max(0, Math.sin(t*2.6 + p.ph)) * (Math.sin(t*9 + p.ph*3) > -0.6 ? 1 : 0.3); }));
-  };
-  SEGS.forEach(s=>{
-    const on = s.final ? litIds.size === 5 : litIds.has(s.id);
-    const curve = segCurve(s), L = curve.getLength();
-    const extras = [s.spike, s.bar].filter(Boolean).map(e=> new THREE.CatmullRomCurve3(e.map(([x,z])=> V(x, z))));
-    if(on){ lit(curve, L); extras.forEach(c=> lit(c, c.getLength())); }
-    else { broken(curve, L); extras.forEach(c=> broken(c, c.getLength())); }
+  let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem('void-seen-lit') || '[]')); }catch(e){}
+  const newLit = [...litIds].filter(id=> !seenLit.has(id));            // stretches this device has not watched come back yet
+  try{ localStorage.setItem('void-seen-lit', JSON.stringify([...litIds])); }catch(e){}
+  window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem('void-seen-lit'));
+  // scattered bits of an empty stretch: dim, flickering, a little off the line
+  const bitPieces = [];
+  const bits = (pc, seed)=> glyphBits(pc, seed).forEach(([a,b], k)=>{ const secs = glyphSlice(pc, a, b); if(secs.length < 2) return;
+    const off = ((seed*7 + k*13) % 11 - 5)*1.6, sh = secs.map(sc=> ({...sc, c:[sc.c[0] + sc.n[0]*off, sc.c[1] + sc.n[1]*off], hw:sc.hw*0.85}));
+    const m = new THREE.MeshBasicMaterial({color:0x9fd8ff, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
+    const geo = bandGeo(sh), under = new THREE.Mesh(geo, baseMat); under.renderOrder = 5; simRoot.add(under);
+    const mesh = new THREE.Mesh(geo.clone(), m); mesh.renderOrder = 6; simRoot.add(mesh); bitPieces.push({m, ph:seed*0.7 + k*2.1}); });
+  islAnim.push(t=> bitPieces.forEach(p=>{ p.m.opacity = 0.7 + 0.3*Math.max(0, Math.sin(t*2.2 + p.ph)) * (Math.sin(t*8 + p.ph*3) > -0.6 ? 1 : 0.2); }));
+  GLYPH.forEach((pc, i)=>{
+    const on = pc.zone === 'final' ? litIds.size === 5 : litIds.has(pc.zone);
+    const rv = pc.zone === 'final' ? newLit.length > 0 : newLit.includes(pc.zone), delay = rv ? (pc.zone === 'final' ? 1.4 : 0.2 + newLit.indexOf(pc.zone)*0.9) : 0;
+    if(pc.kind === 'tri'){ if(on) lit(triGeo(pc.tri), 40, rv, delay + 0.9); return; }
+    const secs = glyphSlice(pc), len = secs[secs.length-1].s - secs[0].s;
+    if(on){ lit(bandGeo(secs), len, rv, delay); sparks(secs); }
+    else if(pc.zone !== 'final') bits(pc, 7 + i*13);
   });
+  islAnim.push(t=>{ flowTex.offset.x = -t*0.35;
+    if(SIM_REVEAL_T == null) return;
+    REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / Math.max(1.4, r.len/110))); const e = 1 - Math.pow(1 - k, 3); r.geos.forEach(g=> g.setDrawRange(0, Math.round(r.total*e/6)*6)); }); });
+  MI.forEach(m=>{ if(m.b && m.scans.length) SIM_LIT++; });
   // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
   MI.forEach((m, k)=>{
     if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz;
     const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.9 : 0.3, true), x, FLOW_Y, z, false));
     xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.35 : 0.12, true), x, FLOW_Y, z, false));
     islAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
-    if(on) SIM_LIT++;
   });
-  islAnim.push(t=>{ flowTex.offset.x = -t*0.5; });
   // source and mouth
   xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -42, FLOW_Y, -528, false));
-  if(SIM_LIT === 5){ xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), 290, FLOW_Y, 277, false));
-    // the whole glyph glows softly once every stretch is lit
-    SEGS.forEach(s=>{ const c = segCurve(s); const full = new THREE.Mesh(new THREE.TubeGeometry(c, 200, 4.2, 8, false), new THREE.MeshBasicMaterial({color:0x9ff6ff, transparent:true, opacity:0.18, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false})); full.renderOrder = 6; simRoot.add(full); }); }
+  if(SIM_LIT === 5) xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), 290, FLOW_Y, 277, false));
 }
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
-let simOn = false;
+let simOn = false, SIM_REVEAL_T = null;
 function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
   flowU.uDim.value = on ? 0.1 : 1; SIM_DIM.forEach(o=> o.visible = !on);
+  if(on && SIM_REVEAL_T == null) SIM_REVEAL_T = performance.now()/1000 + 0.6;   // new stretches sweep in the first time the simulator opens
   if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
     $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
     let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
