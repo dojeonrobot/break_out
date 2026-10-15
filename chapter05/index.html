@@ -39,7 +39,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px
 #stage{position:fixed;inset:0;touch-action:none}
 #stage canvas{display:block;outline:none}
 #labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-.lbl{position:absolute;left:0;top:0;font-size:12px;font-weight:500;white-space:nowrap;padding:2px 7px;border-radius:6px;background:var(--panel);color:var(--fg);border:1px solid var(--line);will-change:transform}
+.lbl{position:absolute;left:0;top:0;font-size:12.5px;font-weight:600;white-space:nowrap;padding:3px 9px;border-radius:999px;background:var(--panel);color:var(--fg);border:1px solid var(--line);box-shadow:0 2px 8px -4px rgba(15,25,40,.35);will-change:transform}
 .lbl.sel{background:var(--accent);color:var(--accent-fg);border-color:transparent;font-weight:600}
 .mk{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:7px;padding:4px 10px 4px 4px;border-radius:999px;font:600 12px var(--sans);white-space:nowrap;cursor:pointer;will-change:transform;border:1px solid transparent}
 .mk.void{background:var(--void);color:var(--void-fg);border-color:var(--void-edge);box-shadow:0 0 0 3px color-mix(in srgb,var(--void-edge) 25%,transparent);animation:voidPulse 2.2s ease-in-out infinite}
@@ -514,7 +514,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="tabs" role="tablist">
     <button role="tab" id="tV" aria-selected="true">복구 필요 <span class="cnt" id="cV">0</span></button>
     <button role="tab" id="tR" aria-selected="false">복구 완료 <span class="cnt" id="cR">0</span></button>
-    <button role="tab" id="tB" aria-selected="false">건물</button>
+    <button role="tab" id="tB" aria-selected="false" hidden>건물</button>
   </div>
   <div class="search" id="searchBox" hidden>
     <label for="q" id="qL">건물 찾기</label>
@@ -556,7 +556,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   </div>
   <span class="sep erica-only"></span>
   <div class="layers" role="group" aria-label="레이어">
-    <button id="lLbl" aria-pressed="false">건물 이름</button>
+    <button id="lLbl" aria-pressed="true">건물 이름</button>
     <button id="lMe" class="erica-only" type="button" aria-pressed="false">내 시점</button>
   </div>
   <div class="seg erica-only" id="navSeg" role="group" aria-label="시점 방식" hidden>
@@ -1615,7 +1615,7 @@ $('hr').step = 'any'; $('hr').value = flowHour;
 $('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); });
 setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2; if(flowHour > 21) flowHour = 6; $('hr').value = flowHour; updateSun(); }, 2000);
 function tgl(id, fn){ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; }
-let showLabels = false;
+let showLabels = true;   // building names sit on the 3D map itself (user, 2026-10-15); the toggle can hide them
 tgl('lLbl', v=>{ showLabels=v; });
 // light / dark switch (campus): remembered on this device; with nothing saved the page follows the system setting
 function setTheme(t, save=true){ if(t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; if(save){ try{ t ? localStorage.setItem('void-theme', t) : localStorage.removeItem('void-theme'); }catch(e){} } syncThemeBtns(); }
@@ -6261,7 +6261,7 @@ function setWorld(id, instant){
   if(id!=='erica' && follow) setFollow(false); if(meAvatar) meAvatar.visible = false; meArrow.visible = false;
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
-  const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl && !SCREEN; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
+  const isl = id==='island'; $('tV').hidden = isl; $('tB').hidden = !isl; $('board').hidden = isl && !SCREEN; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
   $('lLbl').textContent = w.lblBtn;
   document.querySelectorAll('.erica-only').forEach(e=> e.hidden = id!=='erica' || (e.id === 'navSeg' && !follow));   // the nav-mode buttons only while 내 시점 is on
   document.querySelectorAll('.island-only').forEach(e=> e.hidden = id==='erica');
