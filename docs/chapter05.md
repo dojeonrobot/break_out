@@ -113,3 +113,5 @@ sudo cp dorogram.service /etc/systemd/system/ && sudo systemctl daemon-reload &&
 # 4) nginx: config/nginx-breakout.conf 의 location /api/ch5/ 블록 반영 후 sudo nginx -t && sudo systemctl reload nginx
 ```
 데이터는 `/home/ubuntu/dorogram/data/`(게시물 JSON + 업로드 사진)에 쌓인다. 새 기수 시작 전에 운영자 화면에서 "전부 초기화".
+
+- **2026-10-15 「일루아 조각」 개념 삭제(사용자 지시 "일루아 조각이라는 개념은 아예 없애")**: 패널의 「일루아의 흐름 N/5」 상자(문양 SVG + 흐름 1~5 목록 + 단서 문장)와 돌아온 기록 카드의 "돌아온 흐름 N · 단서" 줄을 모두 제거. `GLYPH_ZONES`는 구역 id 5개만 남김(번호·단서 없음). 흐름은 환원 시뮬레이터 안에서만 보이고(HUD N/5 = 돌아온 기록 수), 완성된 코덱스 문양 SVG는 5/5 성공 카드 위에만 한 번 나온다(`#simGlyph`). 운영자 "복구 미리보기" 안내 줄은 그대로. erica-twin `make_template.py`가 `SCANS_ALL` 줄을 치환하도록 고쳤고 build.py는 LF로 저장(`newline=''`), 템플릿을 최신 게시본으로 재생성해 빌드 결과가 게시본과 동일함을 확인.

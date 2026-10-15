@@ -342,26 +342,14 @@ body.sim #simHud{display:flex}
 #simDone h1{margin:0;font-size:clamp(28px,5vw,46px);letter-spacing:-.01em}
 #simDone p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)}
 #simDone button{margin-top:8px;border:0;border-radius:999px;padding:11px 22px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans)}
-/* records that came back, the Ilua fragments, hidden panels on the island */
+/* records that came back, hidden panels on the island, the completed glyph on the success card */
 #board[hidden],.progress[hidden],#tV[hidden]{display:none}
-.ilua{display:grid;gap:6px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px}
-.ilua .ih2{display:flex;justify-content:space-between;align-items:baseline}
-.ilua .ih2 b{font-family:var(--mono);font-size:18px;font-weight:500}
-.ilua .ih2 span{color:var(--muted);font-size:12px}
-.glyphwrap{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
-.glyphwrap .frags{display:grid;gap:4px;min-width:0}
-.glyphwrap .frag{padding:4px 7px;font-size:11.5px;line-height:1.35}
-svg.glyph{display:block;border-radius:12px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:6px;box-sizing:border-box}
+svg.glyph{display:block;border-radius:16px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:8px;box-sizing:border-box}
 svg.glyph polygon{stroke:none}
 svg.glyph polygon.off{fill:color-mix(in srgb,var(--void-edge) 55%,transparent)}
 svg.glyph polygon.on{fill:#9ff6ff;filter:drop-shadow(0 0 4px #9ff6ff)}
 svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9ff6ff 45%,transparent)}
-.ilua .frag{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:8px;background:color-mix(in srgb,var(--void-edge) 10%,transparent);line-height:1.45}
-.ilua .frag i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--void-edge);box-shadow:0 0 10px var(--void-edge);margin-top:1px}
-.ilua .frag b{font:600 12.5px var(--sans);color:var(--fg)}
-.ilua .frag.off{opacity:.35}
-.ilua .frag.off i{background:var(--line);box-shadow:none}
-.ilua .done{padding:8px 10px;border-radius:8px;background:color-mix(in srgb,var(--restored) 14%,transparent);font-weight:600;line-height:1.5}
+#simGlyph{animation:rise 1.2s both}
 .twin{font-size:12px;color:var(--muted);line-height:1.5}
 .twin b{color:var(--fg)}
 .subline.conv span{color:var(--accent)}
@@ -555,7 +543,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 </div></div>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
-<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
+<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
@@ -1037,13 +1025,8 @@ const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾
 // The Ilua flow under the island, built as thick bands in the exact shape of the Codex eye glyph (chapter 3's pattern):
 // an upper chevron with two thorns, the eye with its pupil, a lower chevron with two thorns. Island coordinates (x, z).
 // The five zones own five stretches of it; each is a gap until its record comes back. Shared by the 3D layer and the panel SVG.
-const GLYPH_ZONES = [
-  {id:'dl-safari',   n:1, clue:'원천에서 초원으로 내려온다'},
-  {id:'dl-ferris',   n:2, clue:'원천에서 관람차 언덕으로 오른다'},
-  {id:'dl-carousel', n:3, clue:'언덕을 넘어 회전목마까지 이어진다'},
-  {id:'dl-harmonia', n:4, clue:'광장을 한 바퀴 돌고 메인 스트리트를 가로지른다'},
-  {id:'dl-coaster',  n:5, clue:'롤러코스터에서 항구로 내려간다'}
-];
+// the five island zones whose stretch of the Ilua flow is missing until their record is back (no numbering, no clue text: the flow is only seen in the simulator)
+const GLYPH_ZONES = [{id:'dl-safari'}, {id:'dl-ferris'}, {id:'dl-carousel'}, {id:'dl-harmonia'}, {id:'dl-coaster'}];
 const GLYPH = (()=>{
   const A = [30,-470], TW = [-300,-30], TE = [360,-30], B = [30,440], BW = [-300,240], BE = [360,240], E = [10,78], W = 34;
   const sub = (p,q)=>[p[0]-q[0],p[1]-q[1]], add = (p,q)=>[p[0]+q[0],p[1]+q[1]], mul = (p,k)=>[p[0]*k,p[1]*k], len = p=>Math.hypot(p[0],p[1]), nrm = p=>{ const l = len(p)||1; return [p[0]/l,p[1]/l]; }, perp = p=>[-p[1],p[0]];
@@ -1087,7 +1070,6 @@ function glyphOutline(secs){ const L = secs.map(s=> [s.c[0] + s.n[0]*s.hw, s.c[1
 // scattered bits of an empty stretch: a few short slices, so the shape stays unreadable until the record is back
 function glyphBits(piece, seed){ let sd = seed; const r = ()=> (sd = (sd*16807) % 2147483647) / 2147483647; const span = piece.u1 - piece.u0, n = span > 0.4 ? 5 : 3, out = [];
   for(let i=0;i<n;i++){ const a = piece.u0 + span*((i + 0.15 + r()*0.7)/n), w = span*(0.05 + r()*0.04); out.push([a, Math.min(piece.u1, a + w)]); } return out; }
-const glyphId = m => m ? (GLYPH_ZONES.some(z=> z.id === m.id) ? m.id : (m.twin && GLYPH_ZONES.some(z=> z.id === m.twin) ? m.twin : null)) : null;
 const glyphHave = ()=> GLYPH_ZONES.filter(z=> (scansFor(z.id) || []).length).map(z=> z.id);
 // the glyph as an inline SVG: restored pieces filled, empty ones as scattered bits (world x -400..440 → 0..200, z -560..520 → 0..200 with the same scale)
 function glyphSVG(have, size=150){
@@ -1101,18 +1083,11 @@ function glyphSVG(have, size=150){
   });
   return `<svg class="glyph${all ? ' done' : ''}" viewBox="0 0 200 200" width="${size}" height="${size}" aria-label="일루아의 흐름 ${have.length}/5">${out.join('')}</svg>`;
 }
-function iluaLine(m){ const id = glyphId(m); if(!id || !m.scans.length) return ''; const s = GLYPH_ZONES.find(x=> x.id === id); return `<div class="ilua"><div class="frag"><i></i><div><b>돌아온 흐름 ${s.n}</b> · ${esc(s.clue)}</div></div></div>`; }
-function iluaHTML(){
-  const have = glyphHave(), n = have.length;
-  return `<div class="ilua"><div class="ih2"><span>${n===5 ? '일루아의 흐름 · 코덱스 문양' : '일루아의 흐름'}</span><b>${n} / 5</b></div>
-    <div class="glyphwrap">${glyphSVG(have, 132)}<div class="frags">${GLYPH_ZONES.map(s=>{ const on = have.includes(s.id); return `<div class="frag ${on ? '' : 'off'}"><i></i><div>${on ? `<b>흐름 ${s.n}</b> · ${esc(s.clue)}` : `흐름 ${s.n} · 아직 비어 있음`}</div></div>`; }).join('')}</div></div>
-    ${n===5 ? `<div class="done">다섯 흐름이 모두 돌아왔습니다. 섬 아래 일루아의 흐름은 코덱스 가문이 대대로 써 온 눈 문양과 같은 모양입니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 그 사실은 몰랐습니다.</div>` : ''}</div>`;
-}
 function updateProgress(){
   const isl = W && W.id==='island';
   $('pN').textContent = `${M.filter(m=>m.scans.length).length} / ${M.length}`;
   $('pCells').innerHTML = M.map(m=>`<i class="${m.scans.length?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
-  const box = $('iluaBox'); if(box) box.innerHTML = (DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 탭에서 끔)</span></div>` : '') + iluaHTML();
+  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 탭에서 끔)</span></div>` : '';
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
 updateProgress();
@@ -1354,7 +1329,7 @@ function zoneCard(m, k){
     <div class="ms is-ok ${m.bi===selected?'on':''}" data-m="${k}" role="button" tabindex="0">
       <div class="top"><h4>${esc(m.name)}</h4><span class="st ok">돌아온 기록 ${m.scans.length}건</span></div>
       <div class="chap">${esc(m.ch||'')}</div>
-      ${twinLine(m)}${thumbsHTML(m.scans)}${iluaLine(m)}
+      ${twinLine(m)}${thumbsHTML(m.scans)}
     </div>`;
   return `
     <div class="ms is-${s} ${m.bi===selected?'on':''}" ${hid ? '' : `data-m="${k}" role="button" tabindex="0"`}>
@@ -5415,7 +5390,7 @@ function setSim(on){
   if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
     $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
     let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
-    if(SIM_LIT === 5 && !seen){ $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} } }
+    if(SIM_LIT === 5 && !seen){ $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} } }
   else { islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
 $('simBtn').onclick = ()=> setSim(!simOn);
@@ -5878,7 +5853,7 @@ function infoI(i, move){
   const back = m && m.scans.length;
   $('iS').style.background = back ? 'var(--restored)' : CATS_I[b.c].color;
   $('iC').textContent = back ? '돌아온 기록' : CATS_I[b.c].name;
-  $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}${iluaLine(m)}` : '';
+  $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
   $('iDl').hidden = true; $('iNote').hidden = true; $('iIsl').hidden = false;
   $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
   if(move){
