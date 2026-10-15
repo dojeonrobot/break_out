@@ -2367,6 +2367,7 @@ const coveAt = (a, dr) => { const r = islR(a) + dr; return new THREE.Vector3(Mat
 const CLIFF_TOP = 17;
 const edgeR = (x,z) => islR(Math.atan2(z,x));
 const islRoot = new THREE.Group(); sceneI.add(islRoot);
+const SIM_DIM = [];                                      // objects hidden while the simulator is on (balloons, drones, gulls, mist)
 const IB = [];                                                 // pickables: attractions, places, characters
 const islAnim = [];                                            // per-frame callbacks (t in seconds)
 const charGroups = [];
@@ -3056,7 +3057,7 @@ for(let i=0;i<9;i++){
   const g = new THREE.Group(), wl = add(g, BOX(5,0.3,1.4), mat(0xffffff), -2.5, 0, 0, false), wr = add(g, BOX(5,0.3,1.4), mat(0xffffff), 2.5, 0, 0, false);
   wl.geometry = wl.geometry.clone().translate(-2.5,0,0); wr.geometry = wr.geometry.clone().translate(2.5,0,0); wl.position.x = 0; wr.position.x = 0;
   add(g, SPH(0.9,8,6), mat(0xffffff), 0, 0, 0, false).scale.set(1,0.8,2);
-  sceneI.add(g); gulls.push({g, wl, wr, r:120 + i*35, y:85 + (i%3)*18, sp:0.12 + (i%4)*0.03, ph:i});
+  sceneI.add(g); SIM_DIM.push(g); gulls.push({g, wl, wr, r:120 + i*35, y:85 + (i%3)*18, sp:0.12 + (i%4)*0.03, ph:i});
 }
 islAnim.push(t=> gulls.forEach(b=>{ const a = t*b.sp + b.ph; b.g.position.set(Math.cos(a)*b.r, b.y + Math.sin(t+b.ph)*4, Math.sin(a)*b.r); b.g.rotation.y = -a; const f = Math.sin(t*6+b.ph)*0.5; b.wl.rotation.z = f; b.wr.rotation.z = -f; }));
 
@@ -3933,7 +3934,7 @@ const balloon = new THREE.Group();
   [[-2,-2],[2,-2],[-2,2],[2,2]].forEach(([x,z])=> balloon.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,-24,z), new THREE.Vector3(x*2.6,-18,z*2.6)]), new THREE.LineBasicMaterial({color:0x5a3e28}))));
   islAnim.push(t=>{ const a = t*0.02; balloon.position.set(-60 + Math.cos(a)*170, 175 + Math.sin(t*0.3)*6, -40 + Math.sin(a)*140); balloon.rotation.y = t*0.05; });
 }
-sceneI.add(balloon);
+sceneI.add(balloon); SIM_DIM.push(balloon);   // nothing flies over the simulator
 // two more balloons on their own slow rounds
 [['#5aa0e6','#ffffff',0.016,130,210,80,-170,1.9],['#58b368','#ffd400',0.013,-200,-120,160,120,4.1]].forEach(([c1,c2,sp,cx,cz,rx,rz,ph])=>{
   const b = new THREE.Group();
@@ -3942,7 +3943,7 @@ sceneI.add(balloon);
   add(b, BOX(4.6, 3.8, 4.6), mat(0x8a5a36), 0, -24.5, 0);
   [[-2,-2],[2,-2],[-2,2],[2,2]].forEach(([x,z])=> b.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,-22.5,z), new THREE.Vector3(x*2.4,-17,z*2.4)]), new THREE.LineBasicMaterial({color:0x5a3e28}))));
   islAnim.push(t=>{ const a = t*sp + ph; b.position.set(cx + Math.cos(a)*rx, 150 + Math.sin(t*0.27 + ph)*8, cz + Math.sin(a)*Math.abs(rz)); b.rotation.y = t*0.04 + ph; });
-  sceneI.add(b);
+  sceneI.add(b); SIM_DIM.push(b);
 });
 
 // visitors strolling along every path
@@ -4220,7 +4221,6 @@ pickable(kids, {n:'키즈 라군', c:'ride', sub:'어린이 구역', cx:-150/K, 
 
 // ---------- waterfall and valley stream from the mountain to the sea (the chapter 5 "valley → seashore" flow) ----------
 const flowU = {uTime:{value:0}, uDim:{value:1}};   // uDim → 0.1 while the restoration simulator is on
-const SIM_DIM = [];                                      // objects hidden while the simulator is on
 const flowMat = new THREE.ShaderMaterial({uniforms:flowU, transparent:true, depthWrite:false, side:THREE.DoubleSide,
   vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
   fragmentShader:`uniform float uTime, uDim; varying vec2 vUv;
@@ -4324,7 +4324,7 @@ pickable(renDoor, {n:'렌의 지하 연구실', c:'place', sub:'챕터 4', cx:-1
     for(let k=0;k<4;k++){ const a = k*Math.PI/2 + Math.PI/4; add(d, BOX(5, 0.3, 0.5), mat(0x3d7be0), Math.cos(a)*2.4, 0.4, Math.sin(a)*2.4).rotation.y = -a; const r = add(d, CYL(1.6, 1.6, 0.2, 12), glowMat(0xdfe9ff, 0.6), Math.cos(a)*4.6, 0.8, Math.sin(a)*4.6, false); r.userData.rot = true; }
     add(d, SPH(0.6, 8, 6), glowMat(0xffd84a), 0, -0.8, 1.8, false);
     const cone = add(d, new THREE.ConeGeometry(14, 60, 20, 1, true).translate(0, -30, 0), new THREE.MeshBasicMaterial({color:0x7fd7ff, transparent:true, opacity:0.08, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending}), 0, -1, 0, false);
-    sceneI.add(d); drones.push(d);
+    sceneI.add(d); drones.push(d); SIM_DIM.push(d);
   }
   islAnim.push(t=> drones.forEach((d,i)=>{ const a = t*0.05 + i*Math.PI/2, r = 160 + (i%2)*170; d.position.set(Math.cos(a)*r, 92 + Math.sin(t*0.7 + i)*6, 40 + Math.sin(a)*r*0.9); d.rotation.y = -a; d.rotation.z = Math.sin(t + i)*0.08; }));
 }
@@ -5445,8 +5445,33 @@ const GRIDM = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uC:{value:
       float ring = exp(-pow((d - mod(uTime*120.0, 1000.0))*0.018, 2.0));
       float a = (line*0.09 + ring*0.4)*isl; gl_FragColor = vec4(vec3(0.45,0.9,1.0), a); }`});
 const simGrid = new THREE.Mesh(new THREE.PlaneGeometry(1500, 1500).rotateX(-Math.PI/2), GRIDM); simGrid.position.y = G + 0.6; simGrid.renderOrder = 4; simGrid.visible = false; sceneI.add(simGrid);
+// the island's underside as a hologram block: a skirt from the shoreline down into the bedrock, tapering in, with strata lines and the
+// Ilua layer marked, so the simulator reads as a 3D cross-section rather than a flat map (user, 2026-10-15)
+const BED_D = 150;
+const bedMat = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uFlowY:{value:G - 26}}, transparent:true, depthWrite:true, side:THREE.FrontSide, fog:false,   // outer faces only, and it occludes: the far wall must not show through the island
+  vertexShader:`varying vec3 vN; varying vec3 vW; void main(){ vN = normalize(normalMatrix*normal); vec4 wp = modelMatrix*vec4(position,1.0); vW = wp.xyz; gl_Position = projectionMatrix*viewMatrix*wp; }`,
+  fragmentShader:`uniform float uTime, uFlowY; varying vec3 vN; varying vec3 vW;
+    void main(){ vec3 V = normalize(cameraPosition - vW); float fr = pow(1.0-abs(dot(normalize(vN), V)), 1.6);
+      float strata = pow(0.5+0.5*sin(vW.y*0.42), 24.0);                       // thin horizontal layer lines
+      float ilua = exp(-pow((vW.y - uFlowY)*0.14, 2.0))*(0.6+0.4*sin(uTime*2.0));   // the Ilua layer glows
+      float scan = 0.5+0.5*sin(vW.y*1.3 + uTime*1.8);
+      vec3 col = vec3(0.03,0.08,0.16) + vec3(0.30,0.75,1.0)*(fr*0.55 + strata*0.35 + ilua*0.9) + vec3(0.05,0.12,0.2)*scan*0.3;
+      float a = 0.55 + fr*0.35 + strata*0.2 + ilua*0.4; gl_FragColor = vec4(col, a); }`});
+const simBed = (()=>{ const N = 160, pos = [], nor = [], idx = [], rows = [[G - 0.5, 1.0], [G - 25, 0.99], [G - 60, 0.965], [G - 105, 0.92], [G - BED_D, 0.84]];
+  rows.forEach(([y, k])=>{ for(let i=0;i<=N;i++){ const a = i/N*Math.PI*2, r = islR(a)*k; pos.push(Math.cos(a)*r, y, Math.sin(a)*r); nor.push(Math.cos(a), 0.25, Math.sin(a)); } });
+  for(let j=0;j<rows.length-1;j++) for(let i=0;i<N;i++){ const a = j*(N+1) + i, b = a + N + 1; idx.push(a, a+1, b, a+1, b+1, b); }   // wound so the outside is the front face
+  const base = pos.length/3; pos.push(0, G - BED_D, 0); nor.push(0, -1, 0); const last = (rows.length-1)*(N+1);
+  for(let i=0;i<N;i++) idx.push(base, last + i, last + i + 1);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setIndex(idx);
+  const m = new THREE.Mesh(g, bedMat); m.renderOrder = 3; m.visible = false; sceneI.add(m);
+  // depth rings: the Ilua layer bright, the others faint
+  [[G - 26, 0x9ff6ff, 0.9], [G - 60, 0x3b8fd6, 0.35], [G - 105, 0x3b8fd6, 0.25]].forEach(([y, c, op])=>{ const pts = []; for(let i=0;i<=N;i++){ const a = i/N*Math.PI*2, k = 1 - (G - y)/BED_D*0.16; pts.push(new THREE.Vector3(Math.cos(a)*islR(a)*k + 0.5, y, Math.sin(a)*islR(a)*k)); }
+    const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color:c, transparent:true, opacity:op, fog:false})); ln.renderOrder = 4; m.add(ln); });
+  return m; })();
 const sparkTex = (()=>{ const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32,32,0,32,32,32); r.addColorStop(0,'rgba(255,255,255,1)'); r.addColorStop(0.3,'rgba(190,245,255,0.9)'); r.addColorStop(1,'rgba(120,200,255,0)'); g.fillStyle = r; g.fillRect(0,0,64,64); const t = new THREE.CanvasTexture(c); return t; })();
-const holoSwap = on=>{ islRoot.traverse(o=>{ if(!(o.isMesh || o.isInstancedMesh || o.isPoints || o.isLine) || o === caveEye) return;   // the cave's eye keeps its own glow
+const HOLO_SKIP = ()=> new Set([simRoot, simBed, simGrid, water, caveEye]);
+const holoSwap = on=>{ const skip = HOLO_SKIP(); sceneI.traverse(o=>{ if(skip.has(o)) return; let q = o.parent, under = false; while(q){ if(skip.has(q)){ under = true; break; } q = q.parent; } if(under) return;   // the whole island scene (pier, boats, sea rocks too), not only islRoot
+  if(!(o.isMesh || o.isInstancedMesh || o.isPoints || o.isLine)) return;
   if(on){ if(o.userData.mat0 === undefined){ o.userData.mat0 = o.material; o.userData.vis0 = o.visible; } if(o.isInstancedMesh || o.isPoints || o.isLine) o.visible = false; else o.material = HOLO; }
   else if(o.userData.mat0 !== undefined){ o.material = o.userData.mat0; o.visible = o.userData.vis0; delete o.userData.mat0; delete o.userData.vis0; } }); };
 islAnim.push(t=>{ if(!simOn) return; simAnim.forEach(f=> f(t)); VEIN_U.uTime.value = t;
@@ -5651,14 +5676,14 @@ function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
   flowU.uDim.value = on ? 0.1 : 1;
   if(on){ SIM_DIM.forEach(o=> o.visible = false); holoSwap(true); } else { holoSwap(false); SIM_DIM.forEach(o=> o.visible = true); }
-  simGrid.visible = on; clouds.forEach(c=> c.g.visible = !on);   // no clouds over an instrument view
+  simGrid.visible = on; simBed.visible = on; water.visible = !on; clouds.forEach(c=> c.g.visible = !on);   // no sea, no clouds: the island hangs in the void as a block
   // the sea goes dark too: the whole view is an instrument, not a sunny park (islandTheme() restores the colours on the way out)
   if(on){ if(!waterU._day) waterU._day = Object.fromEntries(['uShallow','uDeep','uFoam','uFog','uSky'].map(k=> [k, waterU[k].value.clone()]));
     waterU.uShallow.value.set(0x0b1d33); waterU.uDeep.value.set(0x04101e); waterU.uFoam.value.set(0x1b3a5a); waterU.uFog.value.set(0x03060c); waterU.uSky.value.set(0x05101c); }
   else if(waterU._day){ Object.entries(waterU._day).forEach(([k, v])=> waterU[k].value.copy(v)); }
   if(on && SIM_REVEAL_T == null) SIM_REVEAL_T = performance.now()/1000 + 1.4;   // new stretches sweep in once the camera has settled
   if(on){ sceneI.background = new THREE.Color(0x03060c); sceneI.fog = new THREE.Fog(0x03060c, 900, 2600); updateSun(); simHud();
-    if(W.id === 'island') flyTo(new THREE.Vector3(20 + 430, 860, -10 + 900), new THREE.Vector3(20, 0, -70), 1800); }   // an oblique view that frames the whole glyph
+    if(W.id === 'island') flyTo(new THREE.Vector3(20 + 600, 470, -10 + 1120), new THREE.Vector3(20, -40, -80), 1800); }   // low oblique view: the glyph and the island's underside   // an oblique view that frames the whole glyph
   else { clearTimeout(simDoneT); islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
 $('simBtn').onclick = ()=> setSim(!simOn);
