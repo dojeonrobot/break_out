@@ -1483,12 +1483,14 @@ $('adminX').onclick = closeAdmin;
 // team picker (remembered on this device) and the admin entry (password checked by the server)
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
 teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; try{ localStorage.setItem('void-team', TEAM || ''); if(TEAM) localStorage.setItem('dorogram-team', String(TEAM)); }catch(e){} rescan(); if(TEAM && !SCREEN) startGeo(); };
-// first open: pick a team, then ask for the position
+// first open: pick a team (after the map's entrance), then ask for the position
+var ASK_TEAM = false;
 { const tp = $('teamPick');
   $('tpGrid').innerHTML = Array.from({length:12}, (_,i)=> `<button type="button" data-t="${i+1}">${i+1}조</button>`).join('');
   $('tpGrid').onclick = e=>{ const b = e.target.closest('[data-t]'); if(!b) return; teamSel.value = b.dataset.t; teamSel.onchange(); delete tp.dataset.on; startGeo(); };
   $('tpSkip').onclick = ()=>{ delete tp.dataset.on; };
-  if(!TEAM && !SCREEN && !LOCAL) tp.dataset.on = '1'; else if(TEAM && !SCREEN) setTimeout(startGeo, 0);
+  // the team question waits until the intro (the map's entrance) has played; endIntro() opens it
+  if(!TEAM && !SCREEN && !LOCAL) ASK_TEAM = true; else if(TEAM && !SCREEN) setTimeout(startGeo, 0);
 }
 $('adminBtn').onclick = async ()=>{
   if(LOCAL){ toast('서버에 올라간 페이지에서만 쓸 수 있습니다'); return; }
@@ -6211,7 +6213,10 @@ function endIntro(){
   if(!intro) return;
   setIntro(99); intro = null; controls.enabled = true;
   $('intro').classList.add('out'); document.body.classList.remove('intro');
+  askTeamLater();
 }
+// after the entrance: give the map a moment on screen, then ask which team this tablet is
+function askTeamLater(){ if(!ASK_TEAM) return; ASK_TEAM = false; setTimeout(()=>{ if(!TEAM) $('teamPick').dataset.on = '1'; }, 1400); }
 function startIntro(short){
   if(reduce) return;
   intro = {t0: performance.now() - (short ? 700 : 0)};
@@ -6324,6 +6329,7 @@ if(SCREEN){ document.body.classList.add('screen'); controls.autoRotate = true; c
 lastSig = pairSig();
 syncState(); setInterval(syncState, SCREEN ? 8000 : 15000); document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) syncState(); });
 startIntro(false);
+if(!intro) askTeamLater();   // reduced motion: no entrance, ask right away
 $('loading').hidden = true;
 requestAnimationFrame(tick);
 </script>
