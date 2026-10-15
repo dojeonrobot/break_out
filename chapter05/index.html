@@ -346,6 +346,9 @@ body.sim #simHud{display:flex}
 #simHud .cells{display:flex;gap:4px}
 #simHud .cells i{width:26px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--void-fg) 18%,transparent)}
 #simHud .cells i.ok{background:#9ff6ff;box-shadow:0 0 10px #9ff6ff}
+/* narrow screens: in simulator mode the HUD sits where the panel starts, so the panel moves down; on phones the HUD is one row and the simulator button rides above the two-row bar */
+@media (max-width:1000px){body.sim #panel{top:calc(136px + env(safe-area-inset-top,0px));max-height:calc(100% - 240px - env(safe-area-inset-top,0px))}}
+@media (max-width:760px){#simBtn{left:12px;bottom:calc(124px + env(safe-area-inset-bottom,0px))}#simHud{top:calc(64px + env(safe-area-inset-top,0px));gap:10px;padding:7px 12px}#simHud small{display:none}#simHud h2{font-size:13.5px}#simHud b{font-size:20px}#simHud .cells i{width:18px}}
 #simDone{position:fixed;inset:0;z-index:33;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 22%,var(--void)) 0%,color-mix(in srgb,var(--void) 92%,transparent) 70%);color:var(--void-fg);text-align:center}
 #simDone[data-on]{display:grid}
 #simDone .in{display:grid;gap:12px;justify-items:center;max-width:min(560px,86vw);animation:rise .9s both}
@@ -1300,6 +1303,9 @@ function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ localSt
 function renderAdmin(){ const b = $('adminBody'); if(b && !$('adminDlg').hidden) b.innerHTML = adminHTML(); }
 function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); }
 function closeAdmin(){ $('adminDlg').hidden = true; document.body.classList.remove('admin'); }
+// clipboard with a fallback for browsers that refuse writeText (http, denied permission): a hidden textarea + execCommand
+async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
+  try{ const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; } }
 async function adminAct(act){
   try{
     if(act==='logout'){ ADMIN_KEY=''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} closeAdmin(); return; }
@@ -1307,7 +1313,7 @@ async function adminAct(act){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
         .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
           return [`${s.team || '-'}조`, m ? m.name : s.mission, s.note || '', s.kind==='orbit' ? `${location.origin}${API}/scan/${s.scanId}/0.jpg (사진 ${s.frames}장)` : s.url, timeText(s.createdAt), done ? (s.kind==='orbit' ? '복구됨' : '3D 반영됨') : (s.kind==='orbit' ? '확인 대기' : '반영 대기')].join('\t'); });
-      await navigator.clipboard.writeText(['조\t구역\t찍은 것\t링크\t제출 시각\t상태', ...lines].join('\n')); toast(`${lines.length}건을 복사했습니다`); return;
+      const ok = await copyText(['조\t구역\t찍은 것\t링크\t제출 시각\t상태', ...lines].join('\n')); toast(ok ? `${lines.length}건을 복사했습니다` : '복사할 수 없는 브라우저입니다'); return;
     }
     if(act==='reset'){
       const real = SCANS.filter(s=> !s.demo).length;
@@ -1452,7 +1458,7 @@ document.addEventListener('click', e=>{
   const cp = e.target.closest('[data-copy]');
   if(cp){ e.stopPropagation();
     const txt = cp.dataset.copy;
-    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(()=>toast('좌표를 복사했습니다'), ()=>{
+    copyText(txt).then(ok=>{ if(ok){ toast('좌표를 복사했습니다'); return; }
       const code = cp.parentElement.querySelector('code'); if(code){ const r=document.createRange(); r.selectNodeContents(code); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
       toast('좌표를 선택했습니다. 직접 복사하세요');
     }); return; }
@@ -5600,9 +5606,9 @@ const CHAR = [
   {g:RICO, n:'리코', desc:'냉철한 분석가. 연보라색 점퍼에 금색 D 배지를 달고, 코딩과 지도 읽기를 맡습니다. 선대 연구자 노아의 핏줄입니다.', facts:[['역할','신입사원 · 분석, 코딩, 지도'],['성격','차분하고 논리적']]},
   {g:ZERO, n:'제로', desc:'호기심 많고 공감을 잘하는 신입사원. 부스스한 주황 머리에 초록 점퍼를 입고 운전과 조립을 맡습니다. 선대 연구자 루나의 핏줄입니다.', facts:[['역할','신입사원 · 운전, 조립'],['성격','다정하고 행동이 빠름']]},
   {g:XYLO, n:'자일로', desc:'은빛 머리에 네모난 안경을 쓴 도로랜드 총책임자. 롤러코스터와 바이킹을 사랑하는 낙천적인 기계 덕후지만, 섬의 비밀을 오랫동안 혼자 품어 왔습니다.', facts:[['역할','총책임자 · 출입증 X-404'],['좋아하는 것','롤러코스터, 바이킹']]},
-  {g:CODEX, n:'코덱스', desc:'섬의 수호자. 나뭇잎 귀와 노란 눈, 눈 문양이 새겨진 초록 망토에 길고 무거운 지팡이를 듭니다. 초대장을 보낸 사람도 코덱스였습니다.', facts:[['역할','원류민 수호자'],['상징','눈 문양, 지팡이']]},
-  {g:NATY, s:0.08, n:'네이티', desc:'감정에 따라 몸 색이 바뀌는 작은 불꽃 정령. 하늘색은 평온, 초록은 호기심, 노랑은 긴장, 빨강은 분노, 보라는 슬픔, 흰색은 조화. 챕터 5에서 환원된 일루아가 형태를 띤 존재로 밝혀집니다.', facts:[['정체','일루아의 정령'],['특징','감정 따라 색이 변함']]},
-  {g:VOID, s:0.15, n:'보이드', desc:'노아와 루나가 섬의 변화를 기록하라고 남긴 하얀 로봇. 원류민의 오해로 분해됐다가 제로와 자일로가 다시 조립했고, 몸속에 응축 이전 일루아의 분포 기록을 품고 있습니다. 이 지도의 이름도 보이드의 기록입니다.', facts:[['역할','섬의 기록자'],['특징','겁먹으면 공처럼 몸을 맒']]},
+  {g:CODEX, n:'코덱스', desc:'섬의 수호자. 나뭇잎 귀와 노란 눈, 눈 문양이 새겨진 초록 망토에 길고 무거운 지팡이를 듭니다. 초대장을 보낸 사람도 코덱스였습니다.', facts:[['역할','섬의 수호자'],['상징','눈 문양, 지팡이']]},
+  {g:NATY, s:0.08, n:'네이티', desc:'감정에 따라 몸 색이 바뀌는 작은 불꽃 정령. 하늘색은 평온, 초록은 호기심, 노랑은 긴장, 빨강은 분노, 보라는 슬픔, 흰색은 조화.', facts:[['정체','작은 불꽃 정령'],['특징','감정 따라 색이 변함']]},
+  {g:VOID, s:0.15, n:'보이드', desc:'노아와 루나가 섬의 변화를 기록하라고 남긴 하얀 로봇. 섬사람들의 오해로 분해됐다가 제로와 자일로가 다시 조립했고, 몸속에 응축 이전 일루아의 분포 기록을 품고 있습니다. 이 지도의 이름도 보이드의 기록입니다.', facts:[['역할','섬의 기록자'],['특징','겁먹으면 공처럼 몸을 맒']]},
   {g:DARK, s:0.16, n:'그림자', desc:'광장 나무 뒤, 동굴, 전광판 화면에서 몰래 지켜보던 붉은 뿔의 검은 그림자. 정체를 숨긴 코덱스였습니다.', facts:[['등장','챕터 1~4'],['힌트','붉은 뿔, 붉은 눈']]}
 ];
 CHAR.forEach(c=>{ islRoot.add(c.g); charGroups.push(c.g); c.b = pickable(c.g, {n:c.n, c:'char', sub:'등장인물', desc:c.desc, facts:c.facts, cx:0, cz:0, h:2, r:1, s:c.s||0.15, keepSize:true}); prepGroup(c.b); c.g.scale.setScalar(c.s||0.15); });
@@ -6029,7 +6035,7 @@ function setWorld(id, instant){
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
   $('lLbl').textContent = w.lblBtn;
-  document.querySelectorAll('.erica-only').forEach(e=> e.hidden = id!=='erica');
+  document.querySelectorAll('.erica-only').forEach(e=> e.hidden = id!=='erica' || (e.id === 'navSeg' && !follow));   // the nav-mode buttons only while 내 시점 is on
   document.querySelectorAll('.island-only').forEach(e=> e.hidden = id==='erica');
   $('credit').innerHTML = w.credit;
   $('introSmall').textContent = w.introSmall; $('introTitle').textContent = w.introTitle; $('introSub').textContent = w.introSub;
