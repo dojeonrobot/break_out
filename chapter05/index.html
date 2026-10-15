@@ -2586,7 +2586,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-42,-528,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,32],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],[Math.cos(-0.05)*(islR(-0.05)+12),Math.sin(-0.05)*(islR(-0.05)+12),18],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[358,173,30],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [165,420,40],[-150,412,24],[84,202,34],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [165,420,40],[-150,412,24],[95,225,52],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[-162,-354,18],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -3560,8 +3560,8 @@ const viking = new THREE.Group();
   add(ship, new THREE.TorusGeometry(3, 0.9, 8, 20, Math.PI*1.4), mat(0x2f9d63), -26.5, 19.5, 0).rotation.z = 0.4;
   islAnim.push(t=>{ swing.rotation.z = Math.sin(t*0.75)*0.95; });
 }
-place(viking, 62, 150, 0.5); viking.scale.setScalar(0.85);
-pickable(viking, {n:'바이킹', c:'ride', sub:'놀이기구', cx:62, cz:150,
+place(viking, 70, 167, 0.5); viking.scale.setScalar(1.275);   // 1.5× (user, 2026-10-15); moved SE so the bigger lot clears the drop-tower path
+pickable(viking, {n:'바이킹', c:'ride', sub:'놀이기구', cx:70, cz:167,
   desc:'용머리를 단 거대한 배가 하늘 높이 흔들리는 바이킹. 배의 양 끝자리에 앉을수록 더 아찔합니다.',
   facts:[['위치','정문 거리 동쪽'],['특징','용머리 · 방패 장식 · 최대 각도 약 55°']]});
 
@@ -5123,8 +5123,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     for(let i=0;i<6;i++){ const x = -17.5 + i*7;
       add(Gt, BOX(2.2, 7, 2.2), mat(0xf4efe4), x, 0, 20); add(Gt, BOX(2.6, 0.6, 2.6), mat(C.navy), x, 7, 20); add(Gt, BOX(0.8, 0.8, 0.5), glowMat(i%2 ? 0x4cd96a : 0xff4a3b), x, 5, 21.3, false);
       if(i < 5){ const bar = add(Gt, CYL(0.25, 0.25, 5.4, 6).rotateZ(Math.PI/2), mat(0x3a3f4a), x + 3.5, 4.4, 20.8); islAnim.push(t=>{ bar.rotation.y = ((t*0.6 + i) % 3 < 0.5) ? ((t*0.6 + i) % 3)*Math.PI : 0; }); } }
-    add(Gt, BOX(44, 1.2, 10), mat(0x3b4c78), 0, 9.5, 20); add(Gt, new THREE.PlaneGeometry(40, 5), new THREE.MeshBasicMaterial({map:signTex('WELCOME TO DOROLAND', {bg:'#1d2f55', fg:'#ffd400', size:60, w:1024, h:128})}), 0, 10.8, 25.2, false);
-    [-24, 24].forEach(x=> add(Gt, CYL(0.5, 0.6, 10.7, 8), mat(0xf4efe4), x, 0, 20));
+    add(Gt, BOX(44, 5.6, 1.2), mat(0x3b4c78), 76, 17.6, 3.2); add(Gt, new THREE.PlaneGeometry(40, 5), new THREE.MeshBasicMaterial({map:signTex('WELCOME TO DOROLAND', {bg:'#1d2f55', fg:'#ffd400', size:60, w:1024, h:128})}), 76, 20.4, 3.9, false);
     // lamp posts and benches round the plaza outside, flagpoles with rainbow flags, a balloon arch at the pier head
     for(let i=0;i<10;i++){ const a = Math.PI*0.08 + i/9*Math.PI*0.84, x = Math.cos(a)*60, z = 452 + Math.sin(a)*60; lampPost(islRoot, x, z, 9, 1.1).position.y = G; }
     [[-54, 420, 0.9],[54, 420, -0.9],[-66, 470, 1.6],[66, 470, -1.6]].forEach(([x,z,r])=> bench(islRoot, x, z, r).position.y = G);
@@ -5133,7 +5132,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     { const arc = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-16, 0, 500), new THREE.Vector3(0, 30, 500), new THREE.Vector3(16, 0, 500));
       arc.getPoints(30).forEach((p,i)=> add(islRoot, SPH(1.6 + (i%3)*0.3, 8, 6), mat(FC[i % 6]), p.x, G + p.y + 1, p.z)); }
     // floral DOROLAND bed in front of the plaza
-    { const g = new THREE.Group(); g.position.set(0, G, 418); islRoot.add(g);
+    { const g = new THREE.Group(); g.position.set(52, G, 424); g.rotation.y = -0.35; islRoot.add(g);
       add(g, BOX(46, 0.6, 7), mat(0x4f8a3c), 0, 0, 0); for(let i=0;i<120;i++){ add(g, ICO(0.55, 0), flat([0xff9fcf, 0xffd400, 0xffffff, 0xe2574c][i%4]), -21 + rr()*42, 0.9, -2.6 + rr()*5.2, false); }
       add(g, new THREE.PlaneGeometry(30, 4), new THREE.MeshBasicMaterial({map:signTex('DOROLAND', {bg:'#ffffff', fg:'#e2574c', size:84, w:768, h:110})}), 0, 2.6, 3.6, false).rotation.x = -0.35; }
     // bigger mascot statue of Void on the pedestal
