@@ -327,6 +327,7 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 .mk.team{background:var(--panel-solid);color:var(--fg);border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);gap:6px;padding:3px 9px 3px 5px}
 .mk.team i{width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:voidPulse 2s ease-in-out infinite}
 .mk.team.me{background:var(--accent);color:var(--accent-fg)} .mk.team.me i{background:#fff}
+body.medemo .mk.team.me{display:none}   /* the robot preview: nothing over the robot */
 .mk.team.old{opacity:.45}
 .mk.team small{font-size:10px;color:var(--muted)} .mk.team.me small{color:color-mix(in srgb,var(--accent-fg) 75%,transparent)}
 /* the admin drawer: opens on the right from the 관리자 button, over the board, leaving the 3D view visible */
@@ -363,6 +364,9 @@ body.sim #simHud{display:flex}
 #simFx::after{content:"";position:absolute;left:0;right:0;height:140px;top:-140px;background:linear-gradient(180deg,transparent,rgba(130,225,255,.09),transparent);animation:simSweep 7s linear infinite}
 @keyframes simSweep{to{transform:translateY(calc(100vh + 280px))}}
 body.sim #simFx{display:block}
+#arrFlash{position:fixed;inset:0;pointer-events:none;z-index:18;background:radial-gradient(ellipse at 50% 50%,rgba(220,250,255,.9),rgba(120,220,255,.35) 45%,transparent 75%);opacity:0}
+#arrFlash.on{animation:arrFlash .9s ease-out}
+@keyframes arrFlash{0%{opacity:0}12%{opacity:.55}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){#simFx::after{animation:none}}
 /* narrow screens: in simulator mode the HUD sits where the panel starts, so the panel moves down; on phones the HUD is one row and the simulator button rides above the two-row bar */
 @media (max-width:1000px){body.sim #panel{top:calc(136px + env(safe-area-inset-top,0px));max-height:calc(100% - 240px - env(safe-area-inset-top,0px))}}
@@ -579,6 +583,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2><span id="simStat"></span></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
 <div id="simFx" aria-hidden="true"></div>
+<div id="arrFlash" aria-hidden="true"></div>
 <div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
@@ -1202,10 +1207,10 @@ function applyState(st){
   // the hidden list and the restored records are applied live, no reload: the 3D side (markers, monuments, flow) rebuilds through rescan()
   const hid = new Set(st.hidden || []); let changed = false;
   if([...hid].sort().join() !== [...HIDDEN].sort().join()){ HIDDEN.clear(); hid.forEach(x=> HIDDEN.add(x)); try{ localStorage.setItem('void-hidden', JSON.stringify([...hid])); }catch(e){} changed = true; }
-  const done = orbitOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
-  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ SCANS.push(orbitScan(s)); changed = true; } });
+  const done = orbitOk(SUBS), doneIds = new Set(done.map(s=> s.scanId)), arrived = [];
+  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = orbitScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; if(z && !arrived.includes(z)) arrived.push(z); } } });
   for(let k = SCANS.length - 1; k >= 0; k--){ const x = SCANS[k]; if((x.kind === 'orbit' || x.kind === 'splat') && !x.demo && !doneIds.has(x.id)){ SCANS.splice(k, 1); changed = true; } }
-  if(changed && typeof rescan === 'function' && typeof MI !== 'undefined') rescan(); else refreshSubUI();
+  if(changed && typeof rescan === 'function' && typeof MI !== 'undefined') rescan(arrived.length ? arrived : undefined, arrived.length > 0); else refreshSubUI();
 }
 async function syncState(){
   if(LOCAL) return;
@@ -1242,7 +1247,7 @@ function formHTML(m, pre=''){
         <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="https://scaniverse.com/scan/..." autocomplete="off"><button type="submit">제출</button></div>
         <input data-draft="n-${pre}${esc(m.id)}" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
         ${msg.text ? `<p class="subhelp" data-kind="${msg.kind}">${esc(msg.text)}</p>` : ''}
-        <p class="subhelp">좌표가 가리키는 곳을 찾아가 Scaniverse로 스캔한 뒤, 공유 링크를 붙여 넣으세요. 서버가 바로 3D로 바꿔 기록으로 세웁니다.${LOCAL ? ' (서버 연결 전이라 이 기기에만 저장됩니다)' : ''}</p>
+        ${LOCAL ? '<p class="subhelp">서버 연결 전이라 이 기기에만 저장됩니다.</p>' : ''}
       </form>
       <details class="linkalt"><summary>Scaniverse 없이 카메라로 찍기</summary>
         <button type="button" class="capbtn" data-cap="${esc(m.id)}">${CAM_ICON} 이 구역 카메라로 찍기</button>
@@ -1336,7 +1341,7 @@ function adminHTML(){
   </div>`;
 }
 // preview ticks apply at once, without a reload: stand-in records go in or out, the zones and the flow layer rebuild (see setDemo)
-function demoTick(ids, on){ setDemo(ids, on); if(on){ if(W.id !== 'island') setWorld('island'); if(!simOn) setSim(true); } }
+function demoTick(ids, on){ setDemo(ids, on); }   // on: the arrival plays in the park, or as a vein sweep if the simulator is on (setDemo → rescan)
 function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ Object.keys(localStorage).filter(k=> k.startsWith('void-seen-lit')).forEach(k=> localStorage.removeItem(k)); Object.keys(sessionStorage).filter(k=> k.startsWith('void-simdone')).forEach(k=> sessionStorage.removeItem(k)); }catch(e){} }
 function renderAdmin(){ const b = $('adminBody'); if(b && !$('adminDlg').hidden) b.innerHTML = adminHTML(); }
 function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); rescan(); }
@@ -1419,7 +1424,7 @@ function zoneCard(m, k){
     <div class="ms is-${s} ${m.bi===selected?'on':''}" ${hid ? '' : `data-m="${k}" role="button" tabindex="0"`}>
       <div class="top"><h4>${esc(zoneName(m))}</h4>${statusHTML(m)}</div>
       ${coordHTML(m)}
-      ${s==='ok' ? `${twinLine(m)}${thumbsHTML(m.scans)}` : `<p>${esc(zoneBrief(m))}</p>${subLines(m)}${formHTML(m)}`}
+      ${s==='ok' ? `${twinLine(m)}${thumbsHTML(m.scans)}` : `${subLines(m)}${formHTML(m)}`}
     </div>`;
 }
 function renderList(){
@@ -1430,7 +1435,7 @@ function renderList(){
   const todo = M.map((m,k)=>[m,k]).filter(([m])=>!m.scans.length), done = M.map((m,k)=>[m,k]).filter(([m])=>m.scans.length);
   $('cV').textContent = todo.length; $('cR').textContent = done.length;
   if(tab==='v'){
-    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 보고 직접 찾아가 스캔하세요.</p>` : '')
+    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 찾아가 Scaniverse로 스캔하고 공유 링크를 붙여 넣으면 서버가 3D 기록으로 세웁니다.</p>` : '')
       + (todo.length ? todo.map(([m,k])=>zoneCard(m,k)).join('') : `<div class="empty">모든 구역이 복구되었습니다.</div>`);
   } else if(tab==='r'){
     const free = W.id==='erica' ? SCANS.filter(s=>!s.mission) : [];
@@ -1722,6 +1727,8 @@ function navTick(){
   meArrow.visible = true; meArrow.position.set(x, 0.15, z); meArrow.rotation.y = av.rotation.y;
   av.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(tt*3); const blink = (tt % 4) < 0.12 ? 0.15 : 1; av.userData.eyes.forEach(e=> e.scale.y = blink);
   if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
+  if(ME_DEMO){ const cam = new THREE.Vector3(x - navDirS.x*5.5 + navDirS.z*1.2, 2.6, z - navDirS.z*5.5 - navDirS.x*1.2);   // the robot preview: a low view just behind the robot
+    controls.target.lerp(new THREE.Vector3(x, 1.1, z), 0.1); camera.position.lerp(cam, 0.1); return; }
   const d = Math.max(12, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
   const cam = navCam(x, z, navDirS, d);
   controls.target.lerp(new THREE.Vector3(x, 0, z), 0.1); camera.position.lerp(cam, 0.1);
@@ -1734,7 +1741,7 @@ function updateTeamDots(pos, now){
     mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? 2.6 : 8;
     mk.el.className = 'mk team' + (mine ? ' me' : '') + (age > 90000 ? ' old' : '');
     mk.el.innerHTML = `<i></i>${t === 'me' ? '내 위치' : mine ? `${t}조 · 내 위치` : `${t}조`}${v.acc ? `<small>±${Math.round(v.acc)}m</small>` : ''}`;
-    if(mine){ meRing.visible = true; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
+    if(mine){ meRing.visible = !ME_DEMO; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
   });
   Object.keys(teamMk).forEach(t=>{ if(!list[t]){ teamMk[t].el.remove(); markers.splice(markers.indexOf(teamMk[t]), 1); delete teamMk[t]; } });
   refreshZones();
@@ -1762,7 +1769,8 @@ function startGeo(){
 // navigation view on, so the robot, its direction arrow and the coordinate chip can be checked as they will appear outdoors.
 let ME_DEMO = false, meDemoT = 0, meDemoA = 0;
 function demoMe(on){
-  clearInterval(meDemoT); ME_DEMO = on;
+  clearInterval(meDemoT); ME_DEMO = on; document.body.classList.toggle('medemo', on);
+  controls.minDistance = on ? 3 : 40;   // the orbit controls would push a close camera back out to 40 m
   if(on){
     if(W.id !== 'erica') setWorld('erica');
     const step = ()=>{ meDemoA += 0.12; const r = 14; onGeo({coords:{latitude: DATA.origin[0] + r*Math.sin(meDemoA)/KZ, longitude: DATA.origin[1] + r*Math.cos(meDemoA)/KX, accuracy: 8, heading: null, speed: 1.2}}, true); };
@@ -5579,10 +5587,42 @@ function buildSim(revealIds){
 }
 buildSim();
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
-function rescan(revealIds){
+function rescan(revealIds, arrive){
   rebuildIndex();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
+  if(arrive && revealIds && revealIds.length) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && m.scans.length)));
+}
+// A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground,
+// sparks rising, and the camera moving to watch it. The simulator has its own arrival (the vein sweeping in).
+function arriveFx(ids){
+  if(!ids.length) return;
+  if(W.id !== 'island') setWorld('island');
+  if(simOn) return;   // the vein sweep is the arrival there
+  const zones = ids.map(id=> MI.find(m=> m.id === id)).filter(m=> m && m.b);
+  if(zones.length === 1){ const b = zones[0].b, R = (b.r || 24); flyTo(new THREE.Vector3(b.cx + R*2.6 + 90, 150 + R*1.6, b.cz + R*3.2 + 140), new THREE.Vector3(b.cx, G + 12, b.cz), 1300); }
+  else flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1300);
+  zones.forEach((m, i)=>{
+    const b = m.b, R = (b.r || 24), g = new THREE.Group(); g.position.set(b.cx, G, b.cz); sceneI.add(g);
+    const beam = add(g, CYL(R*0.3, R*0.75, 480, 20), glowMat(0x7fd9ff, 0, true), 0, 0, 0, false); beam.material.depthWrite = false; beam.renderOrder = 10;
+    const beam2 = add(g, CYL(R*0.08, R*0.2, 480, 12), glowMat(0xffffff, 0, true), 0, 0, 0, false); beam2.material.depthWrite = false; beam2.renderOrder = 10;
+    const rings = [0, 1, 2].map(j=>{ const r = add(g, new THREE.TorusGeometry(1, 0.035, 8, 72).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color:j ? 0x2aa7ff : 0xffffff, transparent:true, opacity:0.95, depthWrite:false, depthTest:false}), 0, 4 + j*0.3, 0, false); r.renderOrder = 10; r.visible = false; return r; });
+    const flash = new THREE.Sprite(new THREE.SpriteMaterial({map:sparkTex, color:0xffffff, transparent:true, opacity:0, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending})); flash.position.y = 14; flash.renderOrder = 11; g.add(flash);
+    const n = 160, pts = new Float32Array(n*3), seeds = Array.from({length:n}, ()=> ({a:Math.random()*6.283, r:R*(0.3 + Math.random()*0.9), v:22 + Math.random()*40, w:1.2 + Math.random()*2.2, d:Math.random()*1.6}));
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+    const pm = new THREE.PointsMaterial({size:3.2, map:sparkTex, color:0x2aa7ff, transparent:true, opacity:0.95, depthWrite:false, sizeAttenuation:true}); const pc = new THREE.Points(pg, pm); pc.renderOrder = 11; g.add(pc);
+    const t0 = performance.now()/1000 + 1.1 + i*0.35, life = 5.2; let flashed = false;
+    islAnim.push(function fx(t){ const k = t - t0;
+      if(k < 0) return; if(k > life){ sceneI.remove(g); const at = islAnim.indexOf(fx); if(at >= 0) islAnim.splice(at, 1); return; }
+      const e = Math.min(1, k/0.35), f = Math.max(0, 1 - (k - 0.35)/2.8);
+      if(!flashed){ flashed = true; const fl = $('arrFlash'); fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on'); }
+      beam.material.opacity = 0.32*e*f; beam2.material.opacity = 0.45*e*f; beam.scale.set(1 + k*0.35, 1, 1 + k*0.35); beam.rotation.y = k*0.6;
+      rings.forEach((r, j)=>{ const rk = (k - j*0.7)/2.2; r.visible = rk > 0 && rk < 1; if(!r.visible) return; const ee = 1 - Math.pow(1 - rk, 3); r.scale.setScalar(1 + ee*R*3); r.material.opacity = 0.95*(1 - rk*rk); });
+      flash.scale.setScalar(R*1.2 + k*R*3); flash.material.opacity = 0.7*Math.max(0, 1 - k/0.7);
+      for(let j=0;j<n;j++){ const sd = seeds[j], kk = Math.max(0, k - sd.d), a = sd.a + kk*sd.w, rr = sd.r*(1 - kk*0.12); pts[j*3] = Math.cos(a)*rr; pts[j*3+1] = kk > 0 ? 1 + sd.v*kk : -50; pts[j*3+2] = Math.sin(a)*rr; }
+      pg.attributes.position.needsUpdate = true; pm.opacity = 0.95*Math.max(0, 1 - k/life); });
+  });
+  toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`);
 }
 // preview records on/off (this device only; stored in localStorage 'void-demo')
 function setDemo(ids, on){
@@ -5592,7 +5632,7 @@ function setDemo(ids, on){
     else { if(!DEMO.has(id)) return; DEMO.delete(id); const k = SCANS.findIndex(s=> s.id === `demo-${id}`); if(k >= 0) SCANS.splice(k, 1); if(byMission[id]) byMission[id] = byMission[id].filter(s=> s.id !== `demo-${id}`); }
   });
   try{ localStorage.setItem('void-demo', JSON.stringify([...DEMO])); }catch(e){}
-  rescan(on ? added : undefined);
+  rescan(on ? added : undefined, on);
 }
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
 // HUD count, the cave eye and the 5/5 card; the card waits for a pending sweep to finish so the last stretch is seen joining
