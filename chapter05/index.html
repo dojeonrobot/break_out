@@ -357,9 +357,16 @@ body.sim #simHud{display:flex}
 #simHud .cells{display:flex;gap:4px}
 #simHud .cells i{width:26px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--void-fg) 18%,transparent)}
 #simHud .cells i.ok{background:#9ff6ff;box-shadow:0 0 10px #9ff6ff}
+#simHud #simStat{display:block;margin-top:3px;font:500 11px var(--mono);letter-spacing:.06em;color:#9ff6ff;opacity:.85}
+/* simulator screen overlay: vignette, faint scanlines and a slow sweep, so the view reads as an instrument, not the park */
+#simFx{position:fixed;inset:0;pointer-events:none;z-index:19;display:none;background:radial-gradient(ellipse at 50% 55%,transparent 52%,rgba(2,8,18,.62) 100%),repeating-linear-gradient(0deg,rgba(130,225,255,.035) 0 1px,transparent 1px 4px);overflow:hidden}
+#simFx::after{content:"";position:absolute;left:0;right:0;height:140px;top:-140px;background:linear-gradient(180deg,transparent,rgba(130,225,255,.09),transparent);animation:simSweep 7s linear infinite}
+@keyframes simSweep{to{transform:translateY(calc(100vh + 280px))}}
+body.sim #simFx{display:block}
+@media (prefers-reduced-motion:reduce){#simFx::after{animation:none}}
 /* narrow screens: in simulator mode the HUD sits where the panel starts, so the panel moves down; on phones the HUD is one row and the simulator button rides above the two-row bar */
 @media (max-width:1000px){body.sim #panel{top:calc(136px + env(safe-area-inset-top,0px));max-height:calc(100% - 240px - env(safe-area-inset-top,0px))}}
-@media (max-width:760px){#simBtn{left:12px;bottom:calc(124px + env(safe-area-inset-bottom,0px))}#simHud{top:calc(64px + env(safe-area-inset-top,0px));gap:10px;padding:7px 12px}#simHud small{display:none}#simHud h2{font-size:13.5px}#simHud b{font-size:20px}#simHud .cells i{width:18px}}
+@media (max-width:760px){#simBtn{left:12px;bottom:calc(124px + env(safe-area-inset-bottom,0px))}#simHud{top:calc(64px + env(safe-area-inset-top,0px));gap:10px;padding:7px 12px}#simHud small,#simHud #simStat{display:none}#simHud h2{font-size:13.5px}#simHud b{font-size:20px}#simHud .cells i{width:18px}}
 #simDone{position:fixed;inset:0;z-index:33;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 22%,var(--void)) 0%,color-mix(in srgb,var(--void) 92%,transparent) 70%);color:var(--void-fg);text-align:center}
 #simDone[data-on]{display:grid}
 #simDone .in{display:grid;gap:12px;justify-items:center;max-width:min(560px,86vw);animation:rise .9s both}
@@ -570,7 +577,8 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="scroll" id="adminBody"></div>
 </aside>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
-<div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
+<div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2><span id="simStat"></span></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
+<div id="simFx" aria-hidden="true"></div>
 <div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
@@ -5394,10 +5402,51 @@ const FLOW_Y = G - 26;   // the vein runs through the crust under the island
 const veinTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); veinTex.wrapS = THREE.RepeatWrapping; veinTex.repeat.set(1, 1);
 const veinMat = new THREE.MeshBasicMaterial({map:veinTex, transparent:true, opacity:0.92, depthWrite:false, depthTest:false, side:THREE.DoubleSide, fog:false});   // normal blending: where pieces overlap (apex, thorn roots, pupil) the band stays one tone instead of flaring
 const veinBase = new THREE.MeshBasicMaterial({color:0x2a7fa8, transparent:true, opacity:0.5, depthWrite:false, depthTest:false, side:THREE.DoubleSide, fog:false});   // x-ray layer: never fogged, so the glyph reads from any height
-islAnim.push(t=>{ simAnim.forEach(f=> f(t)); veinTex.offset.x = -t*0.35;
+// ---- simulator look (user, 2026-10-15): energy veins with volume, the island as a hologram, a scanning grid on the ground
+const VEIN_U = {uTime:{value:0}};
+const veinShader = (color, core, alpha)=> new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uColor:{value:new THREE.Color(color)}, uCore:{value:new THREE.Color(core)}, uAlpha:{value:alpha}},
+  transparent:true, depthWrite:false, depthTest:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, fog:false,
+  vertexShader:`varying vec2 vUv; varying vec3 vN; varying vec3 vW; void main(){ vUv = uv; vN = normalize(normalMatrix*normal); vec4 wp = modelMatrix*vec4(position,1.0); vW = wp.xyz; gl_Position = projectionMatrix*viewMatrix*wp; }`,
+  fragmentShader:`uniform float uTime, uAlpha; uniform vec3 uColor, uCore; varying vec2 vUv; varying vec3 vN; varying vec3 vW;
+    void main(){ float across = abs(vUv.y*2.0-1.0); float core = pow(1.0-across, 3.0);
+      float pulse = pow(0.5+0.5*sin(vUv.x*2.2 - uTime*2.6), 6.0); float pulse2 = pow(0.5+0.5*sin(vUv.x*0.7 - uTime*1.1 + 1.7), 10.0);
+      vec3 V = normalize(cameraPosition - vW); float fr = pow(1.0-abs(dot(normalize(vN), V)), 1.5);
+      vec3 col = uColor*(0.45 + fr*0.4) + uCore*(core*0.55 + pulse*0.45 + pulse2*0.25);
+      float a = (0.16 + core*0.42 + fr*0.22 + pulse*0.22)*uAlpha; gl_FragColor = vec4(col, a); }`});
+const VEIN = veinShader(0x1489d8, 0xbdf3ff, 0.9), VEIN_GHOST = veinShader(0x3a5f9a, 0x9fd8ff, 0.28);
+const haloMat = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uColor:{value:new THREE.Color(0x39b6ff)}}, transparent:true, depthWrite:false, depthTest:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, fog:false,
+  vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`uniform float uTime; uniform vec3 uColor; varying vec2 vUv; void main(){ float across = abs(vUv.y*2.0-1.0); float a = pow(1.0-across, 2.4)*(0.16 + 0.07*sin(vUv.x*1.3 - uTime*1.6)); gl_FragColor = vec4(uColor, a); }`});
+const columnMat = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uColor:{value:new THREE.Color(0x9ff6ff)}, uAlpha:{value:1}}, transparent:true, depthWrite:false, depthTest:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, fog:false,
+  vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`uniform float uTime, uAlpha; uniform vec3 uColor; varying vec2 vUv; void main(){ float band = 0.5+0.5*sin(vUv.y*18.0 - uTime*3.0); float a = (1.0-vUv.y)*(0.22 + band*0.18)*uAlpha; gl_FragColor = vec4(uColor, a); }`});
+// the island as a hologram: dark glass with cyan rims and scanlines (every mesh swaps to this while the simulator is on)
+const HOLO = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime}, transparent:true, depthWrite:false, side:THREE.DoubleSide, fog:false,
+  vertexShader:`varying vec3 vN; varying vec3 vW; void main(){ vN = normalize(normalMatrix*normal); vec4 wp = modelMatrix*vec4(position,1.0); vW = wp.xyz; gl_Position = projectionMatrix*viewMatrix*wp; }`,
+  fragmentShader:`uniform float uTime; varying vec3 vN; varying vec3 vW;
+    void main(){ vec3 V = normalize(cameraPosition - vW); float fr = pow(1.0-abs(dot(normalize(vN), V)), 2.2);
+      float scan = 0.5+0.5*sin(vW.y*0.9 - uTime*2.5); float up = max(0.0, normalize(vN).y);
+      vec3 col = mix(vec3(0.04,0.10,0.20), vec3(0.35,0.85,1.0), fr*0.9 + scan*0.06) + vec3(0.10,0.22,0.34)*up;
+      float a = 0.17 + fr*0.5 + scan*0.04; gl_FragColor = vec4(col, a); }`});
+HOLO.color = new THREE.Color(); HOLO.emissive = new THREE.Color(); HOLO.emissiveIntensity = 1;   // island animations that tint their material keep working while it is swapped
+const GRIDM = new THREE.ShaderMaterial({uniforms:{uTime:VEIN_U.uTime, uC:{value:new THREE.Vector2(20, -10)}}, transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending, fog:false,
+  vertexShader:`varying vec2 vP; void main(){ vec4 wp = modelMatrix*vec4(position,1.0); vP = wp.xz; gl_Position = projectionMatrix*viewMatrix*wp; }`,
+  fragmentShader:`uniform float uTime; uniform vec2 uC; varying vec2 vP;
+    void main(){ float d = length(vP - uC); float isl = 1.0 - smoothstep(480.0, 560.0, d);
+      float gx = abs(fract(vP.x/30.0)-0.5), gz = abs(fract(vP.y/30.0)-0.5); float line = 1.0 - smoothstep(0.0, 0.05, min(gx, gz));
+      float ring = exp(-pow((d - mod(uTime*120.0, 1000.0))*0.018, 2.0));
+      float a = (line*0.09 + ring*0.4)*isl; gl_FragColor = vec4(vec3(0.45,0.9,1.0), a); }`});
+const simGrid = new THREE.Mesh(new THREE.PlaneGeometry(1500, 1500).rotateX(-Math.PI/2), GRIDM); simGrid.position.y = G + 0.6; simGrid.renderOrder = 4; simGrid.visible = false; sceneI.add(simGrid);
+const sparkTex = (()=>{ const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32,32,0,32,32,32); r.addColorStop(0,'rgba(255,255,255,1)'); r.addColorStop(0.3,'rgba(190,245,255,0.9)'); r.addColorStop(1,'rgba(120,200,255,0)'); g.fillStyle = r; g.fillRect(0,0,64,64); const t = new THREE.CanvasTexture(c); return t; })();
+const holoSwap = on=>{ islRoot.traverse(o=>{ if(!(o.isMesh || o.isInstancedMesh || o.isPoints || o.isLine) || o === caveEye) return;   // the cave's eye keeps its own glow
+  if(on){ if(o.userData.mat0 === undefined){ o.userData.mat0 = o.material; o.userData.vis0 = o.visible; } if(o.isInstancedMesh || o.isPoints || o.isLine) o.visible = false; else o.material = HOLO; }
+  else if(o.userData.mat0 !== undefined){ o.material = o.userData.mat0; o.visible = o.userData.vis0; delete o.userData.mat0; delete o.userData.vis0; } }); };
+islAnim.push(t=>{ if(!simOn) return; simAnim.forEach(f=> f(t)); VEIN_U.uTime.value = t;
   if(SIM_REVEAL_T == null) return;
-  REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / Math.max(1.4, r.len/110))); const e = 1 - Math.pow(1 - k, 3); r.geos.forEach(g=> g.setDrawRange(0, Math.round(r.total*e/6)*6)); });
-  FADES.forEach(f=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - f.delay) / f.dur)); f.f(1 - Math.pow(1 - k, 3)); }); });
+  REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / r.dur)), e = 1 - Math.pow(1 - k, 3);
+    r.items.forEach(it=> it.g.setDrawRange(0, Math.round(it.total*e/it.step)*it.step));
+    if(r.head){ const on = k > 0 && k < 1; r.head.visible = on; if(on){ const sc = r.secs[Math.min(r.secs.length-1, Math.floor(e*(r.secs.length-1)))]; r.head.position.set(sc.c[0], FLOW_Y + sc.hw*0.45, sc.c[1]); r.head.scale.setScalar(r.head.userData.sz*(1 + 0.25*Math.sin(t*22))); } } });
+  FADES.forEach(f=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - f.delay) / f.dur)); f.f(1 - Math.pow(1 - k, 3), k); }); });
 window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem(`void-seen-lit-${viewTeam()}`));
 function buildSim(revealIds){
   while(simRoot.children.length) simRoot.remove(simRoot.children[0]);
@@ -5432,67 +5481,98 @@ function buildSim(revealIds){
     const R = (b.r || 20) + 14;
     monByZone[m.id] = monument(simRoot, b.cx + d.x*R, G, b.cz + d.y*R, m.scans[0], t ? `ERICA ${t.name}에서 돌아온 기록` : '돌아온 기록');
   });
-  // The Ilua flow under the island: thick glowing bands in the shape of the Codex eye glyph (geometry in GLYPH, shared with the panel).
-  // A zone's stretch is a gap (only scattered bits of flow) until its record is back; then it sweeps in as one running band.
+  // The Ilua flow under the island: the Codex eye glyph (geometry in GLYPH) as energy veins with volume: a bright core tube, a soft halo,
+  // energy packets running along, particles drifting above. A zone's stretch stays a faint ghost until its record is back; then the vein
+  // sweeps in from its start with a running head of light and a burst where it arrives.
   const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.material.fog = false; o.renderOrder = order; return o; };
-  // flat band geometry from cross-sections: uv.u runs along the band (one stripe every 60 m), indices ordered along it so drawRange can sweep it in
-  const bandGeo = secs=>{ const pos = [], uv = [], idx = []; let dist = 0;
+  const S = 8;   // rings across a vein
+  // a half-tube along the cross-sections (index order along the vein, so drawRange sweeps it in); uv.x = distance / 60, uv.y across
+  const tubeGeo = (secs, w=1, h=0.55)=>{ const pos = [], nor = [], uv = [], idx = []; let dist = 0;
     secs.forEach((sc, i)=>{ if(i) dist += Math.hypot(sc.c[0] - secs[i-1].c[0], sc.c[1] - secs[i-1].c[1]);
-      pos.push(sc.c[0] + sc.n[0]*sc.hw, FLOW_Y, sc.c[1] + sc.n[1]*sc.hw, sc.c[0] - sc.n[0]*sc.hw, FLOW_Y, sc.c[1] - sc.n[1]*sc.hw); uv.push(dist/60, 0, dist/60, 1);
+      for(let j=0;j<=S;j++){ const u = -1 + 2*j/S, lift = Math.sqrt(Math.max(0, 1 - u*u)), hw = sc.hw*w;
+        pos.push(sc.c[0] + sc.n[0]*hw*u, FLOW_Y + hw*h*lift, sc.c[1] + sc.n[1]*hw*u);
+        const nx = sc.n[0]*u, nz = sc.n[1]*u, ny = lift*1.1 + 0.15, l = Math.hypot(nx, ny, nz) || 1; nor.push(nx/l, ny/l, nz/l); uv.push(dist/60, j/S); }
+      if(i){ const a0 = (i-1)*(S+1), b0 = i*(S+1); for(let j=0;j<S;j++){ idx.push(a0+j, b0+j, a0+j+1, a0+j+1, b0+j, b0+j+1); } } });
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); return g; };
+  const bandGeo = (secs, w=1)=>{ const pos = [], uv = [], idx = []; let dist = 0;
+    secs.forEach((sc, i)=>{ if(i) dist += Math.hypot(sc.c[0] - secs[i-1].c[0], sc.c[1] - secs[i-1].c[1]); const hw = sc.hw*w;
+      pos.push(sc.c[0] + sc.n[0]*hw, FLOW_Y + 0.4, sc.c[1] + sc.n[1]*hw, sc.c[0] - sc.n[0]*hw, FLOW_Y + 0.4, sc.c[1] - sc.n[1]*hw); uv.push(dist/60, 0, dist/60, 1);
       if(i){ const k = (i-1)*2; idx.push(k, k+2, k+1, k+1, k+2, k+3); } });
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); return g; };
-  const lit = (geo, len, reveal, delay)=>{
-    const under = new THREE.Mesh(geo, veinBase); under.renderOrder = 5; simRoot.add(under);
-    const over = new THREE.Mesh(geo.clone(), veinMat); over.renderOrder = 6; simRoot.add(over);
-    if(reveal){ geo.setDrawRange(0, 0); over.geometry.setDrawRange(0, 0); REVEALS.push({geos:[geo, over.geometry], total:geo.index.count, delay, len}); } };
-  const fade = (f, delay, dur)=>{ f(0); FADES.push({f, delay, dur}); };   // anything that is not a band eases in instead of popping
-  const sparks = (secs, at)=>{ const n = Math.max(6, Math.round(Math.abs(secs[secs.length-1].s - secs[0].s)/16)), sp = xray(new THREE.InstancedMesh(SPH(1.1, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(sp);
-    if(at >= 0) fade(e=> { sp.material.opacity = 0.9*e; }, at, 0.9);
-    simAnim.push(t=>{ for(let i=0;i<n;i++){ const u = ((t*0.05) + i/n) % 1, k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = (Math.sin(t*2.1 + i*2.3))*sc.hw*0.7;
-        o.position.set(sc.c[0] + sc.n[0]*w, FLOW_Y + 2 + Math.sin(t*3 + i)*2, sc.c[1] + sc.n[1]*w); o.updateMatrix(); sp.setMatrixAt(i, o.matrix); } sp.instanceMatrix.needsUpdate = true; }); };
+  const fade = (f, delay, dur)=>{ f(0, 0); FADES.push({f, delay, dur}); };   // anything that is not a vein eases in instead of popping
+  const glowSphere = (r, color, op, x, y, z)=> xray(add(simRoot, SPH(r, 14, 10), glowMat(color, op, true), x, y, z, false), 7);
+  const glowSprite = (size, color, op, x, y, z)=>{ const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:sparkTex, color, transparent:true, opacity:op, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending, fog:false})); sp.scale.setScalar(size); sp.position.set(x, y, z); sp.renderOrder = 9; simRoot.add(sp); return sp; };
+  // a burst where a sweep arrives: a flash and a ring racing outwards along the ground
+  const burst = (x, z, at)=>{ const ring = xray(add(simRoot, new THREE.TorusGeometry(1, 0.35, 6, 48).rotateX(Math.PI/2), glowMat(0xdffaff, 0.9, true), x, G + 1.5, z, false), 8);
+    const flash = glowSprite(1, 0xdffaff, 0.9, x, FLOW_Y + 6, z); ring.visible = flash.visible = false;
+    fade((e, k)=>{ const on = k > 0 && k < 1; ring.visible = flash.visible = on; ring.scale.setScalar(1 + e*46); ring.material.opacity = 0.9*(1 - e); flash.scale.setScalar(30 + e*90); flash.material.opacity = 0.9*(1 - e); }, at, 1.1); };
+  // a lit vein: core tube + halo band + running particles; `reveal` sweeps it in from its first section with a head of light
+  const vein = (secs, len, reveal, delay, dur)=>{
+    const tube = new THREE.Mesh(tubeGeo(secs), VEIN); tube.renderOrder = 6; simRoot.add(tube);
+    const halo = new THREE.Mesh(bandGeo(secs, 2.1), haloMat); halo.renderOrder = 5; simRoot.add(halo);
+    const n = Math.min(140, Math.max(10, Math.round(len/4))), pts = new Float32Array(n*3), seed = Array.from({length:n}, (_, i)=> ({u:i/n, v:0.035 + Math.random()*0.05, w:(Math.random()*2-1), h:2 + Math.random()*9, ph:Math.random()*6.3}));
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+    const pm = new THREE.PointsMaterial({size:5.5, map:sparkTex, transparent:true, opacity:0.8, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true, fog:false});
+    const pc = new THREE.Points(pg, pm); pc.renderOrder = 8; simRoot.add(pc);
+    let gate = reveal ? 0 : 1;   // particles only on the part of the vein that has arrived
+    simAnim.push(t=>{ for(let i=0;i<n;i++){ const sd = seed[i], u = (sd.u + t*sd.v) % 1; if(u > gate){ pts[i*3+1] = -9999; continue; }
+        const k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = sd.w*sc.hw*0.55*Math.sin(t*1.3 + sd.ph);
+        pts[i*3] = sc.c[0] + sc.n[0]*w; pts[i*3+1] = FLOW_Y + sd.h + Math.sin(t*2.2 + sd.ph)*1.5; pts[i*3+2] = sc.c[1] + sc.n[1]*w; } pg.attributes.position.needsUpdate = true; });
+    if(reveal){ const head = glowSprite(Math.min(70, secs[0].hw*2.6), 0xffffff, 0.95, 0, 0, 0); head.visible = false; head.userData.sz = head.scale.x;
+      const items = [{g:tube.geometry, total:tube.geometry.index.count, step:S*6}, {g:halo.geometry, total:halo.geometry.index.count, step:6}]; items.forEach(it=> it.g.setDrawRange(0, 0));
+      REVEALS.push({items, delay, dur, secs, head}); fade((e, k)=>{ gate = e; }, delay, dur);
+      const end = secs[secs.length-1]; burst(end.c[0], end.c[1], delay + dur); } };
   const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
   let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem(`void-seen-lit-${viewTeam()}`) || '[]')); }catch(e){}
   // stretches that sweep in: the ones just switched on (live), or the ones this device has not watched come back yet
   const newLit = revealIds ? revealIds.filter(id=> litIds.has(id)) : [...litIds].filter(id=> !seenLit.has(id));
   try{ localStorage.setItem(`void-seen-lit-${viewTeam()}`, JSON.stringify([...litIds])); }catch(e){}
-  const startOf = id=> 0.2 + Math.max(0, newLit.indexOf(id))*0.9;
+  const startOf = id=> 0.4 + Math.max(0, newLit.indexOf(id))*1.1;
   // monuments of zones just lit grow out of the ground once their stretch has arrived
-  Object.entries(monByZone).forEach(([id, g])=>{ if(newLit.includes(id)) fade(e=> g.scale.setScalar(Math.max(0.001, e)), startOf(id) + 1.6, 1.0); });
+  Object.entries(monByZone).forEach(([id, g])=>{ if(newLit.includes(id)) fade(e=> g.scale.setScalar(Math.max(0.001, e)), startOf(id) + 2.2, 1.0); });
   MI.forEach(m=>{ if(m.b && m.scans.length) SIM_LIT++; });
-  if(litIds.size){   // nothing restored yet: the simulator is just the dark island — no bits, no markers, no source light
-    // scattered bits of an empty stretch: dim, flickering, a little off the line
-    const bitPieces = [];
-    const bits = (pc, seed)=> glyphBits(pc, seed).forEach(([a,b], k)=>{ const secs = glyphSlice(pc, a, b); if(secs.length < 2) return;
-      const off = ((seed*7 + k*13) % 11 - 5)*1.6, sh = secs.map(sc=> ({...sc, c:[sc.c[0] + sc.n[0]*off, sc.c[1] + sc.n[1]*off], hw:sc.hw*0.85}));
-      const m = new THREE.MeshBasicMaterial({color:0x9fd8ff, transparent:true, opacity:0.9, depthWrite:false, depthTest:false, side:THREE.DoubleSide, fog:false});
-      const geo = bandGeo(sh), under = new THREE.Mesh(geo, veinBase); under.renderOrder = 5; simRoot.add(under);
-      const mesh = new THREE.Mesh(geo.clone(), m); mesh.renderOrder = 6; simRoot.add(mesh); bitPieces.push({m, ph:seed*0.7 + k*2.1}); });
-    simAnim.push(t=> bitPieces.forEach(p=>{ p.m.opacity = 0.7 + 0.3*Math.max(0, Math.sin(t*2.2 + p.ph)) * (Math.sin(t*8 + p.ph*3) > -0.6 ? 1 : 0.2); }));
+  if(litIds.size){   // nothing restored yet: the simulator is just the hologram island — no veins, no nodes, no source light
+    // a ghost of an empty stretch: faint broken segments, flickering, so the shape stays unreadable until its record is back
+    const ghosts = [];
+    const ghost = (pc, seed)=> glyphBits(pc, seed).forEach(([a,b], k)=>{ const secs = glyphSlice(pc, a, b); if(secs.length < 2) return;
+      const off = ((seed*7 + k*13) % 11 - 5)*1.4, sh = secs.map(sc=> ({...sc, c:[sc.c[0] + sc.n[0]*off, sc.c[1] + sc.n[1]*off], hw:sc.hw*0.8}));
+      const m = new THREE.Mesh(tubeGeo(sh), VEIN_GHOST.clone()); m.material.uniforms.uTime = VEIN_U.uTime; m.renderOrder = 5; simRoot.add(m); ghosts.push({m, ph:seed*0.7 + k*2.1}); });
+    simAnim.push(t=> ghosts.forEach(g=>{ g.m.material.uniforms.uAlpha.value = 0.14 + 0.16*Math.max(0, Math.sin(t*2.2 + g.ph)) * (Math.sin(t*8 + g.ph*3) > -0.6 ? 1 : 0.25); }));
     // the pieces: a zone's later piece (its thorn) starts when the earlier one has swept in; the pupil waits for everything else
     const zoneT = {};
     GLYPH.forEach((pc, i)=>{
       const on = pc.zone === 'final' ? litIds.size === 5 : litIds.has(pc.zone);
       const rv = pc.zone === 'final' ? newLit.length > 0 : newLit.includes(pc.zone);
-      const secs = glyphSlice(pc), len = Math.abs(secs[secs.length-1].s - secs[0].s), dur = Math.max(1.4, len/110);
+      const secs = glyphSlice(pc), len = Math.abs(secs[secs.length-1].s - secs[0].s), dur = Math.max(1.6, len/95);
       if(on){
-        const start = pc.zone === 'final' ? Math.max(1.0, ...Object.values(zoneT)) : (pc.after && zoneT[pc.zone] != null ? zoneT[pc.zone] : startOf(pc.zone));
-        lit(bandGeo(secs), len, rv, start); zoneT[pc.zone] = start + dur;
-        sparks(secs, rv ? start + dur*0.7 : -1);
-      } else if(pc.zone !== 'final' && !glyphShort(pc)) bits(pc, 7 + i*13);
+        const start = pc.zone === 'final' ? Math.max(1.0, ...Object.values(zoneT)) + 0.6 : (pc.after && zoneT[pc.zone] != null ? zoneT[pc.zone] : startOf(pc.zone));
+        vein(secs, len, rv, start, dur); zoneT[pc.zone] = start + dur;
+      } else if(pc.zone !== 'final' && !glyphShort(pc)) ghost(pc, 7 + i*13);
     });
-    // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
+    // zone nodes: a node under the zone, an energy column rising to the surface and shock rings on the ground when its record is back;
+    // a faint violet ring while it is still missing
     MI.forEach((m, k)=>{
-      if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz;
-      const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.9 : 0.3, true), x, FLOW_Y, z, false));
-      const shaft = xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.35 : 0.12, true), x, FLOW_Y, z, false));
-      if(newLit.includes(m.id)) fade(e=>{ ring.material.opacity = 0.9*e; shaft.material.opacity = 0.35*e; }, startOf(m.id) + 0.8, 1.0);
-      simAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
+      if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz, at = newLit.includes(m.id) ? startOf(m.id) + 1.2 : -1;
+      if(!on){ const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(0x9b7bff, 0.3, true), x, FLOW_Y, z, false));
+        simAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); }); return; }
+      const node = glowSphere(4.5, 0xdffaff, 0.95, x, FLOW_Y, z), aura = glowSphere(9, 0x5fd3ff, 0.28, x, FLOW_Y, z);
+      const col = new THREE.Mesh(CYL(2.6, 3.4, G + 34 - FLOW_Y, 14), columnMat.clone()); col.material.uniforms.uTime = VEIN_U.uTime; col.position.set(x, FLOW_Y, z); col.renderOrder = 7; simRoot.add(col);
+      const ring = xray(add(simRoot, new THREE.TorusGeometry(12, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(0x9ff6ff, 0.9, true), x, FLOW_Y, z, false));
+      const shock = xray(add(simRoot, new THREE.TorusGeometry(1, 0.3, 6, 48).rotateX(Math.PI/2), glowMat(0x9ff6ff, 0.7, true), x, G + 1.2, z, false), 8);
+      let onK = at >= 0 ? 0 : 1;
+      if(at >= 0) fade(e=>{ onK = e; node.material.opacity = 0.95*e; aura.material.opacity = 0.28*e; col.material.uniforms.uAlpha.value = e; ring.material.opacity = 0.9*e; }, at, 1.0);
+      simAnim.push(t=>{ const p = 1 + 0.18*Math.sin(t*3 + k); node.scale.setScalar(p); aura.scale.setScalar(1.3 - 0.15*Math.sin(t*3 + k)); ring.rotation.z = -t*0.5;
+        const q = ((t*0.45) + k*0.2) % 1; shock.visible = onK > 0.5; shock.scale.setScalar(1 + q*34); shock.material.opacity = 0.7*(1 - q)*onK; });
     });
-    // source (top apex) and mouth (bottom apex, only when the whole glyph is lit)
+    // source (top apex): a pulsing core with orbit rings; mouth (bottom apex) once the whole glyph is lit
     const src = GLYPH[0].band.secs, apexT = src.reduce((a, b)=> b.c[1] < a.c[1] ? b : a), mouth = GLYPH[5].band.secs.reduce((a, b)=> b.c[1] > a.c[1] ? b : a);
-    const srcL = xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, 0.3, true), apexT.c[0], FLOW_Y, apexT.c[1], false));
-    if(newLit.length && !seenLit.size) fade(e=>{ srcL.material.opacity = 0.3*e; }, 0, 0.8);
-    if(SIM_LIT === 5){ const mL = xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), mouth.c[0], FLOW_Y, mouth.c[1], false)); if(newLit.length) fade(e=>{ mL.material.opacity = 0.35*e; }, Math.max(1.0, ...Object.values(zoneT)) + 1.2, 1.2); }
+    const core = (x, z, r, color, at)=>{ const c = glowSphere(r, 0xffffff, 0.95, x, FLOW_Y, z), a = glowSphere(r*2.2, color, 0.3, x, FLOW_Y, z), beam = glowSphere(1, color, 0.2, x, FLOW_Y, z);
+      beam.geometry = CYL(r*0.5, r*0.5, G + 60 - FLOW_Y, 12);
+      const rings = [0, 1].map(i=> xray(add(simRoot, new THREE.TorusGeometry(r*2.6 + i*r, 0.5, 8, 64), glowMat(color, 0.8, true), x, FLOW_Y, z, false), 7));
+      if(at >= 0) fade(e=>{ c.material.opacity = 0.95*e; a.material.opacity = 0.3*e; beam.material.opacity = 0.2*e; rings.forEach(rg=> rg.material.opacity = 0.8*e); }, at, 1.2);
+      simAnim.push(t=>{ c.scale.setScalar(1 + 0.15*Math.sin(t*4)); a.scale.setScalar(1 + 0.25*Math.sin(t*2.3)); rings[0].rotation.set(t*0.7, t*0.9, 0); rings[1].rotation.set(-t*0.5, 0, t*0.8); }); };
+    core(apexT.c[0], apexT.c[1], 7, 0xb9a6ff, (newLit.length && !seenLit.size) ? 0 : -1);
+    if(SIM_LIT === 5) core(mouth.c[0], mouth.c[1], 9, 0x9ff6ff, newLit.length ? Math.max(1.0, ...Object.values(zoneT)) + 0.6 : -1);
   }
   SIM_REVEAL_T = simOn ? performance.now()/1000 + 0.3 : null;   // live: sweep now; otherwise the next time the simulator opens
   if(simOn) simHud();
@@ -5517,18 +5597,28 @@ function setDemo(ids, on){
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
 // HUD count, the cave eye and the 5/5 card; the card waits for a pending sweep to finish so the last stretch is seen joining
 function simHud(){
-  caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
+  if(caveEye.material.color) caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
   $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
   let seen = false; try{ seen = sessionStorage.getItem(`void-simdone-${viewTeam()}`) === '1'; }catch(e){}
+  $('simStat').textContent = SIM_LIT === 5 ? '전 구간 연결됨 · 환원 가능' : SIM_LIT ? `흐름 경로 추적 중 · ${SIM_LIT}개 구간 연결` : '흐름 경로 추적 중 · 돌아온 기록 없음';
   clearTimeout(simDoneT);
+  // the card only after everything that is still sweeping or fading in has finished (plus a breath), so the last stretch is seen joining
+  const endT = Math.max(0, ...REVEALS.map(r=> r.delay + r.dur), ...FADES.map(f=> f.delay + f.dur));
   if(SIM_LIT === 5 && !seen) simDoneT = setTimeout(()=>{ if(!simOn || SIM_LIT !== 5) return;
-    $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){} }, REVEALS.length ? 4500 : 0);
+    $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){} }, REVEALS.length ? (endT + 2.0)*1000 : 400);
 }
 function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
-  flowU.uDim.value = on ? 0.1 : 1; SIM_DIM.forEach(o=> o.visible = !on);
-  if(on && SIM_REVEAL_T == null) SIM_REVEAL_T = performance.now()/1000 + 0.6;   // new stretches sweep in the first time the simulator opens
-  if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); simHud(); }
+  flowU.uDim.value = on ? 0.1 : 1;
+  if(on){ SIM_DIM.forEach(o=> o.visible = false); holoSwap(true); } else { holoSwap(false); SIM_DIM.forEach(o=> o.visible = true); }
+  simGrid.visible = on; clouds.forEach(c=> c.g.visible = !on);   // no clouds over an instrument view
+  // the sea goes dark too: the whole view is an instrument, not a sunny park (islandTheme() restores the colours on the way out)
+  if(on){ if(!waterU._day) waterU._day = Object.fromEntries(['uShallow','uDeep','uFoam','uFog','uSky'].map(k=> [k, waterU[k].value.clone()]));
+    waterU.uShallow.value.set(0x0b1d33); waterU.uDeep.value.set(0x04101e); waterU.uFoam.value.set(0x1b3a5a); waterU.uFog.value.set(0x03060c); waterU.uSky.value.set(0x05101c); }
+  else if(waterU._day){ Object.entries(waterU._day).forEach(([k, v])=> waterU[k].value.copy(v)); }
+  if(on && SIM_REVEAL_T == null) SIM_REVEAL_T = performance.now()/1000 + 1.4;   // new stretches sweep in once the camera has settled
+  if(on){ sceneI.background = new THREE.Color(0x03060c); sceneI.fog = new THREE.Fog(0x03060c, 900, 2600); updateSun(); simHud();
+    if(W.id === 'island') flyTo(new THREE.Vector3(20 + 430, 860, -10 + 900), new THREE.Vector3(20, 0, -70), 1800); }   // an oblique view that frames the whole glyph
   else { clearTimeout(simDoneT); islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
 $('simBtn').onclick = ()=> setSim(!simOn);
