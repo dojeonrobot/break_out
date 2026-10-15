@@ -395,7 +395,8 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 .capbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:10px;padding:11px 14px;background:var(--accent);color:var(--accent-fg);font:600 13.5px var(--sans);cursor:pointer}
 .capbtn:active{transform:scale(.98)}
 .capbtn svg{width:18px;height:18px;flex:none}
-.task{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.task{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;min-height:22px}
+.capbtn.again{background:transparent;border:1px solid var(--line);color:var(--fg)}
 .task b{font-weight:600}
 .task+.cardsub,.capbtn+.task{margin-top:2px}
 .capwrap .cardsub{border-top:0;padding-top:0}
@@ -525,7 +526,6 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 <aside id="board" class="glass" aria-label="도로랜드 복구 현황">
   <div class="bh"><div><small>SCAN BREAK</small><h2>도로랜드 복구 현황</h2></div><div class="acts"><b id="bN">0 / 0</b><button id="bMin" class="x" type="button" aria-expanded="true">접기</button></div></div>
   <div class="bbar"><i id="bFill"></i></div>
-  <p class="bhint">캠퍼스의 빈 곳에서 실사 사진과 스캔본을 둘 다 내면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.</p>
   <div id="bRows"></div>
 </aside>
 <section id="info" class="glass off" aria-live="polite">
@@ -1247,17 +1247,17 @@ const CAM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 function formHTML(m, pre=''){
   const msg = MSG[m.id] || {text:'', kind:''}, q = zoneParts(m), pend = subsFor(m);
   const photoPend = pend.some(x=> x.kind === 'orbit'), scanPend = pend.some(x=> x.kind !== 'orbit');
-  const chip = (done, p)=> done ? '<span class="st ok">완료</span>' : p ? '<span class="st pend">확인 중</span>' : '<span class="st void">아직</span>';
+  const chip = (done, p)=> done ? '<span class="st ok">완료</span>' : p ? '<span class="st pend">확인 중</span>' : '';
   return `<div class="capwrap">
       <div class="task"><b>① 실사 사진</b>${chip(q.photo, photoPend)}</div>
-      ${q.photo ? '' : `<button type="button" class="capbtn" data-cap="${esc(m.id)}">${CAM_ICON} 이 구역 카메라로 찍기</button>`}
+      <button type="button" class="capbtn ${q.photo ? 'again' : ''}" data-cap="${esc(m.id)}">${CAM_ICON} ${q.photo ? '다시 찍기' : '이 구역 카메라로 찍기'}</button>
       <div class="task"><b>② 스캔본</b>${chip(q.scan, scanPend)}</div>
-      ${q.scan ? '' : `<form class="cardsub" data-sub="${esc(m.id)}" novalidate>
-        <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="Scaniverse 스캔 링크" autocomplete="off" aria-label="스캔 링크"><button type="submit">제출</button></div>
+      <form class="cardsub" data-sub="${esc(m.id)}" novalidate>
+        <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="${q.scan ? '다시 제출할 스캔 링크' : 'Scaniverse 스캔 링크'}" autocomplete="off" aria-label="스캔 링크"><button type="submit">${q.scan ? '다시 제출' : '제출'}</button></div>
         <input data-draft="n-${pre}${esc(m.id)}" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
         ${msg.text ? `<p class="subhelp" data-kind="${msg.kind}">${esc(msg.text)}</p>` : ''}
         ${LOCAL ? '<p class="subhelp">서버 연결 전이라 이 기기에만 저장됩니다.</p>' : ''}
-      </form>`}
+      </form>
     </div>`;
 }
 const subThumb = s => s.kind==='orbit' ? orbitThumb(s) : `${API}/thumb/${esc(s.scanId)}`;
@@ -1280,18 +1280,15 @@ function boardRow(p){
 function teamZones(t, ps){ return ps.map(p=>{ const ids = pairIds(p.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)), ok = mine.filter(subDone); const both = ok.some(x=> x.kind === 'orbit') && ok.some(x=> x.kind !== 'orbit'); return {p, st: both ? 'ok' : mine.length ? 'pend' : 'void'}; }); }
 function renderBoard(){
   let ps; try{ ps = PAIRS(); }catch(e){ if(e instanceof ReferenceError) return; throw e; }   // island list not built yet on the very first render
-  const hint = document.querySelector('#board .bhint');
   if(viewTeam() === 0){   // the admin's or the big screen's overview: one row per team, nothing about which team sees what
     const teams = [...new Set(SUBS.map(s=> s.team || 0))].filter(Boolean).sort((a,b)=> a-b);
     const rows = teams.map(t=>{ const zs = teamZones(t, ps), ok = zs.filter(z=> z.st === 'ok').length;
       return `<div class="trow ${ok === ps.length ? 'full' : ''}"><b>${t}조</b><div class="cells">${zs.map(z=> `<i class="${z.st === 'ok' ? 'ok' : z.st === 'pend' ? 'pend' : ''}" title="${esc(z.p.island.name)}"></i>`).join('')}</div><span class="tn">${ok} / ${ps.length}</span><div class="tz">${zs.filter(z=> z.st !== 'void').map(z=> `<em class="${z.st}">${esc(z.p.island.name)}</em>`).join('')}</div></div>`; });
     const full = teams.filter(t=> teamZones(t, ps).every(z=> z.st === 'ok')).length;
     $('bN').textContent = `${full} / ${teams.length}`; $('bFill').style.width = teams.length ? `${full/teams.length*100}%` : '0';
-    $('bRows').innerHTML = rows.join('') || `<div class="empty">아직 제출한 조가 없습니다.<br>조가 구역을 복구하면 여기에 조별로 나타납니다.</div>`;
-    if(hint) hint.textContent = '조별 진행입니다. 다섯 구역을 모두 복구한 조 수 / 제출한 조 수';
+    $('bRows').innerHTML = rows.join('');
     return;
   }
-  if(hint) hint.textContent = '캠퍼스의 빈 곳에서 실사 사진과 스캔본을 둘 다 내면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.';
   const ok = ps.filter(p=>zoneState(p.campus)==='ok').length;
   $('bN').textContent = `${ok} / ${ps.length}`; $('bFill').style.width = ps.length ? `${ok/ps.length*100}%` : '0';
   $('bRows').innerHTML = ps.map(boardRow).join('');
