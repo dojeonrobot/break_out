@@ -215,6 +215,17 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 .brow.is-pend .th{background:var(--accent)}
 .brow.is-void{border-style:dashed;border-color:color-mix(in srgb,var(--void-edge) 55%,transparent)}
 .bfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 18px 12px;border-top:1px solid var(--line);font-size:12.5px}
+/* per-team rows on the admin's and the big screen's board */
+.trow{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;margin-top:6px;border-radius:10px;border:1px solid var(--line)}
+.trow b{font-size:14px}
+.trow .cells i.pend{background:var(--accent);outline:0}
+.trow .tn{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.trow .tz{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px}
+.trow .tz em{font-style:normal;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--line)}
+.trow .tz em.ok{background:color-mix(in srgb,var(--restored) 18%,transparent);color:var(--restored)}
+.trow .tz em.pend{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.trow.full{border-color:color-mix(in srgb,var(--restored) 50%,transparent);background:color-mix(in srgb,var(--restored) 7%,transparent)}
+body.screen .trow{padding:12px 14px} body.screen .trow b{font-size:18px} body.screen .trow .tn{font-size:18px} body.screen .trow .cells i{width:34px;height:8px} body.screen .trow .tz em{font-size:13px}
 .bfoot a{font-weight:600;text-decoration:none}
 .subline img{width:100%;height:72px;object-fit:cover;border-radius:6px;margin-bottom:4px;display:block}
 body.screen #panel,body.screen #bar,body.screen #credit,body.screen .bfoot,body.screen #info{display:none}
@@ -318,7 +329,7 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 .mk.team.me{background:var(--accent);color:var(--accent-fg)} .mk.team.me i{background:#fff}
 .mk.team.old{opacity:.45}
 .mk.team small{font-size:10px;color:var(--muted)} .mk.team.me small{color:color-mix(in srgb,var(--accent-fg) 75%,transparent)}
-/* the admin drawer: opens on the right from the 운영자 button, over the board, leaving the 3D view visible */
+/* the admin drawer: opens on the right from the 관리자 button, over the board, leaving the 3D view visible */
 #adminDlg{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;width:380px;max-height:calc(100% - 120px - env(safe-area-inset-top,0px));z-index:22;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
 #adminDlg[hidden]{display:none}
 #adminDlg .ah{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px 10px;border-bottom:1px solid var(--line)}
@@ -488,7 +499,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
     <label for="teamSel">우리 조
       <select id="teamSel"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
     </label>
-    <button id="adminBtn" class="mini" type="button">운영자</button>
+    <button id="adminBtn" class="mini" type="button">관리자</button>
   </div>
   <div class="tabs" role="tablist">
     <button role="tab" id="tV" aria-selected="true">복구 필요 <span class="cnt" id="cV">0</span></button>
@@ -554,8 +565,8 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="grid" id="tpGrid"></div>
   <button type="button" class="skip" id="tpSkip">조 없이 둘러보기</button>
 </div></div>
-<aside id="adminDlg" class="glass" hidden aria-label="운영자">
-  <div class="ah"><div><small>ADMIN</small><h2>운영자</h2></div><div class="acts"><button type="button" class="mini" data-aact="logout">운영자 종료</button><button type="button" class="x" id="adminX">닫기</button></div></div>
+<aside id="adminDlg" class="glass" hidden aria-label="관리자">
+  <div class="ah"><div><small>ADMIN</small><h2>관리자</h2></div><div class="acts"><button type="button" class="mini" data-aact="logout">관리자 종료</button><button type="button" class="x" id="adminX">닫기</button></div></div>
   <div class="scroll" id="adminBody"></div>
 </aside>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
@@ -656,7 +667,7 @@ const HIDDEN = (()=>{ try{
     if(BOOT){ localStorage.setItem('void-hidden', JSON.stringify(BOOT.hidden || [])); return new Set(BOOT.hidden || []); }
     return new Set(JSON.parse(localStorage.getItem('void-hidden') || '[]'));
   }catch(e){ return new Set(BOOT ? BOOT.hidden || [] : []); } })();
-const SCANS = SCANS_ALL.filter(s=>!HIDDEN.has(s.id));
+const SCANS = SCANS_ALL.slice();   // the admin's hidden list is applied when the visible index is built (visibleScan)
 // Records shot with the page's own camera (kind "orbit": a ring of photos around the thing, stored on our server).
 // Once the server marks one restored it joins the scans before the map is built, so the zone renders restored like a splat would.
 const orbitThumb = s => s.thumb || `${API}/scan/${s.scanId || s.id}/thumb.jpg`;
@@ -674,7 +685,7 @@ orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
 // Preview records (admin, this device only): zones ticked under "복구 미리보기" count as restored with a stand-in record,
 // so the island, the flow and the 5/5 ending can be checked without submitting five real links. Stored in localStorage 'void-demo'.
 const DEMO = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem('void-demo') || '[]')); }catch(e){ return new Set(); } })();
-const demoScan = id=>{ const base = SCANS_ALL[0] || {}; return {...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'운영자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}; };
+const demoScan = id=>{ const base = SCANS_ALL[0] || {}; return {...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'관리자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}; };
 DEMO.forEach(id=>{ if(!SCANS.some(s=> s.mission === id)) SCANS.push(demoScan(id)); });
 const ORBIT_SIG = orbitSig(BOOT && BOOT.subs);
 let AUTO = BOOT ? BOOT.auto !== false : true;
@@ -825,7 +836,19 @@ function paintSky(){
 }
 
 // ---------- missions & scans ----------
-const byMission = {}; SCANS.forEach(s=>{ if(s.mission) (byMission[s.mission] ||= []).push(s); });
+let ADMIN_KEY = ''; try{ ADMIN_KEY = sessionStorage.getItem('void-admin') || ''; }catch(e){}
+const QS = new URLSearchParams(location.search);
+const SCREEN = QS.get('view') === 'screen';
+let TEAM = 0; try{ TEAM = +(QS.get('team') || localStorage.getItem('dorogram-team') || localStorage.getItem('void-team')) || 0; }catch(e){}
+if(TEAM < 1 || TEAM > 12) TEAM = 0;
+// Who sees which records (user, 2026-10-15): a team's tablet shows only its own team's records, so teams cannot see each other's work.
+// The admin (logged in on this device) and the big screen see every team's, and the admin can pick one team to view as. Team GPS dots stay visible to all.
+let VIEW_ADMIN = 0; try{ VIEW_ADMIN = +sessionStorage.getItem('void-view') || 0; }catch(e){}
+const viewTeam = ()=> ADMIN_KEY ? VIEW_ADMIN : SCREEN ? 0 : (TEAM || -1);   // 0 = everyone's records, -1 = none (no team picked yet)
+const visibleScan = s=>{ if(HIDDEN.has(s.id)) return false; if(s.demo) return true; const v = viewTeam(); return v === 0 || (v > 0 && s.team === v); };
+let byMission = {}, inMap = new Set();
+function rebuildIndex(){ byMission = {}; inMap = new Set(); SCANS.forEach(s=>{ if(!visibleScan(s)) return; inMap.add(s.id); if(s.mission) (byMission[s.mission] ||= []).push(s); }); }
+rebuildIndex();
 // A campus spot and its island twin share one restoration state: scans and submissions for either count for both.
 const TWIN = {}; MISSIONS.forEach(m=>{ if(m.twin){ TWIN[m.id] = m.twin; TWIN[m.twin] = m.id; } });
 const pairIds = id => TWIN[id] ? [id, TWIN[id]] : [id];
@@ -1120,7 +1143,7 @@ function updateProgress(){
   const isl = W && W.id==='island';
   $('pN').textContent = `${M.filter(m=>m.scans.length).length} / ${M.length}`;
   $('pCells').innerHTML = M.map(m=>`<i class="${m.scans.length?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
-  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 창에서 끔)</span></div>` : '';
+  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 관리자 창에서 끔)</span></div>` : '';
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
 updateProgress();
@@ -1131,18 +1154,12 @@ function thumbsHTML(list){ return `<div class="thumbs">${list.map(s=>`<button da
 function coordHTML(m){ if(m.lat==null) return `<div class="chap">${esc(m.ch||'')}</div>`; return `<div class="coord"><code>${coordText(m)}</code><button class="mini" data-copy="${coordText(m)}">복사</button>${hiddenZone(m) ? '' : `<a class="mini" href="${mapLink(m)}" target="_blank" rel="noopener">지도</a>`}</div>`; }
 
 let tab = 'v';
-const inMap = new Set(SCANS.map(s=>s.id));
 
 // ---------- scan link submissions ----------
 // Saved on the server (/api/void, server/ch5_void_server.py) so the admin sees every team's links.
 // Opened as a plain file, or when the server is unreachable, they stay in this browser instead.
 const SUB_KEY = 'void-subs';
 let LOCAL = location.protocol === 'file:';
-let ADMIN_KEY = ''; try{ ADMIN_KEY = sessionStorage.getItem('void-admin') || ''; }catch(e){}
-const QS = new URLSearchParams(location.search);
-const SCREEN = QS.get('view') === 'screen';
-let TEAM = 0; try{ TEAM = +(QS.get('team') || localStorage.getItem('dorogram-team') || localStorage.getItem('void-team')) || 0; }catch(e){}
-if(TEAM < 1 || TEAM > 12) TEAM = 0;
 const loadLocal = ()=>{ try{ return JSON.parse(localStorage.getItem(SUB_KEY) || '[]'); }catch(e){ return []; } };
 const saveLocal = list=>{ try{ localStorage.setItem(SUB_KEY, JSON.stringify(list)); return true; }catch(e){ return false; } };
 let SUBS = LOCAL ? loadLocal() : [];
@@ -1165,7 +1182,7 @@ function checkReset(st){
   TEAM = 0; try{ localStorage.removeItem('void-team'); localStorage.removeItem('dorogram-team'); }catch(e){}
   const sel = $('teamSel'); if(sel) sel.value = '';
   if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
-  toast('운영자가 초기화했습니다. 조를 다시 골라 주세요');
+  toast('관리자가 초기화했습니다. 조를 다시 골라 주세요');
 }
 function applyState(st){
   checkReset(st);
@@ -1174,16 +1191,13 @@ function applyState(st){
   AUTO = st.auto !== false;
   if(st.pos){ LAST_POS = st.pos; updateTeamDots(LAST_POS, st.now); }
   if(lastSig !== null) announceChanges();
-  const hid = (st.hidden || []).slice().sort().join(','), cur = [...HIDDEN].sort().join(',');
-  const orbitChanged = orbitSig(SUBS) !== ORBIT_SIG;   // a camera record was restored (or removed): the 3D needs a rebuild
-  if(hid !== cur || orbitChanged){
-    // the admin reset or restored scans: remember the new hidden set and rebuild the page once
-    let stored = true; try{ localStorage.setItem('void-hidden', JSON.stringify(st.hidden || [])); }catch(e){ stored = false; }
-    if(!stored && !orbitChanged){ refreshSubUI(); return; }
-    let recent = false; try{ recent = Date.now() - (+sessionStorage.getItem('void-rl') || 0) < 5000; sessionStorage.setItem('void-rl', Date.now()); }catch(e){}
-    if(!recent){ if(orbitChanged) toast('새 기록을 3D에 반영합니다'); setTimeout(()=>location.reload(), orbitChanged ? 900 : 0); return; }
-  }
-  refreshSubUI();
+  // the hidden list and the restored records are applied live, no reload: the 3D side (markers, monuments, flow) rebuilds through rescan()
+  const hid = new Set(st.hidden || []); let changed = false;
+  if([...hid].sort().join() !== [...HIDDEN].sort().join()){ HIDDEN.clear(); hid.forEach(x=> HIDDEN.add(x)); try{ localStorage.setItem('void-hidden', JSON.stringify([...hid])); }catch(e){} changed = true; }
+  const done = orbitOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
+  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ SCANS.push(orbitScan(s)); changed = true; } });
+  for(let k = SCANS.length - 1; k >= 0; k--){ const x = SCANS[k]; if((x.kind === 'orbit' || x.kind === 'splat') && !x.demo && !doneIds.has(x.id)){ SCANS.splice(k, 1); changed = true; } }
+  if(changed && typeof rescan === 'function' && typeof MI !== 'undefined') rescan(); else refreshSubUI();
 }
 async function syncState(){
   if(LOCAL) return;
@@ -1191,7 +1205,7 @@ async function syncState(){
   catch(e){ if(STATE_VER < 0){ LOCAL = true; SUBS = loadLocal(); refreshSubUI(); } }
 }
 const MSG = {};
-const subsFor = m => SUBS.filter(s=> pairIds(m.id).includes(s.mission) && !inMap.has(s.scanId));
+const subsFor = m => { const v = viewTeam(); return SUBS.filter(s=> pairIds(m.id).includes(s.mission) && !inMap.has(s.scanId) && (v === 0 || s.team === v)); };
 function zoneState(m){ return m.scans.length ? 'ok' : subsFor(m).length ? 'pend' : 'void'; }
 const timeText = t => new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const cancelBtn = s => (LOCAL || s.team===TEAM) ? `<button type="button" class="mini" data-unsub="${esc(s.id || s.scanId)}">취소</button>` : '';
@@ -1200,9 +1214,9 @@ function subLines(m){
     const who = s.team ? s.team+'조가 ' : '';
     if(s.kind==='orbit') return `<div class="subline orb">
       <button type="button" class="orbbtn" data-orbit="${esc(s.id)}"><img src="${esc(orbitThumb(s))}" alt="" loading="lazy"><span>${who}찍은 기록 보기${s.note ? ' · '+esc(s.note) : ''}<br><small>사진 ${s.frames || '?'}장</small></span></button>
-      <span>${timeText(s.createdAt)} 올림 · ${s.status==='ok' ? '복구 반영 중' : '운영자 확인 대기 중'} ${ADMIN_KEY && s.status!=='ok' ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${cancelBtn(s)}</span>
+      <span>${timeText(s.createdAt)} 올림 · ${s.status==='ok' ? '복구 반영 중' : '관리자 확인 대기 중'} ${ADMIN_KEY && s.status!=='ok' ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${cancelBtn(s)}</span>
     </div>`;
-    const st = s.splat ? (s.status==='ok' ? '3D 반영 중' : '운영자 확인 대기 중') : s.error ? `변환 실패 · ${esc(s.error)}` : '서버가 3D로 바꾸는 중 (1~2분)';
+    const st = s.splat ? (s.status==='ok' ? '3D 반영 중' : '관리자 확인 대기 중') : s.error ? `변환 실패 · ${esc(s.error)}` : '서버가 3D로 바꾸는 중 (1~2분)';
     return `<div class="subline ${s.splat ? '' : s.error ? 'err' : 'conv'}">
       ${LOCAL ? '' : `<img src="${API}/thumb/${esc(s.scanId)}" alt="" loading="lazy" onerror="this.remove()">`}
       <a href="${esc(s.url)}" target="_blank" rel="noopener">${who}제출한 스캔${s.caption ? ' · '+esc(s.caption) : ''}${s.note ? ' · '+esc(s.note) : ''}</a>
@@ -1242,8 +1256,21 @@ function boardRow(p){
     ${statusHTML(p.campus)}
   </button>`;
 }
+function teamZones(t, ps){ return ps.map(p=>{ const ids = pairIds(p.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)); return {p, st: mine.some(subDone) ? 'ok' : mine.length ? 'pend' : 'void'}; }); }
 function renderBoard(){
   let ps; try{ ps = PAIRS(); }catch(e){ if(e instanceof ReferenceError) return; throw e; }   // island list not built yet on the very first render
+  const hint = document.querySelector('#board .bhint');
+  if(viewTeam() === 0){   // the admin's or the big screen's overview: one row per team, nothing about which team sees what
+    const teams = [...new Set(SUBS.map(s=> s.team || 0))].filter(Boolean).sort((a,b)=> a-b);
+    const rows = teams.map(t=>{ const zs = teamZones(t, ps), ok = zs.filter(z=> z.st === 'ok').length;
+      return `<div class="trow ${ok === ps.length ? 'full' : ''}"><b>${t}조</b><div class="cells">${zs.map(z=> `<i class="${z.st === 'ok' ? 'ok' : z.st === 'pend' ? 'pend' : ''}" title="${esc(z.p.island.name)}"></i>`).join('')}</div><span class="tn">${ok} / ${ps.length}</span><div class="tz">${zs.filter(z=> z.st !== 'void').map(z=> `<em class="${z.st}">${esc(z.p.island.name)}</em>`).join('')}</div></div>`; });
+    const full = teams.filter(t=> teamZones(t, ps).every(z=> z.st === 'ok')).length;
+    $('bN').textContent = `${full} / ${teams.length}`; $('bFill').style.width = teams.length ? `${full/teams.length*100}%` : '0';
+    $('bRows').innerHTML = rows.join('') || `<div class="empty">아직 제출한 조가 없습니다.<br>조가 구역을 복구하면 여기에 조별로 나타납니다.</div>`;
+    if(hint) hint.textContent = '조별 진행입니다. 다섯 구역을 모두 복구한 조 수 / 제출한 조 수';
+    return;
+  }
+  if(hint) hint.textContent = '캠퍼스의 빈 곳을 카메라로 스캔하면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.';
   const ok = ps.filter(p=>zoneState(p.campus)==='ok').length;
   $('bN').textContent = `${ok} / ${ps.length}`; $('bFill').style.width = ps.length ? `${ok/ps.length*100}%` : '0';
   $('bRows').innerHTML = ps.map(boardRow).join('');
@@ -1254,15 +1281,15 @@ document.addEventListener('click', e=>{
   if(m && m.bi != null) select(m.bi, true);
 });
 let lastSig = null;
-function pairSig(){ return PAIRS().map(p=>{ const st = zoneState(p.campus); return `${p.campus.id}:${st}:${subsFor(p.campus).map(s=>s.team).join('+')}`; }).join('|'); }
+function pairSig(){ return [...new Set(SUBS.filter(s=> s.team).map(s=> `${s.team}:${s.mission}:${subDone(s) ? 'ok' : 'pend'}`))].sort().join('|'); }
 function announceChanges(){
   const sig = pairSig(); if(lastSig===null || sig===lastSig){ lastSig = sig; return; }
-  const before = Object.fromEntries(lastSig.split('|').map(x=>[x.split(':')[0], x])); lastSig = sig;
-  sig.split('|').forEach(x=>{ if(before[x.split(':')[0]]===x) return;
-    const [id, st, teams] = x.split(':'); const p = PAIRS().find(q=>q.campus.id===id); if(!p) return;
-    if(st==='pend') toast(`${teams.replace(/\+/g,'·')}조가 ${p.island.name} 구역을 복구하고 있습니다`);
-    else if(st==='ok') toast(`${p.island.name} 구역이 돌아왔습니다`);
-    if(SCREEN){ const m = M.find(q=>pairIds(id).includes(q.id)); if(m && m.bi != null) select(m.bi, true); }
+  const before = new Set(lastSig.split('|')); lastSig = sig; const v = viewTeam();
+  sig.split('|').forEach(x=>{ if(!x || before.has(x)) return;
+    const [t, mid, st] = x.split(':'); if(v !== 0 && +t !== v) return;   // a team only hears about its own work
+    const p = PAIRS().find(q=> pairIds(q.campus.id).includes(mid)); if(!p) return;
+    toast(st==='pend' ? `${t}조가 ${p.island.name} 구역을 복구하고 있습니다` : `${t}조가 ${p.island.name} 구역을 복구했습니다`);
+    if(SCREEN){ const m = M.find(q=> pairIds(mid).includes(q.id)); if(m && m.bi != null) select(m.bi, true); }
   });
 }
 function missionById(id){ return MISSION_E.find(m=>m.id===id) || (typeof MI !== 'undefined' ? MI.find(m=>m.id===id) : null) || null; }
@@ -1283,10 +1310,13 @@ function adminHTML(){
   const n = SUBS.length, done = SUBS.filter(isDone).length, wait = SUBS.filter(s=>s.kind==='orbit' && s.status!=='ok').length;
   return `<div class="adm">
     <p class="subhelp">조별 제출 ${n}건 · 복구됨 ${done}건${wait ? ` · 확인 대기 ${wait}건` : ''}${HIDDEN.size ? ` · 숨긴 스캔 ${HIDDEN.size}건` : ''}</p>
-    <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 운영자가 "복구 확정"을 눌러야 함)</label>
+    <label class="autol">이 화면에 보이는 기록 <select data-aview><option value="0" ${VIEW_ADMIN ? '' : 'selected'}>모든 조</option>${Array.from({length:12}, (_,i)=> `<option value="${i+1}" ${VIEW_ADMIN === i+1 ? 'selected' : ''}>${i+1}조가 보는 대로</option>`).join('')}</select></label>
+    <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 관리자가 "복구 확정"을 눌러야 함)</label>
     <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 스캔 없이 구역이 돌아온 것으로 보기 (확인용). 체크하면 바로 섬과 환원 시뮬레이터에 반영됩니다.</span>
       ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
       <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div></div>
+    <div class="demo"><b>보이드 로봇 미리보기</b> <span>건물 안이라 GPS가 안 잡혀도, 캠퍼스 가운데에 로봇과 방향 화살표를 띄워 생김새와 표시 방식을 봅니다 (이 기기만).</span>
+      <div class="arow"><button type="button" class="mini" data-aact="meDemo">${ME_DEMO ? '미리보기 끄기' : '로봇 띄우기'}</button></div></div>
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
@@ -1299,16 +1329,17 @@ function adminHTML(){
 }
 // preview ticks apply at once, without a reload: stand-in records go in or out, the zones and the flow layer rebuild (see setDemo)
 function demoTick(ids, on){ setDemo(ids, on); if(on){ if(W.id !== 'island') setWorld('island'); if(!simOn) setSim(true); } }
-function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ localStorage.removeItem('void-seen-lit'); sessionStorage.removeItem('void-simdone'); }catch(e){} }
+function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ Object.keys(localStorage).filter(k=> k.startsWith('void-seen-lit')).forEach(k=> localStorage.removeItem(k)); Object.keys(sessionStorage).filter(k=> k.startsWith('void-simdone')).forEach(k=> sessionStorage.removeItem(k)); }catch(e){} }
 function renderAdmin(){ const b = $('adminBody'); if(b && !$('adminDlg').hidden) b.innerHTML = adminHTML(); }
-function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); }
+function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); rescan(); }
+document.addEventListener('change', e=>{ const v = e.target.closest('[data-aview]'); if(!v) return; VIEW_ADMIN = +v.value || 0; try{ sessionStorage.setItem('void-view', String(VIEW_ADMIN)); }catch(e){} rescan(); });
 function closeAdmin(){ $('adminDlg').hidden = true; document.body.classList.remove('admin'); }
 // clipboard with a fallback for browsers that refuse writeText (http, denied permission): a hidden textarea + execCommand
 async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
   try{ const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; } }
 async function adminAct(act){
   try{
-    if(act==='logout'){ ADMIN_KEY=''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} closeAdmin(); return; }
+    if(act==='logout'){ if(ME_DEMO) demoMe(false); ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
     if(act==='copy'){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
         .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
@@ -1325,8 +1356,9 @@ async function adminAct(act){
       if(!confirm(`숨긴 스캔 ${HIDDEN.size}건을 다시 3D에 보이게 합니다. 계속할까요?`)) return;
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
+    if(act==='meDemo'){ demoMe(!ME_DEMO); renderAdmin(); return; }
     if(act==='demoAll' || act==='demoNone'){ demoTick([...document.querySelectorAll('[data-demo]')].map(c=> c.dataset.demo), act==='demoAll'); return; }
-    if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '운영자가 확정해야 복구됩니다'); return; }
+    if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '관리자가 확정해야 복구됩니다'); return; }
   }catch(err){ toast(err.message); }
 }
 function refreshSubUI(){
@@ -1395,6 +1427,7 @@ function renderList(){
   } else if(tab==='r'){
     const free = W.id==='erica' ? SCANS.filter(s=>!s.mission) : [];
     L.innerHTML = (done.length ? done.map(([m,k])=>zoneCard(m,k)).join('')
+      : viewTeam() === -1 ? `<div class="empty">조를 고르면 우리 조가 복구한 기록이 보입니다.</div>`
       : (W.id==='island' ? `<div class="empty">아직 돌아온 기록이 없습니다.<br>보이드의 기록에서 빈 기록을 복구하면 그 기록이 이곳에 나타납니다.</div>`
                          : `<div class="empty">아직 복구된 구역이 없습니다.<br>"복구 필요" 탭에서 좌표를 확인하고 그곳을 Scaniverse로 스캔하세요.</div>`))
       + (free.length ? `<div class="grp"><h3>구역 밖 기록 ${free.length}</h3>${thumbsHTML(free)}</div>` : '');
@@ -1433,7 +1466,7 @@ $('tV').onclick=()=>setTab('v'); $('tR').onclick=()=>setTab('r'); $('tB').onclic
 $('adminX').onclick = closeAdmin;
 // team picker (remembered on this device) and the admin entry (password checked by the server)
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
-teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; try{ localStorage.setItem('void-team', TEAM || ''); if(TEAM) localStorage.setItem('dorogram-team', String(TEAM)); }catch(e){} refreshSubUI(); if(TEAM && !SCREEN) startGeo(); };
+teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; try{ localStorage.setItem('void-team', TEAM || ''); if(TEAM) localStorage.setItem('dorogram-team', String(TEAM)); }catch(e){} rescan(); if(TEAM && !SCREEN) startGeo(); };
 // first open: pick a team, then ask for the position
 { const tp = $('teamPick');
   $('tpGrid').innerHTML = Array.from({length:12}, (_,i)=> `<button type="button" data-t="${i+1}">${i+1}조</button>`).join('');
@@ -1443,7 +1476,7 @@ teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; try{ localStorage.setItem('
 }
 $('adminBtn').onclick = async ()=>{
   if(LOCAL){ toast('서버에 올라간 페이지에서만 쓸 수 있습니다'); return; }
-  if(!ADMIN_KEY){ const k = prompt('운영자 비밀번호'); if(k==null) return; ADMIN_KEY = k.trim(); }
+  if(!ADMIN_KEY){ const k = prompt('관리자 비밀번호'); if(k==null) return; ADMIN_KEY = k.trim(); }
   try{ const st = await api('/admin/state', null, true); try{ sessionStorage.setItem('void-admin', ADMIN_KEY); }catch(e){}
     STATE_VER = -1; applyState(st); openAdmin(); }
   catch(err){ ADMIN_KEY = ''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} toast(err.message); }
@@ -1601,7 +1634,7 @@ SCANS.filter(s=>!s.mission && s.x!=null).forEach(s=>{
   const d = document.createElement('button'); d.className='mk free';
   d.innerHTML = `<img src="${esc(s.thumb)}" alt="">`; d.setAttribute('aria-label', `${s.caption||'스캔'} 보기`);
   d.onclick = ()=>openScan(s);
-  LBL.appendChild(d); markers.push({el:d, x:s.x, y:6, z:s.z, free:true});
+  LBL.appendChild(d); markers.push({el:d, x:s.x, y:6, z:s.z, free:true, s});
 });
 // ---------- team positions: GPS from each tablet, shown as dots on the campus twin ----------
 const teamMk = {};
@@ -1698,15 +1731,16 @@ function updateTeamDots(pos, now){
   Object.keys(teamMk).forEach(t=>{ if(!list[t]){ teamMk[t].el.remove(); markers.splice(markers.indexOf(teamMk[t]), 1); delete teamMk[t]; } });
   refreshZones();
 }
-function onGeo(p){
+function onGeo(p, fake){
+  if(ME_DEMO && !fake) return;   // the admin's robot preview holds the stage: real fixes are ignored until it is switched off
   myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()};
   updateTeamDots(LAST_POS, Date.now());
   if(follow){ followMe(); showMeCoord(); }
   // close to an empty record's coordinates? say so once per zone
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   const near = MISSION_E.find(m=> m.lat != null && !m.scans.length && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
-  if(near && nearSaid !== near.id){ nearSaid = near.id; toast(`좌표에 가까워졌습니다 · ${zoneName(near)}`); }
-  if(TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
+  if(!fake && near && nearSaid !== near.id){ nearSaid = near.id; toast(`좌표에 가까워졌습니다 · ${zoneName(near)}`); }
+  if(!fake && TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
 }
 function startGeo(){
   if(!navigator.geolocation || geoWatch != null) return;
@@ -1715,6 +1749,20 @@ function startGeo(){
     if(err.code === 1){ geoWatch = null; if(follow) setFollow(false); toast('위치 사용을 허용하지 않아 내 위치는 표시되지 않습니다'); return; }
     if(Date.now() - geoErrAt > 60000){ geoErrAt = Date.now(); toast(err.code === 3 ? (myPos ? '위치 신호가 약합니다. 건물 밖으로 나가면 다시 잡힙니다' : '위치를 찾는 중입니다. 야외에서 더 잘 잡힙니다') : '지금은 위치를 알 수 없습니다'); }
   }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
+}
+// Admin: a robot preview for when GPS cannot be had (indoors). The Void avatar walks a slow circle around the campus centre with the
+// navigation view on, so the robot, its direction arrow and the coordinate chip can be checked as they will appear outdoors.
+let ME_DEMO = false, meDemoT = 0, meDemoA = 0;
+function demoMe(on){
+  clearInterval(meDemoT); ME_DEMO = on;
+  if(on){
+    if(W.id !== 'erica') setWorld('erica');
+    const step = ()=>{ meDemoA += 0.12; const r = 14; onGeo({coords:{latitude: DATA.origin[0] + r*Math.sin(meDemoA)/KZ, longitude: DATA.origin[1] + r*Math.cos(meDemoA)/KX, accuracy: 8, heading: null, speed: 1.2}}, true); };
+    step(); setFollow(true); followMe(); navJump(); step(); meDemoT = setInterval(step, 1200);
+    toast('보이드 로봇 미리보기: 캠퍼스 가운데를 천천히 돕니다');
+  } else {
+    setFollow(false); myPos = null; prevPos = null; if(meAvatar) meAvatar.visible = false; meArrow.visible = false; meRing.visible = false; $('meCoord').hidden = true;
+  }
 }
 // "내 시점" button (campus): toggle the navigation view
 $('lMe').onclick = ()=>{
@@ -1731,7 +1779,7 @@ function refreshZones(){
   markers.forEach(mk=>{
     if(mk.team){ mk.show = W.id==='erica'; return; }
     if(mk.char){ mk.show = mk.char.g.visible; return; }
-    if(mk.free){ mk.show = tabShows('ok'); return; }
+    if(mk.free){ mk.show = tabShows('ok') && visibleScan(mk.s); return; }
     const st = zoneState(mk.m), isl = W.id==='island'; mk.show = isl ? st==='ok' : (tabShows(st) && !hiddenZone(mk.m));
     if(mk.state===st) return; mk.state = st;
     const m = mk.m, el = mk.el;
@@ -2211,7 +2259,7 @@ function finishCapture(){
   $('capPhoto').hidden = !cap.ori;
   $('capTeam').value = TEAM || '';
   const help = $('capHelp'); help.dataset.kind = '';
-  help.textContent = LOCAL ? '서버 연결 전이라 이 기기에서만 보이고 새로고침하면 사라집니다.' : AUTO ? '올리면 바로 이 구역이 복구됩니다.' : '올리면 운영자가 확인한 뒤 복구됩니다.';
+  help.textContent = LOCAL ? '서버 연결 전이라 이 기기에서만 보이고 새로고침하면 사라집니다.' : AUTO ? '올리면 바로 이 구역이 복구됩니다.' : '올리면 관리자가 확인한 뒤 복구됩니다.';
   cap.photo = !cap.ori || cap.mode !== 'space'; showPreview();   // the dome needs real directions; for an object the photo turntable reads better
 }
 $('capDone').onclick = finishCapture;
@@ -5350,7 +5398,7 @@ islAnim.push(t=>{ simAnim.forEach(f=> f(t)); veinTex.offset.x = -t*0.35;
   if(SIM_REVEAL_T == null) return;
   REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / Math.max(1.4, r.len/110))); const e = 1 - Math.pow(1 - k, 3); r.geos.forEach(g=> g.setDrawRange(0, Math.round(r.total*e/6)*6)); });
   FADES.forEach(f=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - f.delay) / f.dur)); f.f(1 - Math.pow(1 - k, 3)); }); });
-window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem('void-seen-lit'));
+window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem(`void-seen-lit-${viewTeam()}`));
 function buildSim(revealIds){
   while(simRoot.children.length) simRoot.remove(simRoot.children[0]);
   while(simMonE.children.length) simMonE.remove(simMonE.children[0]);
@@ -5403,10 +5451,10 @@ function buildSim(revealIds){
     simAnim.push(t=>{ for(let i=0;i<n;i++){ const u = ((t*0.05) + i/n) % 1, k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = (Math.sin(t*2.1 + i*2.3))*sc.hw*0.7;
         o.position.set(sc.c[0] + sc.n[0]*w, FLOW_Y + 2 + Math.sin(t*3 + i)*2, sc.c[1] + sc.n[1]*w); o.updateMatrix(); sp.setMatrixAt(i, o.matrix); } sp.instanceMatrix.needsUpdate = true; }); };
   const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
-  let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem('void-seen-lit') || '[]')); }catch(e){}
+  let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem(`void-seen-lit-${viewTeam()}`) || '[]')); }catch(e){}
   // stretches that sweep in: the ones just switched on (live), or the ones this device has not watched come back yet
   const newLit = revealIds ? revealIds.filter(id=> litIds.has(id)) : [...litIds].filter(id=> !seenLit.has(id));
-  try{ localStorage.setItem('void-seen-lit', JSON.stringify([...litIds])); }catch(e){}
+  try{ localStorage.setItem(`void-seen-lit-${viewTeam()}`, JSON.stringify([...litIds])); }catch(e){}
   const startOf = id=> 0.2 + Math.max(0, newLit.indexOf(id))*0.9;
   // monuments of zones just lit grow out of the ground once their stretch has arrived
   Object.entries(monByZone).forEach(([id, g])=>{ if(newLit.includes(id)) fade(e=> g.scale.setScalar(Math.max(0.001, e)), startOf(id) + 1.6, 1.0); });
@@ -5452,6 +5500,7 @@ function buildSim(revealIds){
 buildSim();
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
 function rescan(revealIds){
+  rebuildIndex();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
 }
@@ -5470,10 +5519,10 @@ function setDemo(ids, on){
 function simHud(){
   caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
   $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
-  let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
+  let seen = false; try{ seen = sessionStorage.getItem(`void-simdone-${viewTeam()}`) === '1'; }catch(e){}
   clearTimeout(simDoneT);
   if(SIM_LIT === 5 && !seen) simDoneT = setTimeout(()=>{ if(!simOn || SIM_LIT !== 5) return;
-    $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} }, REVEALS.length ? 4500 : 0);
+    $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){} }, REVEALS.length ? 4500 : 0);
 }
 function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
@@ -6033,7 +6082,7 @@ function setWorld(id, instant){
   if(id!=='erica' && follow) setFollow(false); if(meAvatar) meAvatar.visible = false; meArrow.visible = false;
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
-  const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
+  const isl = id==='island'; $('tV').hidden = isl; $('board').hidden = isl && !SCREEN; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
   $('lLbl').textContent = w.lblBtn;
   document.querySelectorAll('.erica-only').forEach(e=> e.hidden = id!=='erica' || (e.id === 'navSeg' && !follow));   // the nav-mode buttons only while 내 시점 is on
   document.querySelectorAll('.island-only').forEach(e=> e.hidden = id==='erica');
