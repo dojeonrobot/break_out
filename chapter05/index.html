@@ -570,9 +570,8 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 </div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
   <small>DOROLAND · CHAPTER 5</small><h2 id="tpT">몇 조인가요?</h2>
-  <p>조를 고르면 위치 사용 허락을 물어봅니다. 허락하면 캠퍼스 트윈 위에 우리 조의 위치가 표시되고, 빈 기록의 좌표에 가까워지면 알려 줍니다.</p>
   <div class="grid" id="tpGrid"></div>
-  <button type="button" class="skip" id="tpSkip">조 없이 둘러보기</button>
+  <button type="button" class="skip" id="tpSkip">나중에</button>
 </div></div>
 <aside id="adminDlg" class="glass" hidden aria-label="관리자">
   <div class="ah"><div><small>ADMIN</small><h2>관리자</h2></div><div class="acts"><button type="button" class="mini" data-aact="logout">관리자 종료</button><button type="button" class="x" id="adminX">닫기</button></div></div>
@@ -620,7 +619,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
       </div>
       <div class="crot" id="capRot" hidden><div>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
-        <b>태블릿을 가로로 돌려 주세요</b><span>가로로 찍어야 한 장에 넓게 담깁니다. 가로가 되면 바로 찍기 시작합니다.</span>
+        <b>태블릿을 가로로 돌려 주세요</b><span>가로로 돌리면 바로 시작합니다.</span>
       </div></div>
       <div class="cctl">
         <div class="cmode" role="group" aria-label="찍는 방법"><button type="button" data-mode="object" aria-pressed="true">사물 한 바퀴</button><button type="button" data-mode="space" aria-pressed="false">공간 둘러보기</button></div>
@@ -701,6 +700,7 @@ orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
 // so the island, the flow and the 5/5 ending can be checked without submitting five real links. Stored in localStorage 'void-demo'.
 const DEMO = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem('void-demo') || '[]')); }catch(e){ return new Set(); } })();
 const demoScan = id=>{ const base = SCANS_ALL[0] || {}; return {...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'관리자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}; };
+{ let adm = false; try{ adm = !!sessionStorage.getItem('void-admin'); }catch(e){} if(!adm){ DEMO.clear(); try{ localStorage.removeItem('void-demo'); }catch(e){} } }   // a preview only lives while the admin is logged in on this device
 DEMO.forEach(id=>{ if(!SCANS.some(s=> s.mission === id)) SCANS.push(demoScan(id)); });
 const ORBIT_SIG = orbitSig(BOOT && BOOT.subs);
 let AUTO = BOOT ? BOOT.auto !== false : true;
@@ -860,7 +860,8 @@ if(TEAM < 1 || TEAM > 12) TEAM = 0;
 // The admin (logged in on this device) and the big screen see every team's, and the admin can pick one team to view as. Team GPS dots stay visible to all.
 let VIEW_ADMIN = 0; try{ VIEW_ADMIN = +sessionStorage.getItem('void-view') || 0; }catch(e){}
 const viewTeam = ()=> ADMIN_KEY ? VIEW_ADMIN : SCREEN ? 0 : (TEAM || -1);   // 0 = everyone's records, -1 = none (no team picked yet)
-const visibleScan = s=>{ if(HIDDEN.has(s.id)) return false; if(s.demo) return true; const v = viewTeam(); return v === 0 || (v > 0 && s.team === v); };
+// preview records exist only for the admin's own full view: never in a team's view, never on a team's tablet (user, 2026-10-15)
+const visibleScan = s=>{ if(HIDDEN.has(s.id)) return false; if(s.demo) return !!ADMIN_KEY && VIEW_ADMIN === 0; const v = viewTeam(); return v === 0 || (v > 0 && s.team === v); };
 let byMission = {}, inMap = new Set();
 function rebuildIndex(){ byMission = {}; inMap = new Set(); SCANS.forEach(s=>{ if(!visibleScan(s)) return; inMap.add(s.id); if(s.mission) (byMission[s.mission] ||= []).push(s); }); }
 rebuildIndex();
@@ -1162,7 +1163,7 @@ function updateProgress(){
   const isl = W && W.id==='island';
   $('pN').textContent = `${M.filter(zoneDone).length} / ${M.length}`;
   $('pCells').innerHTML = M.map(m=>`<i class="${zoneDone(m)?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
-  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 관리자 창에서 끔)</span></div>` : '';
+  const box = $('iluaBox'); if(box) box.innerHTML = (DEMO.size && ADMIN_KEY && VIEW_ADMIN === 0) ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳 켜짐</span></div>` : '';
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
 updateProgress();
@@ -1201,7 +1202,7 @@ function checkReset(st){
   TEAM = 0; try{ localStorage.removeItem('void-team'); localStorage.removeItem('dorogram-team'); }catch(e){}
   const sel = $('teamSel'); if(sel) sel.value = '';
   if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
-  toast('관리자가 초기화했습니다. 조를 다시 골라 주세요');
+  toast('초기화됐습니다. 조를 다시 고르세요');
 }
 function applyState(st){
   checkReset(st);
@@ -1232,10 +1233,10 @@ function subLines(m){
   return subsFor(m).map(s=>{
     const who = s.team ? s.team+'조가 ' : '';
     if(s.kind==='orbit') return `<div class="subline orb">
-      <button type="button" class="orbbtn" data-orbit="${esc(s.id)}"><img src="${esc(orbitThumb(s))}" alt="" loading="lazy"><span>${who}찍은 기록 보기${s.note ? ' · '+esc(s.note) : ''}<br><small>사진 ${s.frames || '?'}장</small></span></button>
-      <span>${timeText(s.createdAt)} 올림 · ${s.status==='ok' ? '복구 반영 중' : '관리자 확인 대기 중'} ${ADMIN_KEY && s.status!=='ok' ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${cancelBtn(s)}</span>
+      <button type="button" class="orbbtn" data-orbit="${esc(s.id)}"><img src="${esc(orbitThumb(s))}" alt="" loading="lazy"><span>${who}찍은 기록${s.note ? ' · '+esc(s.note) : ''}<br><small>사진 ${s.frames || '?'}장</small></span></button>
+      <span>${timeText(s.createdAt)} 올림 · ${s.status==='ok' ? '반영 중' : '확인 대기'} ${ADMIN_KEY && s.status!=='ok' ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${cancelBtn(s)}</span>
     </div>`;
-    const st = s.splat ? (s.status==='ok' ? '3D 반영 중' : '관리자 확인 대기 중') : s.error ? `변환 실패 · ${esc(s.error)}` : '서버가 3D로 바꾸는 중 (1~2분)';
+    const st = s.splat ? (s.status==='ok' ? '반영 중' : '확인 대기') : s.error ? `변환 실패 · ${esc(s.error)}` : '변환 중';
     return `<div class="subline ${s.splat ? '' : s.error ? 'err' : 'conv'}">
       ${LOCAL ? '' : `<img src="${API}/thumb/${esc(s.scanId)}" alt="" loading="lazy" onerror="this.remove()">`}
       <a href="${esc(s.url)}" target="_blank" rel="noopener">${who}제출한 스캔${s.caption ? ' · '+esc(s.caption) : ''}${s.note ? ' · '+esc(s.note) : ''}</a>
@@ -1257,7 +1258,7 @@ function formHTML(m, pre=''){
         <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="${q.scan ? '다시 제출할 스캔 링크' : 'Scaniverse 스캔 링크'}" autocomplete="off" aria-label="스캔 링크"><button type="submit">${q.scan ? '다시 제출' : '제출'}</button></div>
         <input data-draft="n-${pre}${esc(m.id)}" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
         ${msg.text ? `<p class="subhelp" data-kind="${msg.kind}">${esc(msg.text)}</p>` : ''}
-        ${LOCAL ? '<p class="subhelp">서버 연결 전이라 이 기기에만 저장됩니다.</p>' : ''}
+        ${LOCAL ? '<p class="subhelp">이 기기에만 저장됩니다.</p>' : ''}
       </form>
     </div>`;
 }
@@ -1329,9 +1330,9 @@ function adminHTML(){
   const n = SUBS.length, done = SUBS.filter(isDone).length, wait = SUBS.filter(s=>s.kind==='orbit' && s.status!=='ok').length;
   return `<div class="adm">
     <p class="subhelp">조별 제출 ${n}건 · 복구됨 ${done}건${wait ? ` · 확인 대기 ${wait}건` : ''}${HIDDEN.size ? ` · 숨긴 스캔 ${HIDDEN.size}건` : ''}</p>
-    <label class="autol">이 화면에 보이는 기록 <select data-aview><option value="0" ${VIEW_ADMIN ? '' : 'selected'}>모든 조</option>${Array.from({length:12}, (_,i)=> `<option value="${i+1}" ${VIEW_ADMIN === i+1 ? 'selected' : ''}>${i+1}조가 보는 대로</option>`).join('')}</select></label>
-    <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 관리자가 "복구 확정"을 눌러야 함)</label>
-    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 스캔 없이 구역이 돌아온 것으로 보기 (확인용). 체크하면 바로 섬과 환원 시뮬레이터에 반영됩니다.</span>
+    <label class="autol">보기 <select data-aview><option value="0" ${VIEW_ADMIN ? '' : 'selected'}>전체</option>${Array.from({length:12}, (_,i)=> `<option value="${i+1}" ${VIEW_ADMIN === i+1 ? 'selected' : ''}>${i+1}조</option>`).join('')}</select></label>
+    <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록 자동 승인</label>
+    <div class="demo"><b>복구 미리보기</b>
       ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
       <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div></div>
     <div class="arow">
@@ -1341,7 +1342,7 @@ function adminHTML(){
     </div>
     ${teams.length ? teams.map(t=>{ const list = SUBS.filter(s=>(s.team || 0)===t);
       return `<div class="grp"><h3>${t ? t+'조' : '조 미지정'} <span style="font-family:var(--mono);font-weight:400">${list.length}</span></h3>${list.map(row).join('')}</div>`; }).join('')
-      : `<div class="empty">아직 제출된 스캔이 없습니다.<br>아이들이 구역 카드에서 링크를 내면 여기에 조별로 모입니다.</div>`}
+      : ''}
   </div>`;
 }
 // preview ticks apply at once, without a reload: stand-in records go in or out, the zones and the flow layer rebuild (see setDemo)
@@ -1356,7 +1357,7 @@ async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); ret
   try{ const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; } }
 async function adminAct(act){
   try{
-    if(act==='logout'){ ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
+    if(act==='logout'){ clearLocalDemo(); ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
     if(act==='copy'){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
         .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
@@ -1374,7 +1375,7 @@ async function adminAct(act){
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
     if(act==='demoAll' || act==='demoNone'){ demoTick([...document.querySelectorAll('[data-demo]')].map(c=> c.dataset.demo), act==='demoAll'); return; }
-    if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '관리자가 확정해야 복구됩니다'); return; }
+    if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '자동 승인 켬' : '자동 승인 끔'); return; }
   }catch(err){ toast(err.message); }
 }
 function refreshSubUI(){
@@ -1439,14 +1440,14 @@ function renderList(){
   const todo = M.map((m,k)=>[m,k]).filter(([m])=>!zoneDone(m)), done = M.map((m,k)=>[m,k]).filter(([m])=>zoneDone(m));
   $('cV').textContent = todo.length; $('cR').textContent = done.length;
   if(tab==='v'){
-    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 찾아가 카메라로 실사를 찍고 Scaniverse 스캔 링크를 내면, 둘 다 들어온 구역이 돌아옵니다.</p>` : '')
+    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">좌표를 찾아가 실사 사진과 스캔본을 올리세요.</p>` : '')
       + (todo.length ? todo.map(([m,k])=>zoneCard(m,k)).join('') : `<div class="empty">모든 구역이 복구되었습니다.</div>`);
   } else if(tab==='r'){
     const free = W.id==='erica' ? SCANS.filter(s=>!s.mission) : [];
     L.innerHTML = (done.length ? done.map(([m,k])=>zoneCard(m,k)).join('')
-      : viewTeam() === -1 ? `<div class="empty">조를 고르면 우리 조가 복구한 기록이 보입니다.</div>`
-      : (W.id==='island' ? `<div class="empty">아직 돌아온 기록이 없습니다.<br>보이드의 기록에서 빈 기록을 복구하면 그 기록이 이곳에 나타납니다.</div>`
-                         : `<div class="empty">아직 복구된 구역이 없습니다.<br>"복구 필요" 탭에서 좌표를 확인하고 그곳을 Scaniverse로 스캔하세요.</div>`))
+      : viewTeam() === -1 ? `<div class="empty">조를 먼저 고르세요.</div>`
+      : (W.id==='island' ? `<div class="empty">아직 돌아온 기록이 없습니다.</div>`
+                         : `<div class="empty">아직 복구된 구역이 없습니다.</div>`))
       + (free.length ? `<div class="grp"><h3>구역 밖 기록 ${free.length}</h3>${thumbsHTML(free)}</div>` : '');
   } else {
     const q = $('q').value.trim().toLowerCase(); L.innerHTML='';
@@ -1465,7 +1466,7 @@ function renderList(){
       });
       L.appendChild(g);
     });
-    if(!any) L.innerHTML = `<div class="empty">"${esc($('q').value)}"와 일치하는 건물이 없습니다.<br>건물 이름 일부만 입력해 보세요.</div>`;
+    if(!any) L.innerHTML = `<div class="empty">찾는 이름이 없습니다.</div>`;
   }
   L.querySelectorAll('[data-draft]').forEach(i=>{ if(drafts[i.dataset.draft]) i.value = drafts[i.dataset.draft]; if(i.dataset.draft===focused) i.focus(); });
   refreshZones(); renderBoard();
@@ -1512,7 +1513,7 @@ document.addEventListener('click', e=>{
     const txt = cp.dataset.copy;
     copyText(txt).then(ok=>{ if(ok){ toast('좌표를 복사했습니다'); return; }
       const code = cp.parentElement.querySelector('code'); if(code){ const r=document.createRange(); r.selectNodeContents(code); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
-      toast('좌표를 선택했습니다. 직접 복사하세요');
+      toast('길게 눌러 복사하세요');
     }); return; }
   const un = e.target.closest('[data-unsub]');
   if(un){ e.stopPropagation(); const key = un.dataset.unsub;
@@ -1707,7 +1708,7 @@ function navTargetXZ(){ const [x, z] = toLocal(myPos.lat, myPos.lng); return {x,
 function navJump(){
   if(!myPos || !follow) return;
   const {x, z} = navTargetXZ(), far = Math.hypot(x, z);
-  if(far > 2500){ toast(`캠퍼스에서 약 ${(far/1000).toFixed(1)}km 떨어져 있어 내 시점을 쓸 수 없습니다`); setFollow(false); return; }
+  if(far > 2500){ toast(`캠퍼스에서 ${(far/1000).toFixed(1)}km 떨어져 있습니다`); setFollow(false); return; }
   if(W.id !== 'erica') setWorld('erica', true);
   select(-1); const d = 120, dir = navMode === 'north' ? {x:0, z:-1} : headingDir(); navDirS = {x:dir.x, z:dir.z}; navAt = {x, z};
   flyTo(navCam(x, z, dir, d), new THREE.Vector3(x, 0, z), 900);
@@ -1763,14 +1764,14 @@ function onGeo(p){
   // close to an empty record's coordinates? say so once per zone
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   const near = MISSION_E.find(m=> m.lat != null && !zoneDone(m) && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
-  if(near && nearSaid !== near.id){ nearSaid = near.id; toast(`좌표에 가까워졌습니다 · ${zoneName(near)}`); }
+  if(near && nearSaid !== near.id){ nearSaid = near.id; toast(`${zoneName(near)} 근처입니다`); }
   if(TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
 }
 function startGeo(){
   if(!navigator.geolocation || geoWatch != null) return;
   geoWatch = navigator.geolocation.watchPosition(onGeo, err=>{
     // a timeout (code 3) just means no new fix for a while (indoors, tunnel): keep watching and keep following; only a refusal ends it
-    if(err.code === 1){ geoWatch = null; if(follow) setFollow(false); toast('위치 사용을 허용하지 않아 내 위치는 표시되지 않습니다'); return; }
+    if(err.code === 1){ geoWatch = null; if(follow) setFollow(false); toast('위치 사용이 꺼져 있습니다'); return; }
     if(Date.now() - geoErrAt > 60000){ geoErrAt = Date.now(); toast(err.code === 3 ? (myPos ? '위치 신호가 약합니다. 건물 밖으로 나가면 다시 잡힙니다' : '위치를 찾는 중입니다. 야외에서 더 잘 잡힙니다') : '지금은 위치를 알 수 없습니다'); }
   }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
 }
@@ -1780,7 +1781,7 @@ $('lMe').onclick = ()=>{
   if(!navigator.geolocation){ toast('이 브라우저는 위치를 지원하지 않습니다'); return; }
   if(!window.isSecureContext){ toast('https 주소로 열어야 위치를 쓸 수 있습니다'); return; }
   setFollow(true); startGeo();
-  if(myPos && Date.now() - myPos.t < 15000){ followMe(); navJump(); } else toast('위치를 찾는 중입니다. 잡히면 화면이 내 위치를 따라갑니다');
+  if(myPos && Date.now() - myPos.t < 15000){ followMe(); navJump(); } else toast('위치를 찾는 중입니다');
 };
 var LAST_POS = {};
 // zone markers, beacons and rings follow the zone state and the open tab
@@ -2161,10 +2162,10 @@ function onOri(e){
 function stopStream(){ if(cap.stream){ cap.stream.getTracks().forEach(t=>t.stop()); cap.stream = null; } const v = $('capV'); if(v.srcObject) v.srcObject = null; }
 function dropFrames(){ cap.frames.forEach(f=> URL.revokeObjectURL(f.url)); cap.frames = []; cap.cells = new Set(); cap.seq = 0; }
 const portrait = ()=> innerHeight > innerWidth;
-function modeText(){ return cap.mode==='object' ? '사물을 화면 가운데에 두고 한 바퀴 돌아요. 수평 → 조금 위 → 조금 아래 순서로' : '제자리에 서서 한 바퀴 돌아요. 수평 → 조금 위 → 조금 아래 순서로'; }
+function modeText(){ return cap.mode==='object' ? '사물을 가운데에 두고 한 바퀴' : '제자리에서 한 바퀴'; }
 async function openCapture(m){
   if(!m) return;
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저는 카메라를 열 수 없습니다. 태블릿의 Chrome이나 Safari로 열어 주세요.'); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저에서는 카메라를 쓸 수 없습니다'); return; }
   // iOS grants motion access only from inside a tap handler, before anything async
   if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){ try{ DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
   if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
@@ -2204,7 +2205,7 @@ function nextSeqCell(){   // no sensor: fill the grid in order, horizon first
 function guide(){
   if(!cap.ori){ capSay('움직임 센서가 없어 0.8초마다 찍힙니다. 천천히 돌면서 위아래로도 비춰요'); return; }
   const fill = BANDS.map((b,r)=>{ let n=0; for(let c=0;c<COLS[r];c++) if(cap.cells.has(`${r}:${c}`)) n++; return n/COLS[r]; });
-  const txt = {2:'수평으로 천천히 한 바퀴 돌아요', 1:'이제 조금 위를 보며 한 바퀴', 3:'이제 조금 아래를 보며 한 바퀴', 0:'더 위(하늘·천장 쪽)를 보며 한 바퀴', 4:'더 아래(바닥 쪽)를 보며 한 바퀴'};
+  const txt = {2:'수평으로 한 바퀴', 1:'조금 위를 보며 한 바퀴', 3:'조금 아래를 보며 한 바퀴', 0:'더 위를 보며 한 바퀴', 4:'더 아래를 보며 한 바퀴'};
   const r = BAND_ORDER.find(r=> fill[r] < 0.6);
   capSay(r == null ? '거의 다 됐어요. 남은 칸을 채우거나 완료를 누르세요' : txt[r]);
 }
@@ -2308,7 +2309,7 @@ async function uploadCapture(){
     const id = 'o' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b=> b.toString(16).padStart(2,'0')).join('').slice(0,15);
     SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, sensor:cap.ori, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), items:capItems(), thumb:cover.url});
     cap.frames = []; cap.cells = new Set();           // the object URLs now belong to the record
-    closeCapture(); refreshSubUI(); toast('이 기기에 기록을 남겼습니다 (서버 연결 전)'); return;
+    closeCapture(); refreshSubUI(); toast('이 기기에만 저장됐습니다'); return;
   }
   if(!TEAM) return say('우리 조를 먼저 고르세요.', 'err');
   capStep(3);
