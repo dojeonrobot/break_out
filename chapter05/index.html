@@ -1153,7 +1153,7 @@ function applyState(st){
 }
 async function syncState(){
   if(LOCAL) return;
-  try{ applyState(await api('/state')); if(ADMIN_KEY) $('tA').hidden = false; }
+  try{ applyState(await api('/state')); if(ADMIN_KEY){ $('tA').hidden = false; if(REOPEN_ADMIN){ REOPEN_ADMIN = false; $('adminBtn').click(); } } }
   catch(e){ if(STATE_VER < 0){ LOCAL = true; SUBS = loadLocal(); refreshSubUI(); } }
 }
 const MSG = {};
@@ -1250,9 +1250,9 @@ function adminHTML(){
   return `<div class="adm">
     <p class="subhelp">조별 제출 ${n}건 · 복구됨 ${done}건${wait ? ` · 확인 대기 ${wait}건` : ''}${HIDDEN.size ? ` · 숨긴 스캔 ${HIDDEN.size}건` : ''}</p>
     <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 운영자가 "복구 확정"을 눌러야 함)</label>
-    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 링크 없이 구역을 복구된 것으로 보기 (확인용)</span>
+    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 링크 없이 구역을 복구된 것으로 보기 (확인용). 체크하면 바로 새로고침되어 반영됩니다.</span>
       ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
-      <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button><button type="button" class="mini" data-aact="demoApply">적용 (새로고침)</button></div></div>
+      <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div></div>
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
@@ -1264,6 +1264,10 @@ function adminHTML(){
       : `<div class="empty">아직 제출된 스캔이 없습니다.<br>아이들이 구역 카드에서 링크를 내면 여기에 조별로 모입니다.</div>`}
   </div>`;
 }
+// preview ticks apply at once: save, remember to reopen the admin tab, reload (the stand-in records are injected at boot)
+function applyDemo(){ const ids = [...document.querySelectorAll('[data-demo]')].filter(c=> c.checked).map(c=> c.dataset.demo);
+  try{ localStorage.setItem('void-demo', JSON.stringify(ids)); sessionStorage.setItem('void-tab', 'a'); }catch(e){} toast('반영하는 중입니다'); setTimeout(()=> location.reload(), 250); }
+let REOPEN_ADMIN = false; try{ REOPEN_ADMIN = sessionStorage.getItem('void-tab') === 'a'; sessionStorage.removeItem('void-tab'); }catch(e){}
 async function adminAct(act){
   try{
     if(act==='logout'){ ADMIN_KEY=''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} $('tA').hidden = true; setTab('v'); return; }
@@ -1281,8 +1285,7 @@ async function adminAct(act){
       if(!confirm(`숨긴 스캔 ${HIDDEN.size}건을 다시 3D에 보이게 합니다. 계속할까요?`)) return;
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
-    if(act==='demoAll' || act==='demoNone'){ document.querySelectorAll('[data-demo]').forEach(c=> c.checked = act==='demoAll'); return; }
-    if(act==='demoApply'){ const ids = [...document.querySelectorAll('[data-demo]')].filter(c=> c.checked).map(c=> c.dataset.demo); try{ localStorage.setItem('void-demo', JSON.stringify(ids)); }catch(e){} location.reload(); return; }
+    if(act==='demoAll' || act==='demoNone'){ document.querySelectorAll('[data-demo]').forEach(c=> c.checked = act==='demoAll'); applyDemo(); return; }
     if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '운영자가 확정해야 복구됩니다'); return; }
   }catch(err){ toast(err.message); }
 }
@@ -1427,6 +1430,8 @@ document.addEventListener('click', e=>{
   const ad = e.target.closest('[data-adel]');
   if(ad){ e.stopPropagation(); if(!confirm('이 제출을 지울까요?')) return;
     api('/admin/delete', {id:ad.dataset.adel}, true).then(st=>{ STATE_VER = -1; applyState(st); }).catch(err=> toast(err.message)); return; }
+  const dm = e.target.closest('input[data-demo]');
+  if(dm){ e.stopPropagation(); applyDemo(); return; }
   const aa = e.target.closest('[data-aact]');
   if(aa){ e.stopPropagation(); adminAct(aa.dataset.aact); return; }
   const cb = e.target.closest('[data-cap]');
