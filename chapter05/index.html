@@ -5132,12 +5132,65 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     { const arc = new THREE.QuadraticBezierCurve3(new THREE.Vector3(-16, 0, 500), new THREE.Vector3(0, 30, 500), new THREE.Vector3(16, 0, 500));
       arc.getPoints(30).forEach((p,i)=> add(islRoot, SPH(1.6 + (i%3)*0.3, 8, 6), mat(FC[i % 6]), p.x, G + p.y + 1, p.z)); }
     // floral DOROLAND bed in front of the plaza
-    { const g = new THREE.Group(); g.position.set(52, G, 424); g.rotation.y = -0.35; islRoot.add(g);
+    { const g = new THREE.Group(); g.position.set(60, G, 420); g.rotation.y = -0.5; islRoot.add(g);
       add(g, BOX(46, 0.6, 7), mat(0x4f8a3c), 0, 0, 0); for(let i=0;i<120;i++){ add(g, ICO(0.55, 0), flat([0xff9fcf, 0xffd400, 0xffffff, 0xe2574c][i%4]), -21 + rr()*42, 0.9, -2.6 + rr()*5.2, false); }
       add(g, new THREE.PlaneGeometry(30, 4), new THREE.MeshBasicMaterial({map:signTex('DOROLAND', {bg:'#ffffff', fg:'#e2574c', size:84, w:768, h:110})}), 0, 2.6, 3.6, false).rotation.x = -0.35; }
     // bigger mascot statue of Void on the pedestal
     { const g = new THREE.Group(); g.position.set(-44, G + 1.6, 424); g.scale.setScalar(1.2); islRoot.add(g);
       add(g, SPH(2, 14, 12), mat(0xf4f1e6), 0, 2.6, 0); add(g, SPH(2.6, 14, 12), mat(0xf4f1e6), 0, 6.6, 0); [-1, 1].forEach(s=>{ add(g, SPH(0.45, 8, 6), glowMat(0x7fd7ff), s*0.9, 7, 2.3, false); add(g, CYL(0.15, 0.15, 3, 5), mat(0x7fd7ff), s*1.4, 8.6, 0).rotation.z = -s*0.6; }); }
+  }
+
+  // ----- 5b. gate plaza (user, 2026-10-15: the entrance needs more going on). Everything keeps clear of the centre lane |x| < 14 between the
+  //       balloon arch (z 500) and the turnstiles (z ~416), and of the pier / harbour paths (nearPath check for anything near the rim). -----
+  {
+    const P = (x, z)=> !nearPath(x, z, 11);
+    const kiosk = (x, z, rot, name, wall, trim, w=10)=>{ const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; g.scale.setScalar(0.6); islRoot.add(g);
+      add(g, BOX(w, 3.6, 5), mat(new THREE.Color(wall).getHex()), 0, 0, 0); add(g, BOX(w + 0.4, 0.5, 5.4), mat(0xffffff), 0, 3.6, 0);
+      [[-w/2 + 0.5, -2],[w/2 - 0.5, -2],[-w/2 + 0.5, 3.2],[w/2 - 0.5, 3.2]].forEach(([a, b])=> add(g, CYL(0.25, 0.25, 7.2, 6), mat(0xffffff), a, 0, b, false));
+      add(g, new THREE.ConeGeometry(w*0.8, 3.2, 4, 1).rotateY(Math.PI/4).translate(0, 1.6, 0), new THREE.MeshLambertMaterial({map:stripeTexI(trim, '#ffffff', 10)}), 0, 7.2, 0.5).scale.set(1, 1, 0.62);
+      add(g, new THREE.PlaneGeometry(w - 1, 2.2), new THREE.MeshBasicMaterial({map:signTex(name, {bg:'#ffffff', fg:trim, size:62, w:384, h:94})}), 0, 5.4, 3.3, false);
+      add(g, BOX(w - 2, 1.2, 0.6), mat(0x3b4c78), 0, 2.2, 2.6);   // counter
+      return g; };
+    // left of the entrance: ticket windows, information, lockers (facing the centre lane)
+    kiosk(-34, 428, Math.PI/2, '매표소', '#e2574c', '#b83a3a', 12); kiosk(-34, 441, Math.PI/2, '매표소', '#e2574c', '#b83a3a', 12); kiosk(-34, 454, Math.PI/2, '안내', '#5aa0e6', '#2f5f9e', 10);
+    // right of the entrance: a park map, lockers and vending machines, a first-aid post
+    { const g = new THREE.Group(); g.position.set(34, G, 436); g.rotation.y = -Math.PI/2; islRoot.add(g);
+      [-4, 4].forEach(x=> add(g, CYL(0.3, 0.3, 7, 8), mat(0x3b4c78), x, 0, 0)); add(g, BOX(9.6, 5.4, 0.5), mat(0xf4efe4), 0, 2.4, 0);
+      const map = document.createElement('canvas'); map.width = 512; map.height = 288; const c = map.getContext('2d');
+      c.fillStyle = '#bfe3f7'; c.fillRect(0, 0, 512, 288); c.fillStyle = '#93c96f'; c.beginPath(); c.ellipse(256, 150, 190, 110, 0, 0, Math.PI*2); c.fill();
+      c.fillStyle = '#ead6a8'; c.lineWidth = 10; c.strokeStyle = '#ead6a8'; c.beginPath(); c.moveTo(256, 250); c.lineTo(256, 120); c.lineTo(150, 80); c.moveTo(256, 120); c.lineTo(360, 90); c.moveTo(256, 170); c.lineTo(380, 190); c.stroke();
+      [[150,80,'#e2574c'],[360,90,'#5aa0e6'],[256,120,'#ffd400'],[380,190,'#ff9fcf'],[200,200,'#6a4bc4']].forEach(([x, y, col])=>{ c.fillStyle = col; c.beginPath(); c.arc(x, y, 14, 0, Math.PI*2); c.fill(); });
+      c.fillStyle = '#1d2f55'; c.font = 'bold 34px sans-serif'; c.textAlign = 'center'; c.fillText('DOROLAND MAP', 256, 40); c.fillStyle = '#e2574c'; c.beginPath(); c.arc(256, 250, 9, 0, Math.PI*2); c.fill();
+      const t = new THREE.CanvasTexture(map); t.colorSpace = THREE.SRGBColorSpace;
+      add(g, new THREE.PlaneGeometry(9, 5), new THREE.MeshBasicMaterial({map:t}), 0, 2.4, 0.3, false); add(g, BOX(10, 0.6, 1.2), mat(C.navy), 0, 5.4, 0); }
+    { const g = new THREE.Group(); g.position.set(34, G, 448); g.rotation.y = -Math.PI/2; islRoot.add(g);   // lockers
+      for(let i=0;i<4;i++) for(let j=0;j<3;j++){ add(g, BOX(2.2, 1.9, 2.4), mat([0xf39a3b, 0x5aa0e6, 0x58b368, 0xffd400][i]), -3.6 + i*2.4, j*2, 0); add(g, BOX(0.3, 0.6, 0.1), mat(0x2f3540), -3.6 + i*2.4 + 0.7, j*2 + 0.9, 1.25, false); }
+      add(g, BOX(10, 0.4, 2.8), mat(0x3b4c78), 0, 6, 0); add(g, new THREE.PlaneGeometry(6, 1.4), new THREE.MeshBasicMaterial({map:signTex('물품보관', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:90})}), 0, 6.9, 0.9, false); }
+    { const g = new THREE.Group(); g.position.set(34, G, 458); g.rotation.y = -Math.PI/2; islRoot.add(g);   // two vending machines and a first-aid post
+      [[-3, 0xe2574c], [0, 0x5aa0e6]].forEach(([x, col])=>{ add(g, BOX(2.4, 5.2, 2.2), mat(col), x, 0, 0); add(g, BOX(1.6, 3.2, 0.1), glowMat(0xdff6ff), x, 1.4, 1.15, false); });
+      add(g, BOX(4.4, 5.4, 3.6), mat(0xffffff), 4.6, 0, -0.6); add(g, BOX(2.2, 0.6, 0.2), mat(0xe2574c), 4.6, 3.6, 1.25, false); add(g, BOX(0.6, 2.2, 0.2), mat(0xe2574c), 4.6, 3.6, 1.25, false); }
+    // queue lanes in front of the turnstiles: posts and ropes either side of the centre lane
+    [-1, 1].forEach(s=>{ [9, 16].forEach(x0=>{ const x = s*x0; let prev = null; for(let z=414; z<=432; z+=6){ add(islRoot, CYL(0.18, 0.22, 1.1, 8), mat(0x3b4c78), x, G, z); add(islRoot, SPH(0.3, 8, 6), mat(0xffd400), x, G + 1.2, z, false);
+      if(prev != null){ const r = add(islRoot, CYL(0.06, 0.06, 6, 5).rotateX(Math.PI/2), mat(0xe2574c), x, G + 0.95, (prev + z)/2, false); } prev = z; } }); });
+    // two round planters with a tree and a ring bench, either side of the lane
+    [-26, 26].forEach(x=>{ const z = 474; if(!P(x, z)) return;
+      add(islRoot, CYL(4.2, 4.6, 1.4, 20), mat(0xb98f62), x, G, z); add(islRoot, CYL(3.8, 3.8, 0.4, 20), mat(0x6b4a2c), x, G + 1.4, z);
+      add(islRoot, CYL(0.5, 0.6, 5, 8), mat(0x8a6f55), x, G + 1.6, z); add(islRoot, ICO(4.2, 1), new THREE.MeshLambertMaterial({color:0x6e9a5a, flatShading:true}), x, G + 8.6, z);
+      add(islRoot, new THREE.RingGeometry(4.8, 6.4, 24).rotateX(-Math.PI/2), mat(0xc98a4b), x, G + 1.0, z); for(let k=0;k<8;k++){ const a = k/8*Math.PI*2; add(islRoot, BOX(0.5, 1.0, 0.5), mat(0x3a3f4a), x + Math.cos(a)*5.6, G, z + Math.sin(a)*5.6); } });
+    // snack carts flanking the balloon arch and a balloon seller
+    [[-26, 490, 0.4, 0xe2574c, '#e2574c'], [26, 490, -0.4, 0x5aa0e6, '#5aa0e6'], [52, 474, -1.2, 0xffd400, '#f39a3b']].forEach(([x, z, r, c1, c2])=>{ if(!P(x, z)) return;
+      const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = r; g.scale.setScalar(0.45); islRoot.add(g);
+      add(g, BOX(9, 5, 5), mat(c1), 0, 1.5, 0); [[-3.5,-2.6],[3.5,-2.6],[-3.5,2.6],[3.5,2.6]].forEach(([a, b])=> add(g, new THREE.CylinderGeometry(1.1, 1.1, 0.5, 10).rotateX(Math.PI/2), mat(C.dark), a, 1.1, b));
+      [-4, 4].forEach(a=> add(g, CYL(0.25, 0.25, 7, 6), mat(0xffffff), a, 6.5, 0)); add(g, new THREE.CylinderGeometry(0.1, 7, 3, 4, 1).rotateY(Math.PI/4), new THREE.MeshLambertMaterial({map:stripeTexI(c2, '#ffffff', 8)}), 0, 15, 0); });
+    { const x = -50, z = 436; if(P(x, z)){ add(islRoot, CYL(0.15, 0.15, 7, 6), mat(0x3a3f4a), x, G, z);
+      for(let i=0;i<14;i++){ const a = i/14*Math.PI*2, r = 1.6 + (i%3)*0.7; add(islRoot, SPH(0.9, 10, 8), mat([0xff6b6b, 0x5aa0e6, 0xffd400, 0x58b368, 0xff9fcf, 0xb9a6f0, 0xffffff][i%7]), x + Math.cos(a)*r, G + 7 + (i%4)*0.9, z + Math.sin(a)*r, false); } } }
+    // a directional signpost and litter bins by the benches
+    { const x = 18, z = 470; add(islRoot, CYL(0.25, 0.3, 7, 8), mat(0x8a6f55), x, G, z);
+      [['정문 ↑', 5.8, 0], ['매표소 ←', 4.6, 0.5], ['선착장 ↓', 3.4, -0.4]].forEach(([t, y, r])=>{ const b = add(islRoot, new THREE.PlaneGeometry(4.6, 1.1), new THREE.MeshBasicMaterial({map:signTex(t, {bg:'#1d2f55', fg:'#ffffff', size:56, w:384, h:92}), side:THREE.DoubleSide}), x + 2.3, G + y, z, false); b.rotation.y = r; }); }
+    [[-58, 424], [58, 424], [70, 462], [-20, 496], [20, 496]].forEach(([x, z])=>{ if(!P(x, z)) return; add(islRoot, CYL(0.8, 0.7, 1.6, 10), mat(0x3b4c78), x, G, z); add(islRoot, CYL(0.85, 0.85, 0.3, 10), mat(0x2f3540), x, G + 1.6, z); });
+    // small round flower beds round the plaza rim, between the lamp posts
+    for(let i=0;i<9;i++){ const a = Math.PI*0.08 + (i + 0.5)/9*Math.PI*0.84, x = Math.cos(a)*66, z = 452 + Math.sin(a)*66; if(!P(x, z)) continue;
+      add(islRoot, CYL(2.6, 2.8, 0.7, 16), mat(0x6b4a2c), x, G, z); for(let k=0;k<12;k++){ const b = k/12*Math.PI*2, r = 0.6 + (k%3)*0.6; add(islRoot, ICO(0.5, 0), flat([0xff9fcf, 0xffd400, 0xffffff, 0xe2574c][k%4]), x + Math.cos(b)*r, G + 1.0, z + Math.sin(b)*r, false); } }
   }
 
   // ----- 6. driving-licence test course: asphalt, lane lines, kerbs, S-course, T-course, hill bump, tunnel, railway crossing, grandstand, big exam hall -----
