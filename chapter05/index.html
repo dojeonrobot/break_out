@@ -318,6 +318,17 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 .mk.team.me{background:var(--accent);color:var(--accent-fg)} .mk.team.me i{background:#fff}
 .mk.team.old{opacity:.45}
 .mk.team small{font-size:10px;color:var(--muted)} .mk.team.me small{color:color-mix(in srgb,var(--accent-fg) 75%,transparent)}
+/* the admin drawer: opens on the right from the 운영자 button, over the board, leaving the 3D view visible */
+#adminDlg{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;width:380px;max-height:calc(100% - 120px - env(safe-area-inset-top,0px));z-index:22;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
+#adminDlg[hidden]{display:none}
+#adminDlg .ah{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px 10px;border-bottom:1px solid var(--line)}
+#adminDlg .ah small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--muted)}
+#adminDlg .ah h2{margin:2px 0 0;font-size:17px;font-weight:700}
+#adminDlg .ah .acts{display:flex;gap:6px;align-items:center}
+#adminDlg .scroll{padding:8px 10px 14px}
+body.admin #board{display:none}
+@media (min-width:761px) and (max-width:1000px){#adminDlg{top:calc(62px + env(safe-area-inset-top,0px));max-height:calc(100% - 166px - env(safe-area-inset-top,0px))}}
+@media (max-width:760px){#adminDlg{left:12px;right:12px;width:auto;top:calc(62px + env(safe-area-inset-top,0px));max-height:calc(58% - 50px)}body.admin #panel{display:none}}
 /* the restoration simulator: a phantom layer over the island */
 #simBtn{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21;display:none;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid color-mix(in srgb,var(--void-edge) 60%,transparent);background:var(--void);color:var(--void-fg);font:600 13px var(--sans);box-shadow:0 0 0 3px color-mix(in srgb,var(--void-edge) 22%,transparent)}
 #simBtn i{width:10px;height:10px;border-radius:50%;background:var(--void-edge);box-shadow:0 0 10px var(--void-edge)}
@@ -480,7 +491,6 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
     <button role="tab" id="tV" aria-selected="true">복구 필요 <span class="cnt" id="cV">0</span></button>
     <button role="tab" id="tR" aria-selected="false">복구 완료 <span class="cnt" id="cR">0</span></button>
     <button role="tab" id="tB" aria-selected="false">건물</button>
-    <button role="tab" id="tA" aria-selected="false" hidden>운영자</button>
   </div>
   <div class="search" id="searchBox" hidden>
     <label for="q" id="qL">건물 찾기</label>
@@ -541,6 +551,10 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="grid" id="tpGrid"></div>
   <button type="button" class="skip" id="tpSkip">조 없이 둘러보기</button>
 </div></div>
+<aside id="adminDlg" class="glass" hidden aria-label="운영자">
+  <div class="ah"><div><small>ADMIN</small><h2>운영자</h2></div><div class="acts"><button type="button" class="mini" data-aact="logout">운영자 종료</button><button type="button" class="x" id="adminX">닫기</button></div></div>
+  <div class="scroll" id="adminBody"></div>
+</aside>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
 <div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
@@ -657,9 +671,8 @@ orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
 // Preview records (admin, this device only): zones ticked under "복구 미리보기" count as restored with a stand-in record,
 // so the island, the flow and the 5/5 ending can be checked without submitting five real links. Stored in localStorage 'void-demo'.
 const DEMO = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem('void-demo') || '[]')); }catch(e){ return new Set(); } })();
-if(DEMO.size){ const base = SCANS_ALL[0] || {};
-  DEMO.forEach((id, k)=>{ if(SCANS.some(s=> s.mission === id)) return;
-    SCANS.push({...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'운영자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}); }); }
+const demoScan = id=>{ const base = SCANS_ALL[0] || {}; return {...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'운영자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}; };
+DEMO.forEach(id=>{ if(!SCANS.some(s=> s.mission === id)) SCANS.push(demoScan(id)); });
 const ORBIT_SIG = orbitSig(BOOT && BOOT.subs);
 let AUTO = BOOT ? BOOT.auto !== false : true;
 const FLOOR_H = 3.6;
@@ -1087,7 +1100,7 @@ function updateProgress(){
   const isl = W && W.id==='island';
   $('pN').textContent = `${M.filter(m=>m.scans.length).length} / ${M.length}`;
   $('pCells').innerHTML = M.map(m=>`<i class="${m.scans.length?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
-  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 탭에서 끔)</span></div>` : '';
+  const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 운영자 창에서 끔)</span></div>` : '';
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
 updateProgress();
@@ -1127,6 +1140,7 @@ function checkReset(st){
   let seen = 0; try{ seen = +localStorage.getItem('void-reset') || 0; }catch(e){}
   if(rs <= seen) return;
   try{ localStorage.setItem('void-reset', String(rs)); }catch(e){}
+  clearLocalDemo();
   if(!TEAM) return;
   TEAM = 0; try{ localStorage.removeItem('void-team'); localStorage.removeItem('dorogram-team'); }catch(e){}
   const sel = $('teamSel'); if(sel) sel.value = '';
@@ -1153,7 +1167,7 @@ function applyState(st){
 }
 async function syncState(){
   if(LOCAL) return;
-  try{ applyState(await api('/state')); if(ADMIN_KEY){ $('tA').hidden = false; if(REOPEN_ADMIN){ REOPEN_ADMIN = false; $('adminBtn').click(); } } }
+  try{ applyState(await api('/state')); }
   catch(e){ if(STATE_VER < 0){ LOCAL = true; SUBS = loadLocal(); refreshSubUI(); } }
 }
 const MSG = {};
@@ -1250,27 +1264,28 @@ function adminHTML(){
   return `<div class="adm">
     <p class="subhelp">조별 제출 ${n}건 · 복구됨 ${done}건${wait ? ` · 확인 대기 ${wait}건` : ''}${HIDDEN.size ? ` · 숨긴 스캔 ${HIDDEN.size}건` : ''}</p>
     <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록은 올리면 바로 복구됨으로 (끄면 운영자가 "복구 확정"을 눌러야 함)</label>
-    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 링크 없이 구역을 복구된 것으로 보기 (확인용). 체크하면 바로 새로고침되어 반영됩니다.</span>
+    <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 스캔 없이 구역이 돌아온 것으로 보기 (확인용). 체크하면 바로 섬과 환원 시뮬레이터에 반영됩니다.</span>
       ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
       <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div></div>
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
       <button type="button" class="mini danger" data-aact="reset">전체 초기화</button>
-      <button type="button" class="mini" data-aact="logout">운영자 종료</button>
     </div>
     ${teams.length ? teams.map(t=>{ const list = SUBS.filter(s=>(s.team || 0)===t);
       return `<div class="grp"><h3>${t ? t+'조' : '조 미지정'} <span style="font-family:var(--mono);font-weight:400">${list.length}</span></h3>${list.map(row).join('')}</div>`; }).join('')
       : `<div class="empty">아직 제출된 스캔이 없습니다.<br>아이들이 구역 카드에서 링크를 내면 여기에 조별로 모입니다.</div>`}
   </div>`;
 }
-// preview ticks apply at once: save, remember to reopen the admin tab, reload (the stand-in records are injected at boot)
-function applyDemo(){ const ids = [...document.querySelectorAll('[data-demo]')].filter(c=> c.checked).map(c=> c.dataset.demo);
-  try{ localStorage.setItem('void-demo', JSON.stringify(ids)); sessionStorage.setItem('void-tab', 'a'); }catch(e){} toast('반영하는 중입니다'); setTimeout(()=> location.reload(), 250); }
-let REOPEN_ADMIN = false; try{ REOPEN_ADMIN = sessionStorage.getItem('void-tab') === 'a'; sessionStorage.removeItem('void-tab'); }catch(e){}
+// preview ticks apply at once, without a reload: stand-in records go in or out, the zones and the flow layer rebuild (see setDemo)
+function demoTick(ids, on){ setDemo(ids, on); if(on){ if(W.id !== 'island') setWorld('island'); if(!simOn) setSim(true); } }
+function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ localStorage.removeItem('void-seen-lit'); sessionStorage.removeItem('void-simdone'); }catch(e){} }
+function renderAdmin(){ const b = $('adminBody'); if(b && !$('adminDlg').hidden) b.innerHTML = adminHTML(); }
+function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); }
+function closeAdmin(){ $('adminDlg').hidden = true; document.body.classList.remove('admin'); }
 async function adminAct(act){
   try{
-    if(act==='logout'){ ADMIN_KEY=''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} $('tA').hidden = true; setTab('v'); return; }
+    if(act==='logout'){ ADMIN_KEY=''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} closeAdmin(); return; }
     if(act==='copy'){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
         .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
@@ -1278,20 +1293,23 @@ async function adminAct(act){
       await navigator.clipboard.writeText(['조\t구역\t찍은 것\t링크\t제출 시각\t상태', ...lines].join('\n')); toast(`${lines.length}건을 복사했습니다`); return;
     }
     if(act==='reset'){
-      if(!confirm(`모든 조의 제출 기록 ${SUBS.length}건을 지우고, 지금 3D에 들어가 있는 스캔 ${SCANS.length}건을 숨겨 모든 구역을 "복구 필요"로 되돌립니다.\n숨긴 스캔은 "숨긴 스캔 되살리기"로 되돌릴 수 있습니다. 계속할까요?`)) return;
+      const real = SCANS.filter(s=> !s.demo).length;
+      if(!confirm(`모든 조의 제출 기록 ${SUBS.length}건을 지우고, 지금 3D에 들어가 있는 스캔 ${real}건을 숨겨 모든 구역을 "복구 필요"로 되돌립니다.${DEMO.size ? `\n이 기기의 복구 미리보기 ${DEMO.size}곳도 꺼집니다.` : ''}\n모든 태블릿은 조를 다시 고르게 됩니다. 숨긴 스캔은 "숨긴 스캔 되살리기"로 되돌릴 수 있습니다. 계속할까요?`)) return;
+      clearLocalDemo();
       STATE_VER = -1; applyState(await api('/admin/reset', {confirm:'RESET', hide:SCANS_ALL.map(s=>s.id)}, true)); toast('초기화했습니다'); return;
     }
     if(act==='unhide'){
       if(!confirm(`숨긴 스캔 ${HIDDEN.size}건을 다시 3D에 보이게 합니다. 계속할까요?`)) return;
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
-    if(act==='demoAll' || act==='demoNone'){ document.querySelectorAll('[data-demo]').forEach(c=> c.checked = act==='demoAll'); applyDemo(); return; }
+    if(act==='demoAll' || act==='demoNone'){ demoTick([...document.querySelectorAll('[data-demo]')].map(c=> c.dataset.demo), act==='demoAll'); return; }
     if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '운영자가 확정해야 복구됩니다'); return; }
   }catch(err){ toast(err.message); }
 }
 function refreshSubUI(){
   markers.forEach(mk=> mk.state = null);
   if(selected >= 0) select(selected, false); else renderList();
+  renderAdmin();
 }
 document.addEventListener('submit', e=>{
   const form = e.target.closest('form[data-sub]'); if(!form) return;
@@ -1351,8 +1369,6 @@ function renderList(){
   if(tab==='v'){
     L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 보고 직접 찾아가 스캔하세요.</p>` : '')
       + (todo.length ? todo.map(([m,k])=>zoneCard(m,k)).join('') : `<div class="empty">모든 구역이 복구되었습니다.</div>`);
-  } else if(tab==='a'){
-    L.innerHTML = adminHTML();
   } else if(tab==='r'){
     const free = W.id==='erica' ? SCANS.filter(s=>!s.mission) : [];
     L.innerHTML = (done.length ? done.map(([m,k])=>zoneCard(m,k)).join('')
@@ -1382,7 +1398,7 @@ function renderList(){
   refreshZones(); renderBoard();
 }
 function setTab(t){
-  tab=t; [['tV','v'],['tR','r'],['tB','b'],['tA','a']].forEach(([id,k])=>$(id).setAttribute('aria-selected', t===k));
+  tab=t; [['tV','v'],['tR','r'],['tB','b']].forEach(([id,k])=>$(id).setAttribute('aria-selected', t===k));
   renderList(); applyVoidView();
 }
 function applyVoidView(){
@@ -1390,7 +1406,8 @@ function applyVoidView(){
   if(W.id==='erica'){ B.forEach(b=>{ const g = on && !hiddenZone(b.mission); if(b.isVoidB && b.ghost!==g) setEricaGhost(b, g); }); paint(); }
   else IB.forEach(b=>{ if(b.mission && b.ghost) setGhost(b, false); });   // the island never shows holograms: nothing there hints at what is missing
 }
-$('tV').onclick=()=>setTab('v'); $('tR').onclick=()=>setTab('r'); $('tB').onclick=()=>setTab('b'); $('tA').onclick=()=>setTab('a');
+$('tV').onclick=()=>setTab('v'); $('tR').onclick=()=>setTab('r'); $('tB').onclick=()=>setTab('b');
+$('adminX').onclick = closeAdmin;
 // team picker (remembered on this device) and the admin entry (password checked by the server)
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
 teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; try{ localStorage.setItem('void-team', TEAM || ''); if(TEAM) localStorage.setItem('dorogram-team', String(TEAM)); }catch(e){} refreshSubUI(); if(TEAM && !SCREEN) startGeo(); };
@@ -1405,7 +1422,7 @@ $('adminBtn').onclick = async ()=>{
   if(LOCAL){ toast('서버에 올라간 페이지에서만 쓸 수 있습니다'); return; }
   if(!ADMIN_KEY){ const k = prompt('운영자 비밀번호'); if(k==null) return; ADMIN_KEY = k.trim(); }
   try{ const st = await api('/admin/state', null, true); try{ sessionStorage.setItem('void-admin', ADMIN_KEY); }catch(e){}
-    $('tA').hidden = false; STATE_VER = -1; applyState(st); setTab('a'); }
+    STATE_VER = -1; applyState(st); openAdmin(); }
   catch(err){ ADMIN_KEY = ''; try{ sessionStorage.removeItem('void-admin'); }catch(e){} toast(err.message); }
 };
 $('q').addEventListener('input', renderList);
@@ -1431,7 +1448,7 @@ document.addEventListener('click', e=>{
   if(ad){ e.stopPropagation(); if(!confirm('이 제출을 지울까요?')) return;
     api('/admin/delete', {id:ad.dataset.adel}, true).then(st=>{ STATE_VER = -1; applyState(st); }).catch(err=> toast(err.message)); return; }
   const dm = e.target.closest('input[data-demo]');
-  if(dm){ e.stopPropagation(); applyDemo(); return; }
+  if(dm){ e.stopPropagation(); demoTick([dm.dataset.demo], dm.checked); return; }
   const aa = e.target.closest('[data-aact]');
   if(aa){ e.stopPropagation(); adminAct(aa.dataset.aact); return; }
   const cb = e.target.closest('[data-cap]');
@@ -1489,7 +1506,7 @@ function select(i, move){
   if(innerWidth<=760) closePanel();
 }
 $('iX').onclick = ()=>select(-1);
-addEventListener('keydown', e=>{ if(e.key==='Escape'){ if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('cap').hidden) closeCapture(); else if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(!$('cap').hidden) closeCapture(); else if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
 
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e){
@@ -5298,9 +5315,22 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 
 // =====================================================================
 // ---------- what a restored record leaves behind: a monument on the campus, and — inside the restoration simulator — a lit stretch of the Ilua flow on the island ----------
+// Everything here is rebuilt by buildSim() whenever the set of restored zones changes (a record comes back, a preview is ticked, a reset), so no reload is needed.
 const simRoot = new THREE.Group(); simRoot.visible = false; sceneI.add(simRoot);   // on the scene, not islRoot: the static batching must not fold this layer into the island
-let SIM_LIT = 0;
-{
+const simMonE = new THREE.Group(); sceneE.add(simMonE);                             // campus monuments of restored records
+let SIM_LIT = 0, REVEALS = [], simAnim = [], simOn = false, SIM_REVEAL_T = null, simDoneT = 0;
+const FLOW_Y = G - 26;   // the vein runs through the crust under the island
+const veinTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); veinTex.wrapS = THREE.RepeatWrapping; veinTex.repeat.set(1, 1);
+const veinMat = new THREE.MeshBasicMaterial({map:veinTex, transparent:true, opacity:0.95, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
+const veinBase = new THREE.MeshBasicMaterial({color:0x2a7fa8, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
+islAnim.push(t=>{ simAnim.forEach(f=> f(t)); veinTex.offset.x = -t*0.35;
+  if(SIM_REVEAL_T == null) return;
+  REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / Math.max(1.4, r.len/110))); const e = 1 - Math.pow(1 - k, 3); r.geos.forEach(g=> g.setDrawRange(0, Math.round(r.total*e/6)*6)); }); });
+window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem('void-seen-lit'));
+function buildSim(revealIds){
+  while(simRoot.children.length) simRoot.remove(simRoot.children[0]);
+  while(simMonE.children.length) simMonE.remove(simMonE.children[0]);
+  simAnim.length = 0; REVEALS = []; SIM_LIT = 0;
   const texLoader = new THREE.TextureLoader();
   const holoMat = url => { const t = texLoader.load(url); t.colorSpace = THREE.SRGBColorSpace; return new THREE.MeshBasicMaterial({map:t, transparent:true, opacity:0.92, side:THREE.DoubleSide}); };
   // a plinth, a floating hologram of the scan, a light beam and a sign with where it came from
@@ -5312,7 +5342,7 @@ let SIM_LIT = 0;
     add(g, new THREE.PlaneGeometry(8.6*k, 8.6*k), glowMat(0x9b7bff, 0.25, true), 0, 7.5*k, -0.1, false);
     add(g, CYL(0.5*k, 0.5*k, 60*k, 10), glowMat(0xb9a6ff, 0.22, true), 0, 1.8*k, 0, false);
     const sign = add(g, new THREE.PlaneGeometry(14*k, 2.2*k), new THREE.MeshBasicMaterial({map:signTex(text, {bg:'#1d2f55', fg:'#f1f3f6', size:52, w:640, h:100}), transparent:true, side:THREE.DoubleSide}), 0, 13*k, 0, false);
-    islAnim.push(t=>{ holo.position.y = 7.5*k + Math.sin(t*1.3 + x)*0.4*k; holo.rotation.y = t*0.6; sign.rotation.y = t*0.6; });
+    simAnim.push(t=>{ holo.position.y = 7.5*k + Math.sin(t*1.3 + x)*0.4*k; holo.rotation.y = t*0.6; sign.rotation.y = t*0.6; });
     g.userData.scan = scan; return g;
   }
   // campus: in front of the building that held the empty record (always visible — this is the real world)
@@ -5320,7 +5350,7 @@ let SIM_LIT = 0;
     if(!m.scans.length || !m.b) return;
     const b = m.b, t = m.twin ? MISSIONS_I.find(x=>x.id===m.twin) : null;
     const off = b.isSpot ? 9 : 26;
-    monument(sceneE, b.cx + off, 0, b.cz + off, m.scans[0], t ? `도로랜드 ${t.name}과 이어진 기록` : '복구된 기록', true);
+    monument(simMonE, b.cx + off, 0, b.cz + off, m.scans[0], t ? `도로랜드 ${t.name}과 이어진 기록` : '복구된 기록', true);
   });
   // simulator layer: the record beside its island zone
   MI.forEach(m=>{
@@ -5331,10 +5361,6 @@ let SIM_LIT = 0;
   });
   // The Ilua flow under the island: thick glowing bands in the shape of the Codex eye glyph (geometry in GLYPH, shared with the panel).
   // A zone's stretch is a gap (only scattered bits of flow) until its record is back; then it sweeps in as one running band.
-  const FLOW_Y = G - 26;   // the vein runs through the crust under the island
-  const flowTex = stripeTexI('#9ff6ff', '#1a4a8a', 12, false); flowTex.wrapS = THREE.RepeatWrapping; flowTex.repeat.set(1, 1);
-  const flowMat = new THREE.MeshBasicMaterial({map:flowTex, transparent:true, opacity:0.95, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
-  const baseMat = new THREE.MeshBasicMaterial({color:0x2a7fa8, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
   const xray = (o, order=6)=>{ o.material.depthTest = false; o.material.transparent = true; o.renderOrder = order; return o; };
   // flat band geometry from cross-sections: uv.u runs along the band (one stripe every 60 m), indices ordered along it so drawRange can sweep it in
   const bandGeo = secs=>{ const pos = [], uv = [], idx = [];
@@ -5342,27 +5368,26 @@ let SIM_LIT = 0;
       if(i){ const k = (i-1)*2; idx.push(k, k+2, k+1, k+1, k+2, k+3); } });
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); return g; };
   const triGeo = tri=>{ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tri.flatMap(p=> [p[0], FLOW_Y, p[1]]), 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute([0,0, 0,1, 1,0.5], 2)); g.setIndex([0,1,2]); return g; };
-  const REVEALS = [];   // pieces still to sweep in; SIM_REVEAL_T is set the first time the simulator opens
   const lit = (geo, len, reveal, delay)=>{
-    const under = new THREE.Mesh(geo, baseMat); under.renderOrder = 5; simRoot.add(under);
-    const over = new THREE.Mesh(geo.clone(), flowMat); over.renderOrder = 6; simRoot.add(over);
+    const under = new THREE.Mesh(geo, veinBase); under.renderOrder = 5; simRoot.add(under);
+    const over = new THREE.Mesh(geo.clone(), veinMat); over.renderOrder = 6; simRoot.add(over);
     if(reveal){ geo.setDrawRange(0, 0); over.geometry.setDrawRange(0, 0); REVEALS.push({geos:[geo, over.geometry], total:geo.index.count, delay, len}); } };
   const sparks = secs=>{ const n = Math.max(6, Math.round(secs[secs.length-1].s/16)), sp = xray(new THREE.InstancedMesh(SPH(1.1, 6, 5), glowMat(0xdff6ff, 0.9, true), n), 7), o = new THREE.Object3D(); simRoot.add(sp);
-    islAnim.push(t=>{ for(let i=0;i<n;i++){ const u = ((t*0.05) + i/n) % 1, k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = (Math.sin(t*2.1 + i*2.3))*sc.hw*0.7;
+    simAnim.push(t=>{ for(let i=0;i<n;i++){ const u = ((t*0.05) + i/n) % 1, k = Math.min(secs.length-1, Math.floor(u*(secs.length-1))), sc = secs[k], w = (Math.sin(t*2.1 + i*2.3))*sc.hw*0.7;
         o.position.set(sc.c[0] + sc.n[0]*w, FLOW_Y + 2 + Math.sin(t*3 + i)*2, sc.c[1] + sc.n[1]*w); o.updateMatrix(); sp.setMatrixAt(i, o.matrix); } sp.instanceMatrix.needsUpdate = true; }); };
   const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
   let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem('void-seen-lit') || '[]')); }catch(e){}
-  const newLit = [...litIds].filter(id=> !seenLit.has(id));            // stretches this device has not watched come back yet
+  // stretches that sweep in: the ones just switched on (live), or the ones this device has not watched come back yet
+  const newLit = revealIds ? revealIds.filter(id=> litIds.has(id)) : [...litIds].filter(id=> !seenLit.has(id));
   try{ localStorage.setItem('void-seen-lit', JSON.stringify([...litIds])); }catch(e){}
-  window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem('void-seen-lit'));
   // scattered bits of an empty stretch: dim, flickering, a little off the line
   const bitPieces = [];
   const bits = (pc, seed)=> glyphBits(pc, seed).forEach(([a,b], k)=>{ const secs = glyphSlice(pc, a, b); if(secs.length < 2) return;
     const off = ((seed*7 + k*13) % 11 - 5)*1.6, sh = secs.map(sc=> ({...sc, c:[sc.c[0] + sc.n[0]*off, sc.c[1] + sc.n[1]*off], hw:sc.hw*0.85}));
     const m = new THREE.MeshBasicMaterial({color:0x9fd8ff, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:false, side:THREE.DoubleSide});
-    const geo = bandGeo(sh), under = new THREE.Mesh(geo, baseMat); under.renderOrder = 5; simRoot.add(under);
+    const geo = bandGeo(sh), under = new THREE.Mesh(geo, veinBase); under.renderOrder = 5; simRoot.add(under);
     const mesh = new THREE.Mesh(geo.clone(), m); mesh.renderOrder = 6; simRoot.add(mesh); bitPieces.push({m, ph:seed*0.7 + k*2.1}); });
-  islAnim.push(t=> bitPieces.forEach(p=>{ p.m.opacity = 0.7 + 0.3*Math.max(0, Math.sin(t*2.2 + p.ph)) * (Math.sin(t*8 + p.ph*3) > -0.6 ? 1 : 0.2); }));
+  simAnim.push(t=> bitPieces.forEach(p=>{ p.m.opacity = 0.7 + 0.3*Math.max(0, Math.sin(t*2.2 + p.ph)) * (Math.sin(t*8 + p.ph*3) > -0.6 ? 1 : 0.2); }));
   GLYPH.forEach((pc, i)=>{
     const on = pc.zone === 'final' ? litIds.size === 5 : litIds.has(pc.zone);
     const rv = pc.zone === 'final' ? newLit.length > 0 : newLit.includes(pc.zone), delay = rv ? (pc.zone === 'final' ? 1.4 : 0.2 + newLit.indexOf(pc.zone)*0.9) : 0;
@@ -5371,32 +5396,53 @@ let SIM_LIT = 0;
     if(on){ lit(bandGeo(secs), len, rv, delay); sparks(secs); }
     else if(pc.zone !== 'final') bits(pc, 7 + i*13);
   });
-  islAnim.push(t=>{ flowTex.offset.x = -t*0.35;
-    if(SIM_REVEAL_T == null) return;
-    REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / Math.max(1.4, r.len/110))); const e = 1 - Math.pow(1 - k, 3); r.geos.forEach(g=> g.setDrawRange(0, Math.round(r.total*e/6)*6)); }); });
   MI.forEach(m=>{ if(m.b && m.scans.length) SIM_LIT++; });
   // zone markers: a ring and a shaft of light from the vein up to the zone on the surface
   MI.forEach((m, k)=>{
     if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz;
     const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.9 : 0.3, true), x, FLOW_Y, z, false));
     xray(add(simRoot, CYL(0.9, 0.9, G + 30 - FLOW_Y, 10), glowMat(on ? 0x9ff6ff : 0x9b7bff, on ? 0.35 : 0.12, true), x, FLOW_Y, z, false));
-    islAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
+    simAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); });
   });
   // source and mouth
   xray(add(simRoot, CYL(1.4, 1.4, 120, 10), glowMat(0xb9a6ff, SIM_LIT ? 0.3 : 0.1, true), -42, FLOW_Y, -528, false));
   if(SIM_LIT === 5) xray(add(simRoot, CYL(2.2, 2.2, 170, 12), glowMat(0x9ff6ff, 0.35, true), 290, FLOW_Y, 277, false));
+
+  SIM_REVEAL_T = simOn ? performance.now()/1000 + 0.3 : null;   // live: sweep now; otherwise the next time the simulator opens
+  if(simOn) simHud();
+}
+buildSim();
+// a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
+function rescan(revealIds){
+  MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
+  updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
+}
+// preview records on/off (this device only; stored in localStorage 'void-demo')
+function setDemo(ids, on){
+  const added = [];
+  ids.forEach(id=>{
+    if(on){ if(DEMO.has(id)) return; DEMO.add(id); if(!SCANS.some(s=> s.mission === id)){ const sc = demoScan(id); SCANS.push(sc); (byMission[id] ||= []).push(sc); } added.push(id); }
+    else { if(!DEMO.has(id)) return; DEMO.delete(id); const k = SCANS.findIndex(s=> s.id === `demo-${id}`); if(k >= 0) SCANS.splice(k, 1); if(byMission[id]) byMission[id] = byMission[id].filter(s=> s.id !== `demo-${id}`); }
+  });
+  try{ localStorage.setItem('void-demo', JSON.stringify([...DEMO])); }catch(e){}
+  rescan(on ? added : undefined);
 }
 // ---------- simulator on/off: the island goes dark and phantom, the flow layer shows; success when all five stretches are lit ----------
-let simOn = false, SIM_REVEAL_T = null;
+// HUD count, the cave eye and the 5/5 card; the card waits for a pending sweep to finish so the last stretch is seen joining
+function simHud(){
+  caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
+  $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
+  let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
+  clearTimeout(simDoneT);
+  if(SIM_LIT === 5 && !seen) simDoneT = setTimeout(()=>{ if(!simOn || SIM_LIT !== 5) return;
+    $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} }, REVEALS.length ? 4500 : 0);
+}
 function setSim(on){
   simOn = on; simRoot.visible = on; document.body.classList.toggle('sim', on); $('simBtn').setAttribute('aria-pressed', on); $('simBtn').querySelector('em').textContent = on ? 'ON' : 'OFF';
   flowU.uDim.value = on ? 0.1 : 1; SIM_DIM.forEach(o=> o.visible = !on);
   if(on && SIM_REVEAL_T == null) SIM_REVEAL_T = performance.now()/1000 + 0.6;   // new stretches sweep in the first time the simulator opens
-  if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); caveEye.material.color.set(SIM_LIT === 5 ? 0x9ff6ff : 0xffd84a);
-    $('simN').textContent = `${SIM_LIT} / 5`; $('simCells').innerHTML = Array.from({length:5}, (_,i)=> `<i class="${i < SIM_LIT ? 'ok' : ''}"></i>`).join('');
-    let seen = false; try{ seen = sessionStorage.getItem('void-simdone') === '1'; }catch(e){}
-    if(SIM_LIT === 5 && !seen){ $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; try{ sessionStorage.setItem('void-simdone', '1'); }catch(e){} } }
-  else { islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
+  if(on){ sceneI.background = new THREE.Color(0x05070a); sceneI.fog = new THREE.Fog(0x05070a, 420, 1900); updateSun(); simHud(); }
+  else { clearTimeout(simDoneT); islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
 $('simBtn').onclick = ()=> setSim(!simOn);
 $('simDoneX').onclick = ()=>{ delete $('simDone').dataset.on; };
