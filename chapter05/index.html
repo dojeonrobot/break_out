@@ -1666,9 +1666,11 @@ meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
 let meAvatar = null;
 function ensureAvatar(){ if(meAvatar) return meAvatar;   // Naty, the little flame spirit (models/naty.glb, the user's model), standing on its feet and about 3 m tall so it reads from the follow view
   meAvatar = new THREE.Group(); meAvatar.userData = {}; meAvatar.visible = false; sceneE.add(meAvatar);
-  new GLTFLoader().load('models/naty.glb', g=>{ const o = g.scene, box = new THREE.Box3().setFromObject(o), sz = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  const loader = new GLTFLoader(), onLoad = g=>{ const o = g.scene, box = new THREE.Box3().setFromObject(o), sz = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
     const k = 3.0/Math.max(sz.y, 0.01); o.scale.setScalar(k); o.position.set(-c.x*k, -box.min.y*k, -c.z*k); o.rotation.y = NATY_YAW;
-    o.traverse(m=>{ if(m.isMesh){ m.castShadow = true; m.frustumCulled = false; } }); meAvatar.add(o); meAvatar.userData.body = o; });
+    o.traverse(m=>{ if(m.isMesh){ m.castShadow = true; m.frustumCulled = false; } }); meAvatar.add(o); meAvatar.userData.body = o; };
+  // the artifact copy cannot serve .glb: fall back to the same model as base64 text (models/naty.glb.txt)
+  loader.load('models/naty.glb', onLoad, undefined, ()=> fetch('models/naty.glb.txt').then(r=> r.text()).then(t=>{ const bin = Uint8Array.from(atob(t.trim()), c=> c.charCodeAt(0)); loader.parse(bin.buffer, '', onLoad, ()=>{}); }).catch(()=>{}));
   return meAvatar; }
 const NATY_YAW = 0;   // extra turn so the model faces the way it walks (set after checking the model's forward axis)
 // the heading arrow on the ground in front of Void (the way I am facing)
