@@ -327,7 +327,6 @@ body.inside #panel,body.inside #bar,body.inside #info,body.inside #labels,body.i
 .mk.team{background:var(--panel-solid);color:var(--fg);border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent);gap:6px;padding:3px 9px 3px 5px}
 .mk.team i{width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:voidPulse 2s ease-in-out infinite}
 .mk.team.me{background:var(--accent);color:var(--accent-fg)} .mk.team.me i{background:#fff}
-body.medemo .mk.team.me{display:none}   /* the robot preview: nothing over the robot */
 .mk.team.old{opacity:.45}
 .mk.team small{font-size:10px;color:var(--muted)} .mk.team.me small{color:color-mix(in srgb,var(--accent-fg) 75%,transparent)}
 /* the admin drawer: opens on the right from the 관리자 button, over the board, leaving the 3D view visible */
@@ -396,11 +395,10 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 .capbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:10px;padding:11px 14px;background:var(--accent);color:var(--accent-fg);font:600 13.5px var(--sans);cursor:pointer}
 .capbtn:active{transform:scale(.98)}
 .capbtn svg{width:18px;height:18px;flex:none}
-.linkalt summary{font-size:12px;color:var(--muted);cursor:pointer;list-style:none}
-.linkalt summary::-webkit-details-marker{display:none}
-.linkalt summary::before{content:'+ ';font-family:var(--mono)}
-.linkalt[open] summary::before{content:'− '}
-.linkalt .cardsub{border-top:0;padding-top:4px}
+.task{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.task b{font-weight:600}
+.task+.cardsub,.capbtn+.task{margin-top:2px}
+.capwrap .cardsub{border-top:0;padding-top:0}
 .orbbtn{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;width:100%;border:0;background:transparent;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .orbbtn img{width:56px;height:56px;border-radius:8px;object-fit:cover;display:block;margin:0;background:var(--void)}
 .orbbtn span{font-weight:600;font-size:12.5px;line-height:1.4}
@@ -527,7 +525,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 <aside id="board" class="glass" aria-label="도로랜드 복구 현황">
   <div class="bh"><div><small>SCAN BREAK</small><h2>도로랜드 복구 현황</h2></div><div class="acts"><b id="bN">0 / 0</b><button id="bMin" class="x" type="button" aria-expanded="true">접기</button></div></div>
   <div class="bbar"><i id="bFill"></i></div>
-  <p class="bhint">캠퍼스의 빈 곳을 카메라로 스캔하면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.</p>
+  <p class="bhint">캠퍼스의 빈 곳에서 실사 사진과 스캔본을 둘 다 내면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.</p>
   <div id="bRows"></div>
 </aside>
 <section id="info" class="glass off" aria-live="polite">
@@ -872,7 +870,11 @@ const scansFor = id => pairIds(id).flatMap(k=> byMission[k] || []);
 let M = MISSIONS.map(m=>({...m, scans: scansFor(m.id)}));
 const MISSION_E = M;
 const missionOfBuilding = {}; M.forEach(m=> missionOfBuilding[m.building] = m);
-const isVoid = m => m && m.scans.length===0;
+// The mission at a zone (user, 2026-10-15): two records, a real photo set shot with this page's camera (kind "orbit") and a 3D scan
+// (a Scaniverse link the server converts, or a built-in splat). The zone counts as restored only when both are in. A preview record counts as both.
+const zoneParts = m => { const sc = m ? m.scans : []; const demo = sc.some(x=> x.demo); return {photo: demo || sc.some(x=> x.kind === 'orbit'), scan: demo || sc.some(x=> x.kind !== 'orbit')}; };
+const zoneDone = m => { if(!m || !m.scans.length) return false; const q = zoneParts(m); return q.photo && q.scan; };
+const isVoid = m => m && !zoneDone(m);
 
 // ---------- campus buildings ----------
 const edgeMat = new THREE.LineBasicMaterial({color:0x000000, transparent:true, opacity:.16});
@@ -1070,7 +1072,7 @@ function updateSun(){
 // ---------- panel ----------
 const fmt = n => n.toLocaleString('ko-KR');
 // On the campus, a zone that is not yet restored is a secret: no name, no map marker — only coordinates to find on foot.
-const hiddenZone = m => !!m && m.lat != null && !m.scans.length;
+const hiddenZone = m => !!m && m.lat != null && !zoneDone(m);
 const zoneName = m => hiddenZone(m) ? `미확인 구역 ${'ABCDEFGHIJ'[MISSION_E.indexOf(m)] || ''}` : m.name;
 const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾아가세요. 그곳의 사물이나 공간을 휴대폰 카메라로 스캔하면 기록이 되살아납니다.' : (m.brief || '');
 // Ilua: the energy that once flowed through the whole island. Each restored record gives back one fragment of its course.
@@ -1142,7 +1144,7 @@ function glyphOutline(secs){ const L = secs.map(s=> [s.c[0] + s.n[0]*s.hw, s.c[1
 function glyphBits(piece, seed){ let sd = seed; const r = ()=> (sd = (sd*16807) % 2147483647) / 2147483647; const span = piece.u1 - piece.u0, n = span > 0.4 ? 5 : 3, out = [];
   for(let i=0;i<n;i++){ const a = piece.u0 + span*((i + 0.15 + r()*0.7)/n), w = span*(0.05 + r()*0.04); out.push([a, Math.min(piece.u1, a + w)]); } return out; }
 const glyphShort = pc => pc.band.total*(pc.u1 - pc.u0) < 150;   // thorns: no scattered bits, they come with their arm
-const glyphHave = ()=> GLYPH_ZONES.filter(z=> (scansFor(z.id) || []).length).map(z=> z.id);
+const glyphHave = ()=> GLYPH_ZONES.filter(z=> zoneDone(MI.find(m=> m.id === z.id))).map(z=> z.id);
 // the glyph as an inline SVG (the 5/5 card): restored pieces filled, empty ones as scattered bits; framed on the glyph's own bounds
 const GLYPH_BOX = (()=>{ let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9; GLYPH.forEach(pc=> glyphOutline(pc.band.secs).forEach(([x, z])=>{ x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); })); const sz = Math.max(x1 - x0, z1 - z0)*1.12; return {cx:(x0 + x1)/2, cz:(z0 + z1)/2, sz}; })();
 function glyphSVG(have, size=150){
@@ -1157,8 +1159,8 @@ function glyphSVG(have, size=150){
 }
 function updateProgress(){
   const isl = W && W.id==='island';
-  $('pN').textContent = `${M.filter(m=>m.scans.length).length} / ${M.length}`;
-  $('pCells').innerHTML = M.map(m=>`<i class="${m.scans.length?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
+  $('pN').textContent = `${M.filter(zoneDone).length} / ${M.length}`;
+  $('pCells').innerHTML = M.map(m=>`<i class="${zoneDone(m)?'ok':''}" title="${esc(zoneName(m))}"></i>`).join('');
   const box = $('iluaBox'); if(box) box.innerHTML = DEMO.size ? `<div class="subline" style="margin-bottom:8px"><span>복구 미리보기 ${DEMO.size}곳이 켜져 있습니다 (이 기기만, 관리자 창에서 끔)</span></div>` : '';
   const pr = document.querySelector('#panel .progress'); if(pr){ pr.querySelector('.row').hidden = isl; $('pCells').hidden = isl; pr.querySelector('.legend').hidden = isl; }
 }
@@ -1222,7 +1224,7 @@ async function syncState(){
 }
 const MSG = {};
 const subsFor = m => { const v = viewTeam(); return SUBS.filter(s=> pairIds(m.id).includes(s.mission) && !inMap.has(s.scanId) && (v === 0 || s.team === v)); };
-function zoneState(m){ return m.scans.length ? 'ok' : subsFor(m).length ? 'pend' : 'void'; }
+function zoneState(m){ return zoneDone(m) ? 'ok' : (m.scans.length || subsFor(m).length) ? 'pend' : 'void'; }
 const timeText = t => new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const cancelBtn = s => (LOCAL || s.team===TEAM) ? `<button type="button" class="mini" data-unsub="${esc(s.id || s.scanId)}">취소</button>` : '';
 function subLines(m){
@@ -1241,20 +1243,21 @@ function subLines(m){
   }).join('');
 }
 const CAM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>';
-// The zone card: shoot with this page's camera first; the old link form stays folded away as a fallback.
+// The zone card's two tasks: ① a real photo set with this page's camera, ② a Scaniverse scan link. Each shows done / not yet.
 function formHTML(m, pre=''){
-  const msg = MSG[m.id] || {text:'', kind:''};
+  const msg = MSG[m.id] || {text:'', kind:''}, q = zoneParts(m), pend = subsFor(m);
+  const photoPend = pend.some(x=> x.kind === 'orbit'), scanPend = pend.some(x=> x.kind !== 'orbit');
+  const chip = (done, p)=> done ? '<span class="st ok">완료</span>' : p ? '<span class="st pend">확인 중</span>' : '<span class="st void">아직</span>';
   return `<div class="capwrap">
-      <form class="cardsub" data-sub="${esc(m.id)}" novalidate>
-        <label for="u-${pre}${esc(m.id)}">이 구역에서 찍은 스캔 링크</label>
-        <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="https://scaniverse.com/scan/..." autocomplete="off"><button type="submit">제출</button></div>
+      <div class="task"><b>① 실사 사진</b>${chip(q.photo, photoPend)}</div>
+      ${q.photo ? '' : `<button type="button" class="capbtn" data-cap="${esc(m.id)}">${CAM_ICON} 이 구역 카메라로 찍기</button>`}
+      <div class="task"><b>② 스캔본</b>${chip(q.scan, scanPend)}</div>
+      ${q.scan ? '' : `<form class="cardsub" data-sub="${esc(m.id)}" novalidate>
+        <div class="subrow"><input id="u-${pre}${esc(m.id)}" data-draft="${pre}${esc(m.id)}" type="url" inputmode="url" placeholder="Scaniverse 스캔 링크" autocomplete="off" aria-label="스캔 링크"><button type="submit">제출</button></div>
         <input data-draft="n-${pre}${esc(m.id)}" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
         ${msg.text ? `<p class="subhelp" data-kind="${msg.kind}">${esc(msg.text)}</p>` : ''}
         ${LOCAL ? '<p class="subhelp">서버 연결 전이라 이 기기에만 저장됩니다.</p>' : ''}
-      </form>
-      <details class="linkalt"><summary>Scaniverse 없이 카메라로 찍기</summary>
-        <button type="button" class="capbtn" data-cap="${esc(m.id)}">${CAM_ICON} 이 구역 카메라로 찍기</button>
-      </details>
+      </form>`}
     </div>`;
 }
 const subThumb = s => s.kind==='orbit' ? orbitThumb(s) : `${API}/thumb/${esc(s.scanId)}`;
@@ -1262,8 +1265,10 @@ const subThumb = s => s.kind==='orbit' ? orbitThumb(s) : `${API}/thumb/${esc(s.s
 const PAIRS = ()=> MISSION_E.filter(m=>m.twin).map(m=>({campus:m, island: MI.find(x=>x.id===m.twin) || {id:m.twin, name:m.twin}}));
 function boardRow(p){
   const st = zoneState(p.campus), subs = subsFor(p.campus), teams = [...new Set(subs.map(s=>s.team).filter(Boolean))];
+  const half = p.campus.scans[0];   // one of the two records is already in (photo or scan)
   const thumb = st==='ok' ? `<img src="${esc(p.campus.scans[0].thumb)}" alt="">`
-    : st==='pend' && (!LOCAL || subs[0].kind==='orbit') ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
+    : st==='pend' && half ? `<img src="${esc(half.thumb)}" alt="">`
+    : st==='pend' && subs[0] && (!LOCAL || subs[0].kind==='orbit') ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
     : st==='pend' ? '···' : '?';
   const where = st==='ok' ? `${esc(p.campus.name)}에서 복구` : `${esc(zoneName(p.campus))}${p.campus.lat!=null ? ' · '+coordText(p.campus) : ''}`;
   return `<button type="button" class="brow is-${st}" data-pair="${esc(p.campus.id)}">
@@ -1272,7 +1277,7 @@ function boardRow(p){
     ${statusHTML(p.campus)}
   </button>`;
 }
-function teamZones(t, ps){ return ps.map(p=>{ const ids = pairIds(p.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)); return {p, st: mine.some(subDone) ? 'ok' : mine.length ? 'pend' : 'void'}; }); }
+function teamZones(t, ps){ return ps.map(p=>{ const ids = pairIds(p.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)), ok = mine.filter(subDone); const both = ok.some(x=> x.kind === 'orbit') && ok.some(x=> x.kind !== 'orbit'); return {p, st: both ? 'ok' : mine.length ? 'pend' : 'void'}; }); }
 function renderBoard(){
   let ps; try{ ps = PAIRS(); }catch(e){ if(e instanceof ReferenceError) return; throw e; }   // island list not built yet on the very first render
   const hint = document.querySelector('#board .bhint');
@@ -1286,7 +1291,7 @@ function renderBoard(){
     if(hint) hint.textContent = '조별 진행입니다. 다섯 구역을 모두 복구한 조 수 / 제출한 조 수';
     return;
   }
-  if(hint) hint.textContent = '캠퍼스의 빈 곳을 카메라로 스캔하면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.';
+  if(hint) hint.textContent = '캠퍼스의 빈 곳에서 실사 사진과 스캔본을 둘 다 내면 같은 좌표에 있던 도로랜드 구역이 돌아옵니다. 줄을 누르면 그 구역으로 이동합니다.';
   const ok = ps.filter(p=>zoneState(p.campus)==='ok').length;
   $('bN').textContent = `${ok} / ${ps.length}`; $('bFill').style.width = ps.length ? `${ok/ps.length*100}%` : '0';
   $('bRows').innerHTML = ps.map(boardRow).join('');
@@ -1331,8 +1336,6 @@ function adminHTML(){
     <div class="demo"><b>복구 미리보기</b> <span>이 기기에서만, 스캔 없이 구역이 돌아온 것으로 보기 (확인용). 체크하면 바로 섬과 환원 시뮬레이터에 반영됩니다.</span>
       ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
       <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div></div>
-    <div class="demo"><b>보이드 로봇 미리보기</b> <span>건물 안이라 GPS가 안 잡혀도, 캠퍼스 가운데에 로봇과 방향 화살표를 띄워 생김새와 표시 방식을 봅니다 (이 기기만).</span>
-      <div class="arow"><button type="button" class="mini" data-aact="meDemo">${ME_DEMO ? '미리보기 끄기' : '로봇 띄우기'}</button></div></div>
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
@@ -1355,7 +1358,7 @@ async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); ret
   try{ const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; }catch(e){ return false; } }
 async function adminAct(act){
   try{
-    if(act==='logout'){ if(ME_DEMO) demoMe(false); ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
+    if(act==='logout'){ ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
     if(act==='copy'){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
         .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
@@ -1372,7 +1375,6 @@ async function adminAct(act){
       if(!confirm(`숨긴 스캔 ${HIDDEN.size}건을 다시 3D에 보이게 합니다. 계속할까요?`)) return;
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
-    if(act==='meDemo'){ demoMe(!ME_DEMO); renderAdmin(); return; }
     if(act==='demoAll' || act==='demoNone'){ demoTick([...document.querySelectorAll('[data-demo]')].map(c=> c.dataset.demo), act==='demoAll'); return; }
     if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '올리면 바로 복구됩니다' : '관리자가 확정해야 복구됩니다'); return; }
   }catch(err){ toast(err.message); }
@@ -1407,11 +1409,12 @@ document.addEventListener('submit', e=>{
 });
 function statusHTML(m){
   const s = zoneState(m);
-  return s==='ok' ? `<span class="st ok">복구됨 ${m.scans.length}건</span>` : s==='pend' ? `<span class="st pend">복구 중</span>` : `<span class="st void">복구 필요</span>`;
+  const q = zoneParts(m), n = (q.photo ? 1 : 0) + (q.scan ? 1 : 0);
+  return s==='ok' ? `<span class="st ok">복구됨</span>` : s==='pend' ? `<span class="st pend">복구 중 ${n} / 2</span>` : `<span class="st void">복구 필요</span>`;
 }
 const twinOf = m => m && m.twin ? missionById(m.twin) : null;
 function twinLine(m){
-  const t = twinOf(m); if(!t || !m.scans.length) return '';
+  const t = twinOf(m); if(!t || !zoneDone(m)) return '';
   return W.id==='island' ? `<div class="twin">ERICA <b>${esc(t.name)}</b>에서 찾아낸 기록이 이곳으로 돌아왔습니다.</div>`
                          : `<div class="twin">이 기록은 도로랜드 <b>${esc(t.name)}</b>과 이어져 있었습니다. 섬에서 ${esc(t.name)}을 확인해 보세요.</div>`;
 }
@@ -1427,7 +1430,7 @@ function zoneCard(m, k){
     <div class="ms is-${s} ${m.bi===selected?'on':''}" ${hid ? '' : `data-m="${k}" role="button" tabindex="0"`}>
       <div class="top"><h4>${esc(zoneName(m))}</h4>${statusHTML(m)}</div>
       ${coordHTML(m)}
-      ${s==='ok' ? `${twinLine(m)}${thumbsHTML(m.scans)}` : `${subLines(m)}${formHTML(m)}`}
+      ${s==='ok' ? `${twinLine(m)}${thumbsHTML(m.scans)}` : `${m.scans.length ? thumbsHTML(m.scans) : ''}${subLines(m)}${formHTML(m)}`}
     </div>`;
 }
 function renderList(){
@@ -1435,10 +1438,10 @@ function renderList(){
   const drafts = {}; L.querySelectorAll('[data-draft]').forEach(i=>{ drafts[i.dataset.draft] = i.value; });
   const focused = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.draft : null;
   $('searchBox').hidden = tab!=='b';
-  const todo = M.map((m,k)=>[m,k]).filter(([m])=>!m.scans.length), done = M.map((m,k)=>[m,k]).filter(([m])=>m.scans.length);
+  const todo = M.map((m,k)=>[m,k]).filter(([m])=>!zoneDone(m)), done = M.map((m,k)=>[m,k]).filter(([m])=>zoneDone(m));
   $('cV').textContent = todo.length; $('cR').textContent = done.length;
   if(tab==='v'){
-    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 찾아가 Scaniverse로 스캔하고 공유 링크를 붙여 넣으면 서버가 3D 기록으로 세웁니다.</p>` : '')
+    L.innerHTML = (todo.some(([m])=>hiddenZone(m)) ? `<p class="subhelp subnote" style="padding:4px 8px 0;border:0">복구가 필요한 곳은 지도에 표시되지 않습니다. 좌표를 찾아가 카메라로 실사를 찍고 Scaniverse 스캔 링크를 내면, 둘 다 들어온 구역이 돌아옵니다.</p>` : '')
       + (todo.length ? todo.map(([m,k])=>zoneCard(m,k)).join('') : `<div class="empty">모든 구역이 복구되었습니다.</div>`);
   } else if(tab==='r'){
     const free = W.id==='erica' ? SCANS.filter(s=>!s.mission) : [];
@@ -1555,8 +1558,8 @@ function select(i, move){
   const b = B[i], m = hiddenZone(b.mission) ? null : b.mission;
   $('iN').textContent = b.label;
   $('iS').style.background = isVoid(m) ? 'var(--void-edge)' : b.restored ? 'var(--restored)' : `var(--c-${b.c})`;
-  $('iC').textContent = m ? (m.scans.length ? '복구된 구역' : '복구가 필요한 구역') : CATS[b.c].name;
-  $('iM').innerHTML = m ? `${statusHTML(m)}${coordHTML(m)}${m.scans.length?`${twinLine(m)}${thumbsHTML(m.scans)}`:`<p class="note" style="border:0;padding:0">${esc(m.brief||'')}</p>${subLines(m)}${formHTML(m, 'i-')}`}` : '';
+  $('iC').textContent = m ? (zoneDone(m) ? '복구된 구역' : '복구가 필요한 구역') : CATS[b.c].name;
+  $('iM').innerHTML = m ? `${statusHTML(m)}${coordHTML(m)}${zoneDone(m)?`${twinLine(m)}${thumbsHTML(m.scans)}`:`<p class="note" style="border:0;padding:0">${esc(m.brief||'')}</p>${subLines(m)}${formHTML(m, 'i-')}`}` : '';
   if(b.isSpot){ $('iDl').hidden = true; $('iNote').innerHTML = m ? `좌표로 정해진 지점입니다. 반지름 약 ${m.radius || 20}m 안에서 찍은 기록이 이 지점으로 들어옵니다.` : ''; const it = document.querySelector(`.item[data-i="${i}"], .ms.on`); it && it.scrollIntoView({block:'nearest'});
     if(move){ const tgt = new THREE.Vector3(b.cx, 0, b.cz), dir = camera.position.clone().sub(controls.target).normalize(); if(dir.y<0.45){ dir.y=0.45; dir.normalize(); } flyTo(tgt.clone().add(dir.multiplyScalar(160)), tgt); }
     return; }
@@ -1730,8 +1733,6 @@ function navTick(){
   meArrow.visible = true; meArrow.position.set(x, 0.15, z); meArrow.rotation.y = av.rotation.y;
   av.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(tt*3); const blink = (tt % 4) < 0.12 ? 0.15 : 1; av.userData.eyes.forEach(e=> e.scale.y = blink);
   if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
-  if(ME_DEMO){ const cam = new THREE.Vector3(x - navDirS.x*5.5 + navDirS.z*1.2, 2.6, z - navDirS.z*5.5 - navDirS.x*1.2);   // the robot preview: a low view just behind the robot
-    controls.target.lerp(new THREE.Vector3(x, 1.1, z), 0.1); camera.position.lerp(cam, 0.1); return; }
   const d = Math.max(12, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
   const cam = navCam(x, z, navDirS, d);
   controls.target.lerp(new THREE.Vector3(x, 0, z), 0.1); camera.position.lerp(cam, 0.1);
@@ -1744,21 +1745,20 @@ function updateTeamDots(pos, now){
     mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? 2.6 : 8;
     mk.el.className = 'mk team' + (mine ? ' me' : '') + (age > 90000 ? ' old' : '');
     mk.el.innerHTML = `<i></i>${t === 'me' ? '내 위치' : mine ? `${t}조 · 내 위치` : `${t}조`}${v.acc ? `<small>±${Math.round(v.acc)}m</small>` : ''}`;
-    if(mine){ meRing.visible = !ME_DEMO; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
+    if(mine){ meRing.visible = true; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
   });
   Object.keys(teamMk).forEach(t=>{ if(!list[t]){ teamMk[t].el.remove(); markers.splice(markers.indexOf(teamMk[t]), 1); delete teamMk[t]; } });
   refreshZones();
 }
-function onGeo(p, fake){
-  if(ME_DEMO && !fake) return;   // the admin's robot preview holds the stage: real fixes are ignored until it is switched off
+function onGeo(p){
   myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()};
   updateTeamDots(LAST_POS, Date.now());
   if(follow){ followMe(); showMeCoord(); }
   // close to an empty record's coordinates? say so once per zone
   const [x, z] = toLocal(myPos.lat, myPos.lng);
-  const near = MISSION_E.find(m=> m.lat != null && !m.scans.length && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
-  if(!fake && near && nearSaid !== near.id){ nearSaid = near.id; toast(`좌표에 가까워졌습니다 · ${zoneName(near)}`); }
-  if(!fake && TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
+  const near = MISSION_E.find(m=> m.lat != null && !zoneDone(m) && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
+  if(near && nearSaid !== near.id){ nearSaid = near.id; toast(`좌표에 가까워졌습니다 · ${zoneName(near)}`); }
+  if(TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
 }
 function startGeo(){
   if(!navigator.geolocation || geoWatch != null) return;
@@ -1767,21 +1767,6 @@ function startGeo(){
     if(err.code === 1){ geoWatch = null; if(follow) setFollow(false); toast('위치 사용을 허용하지 않아 내 위치는 표시되지 않습니다'); return; }
     if(Date.now() - geoErrAt > 60000){ geoErrAt = Date.now(); toast(err.code === 3 ? (myPos ? '위치 신호가 약합니다. 건물 밖으로 나가면 다시 잡힙니다' : '위치를 찾는 중입니다. 야외에서 더 잘 잡힙니다') : '지금은 위치를 알 수 없습니다'); }
   }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
-}
-// Admin: a robot preview for when GPS cannot be had (indoors). The Void avatar walks a slow circle around the campus centre with the
-// navigation view on, so the robot, its direction arrow and the coordinate chip can be checked as they will appear outdoors.
-let ME_DEMO = false, meDemoT = 0, meDemoA = 0;
-function demoMe(on){
-  clearInterval(meDemoT); ME_DEMO = on; document.body.classList.toggle('medemo', on);
-  controls.minDistance = on ? 3 : 40;   // the orbit controls would push a close camera back out to 40 m
-  if(on){
-    if(W.id !== 'erica') setWorld('erica');
-    const step = ()=>{ meDemoA += 0.12; const r = 14; onGeo({coords:{latitude: DATA.origin[0] + r*Math.sin(meDemoA)/KZ, longitude: DATA.origin[1] + r*Math.cos(meDemoA)/KX, accuracy: 8, heading: null, speed: 1.2}}, true); };
-    step(); setFollow(true); followMe(); navJump(); step(); meDemoT = setInterval(step, 1200);
-    toast('보이드 로봇 미리보기: 캠퍼스 가운데를 천천히 돕니다');
-  } else {
-    setFollow(false); myPos = null; prevPos = null; if(meAvatar) meAvatar.visible = false; meArrow.visible = false; meRing.visible = false; $('meCoord').hidden = true;
-  }
 }
 // "내 시점" button (campus): toggle the navigation view
 $('lMe').onclick = ()=>{
@@ -5531,7 +5516,7 @@ function buildSim(revealIds){
   }
   // campus: in front of the building that held the empty record (always visible — this is the real world)
   MISSION_E.forEach(m=>{
-    if(!m.scans.length || !m.b) return;
+    if(!zoneDone(m) || !m.b) return;
     const b = m.b, t = m.twin ? MISSIONS_I.find(x=>x.id===m.twin) : null;
     const off = b.isSpot ? 9 : 26;
     monument(simMonE, b.cx + off, 0, b.cz + off, m.scans[0], t ? `도로랜드 ${t.name}과 이어진 기록` : '복구된 기록', true);
@@ -5539,7 +5524,7 @@ function buildSim(revealIds){
   // simulator layer: the record beside its island zone
   const monByZone = {};
   MI.forEach(m=>{
-    if(!m.scans.length || !m.b) return;
+    if(!zoneDone(m) || !m.b) return;
     const b = m.b, t = m.twin ? MISSIONS.find(x=>x.id===m.twin) : null, d = new THREE.Vector2(0 - b.cx, 67 - b.cz).normalize();
     const R = (b.r || 20) + 14;
     monByZone[m.id] = monument(simRoot, b.cx + d.x*R, G, b.cz + d.y*R, m.scans[0], t ? `ERICA ${t.name}에서 돌아온 기록` : '돌아온 기록');
@@ -5585,7 +5570,7 @@ function buildSim(revealIds){
       const items = [{g:tube.geometry, total:tube.geometry.index.count, step:S*6}, {g:halo.geometry, total:halo.geometry.index.count, step:6}]; items.forEach(it=> it.g.setDrawRange(0, 0));
       REVEALS.push({items, delay, dur, secs, head}); fade((e, k)=>{ gate = e; }, delay, dur);
       const end = secs[secs.length-1]; burst(end.c[0], end.c[1], delay + dur); } };
-  const litIds = new Set(MI.filter(m=> m.scans.length).map(m=> m.id));
+  const litIds = new Set(MI.filter(zoneDone).map(m=> m.id));
   let seenLit = new Set(); try{ seenLit = new Set(JSON.parse(localStorage.getItem(`void-seen-lit-${viewTeam()}`) || '[]')); }catch(e){}
   // stretches that sweep in: the ones just switched on (live), or the ones this device has not watched come back yet
   const newLit = revealIds ? revealIds.filter(id=> litIds.has(id)) : [...litIds].filter(id=> !seenLit.has(id));
@@ -5593,7 +5578,7 @@ function buildSim(revealIds){
   const startOf = id=> 0.4 + Math.max(0, newLit.indexOf(id))*1.1;
   // monuments of zones just lit grow out of the ground once their stretch has arrived
   Object.entries(monByZone).forEach(([id, g])=>{ if(newLit.includes(id)) fade(e=> g.scale.setScalar(Math.max(0.001, e)), startOf(id) + 2.2, 1.0); });
-  MI.forEach(m=>{ if(m.b && m.scans.length) SIM_LIT++; });
+  MI.forEach(m=>{ if(m.b && zoneDone(m)) SIM_LIT++; });
   if(litIds.size){   // nothing restored yet: the simulator is just the hologram island — no veins, no nodes, no source light
     // a ghost of an empty stretch: faint broken segments, flickering, so the shape stays unreadable until its record is back
     const ghosts = [];
@@ -5615,7 +5600,7 @@ function buildSim(revealIds){
     // zone nodes: a node under the zone, an energy column rising to the surface and shock rings on the ground when its record is back;
     // a faint violet ring while it is still missing
     MI.forEach((m, k)=>{
-      if(!m.b) return; const on = m.scans.length > 0, x = m.b.cx, z = m.b.cz, at = newLit.includes(m.id) ? startOf(m.id) + 1.2 : -1;
+      if(!m.b) return; const on = zoneDone(m), x = m.b.cx, z = m.b.cz, at = newLit.includes(m.id) ? startOf(m.id) + 1.2 : -1;
       if(!on){ const ring = xray(add(simRoot, new THREE.TorusGeometry(10, 0.5, 8, 48).rotateX(Math.PI/2), glowMat(0x9b7bff, 0.3, true), x, FLOW_Y, z, false));
         simAnim.push(t=>{ ring.rotation.z = t*0.4; ring.scale.setScalar(1 + Math.sin(t*2 + k)*0.06); }); return; }
       const node = glowSphere(4.5, 0xdffaff, 0.95, x, FLOW_Y, z), aura = glowSphere(9, 0x5fd3ff, 0.28, x, FLOW_Y, z);
@@ -5646,7 +5631,7 @@ function rescan(revealIds, arrive){
   rebuildIndex();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
-  if(arrive && revealIds && revealIds.length) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && m.scans.length)));
+  if(arrive && revealIds && revealIds.length) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
 }
 // A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground,
 // sparks rising, and the camera moving to watch it. The simulator has its own arrival (the vein sweeping in).
@@ -6173,7 +6158,7 @@ IB.forEach(b=>{ b.delay = b.c==='char' ? 3.1 + (b.i%7)*0.12 : 1.7 + Math.hypot(b
 function infoI(i, move){
   const b = IB[i], m = b.mission;
   $('iN').textContent = b.label;
-  const back = m && m.scans.length;
+  const back = m && zoneDone(m);
   $('iS').style.background = back ? 'var(--restored)' : CATS_I[b.c].color;
   $('iC').textContent = back ? '돌아온 기록' : CATS_I[b.c].name;
   $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
