@@ -382,6 +382,52 @@ body.sim #simFx{display:block}
 #simDone h1{margin:0;font-size:clamp(28px,5vw,46px);letter-spacing:-.01em}
 #simDone p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)}
 #simDone button{margin-top:8px;border:0;border-radius:999px;padding:11px 22px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans)}
+/* 5/5 in the park: the restoration prompt, the 환원하기 pill and the cinema that plays the restoration film */
+#restoreDlg{position:fixed;inset:0;z-index:33;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 20%,var(--void)) 0%,color-mix(in srgb,var(--void) 90%,transparent) 70%);color:var(--void-fg);text-align:center}
+#restoreDlg[data-on]{display:grid}
+#restoreDlg .in{display:grid;gap:12px;justify-items:center;max-width:min(520px,86vw);animation:rise .9s both}
+#restoreDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff}
+#restoreDlg h1{margin:0;font-size:clamp(26px,4.6vw,40px);letter-spacing:-.01em}
+#restoreDlg p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)}
+#restoreDlg .row{display:flex;gap:10px;margin-top:8px;align-items:center}
+#restoreDlg .go{border:0;border-radius:999px;padding:13px 30px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans);box-shadow:0 0 0 6px color-mix(in srgb,#9ff6ff 22%,transparent),0 0 40px color-mix(in srgb,#9ff6ff 45%,transparent);animation:voidPulse 2.2s ease-in-out infinite}
+#restoreDlg .later{border:0;background:transparent;color:color-mix(in srgb,var(--void-fg) 60%,transparent);font-size:13px;text-decoration:underline;padding:10px}
+#restoreBtn{position:fixed;left:16px;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:21;display:none;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:0;background:#9ff6ff;color:#06111a;font:700 13px var(--sans);box-shadow:0 0 0 4px color-mix(in srgb,#9ff6ff 25%,transparent),0 0 30px color-mix(in srgb,#9ff6ff 50%,transparent);animation:voidPulse 2.2s ease-in-out infinite}
+body.island #restoreBtn:not([hidden]){display:flex}
+#cinema{position:fixed;inset:0;z-index:36;background:#000;display:grid;place-items:center}
+#cinema[hidden]{display:none}
+#cinema video{width:100%;height:100%;object-fit:contain;background:#000}
+#cinema .skip{position:absolute;right:16px;top:calc(16px + env(safe-area-inset-top,0px));border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#fff;border-radius:999px;padding:9px 16px;font:600 13px var(--sans)}
+#cinemaEnd{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#fff;background:radial-gradient(ellipse at 50% 55%,rgba(159,246,255,.22) 0%,rgba(3,8,26,.94) 70%)}
+#cinemaEnd[hidden]{display:none}
+#cinemaEnd .in{display:grid;gap:12px;justify-items:center;animation:rise .9s both}
+#cinemaEnd small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff}
+#cinemaEnd h1{margin:0;font-size:clamp(28px,5vw,46px)}
+#cinemaEnd button{margin-top:8px;border:0;border-radius:999px;padding:11px 22px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans)}
+/* walk mode: first person as a character */
+#walkHud{position:fixed;left:0;right:0;top:calc(68px + env(safe-area-inset-top,0px));margin-inline:auto;width:fit-content;max-width:calc(100% - 32px);z-index:21;display:flex;align-items:center;gap:14px;padding:8px 10px 8px 16px;border-radius:14px;box-sizing:border-box}
+#walkHud[hidden]{display:none}
+#walkHud small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--muted)}
+#walkHud b{font-size:15px}
+#walkHud .hint{font-size:12px;color:var(--muted)}
+#walkHud button{border:1px solid var(--line);background:var(--panel-solid);color:var(--fg);border-radius:999px;padding:8px 14px;font:600 13px var(--sans)}
+#walkPad{position:fixed;left:22px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:132px;height:132px;border-radius:50%;background:color-mix(in srgb,var(--panel-solid) 55%,transparent);border:1px solid var(--line);z-index:21;touch-action:none;box-sizing:border-box;display:none}
+#walkPad:not([hidden]){display:block}
+#walkPad i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:var(--accent);box-shadow:0 4px 14px -4px rgba(0,0,0,.4);pointer-events:none}
+#walkPad::before,#walkPad::after{content:'';position:absolute;left:50%;top:50%;width:0;height:0;border:7px solid transparent}
+#walkPad::before{border-bottom-color:var(--muted);transform:translate(-50%,-56px)}
+#walkPad::after{border-top-color:var(--muted);transform:translate(-50%,42px)}
+@media (pointer:fine){#walkPad{display:none!important}}
+body.walk #bar,body.walk #simBtn,body.walk #restoreBtn,body.walk #board,body.walk #panel,body.walk #credit{display:none}
+#walkPick{position:fixed;inset:0;z-index:34;display:none;place-items:center;background:color-mix(in srgb,var(--void) 88%,transparent);color:var(--void-fg)}
+#walkPick[data-on]{display:grid}
+#walkPick .in{display:grid;gap:14px;justify-items:center;width:min(460px,90vw);padding:26px 24px;border-radius:18px;background:var(--void);border:1px solid color-mix(in srgb,var(--void-edge) 55%,transparent);box-shadow:0 30px 80px -30px #000;animation:rise .6s both}
+#walkPick small{font-family:var(--mono);letter-spacing:.3em;font-size:11px;color:var(--void-edge)}
+#walkPick h2{margin:0;font-size:22px}
+#walkPick .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+#walkPick .grid button{border:1px solid color-mix(in srgb,var(--void-fg) 22%,transparent);background:color-mix(in srgb,var(--void-fg) 6%,transparent);color:var(--void-fg);border-radius:12px;padding:14px 0;font:700 15px var(--sans)}
+#walkPick .grid button:active{transform:scale(.96);background:var(--void-edge)}
+#walkPick .skip{border:0;background:transparent;color:color-mix(in srgb,var(--void-fg) 55%,transparent);font-size:12px;text-decoration:underline}
 /* records that came back, hidden panels on the island, the completed glyph on the success card */
 #board[hidden],.progress[hidden],#tV[hidden]{display:none}
 svg.glyph{display:block;border-radius:16px;background:color-mix(in srgb,var(--void) 92%,transparent);padding:8px;box-sizing:border-box}
@@ -570,9 +616,17 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
     <button type="button" data-nav="free" aria-pressed="false">시점 고정</button>
   </div>
   <div class="layers" role="group">
+    <button id="lWalk" class="island-only" type="button" hidden>걷기</button>
     <button id="lFull" type="button" aria-pressed="false">전체 화면</button>
   </div>
 </div>
+<div id="walkPick" role="dialog" aria-modal="true" aria-labelledby="wpT"><div class="in">
+  <small>DOROLAND · WALK</small><h2 id="wpT">누구의 눈으로 걸을까요?</h2>
+  <div class="grid" id="wpGrid"></div>
+  <button type="button" class="skip" id="wpSkip">나중에</button>
+</div></div>
+<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>WALK</small><b id="walkName"></b></div><span class="hint" id="walkHint"></span><button type="button" id="walkX">나가기</button></section>
+<div id="walkPad" hidden aria-hidden="true"><i></i></div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
   <small>DOROLAND · CHAPTER 5</small><h2 id="tpT">몇 조인가요?</h2>
   <div class="grid" id="tpGrid"></div>
@@ -583,6 +637,9 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
   <div class="scroll" id="adminBody"></div>
 </aside>
 <button id="simBtn" type="button" aria-pressed="false"><i></i>환원 시뮬레이터<em>OFF</em></button>
+<button id="restoreBtn" type="button" hidden>환원하기</button>
+<div id="restoreDlg" role="dialog" aria-modal="true"><div class="in"><small>ALL RECORDS BACK</small><div id="restoreGlyph"></div><h1>다섯 기록이 모두 돌아왔습니다</h1><p>일루아를 환원할 준비가 끝났습니다.</p><div class="row"><button type="button" class="go" id="restoreGo">환원하기</button><button type="button" class="later" id="restoreLater">나중에</button></div></div></div>
+<div id="cinema" hidden><video id="cinemaV" playsinline preload="auto"></video><button type="button" class="skip" id="cinemaSkip">건너뛰기</button><div id="cinemaEnd" hidden><div class="in"><small>RESTORATION COMPLETE</small><h1>일루아가 돌아왔습니다</h1><button type="button" id="cinemaX">닫기</button></div></div></div>
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2><span id="simStat"></span></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
 <div id="simFx" aria-hidden="true"></div>
 <div id="arrFlash" aria-hidden="true"></div>
@@ -1103,6 +1160,7 @@ const GLYPH = (()=>{
     const Q = (closed ? poly.concat([poly[0]]) : poly).map(q=> P(q[0], q[1])), segs = [];
     for(let i=0;i<Q.length-1;i++){ const d = sub(Q[i+1],Q[i]); segs.push({d:nrm(d), L:len(d)}); }
     const total = segs.reduce((a,b)=>a+b.L,0), secs = [], hwAt = s=> Math.max(0.6, S(wOf(s/total))/2);
+    const kinks = [0]; for(const sg of segs) kinks.push(kinks[kinks.length-1] + sg.L/total);   // u of every polyline vertex, so a piece can split exactly at a corner
     if(caps){ const d0 = segs[0].d, r = hwAt(0); for(let k=6;k>=1;k--){ const a = k/7*Math.PI/2; secs.push({c:add(Q[0], mul(d0, -r*Math.sin(a))), n:perp(d0), hw:Math.max(0.3, r*Math.cos(a)), u:0, s:0}); } }
     let s = 0;
     for(let i=0;i<Q.length;i++){
@@ -1113,7 +1171,7 @@ const GLYPH = (()=>{
       if(next && i < Q.length-1){ const m = Math.max(2, Math.ceil(next.L/8)); for(let j=1;j<m;j++){ const ss = s + next.L*j/m; secs.push({c:add(Q[i], mul(next.d, next.L*j/m)), n:perp(next.d), hw:hwAt(ss), u:ss/total, s:ss}); } s += next.L; }
     }
     if(caps){ const d1 = segs[segs.length-1].d, r = hwAt(total); for(let k=1;k<=6;k++){ const a = k/7*Math.PI/2; secs.push({c:add(Q[Q.length-1], mul(d1, r*Math.sin(a))), n:perp(d1), hw:Math.max(0.3, r*Math.cos(a)), u:1, s:total}); } }
-    return {secs, total};
+    return {secs, total, kinks};
   }
   // the chevrons: thick at the apex (74 px), tapering to 34 px at the rounded tips
   const chev = u=> 74 - 40*Math.abs(u - 0.5)*2;
@@ -1137,11 +1195,13 @@ const GLYPH = (()=>{
   // pieces: a zone's stretch of the flow; `after` pieces start when the earlier piece of the same zone has swept in; `rev` reverses the sweep direction
   // upper chevron flows from the top apex outwards, the lower one from the tips into the bottom apex; the pupil is the last to light (5/5)
   return [
-    {zone:'dl-safari',   band:top, u0:0,   u1:0.5, rev:true}, {zone:'dl-safari',   band:tUL, after:true},
-    {zone:'dl-ferris',   band:top, u0:0.5, u1:1},             {zone:'dl-ferris',   band:tUR, after:true},
+    // the two halves of a chevron split at the apex vertex itself (its mitred section belongs to both), never at u = 0.5:
+    // the lower chevron's arms are not the same length, so 0.5 fell short of the corner and left a wedge open at the bottom
+    {zone:'dl-safari',   band:top, u0:0,   u1:top.kinks[1], rev:true}, {zone:'dl-safari',   band:tUL, after:true},
+    {zone:'dl-ferris',   band:top, u0:top.kinks[1], u1:1},             {zone:'dl-ferris',   band:tUR, after:true},
     {zone:'dl-harmonia', band:eye},
-    {zone:'dl-coaster',  band:bot, u0:0,   u1:0.5},           {zone:'dl-coaster',  band:tLL, after:true},
-    {zone:'dl-carousel', band:bot, u0:0.5, u1:1, rev:true},   {zone:'dl-carousel', band:tLR, after:true},
+    {zone:'dl-coaster',  band:bot, u0:0,   u1:bot.kinks[1]},           {zone:'dl-coaster',  band:tLL, after:true},
+    {zone:'dl-carousel', band:bot, u0:bot.kinks[1], u1:1, rev:true},   {zone:'dl-carousel', band:tLR, after:true},
     {zone:'final',       band:bar}
   ].map(pc=> ({u0:0, u1:1, ...pc, kind:'band'}));
 })();
@@ -1513,6 +1573,7 @@ let toastT;
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),1800); }
 document.addEventListener('click', e=>{
   const en = e.target.closest('[data-enter]'); if(en){ enterInterior(en.dataset.enter); return; }
+  const wk = e.target.closest('[data-walk]'); if(wk){ startWalk(wk.dataset.walk); return; }
   const cp = e.target.closest('[data-copy]');
   if(cp){ e.stopPropagation();
     const txt = cp.dataset.copy;
@@ -1552,6 +1613,7 @@ document.addEventListener('keydown', e=>{
 
 // ---------- selection & camera ----------
 let fly=null;
+let walk = null;   // first-person walk mode (defined with the island, below)
 function flyTo(pos, tgt, ms=900){
   if(reduce){ camera.position.copy(pos); controls.target.copy(tgt); return; }
   fly = {p0:camera.position.clone(), t0:controls.target.clone(), p1:pos, t1:tgt, s:performance.now(), ms};
@@ -1587,7 +1649,7 @@ function select(i, move){
   if(innerWidth<=760) closePanel();
 }
 $('iX').onclick = ()=>select(-1);
-addEventListener('keydown', e=>{ if(e.key==='Escape'){ if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(!$('cap').hidden) closeCapture(); else if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(walk){ stopWalk(); return; } if(!$('cinema').hidden){ $('cinemaX').onclick(); return; } if($('restoreDlg').dataset.on){ delete $('restoreDlg').dataset.on; return; } if($('walkPick').dataset.on){ delete $('walkPick').dataset.on; return; } if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(!$('cap').hidden) closeCapture(); else if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
 
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e){
@@ -1602,7 +1664,7 @@ function pick(e){
 let down=null;
 renderer.domElement.addEventListener('pointerdown', e=>{ down=[e.clientX,e.clientY]; fly=null; });
 renderer.domElement.addEventListener('pointerup', e=>{
-  if(down && Math.hypot(e.clientX-down[0], e.clientY-down[1])<5){ if(inside) insideClick(e); else { const i=pick(e); select(i, i>=0); } }
+  if(down && Math.hypot(e.clientX-down[0], e.clientY-down[1])<5){ if(inside) insideClick(e); else { const i=pick(e); select(i, i>=0 && !walk); } }
   down=null;
 });
 renderer.domElement.addEventListener('pointermove', e=>{
@@ -5036,6 +5098,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     if(!freeSpot(x, z, r)) continue;
     mounds.push([x, z, r, h, forest]);
   }
+  islRoot.userData.mounds = mounds;   // walk mode reads the ground height from these
   mounds.forEach(([x,z,r,h,forest],i)=>{
     const m = hill(x/K, z/K, r, h, r*(0.8 + rr()*0.4), 7 + i);
     m.rotation.y = rr()*Math.PI*2; m.position.y = G - 1.2;
@@ -5421,7 +5484,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -6098,13 +6161,38 @@ function buildSim(revealIds){
   SIM_REVEAL_T = simOn ? performance.now()/1000 + 0.3 : null;   // live: sweep now; otherwise the next time the simulator opens
   if(simOn) simHud();
 }
+// ---------- 5/5 in the park: the restoration prompt and the film ----------
+// The prompt opens once per session for the team on screen when its fifth record is back (after the arrival effect);
+// the 환원하기 pill stays so the film can be played again. The film is a placeholder until the real one arrives.
+const RESTORE_VIDEO = 'videos/restore_demo.mp4';   // 환원 영상 — 실제 영상이 오면 같은 이름으로 바꿔 넣는다
+let restoreT = 0;
+function maybeRestore(delay){
+  clearTimeout(restoreT);
+  const ready = SIM_LIT === 5 && viewTeam() !== -1;
+  $('restoreBtn').hidden = !ready;
+  if(!ready) return;
+  let seen = false; try{ seen = sessionStorage.getItem(`void-restore-${viewTeam()}`) === '1'; }catch(e){}
+  if(seen) return;
+  restoreT = setTimeout(()=>{ if(SIM_LIT !== 5 || simOn || walk || intro) return; openRestore(); }, delay);
+}
+function openRestore(){ $('restoreGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 120); $('restoreDlg').dataset.on = '1'; try{ sessionStorage.setItem(`void-restore-${viewTeam()}`, '1'); }catch(e){} }
+function playRestore(){ const v = $('cinemaV'); $('cinemaEnd').hidden = true; $('cinema').hidden = false; v.src = RESTORE_VIDEO; v.currentTime = 0; v.play().catch(()=>{}); }
+function endRestore(){ $('cinemaV').pause(); $('cinemaEnd').hidden = false; }
+$('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
+$('restoreGo').onclick = ()=>{ delete $('restoreDlg').dataset.on; playRestore(); };
+$('restoreBtn').onclick = openRestore;
+$('cinemaV').onended = endRestore; $('cinemaV').onerror = endRestore; $('cinemaSkip').onclick = endRestore;
+$('cinemaX').onclick = ()=>{ const v = $('cinemaV'); v.pause(); v.removeAttribute('src'); v.load(); $('cinema').hidden = true; };
 buildSim();
+maybeRestore(7000);
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
 function rescan(revealIds, arrive){
   rebuildIndex();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
-  if(arrive && revealIds && revealIds.length) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
+  const arriving = arrive && revealIds && revealIds.length;
+  if(arriving) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
+  maybeRestore(arriving ? 5600 : 1500);
 }
 // A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground,
 // sparks rising, and the camera moving to watch it. The simulator has its own arrival (the vein sweeping in).
@@ -6637,7 +6725,7 @@ function infoI(i, move){
   $('iC').textContent = back ? '돌아온 기록' : CATS_I[b.c].name;
   $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
   $('iDl').hidden = true; $('iNote').hidden = true; $('iIsl').hidden = false;
-  $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
+  $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + (b.c==='char' && WALKERS.includes(b.label) && !walk ? `<button class="enter" data-walk="${esc(b.label)}">${esc(b.label)}의 눈으로 걷기</button>` : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
   if(move){
     const tgt = new THREE.Vector3(b.cx, b.y0 + b.h*0.45, b.cz);
     const dir = camera.position.clone().sub(controls.target).normalize();
@@ -6653,6 +6741,75 @@ function initIslandIntro(){
 }
 initIslandIntro();
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=> TEXTS.forEach(f=> f()));
+
+// ---------- walk mode: first person as one of the characters ----------
+// Arrow keys / WASD walk and turn (Shift runs), dragging the view looks around; on touch screens the pad at the bottom left walks.
+// The chosen character disappears from the park while you are them. Ride lots, the lake and the shore block the way.
+const WALKERS = ['리코', '제로', '자일로', '코덱스', '네이티', '보이드'];
+const WALK_KEYS = {}, walkPad = {dx:0, dz:0, id:null};
+function groundY(x, z){ let y = G; for(const [mx, mz, r, h] of (islRoot.userData.mounds || [])){ const d = Math.hypot(x - mx, z - mz); if(d < r*0.96) y = Math.max(y, G - 1.2 + h*Math.sqrt(1 - (d/r)*(d/r))); } return y; }
+function walkBlocked(x, z){ if(Math.hypot(x, z) > edgeR(x, z) - 7) return true; for(const b of walk.blocks) if(Math.hypot(x - b.cx, z - b.cz) < b.rr) return true; return false; }
+let walkSaved = null;
+function startWalk(name){
+  const c = CHAR.find(c=> c.n === name); if(!c || walk) return;
+  delete $('walkPick').dataset.on;
+  if(W.id !== 'island') setWorld('island', true);
+  if(simOn) setSim(false); if(inside) exitInterior(); select(-1); delete $('restoreDlg').dataset.on;
+  const box = new THREE.Box3().setFromObject(c.g), eye = Math.max(1.3, (box.max.y - box.min.y)*0.9);
+  const p = c.g.getWorldPosition(new THREE.Vector3());
+  const blocks = IB.filter(b=> b.c==='ride' || b.label === '미러 레이크').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20) + (b.c==='ride' ? 6 : 2)}));
+  walk = {c, eye, x:p.x, z:p.z, yaw:c.g.rotation.y, pitch:-0.04, bob:0, blocks, last:performance.now(), drag:null, fly:c.n === '네이티'};
+  for(let i=0;i<80 && walkBlocked(walk.x, walk.z);i++){ const a = i*0.8, d = 6 + i*3; walk.x = p.x + Math.cos(a)*d; walk.z = p.z + Math.sin(a)*d; }   // characters standing in a fenced lot step out
+  walkSaved = {pos:camera.position.clone(), tgt:controls.target.clone(), near:camera.near, fov:camera.fov};
+  c.g.visible = false; fly = null; if(follow) setFollow(false); hovered = -1; renderer.domElement.style.cursor = '';
+  camera.near = 0.2; camera.fov = 68; camera.updateProjectionMatrix(); controls.enabled = false;
+  document.body.classList.add('walk'); $('walkName').textContent = `${c.n} 시점`;
+  $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '왼쪽 패드로 걷고, 화면을 끌어 둘러봅니다' : '방향키로 걷고, 화면을 끌어 둘러봅니다';
+  $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none');
+  if(innerWidth <= 760) closePanel();
+  walkTick(performance.now());
+}
+function stopWalk(){
+  if(!walk) return;
+  walk.c.g.visible = true; walk = null; for(const k in WALK_KEYS) delete WALK_KEYS[k]; walkPad.dx = walkPad.dz = 0; walkPad.id = null; $('walkPad').querySelector('i').style.transform = '';
+  camera.near = walkSaved.near; camera.fov = walkSaved.fov; camera.updateProjectionMatrix();
+  camera.position.copy(walkSaved.pos); controls.target.copy(walkSaved.tgt); controls.enabled = true;
+  document.body.classList.remove('walk'); $('walkHud').hidden = true; $('walkPad').hidden = true;
+}
+const _wt = new THREE.Vector3();
+function walkTick(now){
+  const w = walk, dt = Math.min(0.05, Math.max(0, (now - w.last)/1000)); w.last = now;
+  const k = WALK_KEYS, fwd = (k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0), turn = (k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0), strafe = (k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0);
+  w.yaw += turn*1.8*dt;
+  let mx = fwd - walkPad.dz, mz = strafe + walkPad.dx; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
+  const speed = (k.ShiftLeft || k.ShiftRight ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
+  const dx = (sy*mx + cy*mz)*speed*dt, dz = (cy*mx - sy*mz)*speed*dt;
+  if(dx || dz){
+    if(!walkBlocked(w.x + dx, w.z + dz)){ w.x += dx; w.z += dz; } else if(!walkBlocked(w.x + dx, w.z)) w.x += dx; else if(!walkBlocked(w.x, w.z + dz)) w.z += dz;
+    w.bob += Math.hypot(dx, dz);
+  }
+  w.pitch = Math.max(-1.15, Math.min(1.05, w.pitch));
+  const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : Math.abs(Math.sin(w.bob*1.7))*0.1;
+  camera.position.set(w.x, groundY(w.x, w.z) + w.eye + lift, w.z);
+  const cp = Math.cos(w.pitch);
+  _wt.set(w.x + sy*cp*12, camera.position.y + Math.sin(w.pitch)*12, w.z + cy*cp*12);
+  camera.lookAt(_wt); controls.target.copy(_wt);
+}
+document.addEventListener('keydown', e=>{ if(!walk || e.target.matches('input,textarea,select')) return; WALK_KEYS[e.code] = true; if(/^Arrow|^Key[WASDQE]$|^Space$/.test(e.code)) e.preventDefault(); });
+document.addEventListener('keyup', e=>{ delete WALK_KEYS[e.code]; });
+addEventListener('blur', ()=>{ for(const k in WALK_KEYS) delete WALK_KEYS[k]; });
+renderer.domElement.addEventListener('pointerdown', e=>{ if(walk && !walk.drag) walk.drag = {id:e.pointerId, x:e.clientX, y:e.clientY}; });
+renderer.domElement.addEventListener('pointermove', e=>{ if(!walk || !walk.drag || walk.drag.id !== e.pointerId) return; walk.yaw -= (e.clientX - walk.drag.x)*0.0045; walk.pitch -= (e.clientY - walk.drag.y)*0.0035; walk.drag.x = e.clientX; walk.drag.y = e.clientY; });
+['pointerup', 'pointercancel'].forEach(ev=> renderer.domElement.addEventListener(ev, e=>{ if(walk && walk.drag && walk.drag.id === e.pointerId) walk.drag = null; }));
+{ const pad = $('walkPad'), nub = pad.querySelector('i'), R = 44;
+  const move = e=>{ const r = pad.getBoundingClientRect(); let x = e.clientX - (r.left + r.width/2), y = e.clientY - (r.top + r.height/2); const d = Math.hypot(x, y); if(d > R){ x *= R/d; y *= R/d; } walkPad.dx = x/R; walkPad.dz = y/R; nub.style.transform = `translate(${x}px,${y}px)`; };
+  pad.addEventListener('pointerdown', e=>{ if(walkPad.id != null) return; walkPad.id = e.pointerId; pad.setPointerCapture(e.pointerId); move(e); e.preventDefault(); });
+  pad.addEventListener('pointermove', e=>{ if(e.pointerId === walkPad.id) move(e); });
+  ['pointerup', 'pointercancel'].forEach(ev=> pad.addEventListener(ev, e=>{ if(e.pointerId !== walkPad.id) return; walkPad.id = null; walkPad.dx = walkPad.dz = 0; nub.style.transform = ''; })); }
+$('wpGrid').innerHTML = WALKERS.map(n=> `<button type="button" data-walk="${n}">${n}</button>`).join('');
+$('wpSkip').onclick = ()=>{ delete $('walkPick').dataset.on; };
+$('lWalk').onclick = ()=>{ $('walkPick').dataset.on = '1'; };
+$('walkX').onclick = stopWalk;
 
 // ---------- loop ----------
 function resize(){ const w=innerWidth,h=innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); if(composer){ composer.setSize(w,h); bloomPass.resolution.set(Math.round(w/2), Math.round(h/2)); } }
@@ -6716,6 +6873,7 @@ const WORLDS = [
 W = WORLDS[0];
 function setWorld(id, instant){
   const w = WORLDS.find(x=>x.id===id); if(!w || w===W) return;
+  if(walk) stopWalk();
   if(!$('viewer').hidden) closeScan();
   if(intro) endIntro();
   select(-1); hovered = -1; renderer.domElement.style.cursor = '';
@@ -6784,7 +6942,7 @@ function tick(now){
     g.userData.guide.material.opacity = zoneK;
   });
   if(W.update) W.update(reduce ? 0 : now, zoneK);
-  controls.update();
+  if(walk) walkTick(now); else controls.update();
   if(lastT.distanceToSquared(controls.target)>400){ lastT.copy(controls.target); updateSun(); }
   if(simOn && composer) composer.render(); else renderer.render(scene, camera);
   placeLabels();
