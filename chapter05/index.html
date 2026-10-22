@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 body.island .lbl{border-radius:6px;font-size:11.5px;font-weight:500;padding:4px 8px;box-shadow:0 2px 6px -4px rgba(20,30,20,.22)}
-body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-color:var(--line)}
+body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-color:var(--line)} #vn{position:fixed;inset:0;z-index:36;display:none;align-items:flex-end;justify-content:center;padding:0 12px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(4,8,16,.78),rgba(4,8,16,.25) 45%,transparent 70%);cursor:pointer;-webkit-user-select:none;user-select:none} #vn[data-on]{display:flex} #vn[data-dark]{background:rgba(2,4,8,.9)} #vn .in{position:relative;width:min(780px,100%)} #vn img{position:absolute;left:4px;bottom:112px;height:min(44vh,340px);max-width:46%;object-fit:contain;object-position:left bottom;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5));animation:rise .35s both;pointer-events:none} #vn img[hidden]{display:none} #vn .box{position:relative;min-height:112px;border-radius:14px;background:rgba(10,16,28,.94);border:1px solid rgba(159,246,255,.38);color:#f4f7ff;padding:16px 18px 18px;box-sizing:border-box;box-shadow:0 20px 50px -20px #000} #vn .box b{display:inline-block;margin:-30px 0 8px;padding:4px 14px;border-radius:999px;background:#9ff6ff;color:#06111a;font:700 13px var(--sans)} #vn .box b[hidden]{display:none} #vn .box p{margin:0;font-size:16px;line-height:1.65;min-height:3.3em;white-space:pre-wrap} #vn .box p.nar{color:#bfe7ff;font-style:italic} #vn .box i{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;color:#9ff6ff;animation:vnBob 1s ease-in-out infinite} #vn .box i[hidden]{display:none} @keyframes vnBob{50%{transform:translateY(3px)}} #questHud{position:fixed;left:50%;transform:translateX(-50%);top:calc(122px + env(safe-area-inset-top,0px));z-index:21;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;padding:8px 14px;border-radius:12px;box-sizing:border-box;width:max-content;max-width:calc(100% - 32px)} #questHud span{flex:1 1 auto;min-width:140px;white-space:normal;word-break:keep-all} #questHud[hidden]{display:none} #questHud small{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--muted)} #questHud b{font-size:14px;white-space:nowrap} #questHud span{font-size:12.5px;color:var(--muted)} #qReward{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 20%,var(--void)) 0%,color-mix(in srgb,var(--void) 92%,transparent) 70%);color:var(--void-fg);text-align:center} #qReward[data-on]{display:grid} #qReward .in{display:grid;gap:12px;justify-items:center;width:min(520px,88vw);animation:rise .9s both} #qReward small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #qReward h1{margin:0;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em} #qReward p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)} #qReward .zs{display:grid;gap:8px;width:100%} #qReward .z{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--void-fg) 8%,transparent);border:1px solid color-mix(in srgb,#9ff6ff 30%,transparent);font-size:14px;text-align:left} #qReward .z code{font-family:var(--mono);font-size:13px;color:#9ff6ff} #qReward .row{display:flex;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap;justify-content:center} #qReward .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans);box-shadow:0 0 0 6px color-mix(in srgb,#9ff6ff 22%,transparent)} #qReward .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} #walkPick .grid button[disabled]{opacity:.42} #walkPick .grid button em{display:block;margin-top:5px;font:500 10.5px var(--mono);letter-spacing:.04em;line-height:1.35;color:#9ff6ff;font-style:normal;white-space:normal} #walkPick .grid button[disabled] em{color:color-mix(in srgb,var(--void-fg) 70%,transparent)} .ms.is-lock{opacity:.9} .ms .lock{display:grid;gap:10px;justify-items:start;margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel-solid);border:1px dashed var(--line);font-size:13px;line-height:1.55} .ms .lock b{font-weight:700} .brow.is-lock .pair{color:var(--muted)}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -406,6 +406,7 @@ body.island #restoreBtn:not([hidden]){display:flex}
 #cinemaEnd button{margin-top:8px;border:0;border-radius:999px;padding:11px 22px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans)}
 /* walk mode: first person as a character */
 #walkHud{position:fixed;left:0;right:0;top:calc(68px + env(safe-area-inset-top,0px));margin-inline:auto;width:fit-content;max-width:calc(100% - 32px);z-index:21;display:flex;align-items:center;gap:14px;padding:8px 10px 8px 16px;border-radius:14px;box-sizing:border-box}
+#walkHud b{white-space:nowrap}#walkHud .hint{min-width:0;word-break:keep-all}
 #walkHud[hidden]{display:none}
 #walkHud small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--muted)}
 #walkHud b{font-size:15px}
@@ -627,6 +628,9 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 </div></div>
 <section id="walkHud" class="glass" hidden aria-live="polite"><div><small>WALK</small><b id="walkName"></b></div><span class="hint" id="walkHint"></span><button type="button" id="walkX">나가기</button></section>
 <div id="walkPad" hidden aria-hidden="true"><i></i></div>
+<section id="questHud" class="glass" hidden aria-live="polite"><small>MISSION</small><b id="qhT"></b><span id="qhHint"></span></section>
+<div id="vn" aria-live="polite"><div class="in"><img id="vnImg" alt=""><div class="box"><b id="vnName"></b><p id="vnText"></p><i id="vnNext">▼ 탭</i></div></div></div>
+<div id="qReward" role="dialog" aria-modal="true" aria-labelledby="qrT"><div class="in"><small>COORDINATES</small><h1 id="qrT">좌표를 받았습니다</h1><p id="qrP"></p><div class="zs" id="qrList"></div><div class="row"><button type="button" class="go" id="qrMap">ERICA 지도에서 보기</button><button type="button" class="later" id="qrStay">계속 걷기</button></div></div></div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
   <small>DOROLAND · CHAPTER 5</small><h2 id="tpT">몇 조인가요?</h2>
   <div class="grid" id="tpGrid"></div>
@@ -1137,6 +1141,9 @@ function updateSun(){
 const fmt = n => n.toLocaleString('ko-KR');
 // On the campus, a zone that is not yet restored is a secret: no name, no map marker — only coordinates to find on foot.
 const hiddenZone = m => !!m && m.lat != null && !zoneDone(m);
+// A zone's coordinates stay locked until the island mission that hands them over is done (QUESTS, with the walk code). Admin and the big screen see everything.
+const zoneQuest = m => (typeof QUESTS === 'object' && m) ? QUESTS.find(q=> q.zones.includes(m.id)) : null;
+const zoneLocked = m => { if(!m || m.lat == null || ADMIN_KEY || SCREEN || typeof QUESTS !== 'object') return false; const q = zoneQuest(m); return !!q && !QDONE.has(q.id); };
 const zoneName = m => hiddenZone(m) ? `미확인 구역 ${'ABCDEFGHIJ'[MISSION_E.indexOf(m)] || ''}` : m.name;
 const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾아가세요. 그곳의 사물이나 공간을 휴대폰 카메라로 스캔하면 기록이 되살아납니다.' : (m.brief || '');
 // Ilua: the energy that once flowed through the whole island. Each restored record gives back one fragment of its course.
@@ -1337,8 +1344,9 @@ function boardRow(p){
     : st==='pend' && half ? `<img src="${esc(half.thumb)}" alt="">`
     : st==='pend' && subs[0] && (!LOCAL || subs[0].kind==='orbit') ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
     : st==='pend' ? '···' : '?';
-  const where = st==='ok' ? `${esc(p.campus.name)}에서 복구` : `${esc(zoneName(p.campus))}${p.campus.lat!=null ? ' · '+coordText(p.campus) : ''}`;
-  return `<button type="button" class="brow is-${st}" data-pair="${esc(p.campus.id)}">
+  const lock = st!=='ok' && zoneLocked(p.campus);
+  const where = st==='ok' ? `${esc(p.campus.name)}에서 복구` : lock ? `${esc(zoneName(p.campus))} · 섬의 미션 뒤에 좌표가 열립니다` : `${esc(zoneName(p.campus))}${p.campus.lat!=null ? ' · '+coordText(p.campus) : ''}`;
+  return `<button type="button" class="brow is-${st} ${lock ? 'is-lock' : ''}" data-pair="${esc(p.campus.id)}">
     <span class="th">${thumb}</span>
     <span><h4>${esc(p.island.name)}</h4><div class="pair">${where}</div>${teams.length ? `<div class="teams">${teams.map(t=>`<span class="tb">${t}조</span>`).join('')}</div>` : ''}</span>
     ${statusHTML(p.campus)}
@@ -1403,6 +1411,7 @@ function adminHTML(){
     <div class="arow">
       <button type="button" class="mini" data-aact="copy">목록 복사</button>
       <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 되살리기</button>
+      <button type="button" class="mini" data-aact="qreset">이 조의 섬 미션 초기화</button>
       <button type="button" class="mini danger" data-aact="reset">전체 초기화</button>
     </div>
     ${teams.length ? teams.map(t=>{ const list = SUBS.filter(s=>(s.team || 0)===t);
@@ -1429,6 +1438,7 @@ async function adminAct(act){
           return [`${s.team || '-'}조`, m ? m.name : s.mission, s.note || '', s.kind==='orbit' ? `${location.origin}${API}/scan/${s.scanId}/0.jpg (사진 ${s.frames}장)` : s.url, timeText(s.createdAt), done ? (s.kind==='orbit' ? '복구됨' : '3D 반영됨') : (s.kind==='orbit' ? '확인 대기' : '반영 대기')].join('\t'); });
       const ok = await copyText(['조\t구역\t찍은 것\t링크\t제출 시각\t상태', ...lines].join('\n')); toast(ok ? `${lines.length}건을 복사했습니다` : '복사할 수 없는 브라우저입니다'); return;
     }
+    if(act==='qreset'){ QDONE.clear(); saveQuest(); questApply(); renderList(); renderBoard(); toast(`${TEAM || 0}조의 섬 미션을 처음으로 되돌렸습니다`); return; }
     if(act==='reset'){
       const real = SCANS.filter(s=> !s.demo).length;
       if(!confirm(`모든 조의 제출 기록 ${SUBS.length}건을 지우고, 지금 3D에 들어가 있는 스캔 ${real}건을 숨겨 모든 구역을 "복구 필요"로 되돌립니다.${DEMO.size ? `\n이 기기의 복구 미리보기 ${DEMO.size}곳도 꺼집니다.` : ''}\n모든 태블릿은 조를 다시 고르게 됩니다. 숨긴 스캔은 "숨긴 스캔 되살리기"로 되돌릴 수 있습니다. 계속할까요?`)) return;
@@ -1484,6 +1494,10 @@ function twinLine(m){
 }
 function zoneCard(m, k){
   const s = zoneState(m), hid = hiddenZone(m);
+  if(W.id!=='island' && zoneLocked(m)){ const q = zoneQuest(m); return `
+    <div class="ms is-lock"><div class="top"><h4>${esc(zoneName(m))}</h4><span class="st">좌표 잠김</span></div>
+      <div class="lock"><span>좌표가 아직 열리지 않았습니다. 도로랜드 섬에서 <b>${esc(q ? q.who.join('·') : '')}</b>의 미션 「${esc(q ? q.title : '')}」을 마치면 이 구역의 좌표를 받습니다.</span><button type="button" class="mini" data-goquest="${esc(q ? q.id : '')}">섬에서 미션 하기</button></div>
+    </div>`; }
   if(W.id==='island') return `
     <div class="ms is-ok ${m.bi===selected?'on':''}" data-m="${k}" role="button" tabindex="0">
       <div class="top"><h4>${esc(m.name)}</h4><span class="st ok">돌아온 기록 ${m.scans.length}건</span></div>
@@ -1573,6 +1587,7 @@ let toastT;
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),1800); }
 document.addEventListener('click', e=>{
   const en = e.target.closest('[data-enter]'); if(en){ enterInterior(en.dataset.enter); return; }
+  const gq = e.target.closest('[data-goquest]'); if(gq){ if(W.id !== 'island') setWorld('island'); renderWalkPick(); $('walkPick').dataset.on = '1'; return; }
   const wk = e.target.closest('[data-walk]'); if(wk){ startWalk(wk.dataset.walk); return; }
   const cp = e.target.closest('[data-copy]');
   if(cp){ e.stopPropagation();
@@ -1858,7 +1873,7 @@ function refreshZones(){
     if(mk.team){ mk.show = W.id==='erica'; return; }
     if(mk.char){ mk.show = mk.char.g.visible; return; }
     if(mk.free){ mk.show = tabShows('ok') && visibleScan(mk.s); return; }
-    const st = zoneState(mk.m), isl = W.id==='island'; mk.show = isl ? st==='ok' : (tabShows(st) && !hiddenZone(mk.m));
+    const st = zoneState(mk.m), isl = W.id==='island'; mk.show = isl ? st==='ok' : (tabShows(st) && !hiddenZone(mk.m) && !zoneLocked(mk.m));
     if(mk.state===st) return; mk.state = st;
     const m = mk.m, el = mk.el;
     el.className = 'mk ' + st;
@@ -1866,7 +1881,7 @@ function refreshZones(){
       : st==='pend' ? `<i></i>${esc(m.name)} <small>복구 중</small>` : `<i></i>${esc(m.name)} <em>복구 필요</em>`;
     el.setAttribute('aria-label', `${m.name} ${st==='ok'?'복구됨':st==='pend'?'복구 중':'복구 필요'}`);
   });
-  M.forEach((m,k)=>{ const st = zoneState(m), show = W.id==='island' ? st==='ok' : (tabShows(st) && !hiddenZone(m)); beacons[k].visible = rings[k].visible = pads[k].visible = ripples[k].visible = show; barriers[k].visible = show && W.id!=='island'; });
+  M.forEach((m,k)=>{ const st = zoneState(m), show = W.id==='island' ? st==='ok' : (tabShows(st) && !hiddenZone(m) && !zoneLocked(m)); beacons[k].visible = rings[k].visible = pads[k].visible = ripples[k].visible = show; barriers[k].visible = show && W.id!=='island'; });
 }
 const v3 = new THREE.Vector3();
 // Measure the actual label instead of guessing its width from the character count.
@@ -2477,10 +2492,13 @@ function canvasTex(w, h, draw){
 function signTex(text, {w=512, h=128, bg='#1d2f55', fg='#ffd400', size=78, dots=false, weight=700}={}){
   return canvasTex(w, h, (g)=>{
     if(bg){ g.fillStyle = bg; g.fillRect(0,0,w,h); }
-    g.fillStyle = fg; g.font = `${weight} ${size}px "IBM Plex Sans KR", system-ui, sans-serif`;
-    const fitted=Math.min(size,h*.72,size*(w-32)/Math.max(1,g.measureText(text).width));
-    g.font=`${weight} ${fitted}px "IBM Plex Sans KR", system-ui, sans-serif`;
-    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w/2, h/2);
+    g.fillStyle = fg; const F = px => `${weight} ${px}px "IBM Plex Sans KR", system-ui, sans-serif`; g.font = F(size);
+    let fitted = Math.min(size, h*.72, size*(w-32)/Math.max(1, g.measureText(text).width));
+    // Hangul glyphs stand taller than the em box, so fit and centre the ink itself, not the font size
+    const ink = ()=>{ const m = g.measureText(text); return [m.actualBoundingBoxAscent || fitted*.8, m.actualBoundingBoxDescent || fitted*.2]; };
+    g.font = F(fitted); let [asc, desc] = ink();
+    if(asc + desc > h - 10){ fitted *= (h - 10)/(asc + desc); g.font = F(fitted); [asc, desc] = ink(); }
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText(text, w/2, h/2 + (asc - desc)/2);
     if(dots){ g.fillStyle = bg; for(let x=0;x<w;x+=7) g.fillRect(x,0,2,h); for(let y=0;y<h;y+=7) g.fillRect(0,y,w,2); }
   });
 }
@@ -2807,7 +2825,7 @@ for(let i=0;i<40;i++){
       const u = i/(n+1), p = curve.getPointAt(u), tg = curve.getTangentAt(u), side = i%2 ? 1 : -1;
       const nx = -tg.z*side, nz = tg.x*side;
       lamps.push([p.x+nx*10, p.z+nz*10]);
-      if(i%2===0) benches.push([p.x-nx*11, p.z-nz*11, Math.atan2(tg.x, tg.z)]);
+      if(i%2===0){ const bx = p.x-nx*11, bz = p.z-nz*11; benches.push([bx, bz, Math.atan2(tg.x, tg.z)]); OCC.push([bx, bz, 2.4]); }   // the seat and the ground in front of it stay clear
     }
   });
   const post = new THREE.InstancedMesh(CYL(0.12,0.16,4.6,6), mat(0x3a3f4a), lamps.length);
@@ -2817,7 +2835,7 @@ for(let i=0;i<40;i++){
   post.castShadow = true; islRoot.add(post, bulb);
   const seat = new THREE.InstancedMesh(BOX(1.9,0.45,0.6), mat(C.wood), benches.length), back = new THREE.InstancedMesh(BOX(1.9,0.5,0.1), mat(C.wood), benches.length);
   benches.forEach(([x,z,r],i)=>{ o.position.set(x,G+0.4,z); o.rotation.set(0,r+Math.PI/2,0); o.updateMatrix(); seat.setMatrixAt(i,o.matrix); o.translateZ(-0.3); o.position.y = G+0.85; o.updateMatrix(); back.setMatrixAt(i,o.matrix); });
-  seat.castShadow = back.castShadow = true; islRoot.add(seat, back);
+  seat.castShadow = back.castShadow = true; islRoot.add(seat, back); islRoot.userData.pathBench = {list:benches, seat, back};
 }
 
 // central plaza with its stone rings
@@ -3042,7 +3060,7 @@ const castle = new THREE.Group();
   for(let i=0;i<8;i++){ const b = new THREE.Group(); const l = add(b, new THREE.BoxGeometry(1.4, 0.06, 0.6).translate(-0.7, 0, 0), mat(T), 0, 0, 0, false), r = add(b, new THREE.BoxGeometry(1.4, 0.06, 0.6).translate(0.7, 0, 0), mat(T), 0, 0, 0, false); castle.add(b); bats.push([b, l, r]); }
   const sign = new THREE.Group(); sign.position.set(-9, 0, 38); castle.add(sign);
   add(sign, CYL(0.18, 0.2, 4, 6), mat(0x3b322c)); add(sign, BOX(6, 2, 0.3), mat(0x3b322c), 1.6, 3.4, 0);
-  add(sign, new THREE.PlaneGeometry(5.6, 1.6), new THREE.MeshBasicMaterial({map:canvasTex(384, 110, g=>{ g.fillStyle = '#2a1a14'; g.fillRect(0,0,384,110); g.fillStyle = '#d6202a'; g.font = '800 70px "IBM Plex Sans KR", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('귀신의 집', 192, 52);
+  add(sign, new THREE.PlaneGeometry(5.6, 1.6), new THREE.MeshBasicMaterial({map:canvasTex(384, 110, g=>{ g.fillStyle = '#2a1a14'; g.fillRect(0,0,384,110); g.fillStyle = '#d6202a'; g.font = '800 56px "IBM Plex Sans KR", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('귀신의 집', 192, 50);
     for(let i=0;i<9;i++){ const x = 60 + i*32; g.fillRect(x, 78, 4, 8 + (i%3)*10); } })}), 1.6, 4.4, 0.16, false);
   islAnim.push(t=>{
     wins.forEach((w,i)=> w.color.setHSL(i%3 ? 0.045 : 0.015, 0.62, 0.19+0.10*(0.5+0.5*Math.sin(t*0.8+i*2.3))));
@@ -3892,7 +3910,7 @@ const flume = new THREE.Group();
   { const st = new THREE.Group(); st.position.set(-6, 0, 33); F.add(st);
     add(st, BOX(30, 1, 7), mat(0xd9cfba), 0, 0, 6); [[-13,3],[13,3],[-13,9],[13,9]].forEach(([x,z])=> add(st, CYL(0.4, 0.4, 8, 8), mat(0xf4efe4), x, 1, z));
     add(st, BOX(32, 0.8, 16), mat(C.teal), 0, 9, 3); add(st, CONE(19, 4, 4).rotateY(Math.PI/4), mat(C.teal), 0, 9.8, 3);
-    add(st, new THREE.PlaneGeometry(16, 2.2), new THREE.MeshBasicMaterial({map:signTex('스플래시 리버', {bg:'#2aa7a0', fg:'#ffffff', size:70, w:512, h:80}), side:THREE.DoubleSide}), 0, 10.4, 11.2, false);
+    add(st, new THREE.PlaneGeometry(16, 2.2), new THREE.MeshBasicMaterial({map:signTex('스플래시 리버', {bg:'#2aa7a0', fg:'#ffffff', size:70, w:512, h:80}), side:THREE.DoubleSide}), 0, 7.3, 11.3, false);
     for(let i=0;i<7;i++) rider(st, -11 + i*3.4, 1, 7 + (i%2), i, 0.55, Math.PI); }
   // log boats: slow on the lift, fast on the drop, a splash at the bottom
   const boatsF = [0, 1, 2, 3].map(i=>{ const b = new THREE.Group(); add(b, BOX(2.4, 1.3, 6.4), mat(0x8a5a36), 0, 0, 0); add(b, SPH(1.2, 8, 6), mat(0x8a5a36), 0, 0.6, 3.2).scale.set(1, 0.9, 1);
@@ -4982,7 +5000,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
       bushSpots.push([x + 5, z + 4, 2.4]);
     } else if(kind===4){                                                           // benches round a lamp and planters
       add(islRoot, CYL(0.12, 0.16, 4.6, 6), mat(0x3a3f4a), x, G, z); add(islRoot, SPH(0.32, 8, 6), glowMat(0xffe7a3), x, G+4.8, z, false);
-      for(let i=0;i<3;i++){ const a = i/3*Math.PI*2 + r3(); const bx = x + Math.cos(a)*5, bz = z + Math.sin(a)*5; add(islRoot, BOX(1.9, 0.45, 0.6), mat(C.wood), bx, G+0.4, bz).rotation.y = -a + Math.PI/2;
+      for(let i=0;i<3;i++){ const a = i/3*Math.PI*2 + r3();   // planters only: benches belong beside the paths, not loose on the lawn
         add(islRoot, CYL(1.2, 1, 1.6, 10), mat(0xe6e1d6), x + Math.cos(a+1)*6.5, G, z + Math.sin(a+1)*6.5); add(islRoot, ICO(1.4, 0), flat(0xff9fcf), x + Math.cos(a+1)*6.5, G+2, z + Math.sin(a+1)*6.5); }
     } else if(kind===5){                                                           // topiary trio
       [[-3,0,0],[3,1,1],[0,-3,2]].forEach(([ox,oz,k])=>{ add(islRoot, CYL(1.2, 1.4, 1.4, 10), mat(0xb9b4aa), x+ox, G, z+oz);
@@ -5484,7 +5502,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, arrow:()=> meAvatar, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meAvatar, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -5549,7 +5567,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
       [-4.5, 0, 4.5].forEach(x=> add(g, BOX(3, 3, 0.3), mat(0x9fd3f5), x, 2.2, -5.6, false)); add(g, BOX(4.4, 5.2, 0.3), mat(0x2b3a4a), 0, 0, 5.6, false);
       [-4.8, 4.8].forEach(x=> add(g, BOX(2.6, 3, 0.3), mat(0x9fd3f5), x, 2.4, 5.6, false));
       const signM = new THREE.MeshBasicMaterial({map:signTex('DOROLAND 선착장', {bg:'#1d2f55', fg:'#ffd400', size:60, w:640, h:90}), side:THREE.DoubleSide});
-      add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 7.4, 6.1, false); add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 7.4, -6.1, false);
+      add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 6.8, 6.2, false); add(g, new THREE.PlaneGeometry(13, 1.8), signM, 0, 6.8, -6.2, false);   // below the pyramid roof's base (7.8), which otherwise covers the top of the letters
       add(g, new THREE.CylinderGeometry(1.5, 1.5, 0.4, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 5, 5.8); add(g, BOX(0.2, 1.1, 0.1), mat(C.navy), 0, 5.2, 6.05); add(g, BOX(0.8, 0.2, 0.1), mat(C.navy), 0.3, 5, 6.05);
       add(g, CYL(0.3, 0.3, 6, 6), mat(0x3a3f4a), 0, 12.4, 0); add(g, new THREE.ConeGeometry(0.9, 1.6, 10).rotateX(Math.PI), mat(0xd9a441), 0, 13.6, 0);
       [-5, -1.7, 1.7, 5].forEach(x=>{ const b = new THREE.Group(); b.position.set(x, DY, 181); P.add(b); add(b, BOX(3, 0.25, 1.1), mat(0x9a6b45), 0, 1, 0); add(b, BOX(3, 1, 0.2), mat(0x9a6b45), 0, 1.2, 0.5).rotation.x = 0.15; [-1.2, 1.2].forEach(k=> add(b, BOX(0.25, 1, 1), mat(0x2f3540), k, 0, 0)); }); }
@@ -5560,7 +5578,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
       for(let i=0;i<8;i++) add(g, new THREE.ConeGeometry(0.5, 1.2, 3).rotateX(Math.PI), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf][i%4]), -7.4 + i*2.1, 7.9, 0.35, false); }
     { const g = new THREE.Group(); g.position.set(-15, 1.2, -4); g.rotation.y = 0.35; P.add(g);
       add(g, BOX(6, 5.5, 5), mat(0xf4efe4)); add(g, BOX(6.6, 0.4, 5.6), mat(C.navy), 0, 5.5, 0); add(g, BOX(5.4, 1.6, 0.1), mat(0x9fd3f5), 0, 2.3, 2.55, false);
-      add(g, new THREE.PlaneGeometry(5.4, 1.2), new THREE.MeshBasicMaterial({map:signTex('승선권', {bg:'#ffffff', fg:'#1d2f55', size:64, w:384, h:90})}), 0, 4, 2.6, false); }
+      add(g, new THREE.PlaneGeometry(5.4, 1.2), new THREE.MeshBasicMaterial({map:signTex('승선권', {bg:'#ffffff', fg:'#1d2f55', size:64, w:384, h:90})}), 0, 4.65, 2.62, false); }   // clear of the window pane below (its top is 3.9)
     // the ferry alongside, a gangway onto the deck, buoys out in the water
     { const ferry = boat(0xf7f7f2, C.navy); ferry.scale.setScalar(1.6); ferry.position.set(HW + 9.5, -1.5, 150); ferry.rotation.y = Math.PI/2; P.add(ferry); boats.push(ferry); pier.userData.ferry=ferry; pier.userData.dressing=P;
       add(ferry, BOX(12, 0.4, 7), mat(C.navy), 2, 8.4, 0); [[-3,-3],[7,-3],[-3,3],[7,3]].forEach(([x,z])=> add(ferry, CYL(0.15, 0.15, 3, 6), mat(0xffffff), x, 5.4, z));
@@ -5823,7 +5841,7 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   [[-8,-4],[8,-4],[-8,4],[8,4]].forEach(([x,z])=>add(terminal,CYL(.27,.35,6,6),mat(0xe2d7ba),x,0,z));
   add(terminal,BOX(18,.45,11),mat(0x536b6b),0,6,0).rotation.x=.08;
   seat(terminal,-4,-1,0);seat(terminal,4,-1,0);
-  add(terminal,new THREE.PlaneGeometry(12,1.4),new THREE.MeshBasicMaterial({map:signTex('도로랜드 항구',{bg:'#536b6b',fg:'#f5ecd7',size:58,w:512,h:80}),side:THREE.DoubleSide}),0,6.5,5.5,false);
+  add(terminal,new THREE.PlaneGeometry(12,1.4),new THREE.MeshBasicMaterial({map:signTex('도로랜드 항구',{bg:'#536b6b',fg:'#f5ecd7',size:58,w:512,h:80}),side:THREE.DoubleSide}),0,4.55,5.6,false);   // under the tilted roof edge (5.56)
   // Support the broadened passenger pier rather than leaving its edges cantilevered.
   const pierDress=pier.userData.dressing;
   if(pierDress){
@@ -5869,15 +5887,24 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   const segments=[];
   routes.forEach(route=>{const c=new THREE.CatmullRomCurve3(route.points.map(([x,z])=>new THREE.Vector3(x,0,z))),pts=c.getSpacedPoints(Math.max(2,Math.ceil(c.getLength()/3)));for(let i=1;i<pts.length;i++)segments.push([pts[i-1].x,pts[i-1].z,pts[i].x,pts[i].z,route.width/2]);});
   function clearance(x,z){let best=Infinity;for(const[a,b,c,d,w]of segments){const dx=c-a,dz=d-b,u=Math.max(0,Math.min(1,((x-a)*dx+(z-b)*dz)/(dx*dx+dz*dz||1)));best=Math.min(best,Math.hypot(x-a-u*dx,z-b-u*dz)-w);}return best;}
+  function nearestPath(x,z){let best=Infinity,px=x,pz=z;for(const[a,b,c,d]of segments){const dx=c-a,dz=d-b,u=Math.max(0,Math.min(1,((x-a)*dx+(z-b)*dz)/(dx*dx+dz*dz||1))),qx=a+u*dx,qz=b+u*dz,q=Math.hypot(x-qx,z-qz);if(q<best){best=q;px=qx;pz=qz;}}return[px,pz,best];}
+  // Benches along the first paths: a spur or link drawn later may run straight through one (drop it), or pass close behind it (turn it to face the nearer path).
+  { const pb=islRoot.userData.pathBench; if(pb){ const zero=new THREE.Matrix4().makeScale(0,0,0),o=new THREE.Object3D();
+      pb.list.forEach(([x,z,r],i)=>{ if(clearance(x,z)<1){pb.seat.setMatrixAt(i,zero);pb.back.setMatrixAt(i,zero);return;}
+        const [px,pz]=nearestPath(x,z),yaw=Math.atan2(px-x,pz-z); if(Math.cos(yaw-(r+Math.PI/2))>0.3)return;
+        o.position.set(x,G+0.4,z);o.rotation.set(0,yaw,0);o.updateMatrix();pb.seat.setMatrixAt(i,o.matrix);o.translateZ(-0.3);o.position.y=G+0.85;o.updateMatrix();pb.back.setMatrixAt(i,o.matrix);});
+      pb.seat.instanceMatrix.needsUpdate=pb.back.instanceMatrix.needsUpdate=true; } }
   const railwayClear=(x,z,r=0)=>Math.abs(Math.hypot(x,z)-trackR(Math.atan2(z,x)))>12+r;
   function free(x,z,r){return Math.hypot(x,z)<edgeR(x,z)-30-r&&!occupied(x,z,r)&&clearance(x,z)>r+1&&railwayClear(x,z,r);}
   // Rebuild the discontinuous old hedge in shorter clipped runs around junctions.
   islRoot.children.filter(o=>o.isInstancedMesh&&o.geometry.parameters?.depth===7.4&&o.geometry.parameters?.width===1.6).forEach(o=>o.visible=false);
+  const pathBenches=(islRoot.userData.pathBench||{list:[]}).list;
   routes.forEach((route,ri)=>{const c=new THREE.CatmullRomCurve3(route.points.map(([x,z])=>new THREE.Vector3(x,0,z))),L=c.getLength();
     for(let d=10;d<L-9;d+=5){const p=c.getPointAt(d/L),v=c.getTangentAt(d/L);if(Math.hypot(p.x,p.z-67)<110||(Math.abs(p.x)<44&&p.z>170&&p.z<525))continue;
       [-1,1].forEach(side=>{const x=p.x-v.z*side*(route.width/2+2),z=p.z+v.x*side*(route.width/2+2);
         if(!free(x,z,.6)||[-2,0,2].some(k=>clearance(x+v.x*k,z+v.z*k)<1.15))return;
         if(parkPolish.borders.some(a=>Math.hypot(a.x-x,a.z-z)<3.7))return;
+        if(pathBenches.some(([a,b])=>Math.hypot(a-x,b-z)<5.4))return;   // a hedge run is 4.35 long: keep the whole run out of a sitter's view
         parkPolish.borders.push({x,z,rotation:Math.atan2(v.x,v.z),clearance:clearance(x,z)});
       });
     }
@@ -5885,13 +5912,13 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   const hedges=new THREE.InstancedMesh(BOX(1.25,1.45,4.35),new THREE.MeshLambertMaterial({color:0xffffff}),parkPolish.borders.length);
   parkPolish.borders.forEach((p,i)=>{dummy.position.set(p.x,G,p.z);dummy.rotation.set(0,p.rotation,0);dummy.scale.setScalar(1);dummy.updateMatrix();hedges.setMatrixAt(i,dummy.matrix);hedges.setColorAt(i,new THREE.Color([0x527d40,0x5c8b45,0x66954c][i%3]));});hedges.castShadow=hedges.receiveShadow=true;hedges.name='connected-path-hedges';islRoot.add(hedges);
   // Infill seating only where its entire footprint clears paths, other benches and railway.
-  const existingSeats=[];islRoot.updateMatrixWorld(true);islRoot.traverse(o=>{const q=o.geometry?.parameters;if(o.isMesh&&!o.isInstancedMesh&&q?.width>=3&&q.width<=4.5&&q.height<=.35&&q.depth>=1&&q.depth<=1.4){const p=o.getWorldPosition(new THREE.Vector3());existingSeats.push([p.x,p.z]);}});
+  const existingSeats=[];islRoot.updateMatrixWorld(true);islRoot.traverse(o=>{const q=o.geometry?.parameters;if(o.isMesh&&!o.isInstancedMesh&&((q?.width>=3&&q.width<=4.5&&q.height<=.35&&q.depth>=1&&q.depth<=1.4)||(q?.width===4.2&&q.height===0.16&&q.depth===0.23))){const p=o.getWorldPosition(new THREE.Vector3());if(clearance(p.x,p.z)<0.8){o.parent.visible=false;return;}existingSeats.push([p.x,p.z]);}});   // a bench a path runs through is no bench
   const lamps=islRoot.userData.lamps||[],newLamps=[];
   routes.forEach((route,ri)=>{const c=new THREE.CatmullRomCurve3(route.points.map(([x,z])=>new THREE.Vector3(x,0,z))),L=c.getLength();
     for(let d=18;d<L-12;d+=33){const p=c.getPointAt(d/L),v=c.getTangentAt(d/L),side=ri%2?1:-1,x=p.x-v.z*side*(route.width/2+6),z=p.z+v.x*side*(route.width/2+6);
       if(!free(x,z,2.8)||parkPolish.amenities.some(a=>Math.hypot(a.x-x,a.z-z)<12))continue;
       if(existingSeats.every(([a,b])=>Math.hypot(x-a,z-b)>20)&&parkPolish.borders.every(a=>Math.hypot(a.x-x,a.z-z)>3.6)){
-        const g=seat(islRoot,x,z,Math.atan2(-v.z*side,v.x*side));g.position.y=G;
+        const g=seat(islRoot,x,z,Math.atan2(-v.z*side,v.x*side)+Math.PI);g.position.y=G;   // the backrest goes on the far side: a sitter faces the path
         add(g,BOX(5,.14,2.5),mat(0xd6ccb5),0,-.02,0,false);parkPolish.amenities.push({kind:'bench',x,z});existingSeats.push([x,z]);
       }
       const lx=p.x+v.z*side*(route.width/2+3.5),lz=p.z-v.x*side*(route.width/2+3.5);
@@ -6193,6 +6220,7 @@ function rescan(revealIds, arrive){
   const arriving = arrive && revealIds && revealIds.length;
   if(arriving) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
   maybeRestore(arriving ? 5600 : 1500);
+  try{ questRefresh(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }   // the characters are not built yet on the very first scan
 }
 // A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground,
 // sparks rising, and the camera moving to watch it. The simulator has its own arrival (the vein sweeping in).
@@ -6725,7 +6753,7 @@ function infoI(i, move){
   $('iC').textContent = back ? '돌아온 기록' : CATS_I[b.c].name;
   $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
   $('iDl').hidden = true; $('iNote').hidden = true; $('iIsl').hidden = false;
-  $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + (b.c==='char' && WALKERS.includes(b.label) && !walk ? `<button class="enter" data-walk="${esc(b.label)}">${esc(b.label)}의 눈으로 걷기</button>` : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
+  $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + (b.c==='char' && WALKERS.includes(b.label) && !walk ? (walkerOpen(b.label) ? `<button class="enter" data-walk="${esc(b.label)}">${esc(b.label)}의 눈으로 걷기</button>` : `<p class="desc" style="opacity:.7">${esc(b.label)}의 시점은 ${esc(walkerWhy(b.label))} 열립니다.</p>`) : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
   if(move){
     const tgt = new THREE.Vector3(b.cx, b.y0 + b.h*0.45, b.cz);
     const dir = camera.position.clone().sub(controls.target).normalize();
@@ -6748,17 +6776,21 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=> TEXTS.
 const WALKERS = ['리코', '제로', '자일로', '코덱스', '네이티', '보이드'];
 const WALK_KEYS = {}, walkPad = {dx:0, dz:0, id:null};
 function groundY(x, z){ let y = G; for(const [mx, mz, r, h] of (islRoot.userData.mounds || [])){ const d = Math.hypot(x - mx, z - mz); if(d < r*0.96) y = Math.max(y, G - 1.2 + h*Math.sqrt(1 - (d/r)*(d/r))); } return y; }
-function walkBlocked(x, z){ if(Math.hypot(x, z) > edgeR(x, z) - 7) return true; for(const b of walk.blocks) if(Math.hypot(x - b.cx, z - b.cz) < b.rr) return true; return false; }
+let walkBlocks = null;
+const WALK_BLOCKS = ()=> walkBlocks || (walkBlocks = IB.filter(b=> b.c==='ride' || b.label === '미러 레이크').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20) + (b.c==='ride' ? 6 : 2)})));
+function walkBlocked(x, z){ if(Math.hypot(x - CAVE_MOUTH[0], z - CAVE_MOUTH[1]) < 16) return false;   // the eye cave sits on the shore: its mouth is always reachable
+  if(Math.hypot(x, z) > edgeR(x, z) - 7) return true; for(const b of WALK_BLOCKS()) if(Math.hypot(x - b.cx, z - b.cz) < b.rr) return true; return false; }
+function freeSpot(x, z){ for(let i=0;i<80 && walkBlocked(x, z);i++){ const a = i*0.8, d = 6 + i*3; x += Math.cos(a)*d; z += Math.sin(a)*d; } return [x, z]; }
 let walkSaved = null;
 function startWalk(name){
   const c = CHAR.find(c=> c.n === name); if(!c || walk) return;
+  if(!walkerOpen(name)){ toast(`${name}의 시점은 ${walkerWhy(name)} 열립니다`); return; }
   delete $('walkPick').dataset.on;
   if(W.id !== 'island') setWorld('island', true);
   if(simOn) setSim(false); if(inside) exitInterior(); select(-1); delete $('restoreDlg').dataset.on;
   const box = new THREE.Box3().setFromObject(c.g), eye = Math.max(1.3, (box.max.y - box.min.y)*0.9);
   const p = c.g.getWorldPosition(new THREE.Vector3());
-  const blocks = IB.filter(b=> b.c==='ride' || b.label === '미러 레이크').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20) + (b.c==='ride' ? 6 : 2)}));
-  walk = {c, eye, x:p.x, z:p.z, yaw:c.g.rotation.y, pitch:-0.04, bob:0, blocks, last:performance.now(), drag:null, fly:c.n === '네이티'};
+  walk = {c, eye, x:p.x, z:p.z, yaw:c.g.rotation.y, pitch:-0.04, bob:0, last:performance.now(), drag:null, fly:c.n === '네이티'};
   for(let i=0;i<80 && walkBlocked(walk.x, walk.z);i++){ const a = i*0.8, d = 6 + i*3; walk.x = p.x + Math.cos(a)*d; walk.z = p.z + Math.sin(a)*d; }   // characters standing in a fenced lot step out
   walkSaved = {pos:camera.position.clone(), tgt:controls.target.clone(), near:camera.near, fov:camera.fov};
   c.g.visible = false; fly = null; if(follow) setFollow(false); hovered = -1; renderer.domElement.style.cursor = '';
@@ -6767,7 +6799,7 @@ function startWalk(name){
   $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '왼쪽 패드로 걷고, 화면을 끌어 둘러봅니다' : '방향키로 걷고, 화면을 끌어 둘러봅니다';
   $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none');
   if(innerWidth <= 760) closePanel();
-  walkTick(performance.now());
+  walkTick(performance.now()); questOnWalk(name);
 }
 function stopWalk(){
   if(!walk) return;
@@ -6775,13 +6807,15 @@ function stopWalk(){
   camera.near = walkSaved.near; camera.fov = walkSaved.fov; camera.updateProjectionMatrix();
   camera.position.copy(walkSaved.pos); controls.target.copy(walkSaved.tgt); controls.enabled = true;
   document.body.classList.remove('walk'); $('walkHud').hidden = true; $('walkPad').hidden = true;
+  questLive = null; $('questHud').hidden = true; if(vn){ vn = null; delete $('vn').dataset.on; }
 }
 const _wt = new THREE.Vector3();
 function walkTick(now){
   const w = walk, dt = Math.min(0.05, Math.max(0, (now - w.last)/1000)); w.last = now;
-  const k = WALK_KEYS, fwd = (k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0), turn = (k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0), strafe = (k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0);
+  const k = WALK_KEYS, hold = vn || qRewardEl.dataset.on ? 0 : 1;   // no walking while a dialogue or the coordinate card is up
+  const fwd = ((k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0))*hold, turn = ((k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0))*hold, strafe = ((k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0))*hold;
   w.yaw += turn*1.8*dt;
-  let mx = fwd - walkPad.dz, mz = strafe + walkPad.dx; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
+  let mx = fwd - walkPad.dz*hold, mz = strafe + walkPad.dx*hold; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
   const speed = (k.ShiftLeft || k.ShiftRight ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
   const dx = (sy*mx + cy*mz)*speed*dt, dz = (cy*mx - sy*mz)*speed*dt;
   if(dx || dz){
@@ -6794,6 +6828,7 @@ function walkTick(now){
   const cp = Math.cos(w.pitch);
   _wt.set(w.x + sy*cp*12, camera.position.y + Math.sin(w.pitch)*12, w.z + cy*cp*12);
   camera.lookAt(_wt); controls.target.copy(_wt);
+  questTick();
 }
 document.addEventListener('keydown', e=>{ if(!walk || e.target.matches('input,textarea,select')) return; WALK_KEYS[e.code] = true; if(/^Arrow|^Key[WASDQE]$|^Space$/.test(e.code)) e.preventDefault(); });
 document.addEventListener('keyup', e=>{ delete WALK_KEYS[e.code]; });
@@ -6806,10 +6841,130 @@ renderer.domElement.addEventListener('pointermove', e=>{ if(!walk || !walk.drag 
   pad.addEventListener('pointerdown', e=>{ if(walkPad.id != null) return; walkPad.id = e.pointerId; pad.setPointerCapture(e.pointerId); move(e); e.preventDefault(); });
   pad.addEventListener('pointermove', e=>{ if(e.pointerId === walkPad.id) move(e); });
   ['pointerup', 'pointercancel'].forEach(ev=> pad.addEventListener(ev, e=>{ if(e.pointerId !== walkPad.id) return; walkPad.id = null; walkPad.dx = walkPad.dz = 0; nub.style.transform = ''; })); }
-$('wpGrid').innerHTML = WALKERS.map(n=> `<button type="button" data-walk="${n}">${n}</button>`).join('');
 $('wpSkip').onclick = ()=>{ delete $('walkPick').dataset.on; };
-$('lWalk').onclick = ()=>{ $('walkPick').dataset.on = '1'; };
+$('lWalk').onclick = ()=>{ renderWalkPick(); $('walkPick').dataset.on = '1'; };
 $('walkX').onclick = stopWalk;
+// ---------- the mission chain: walk the island as a character, find the target, receive ERICA coordinates ----------
+// 제로·리코 look for 자일로 → his two coordinates; once both zones are restored 네이티 opens and looks for the hidden 코덱스 → one coordinate;
+// once that zone is restored 코덱스 opens and enters the eye cave → the last two. The chain is remembered per team on this device.
+const QUESTS = [
+  {id:'q1', who:['제로', '리코'], title:'자일로를 찾아라', hint:'롤러코스터가 제일 잘 보이는 자리', zones:['lions', 'pharm'], r:7},
+  {id:'q2', who:['네이티'], title:'숨은 코덱스를 찾아라', hint:'미로 정원 쪽에서 빛이 흔들렸다', zones:['library'], r:8},
+  {id:'q3', who:['코덱스'], title:'눈 문양 동굴로', hint:'북쪽 해안, 눈이 빛나는 곳', zones:['amphi', 'main'], r:9, dark:true},
+];
+const QKEY = ()=> `void-quest-${TEAM || 0}`;
+let QDONE = new Set();
+function loadQuest(){ try{ QDONE = new Set(JSON.parse(localStorage.getItem(QKEY()) || '[]')); }catch(e){ QDONE = new Set(); } }
+function saveQuest(){ try{ localStorage.setItem(QKEY(), JSON.stringify([...QDONE])); }catch(e){} }
+loadQuest();
+const questDone = q => QDONE.has(q.id);
+const zonesBack = q => q.zones.every(id=>{ const m = MISSION_E.find(x=> x.id === id); return m && zoneDone(m); });
+const questOpen = q => { const i = QUESTS.indexOf(q); return i === 0 || zonesBack(QUESTS[i - 1]); };   // the next mission opens once the previous one's zones are restored
+const questFor = name => QUESTS.find(q=> q.who.includes(name));
+function walkerOpen(name){ if(ADMIN_KEY) return true; const q = questFor(name); if(q) return questOpen(q); return name === '자일로' ? questDone(QUESTS[0]) : name === '보이드' ? zonesBack(QUESTS[2]) : true; }
+const walkerWhy = name => ({'자일로':'자일로를 찾은 뒤', '네이티':'자일로가 준 두 좌표를 복구한 뒤', '코덱스':'코덱스가 준 좌표를 복구한 뒤', '보이드':'다섯 기록이 모두 돌아온 뒤'})[name] || '';
+// where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
+const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531];
+let XYLO_HIDE = null, CODEX_HIDE = [172, 426];   // beside the maze's golden orb, not inside it
+function questTarget(q){ return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? CODEX_HIDE : CAVE_MOUTH; }
+function questApply(){
+  if(!XYLO_HIDE){ const c = IB.find(b=> b.label === '롤러코스터'); const cx = c ? c.cx : -270, cz = c ? c.cz : 257, rr = (c ? c.r : 128) + 10, a = Math.atan2(200 - cz, -190 - cx); XYLO_HIDE = freeSpot(cx + Math.cos(a)*rr, cz + Math.sin(a)*rr); XYLO_HIDE.push(Math.atan2(cx - XYLO_HIDE[0], cz - XYLO_HIDE[1])); }
+  if(questDone(QUESTS[0])){ XYLO.position.set(XYLO_HOME[0], G, XYLO_HOME[1]); XYLO.rotation.y = XYLO_HOME[2]; } else { XYLO.position.set(XYLO_HIDE[0], G, XYLO_HIDE[1]); XYLO.rotation.y = XYLO_HIDE[2]; }
+  if(questDone(QUESTS[1])){ CODEX.position.set(CODEX_HOME[0], G, CODEX_HOME[1]); CODEX.rotation.y = CODEX_HOME[2]; } else { CODEX.position.set(CODEX_HIDE[0], G, CODEX_HIDE[1]); CODEX.rotation.y = 0.4; }
+  renderWalkPick();
+}
+function renderWalkPick(){
+  $('wpGrid').innerHTML = WALKERS.map(n=>{ const ok = walkerOpen(n), q = questFor(n), mine = q && questOpen(q) && !questDone(q);
+    return `<button type="button" data-walk="${n}" ${ok ? '' : 'disabled'}>${n}${!ok ? `<em>잠김 · ${esc(walkerWhy(n))}</em>` : mine ? `<em>미션 · ${esc(q.title)}</em>` : ''}</button>`; }).join('');
+}
+function questRefresh(){
+  loadQuest(); const before = questRefresh.sig; const sig = WALKERS.map(n=> walkerOpen(n) ? '1' : '0').join(''); questRefresh.sig = sig;
+  if(before && sig !== before){ const opened = WALKERS.filter((n, i)=> sig[i] === '1' && before[i] === '0'); if(opened.length) setTimeout(()=> toast(`${opened.join('·')} 시점이 열렸습니다. 도로랜드 섬에서 다음 미션을 이어가세요`), 1200); }
+  questApply();
+}
+// the dialogue box (a visual-novel strip at the bottom): tap or Space/Enter to go on; the first tap finishes the typing
+const VN_IMG = {'제로':'zero', '리코':'rico', '자일로':'xylo', '네이티':'naty', '코덱스':'codex', '그림자':'codex_dark'};
+let vn = null;
+function say(lines, done, opt={}){ const el = $('vn'); lines.forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png`; }); vn = {lines, i:-1, done, typing:null, full:''}; el.dataset.on = '1'; if(opt.dark) el.dataset.dark = '1'; else delete el.dataset.dark; vnNext(); }
+function vnNext(){
+  if(!vn) return;
+  if(vn.typing){ clearInterval(vn.typing); vn.typing = null; $('vnText').textContent = vn.full; $('vnNext').hidden = false; return; }
+  vn.i++;
+  if(vn.i >= vn.lines.length){ const d = vn.done; vn = null; delete $('vn').dataset.on; if(d) d(); return; }
+  const L = vn.lines[vn.i], img = $('vnImg'); img.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png`; img.alt = L.who || ''; img.hidden = !L.who;
+  $('vnName').textContent = L.who || ''; $('vnName').hidden = !L.who; const p = $('vnText'); p.classList.toggle('nar', !!L.nar); p.textContent = ''; $('vnNext').hidden = true;
+  vn.full = L.text; let k = 0;
+  vn.typing = setInterval(()=>{ k++; p.textContent = L.text.slice(0, k); if(k >= L.text.length){ clearInterval(vn.typing); vn.typing = null; $('vnNext').hidden = false; } }, 26);
+}
+$('vn').addEventListener('click', e=>{ e.stopPropagation(); vnNext(); });
+document.addEventListener('keydown', e=>{ if(vn && (e.code === 'Space' || e.code === 'Enter')){ e.preventDefault(); vnNext(); } }, true);
+const QUEST_INTRO = {
+  q1: n => n === '리코' ? [
+    {who:'리코', img:'rico_hmm', text:'흠…… 자일로가 아까부터 안 보여. 보이드의 기록을 되찾으려면 자일로가 알고 있는 좌표가 필요한데.'},
+    {who:'제로', img:'zero', text:'자일로라면 분명 롤러코스터 근처야! 소리만 나면 달려가잖아!'},
+    {who:'리코', img:'rico', text:'롤러코스터가 제일 잘 보이는 자리부터 찾아보자.'}]
+  : [
+    {who:'제로', img:'zero_oops', text:'어?! 자일로가 안 보여! 아까까지 여기 있었는데!'},
+    {who:'리코', img:'rico_hmm', text:'흠…… 자일로라면 롤러코스터가 제일 잘 보이는 자리에 있지 않을까?'},
+    {who:'제로', img:'zero_brave', text:'좋아, 롤러코스터 쪽으로 가 보자!'}],
+  q2: ()=> [
+    {who:'자일로', img:'xylo_talk', text:'네이티, 코덱스가 어디에도 보이지 않습니다. 미로 정원 쪽에서 빛이 흔들렸다는 얘기가 있어요.'},
+    {who:'네이티', img:'naty_green', nar:true, text:'네이티의 불꽃이 초록으로 바뀌며 미로 정원 쪽으로 기운다.'}],
+  q3: ()=> [
+    {who:'코덱스', img:'codex', text:'눈 문양 동굴. 내가 오랫동안 들어가지 못했던 곳이지.'},
+    {who:'코덱스', img:'codex_side', text:'북쪽 해안으로 간다. 그곳에 마지막 기록이 있어.'}],
+};
+const QUEST_FOUND = {
+  q1: n => [
+    {who:'자일로', img:'xylo', text:`${n}! 여기까지 오셨군요. 롤러코스터 소리를 듣고 있었답니다.`},
+    {who:n, img:n === '제로' ? 'zero_joy' : 'rico_joy', text:n === '제로' ? '자일로! 보이드가 기록을 되찾으려면 ERICA에 가야 한대요!' : '자일로, 보이드의 기록을 되찾으려면 ERICA의 좌표가 필요해요.'},
+    {who:'자일로', img:'xylo_point', text:'알고 있습니다. 두 분께 드릴 좌표가 있어요. 사라진 기록이 잠든 곳, 하나씩 맡아 주세요.'},
+    {who:n, img:n === '제로' ? 'zero_hmm' : 'rico_hmm', text:'좌표를 따라가서 그 공간을 사진으로 남기고 스캔하면 되는 거죠?'},
+    {who:'자일로', img:'xylo_talk', text:'맞습니다. 두 곳의 기록이 모두 돌아오면 네이티가 다음 길을 열어 줄 겁니다.'}],
+  q2: ()=> [
+    {who:'코덱스', img:'codex', text:'……네이티. 여기까지 찾아왔군.'},
+    {who:'네이티', img:'naty', nar:true, text:'불꽃이 코덱스의 주위를 천천히 맴돈다.'},
+    {who:'코덱스', img:'codex_side', text:'미안하다. 섬의 비밀을 혼자 지키려다 기록을 잃었지. 이제는 돌려놓을 때다.'},
+    {who:'코덱스', img:'codex', text:'ERICA의 어느 곳에 세 번째 기록이 잠들어 있어. 좌표를 전하지.'},
+    {who:'코덱스', img:'codex', text:'기록이 돌아오면 나도 움직이겠다. 눈 문양 동굴로.'}],
+  q3: ()=> [
+    {who:'그림자', img:'codex_dark', text:'돌아왔군. 기록을 지운 건 너였지.'},
+    {who:'코덱스', img:'codex', text:'그래. 하지만 되돌리는 것도 나다.'},
+    {who:'그림자', img:'codex_dark', text:'……좋아. 벽을 봐. 노아와 루나가 남긴 마지막 두 좌표다.'},
+    {who:'코덱스', img:'codex_side', text:'두 곳. 이 기록들이 돌아오면 일루아를 환원할 수 있어.'},
+    {who:'네이티', img:'naty', nar:true, text:'네이티의 빛이 하늘색으로 가라앉는다.'}],
+};
+let questLive = null;   // the mission being walked right now
+const qRewardEl = $('qReward');
+function questOnWalk(name){
+  const q = questFor(name); questLive = null; $('questHud').hidden = true;
+  if(!q || questDone(q) || !questOpen(q)) return;
+  questLive = q; q.found = false; QUEST_FOUND[q.id](name).forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png`; }); $('qhT').textContent = q.title; $('qhHint').textContent = q.hint; $('questHud').hidden = false;
+  const key = `void-vn-${q.id}-${TEAM || 0}`; let seen = false; try{ seen = !!sessionStorage.getItem(key); }catch(e){}
+  if(!seen){ try{ sessionStorage.setItem(key, '1'); }catch(e){} setTimeout(()=>{ if(walk && questLive === q && !vn) say(QUEST_INTRO[q.id](name)); }, 700); }
+}
+function questTick(){
+  const q = questLive; if(!q || !walk || vn || q.found) return;
+  const [tx, tz] = questTarget(q); if(Math.hypot(walk.x - tx, walk.z - tz) > q.r) return;
+  q.found = true;
+  const tg = q.id === 'q1' ? XYLO : q.id === 'q2' ? CODEX : null; if(tg) tg.rotation.y = Math.atan2(walk.x - tg.position.x, walk.z - tg.position.z);   // the one found turns to the walker
+  walk.yaw = Math.atan2(tx - walk.x, tz - walk.z); walk.pitch = -0.05;
+  say(QUEST_FOUND[q.id](walk.c.n), ()=> questComplete(q), {dark:q.dark});
+}
+function questComplete(q){
+  q.found = false; QDONE.add(q.id); saveQuest(); questLive = null; $('questHud').hidden = true;
+  questApply(); renderList(); renderBoard(); showReward(q);
+}
+function showReward(q){
+  const zs = q.zones.map(id=> MISSION_E.find(m=> m.id === id)).filter(Boolean);
+  $('qrP').textContent = zs.length > 1 ? '두 곳의 좌표입니다. ERICA 지도에서 좌표를 따라가 그 공간을 사진으로 남기고 스캔하면 기록이 돌아옵니다.' : 'ERICA 지도에서 이 좌표를 따라가 그 공간을 사진으로 남기고 스캔하면 기록이 돌아옵니다.';
+  $('qrList').innerHTML = zs.map(m=> `<div class="z"><span>${esc(zoneName(m))}</span><code>${coordText(m)}</code></div>`).join('');
+  qRewardEl.dataset.on = '1';
+}
+$('qrMap').onclick = ()=>{ delete qRewardEl.dataset.on; stopWalk(); setWorld('erica'); setTab('v'); setPanel(true); toast('복구 필요 목록에 좌표가 열렸습니다'); };
+$('qrStay').onclick = ()=>{ delete qRewardEl.dataset.on; };
+questApply();
+
 
 // ---------- loop ----------
 function resize(){ const w=innerWidth,h=innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); if(composer){ composer.setSize(w,h); bloomPass.resolution.set(Math.round(w/2), Math.round(h/2)); } }
