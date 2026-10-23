@@ -10,33 +10,33 @@ body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-colo
 /* Layout: full-bleed 3D campus model; void sites read as dark hollow volumes until a student scan restores them.
    Left: mission + building catalogue. Right: inspector. Bottom: time + layer rail. Scan viewer opens as a full overlay. */
 :root{
-  --bg:#eef1f3; --ground:#e3e6e2; --campus:#d9e0d6; --road:#f8f9f9;
-  --ctx:#eceef0; --park:#c6dbb8; --wood:#b2cfa3; --water:#a9c3d9; --pitch:#bcd3b4; --lot:#d6dade;
+  --bg:#eef1f3; --ground:#e9ece5; --campus:#e0e7d9; --road:#fbfcfc;
+  --ctx:#eff1f3; --park:#cbe2b8; --wood:#b8d3a6; --water:#aecbe2; --pitch:#c1d9b6; --lot:#dde1e5;
   --fg:#16202b; --muted:#5b6774; --line:rgba(22,32,43,.12); --panel:rgba(250,251,252,.9); --panel-solid:#fafbfc;
   --accent:#0e4a84; --accent-fg:#fff; --edge:#24313f;
   --void:#1d2530; --void-edge:#6c3df0; --void-fg:#f1f3f6; --restored:#12b35a;
   --c-edu:#4a78ad; --c-lab:#7b8ea6; --c-dorm:#c48a52; --c-hub:#b8574d; --c-ext:#8a9099; --c-misc:#b2b9c2; --c-build:#cdb66a;
-  --sky:#eef1f3; --sky-top:#bcd4ea; --viewer:#14181d; --tree:#6e9a5a; --trunk:#8a6f55; --facade-mix:.55;
+  --sky:#f1f4f6; --sky-top:#c4dbef; --viewer:#14181d; --tree:#72a35c; --trunk:#927459; --facade-mix:.58;
   --sans:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
   --r:12px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0f141a; --ground:#141a21; --campus:#1a232d; --road:#2a333d;
-  --ctx:#242c35; --park:#1f2e24; --wood:#1c2a20; --water:#1b2d3d; --pitch:#22352a; --lot:#20262d;
+  --bg:#0f141a; --ground:#222b35; --campus:#2b3644; --road:#46525f;
+  --ctx:#38424d; --park:#2f4634; --wood:#2a3e2e; --water:#27425a; --pitch:#344d3b; --lot:#333c46;
   --fg:#e6ebf0; --muted:#97a3af; --line:rgba(230,235,240,.12); --panel:rgba(20,26,33,.88); --panel-solid:#141a21;
   --accent:#5b9be0; --accent-fg:#0b1118; --edge:#0b0f14;
   --void:#05070a; --void-edge:#9b7bff; --void-fg:#f1f3f6; --restored:#3ee07f;
   --c-edu:#5a8cc4; --c-lab:#71849b; --c-dorm:#c99560; --c-hub:#c9665b; --c-ext:#69707a; --c-misc:#5d6672; --c-build:#b9a35c;
-  --sky:#161d26; --sky-top:#06090d; --viewer:#0b0e12; --tree:#2f4c35; --trunk:#3b3128; --facade-mix:.22; color-scheme:dark}}
+  --sky:#232e3b; --sky-top:#0d131a; --viewer:#0b0e12; --tree:#4a7352; --trunk:#5a4a3c; --facade-mix:.34; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0f141a; --ground:#141a21; --campus:#1a232d; --road:#2a333d;
-  --ctx:#242c35; --park:#1f2e24; --wood:#1c2a20; --water:#1b2d3d; --pitch:#22352a; --lot:#20262d;
+  --bg:#0f141a; --ground:#222b35; --campus:#2b3644; --road:#46525f;
+  --ctx:#38424d; --park:#2f4634; --wood:#2a3e2e; --water:#27425a; --pitch:#344d3b; --lot:#333c46;
   --fg:#e6ebf0; --muted:#97a3af; --line:rgba(230,235,240,.12); --panel:rgba(20,26,33,.88); --panel-solid:#141a21;
   --accent:#5b9be0; --accent-fg:#0b1118; --edge:#0b0f14;
   --void:#05070a; --void-edge:#9b7bff; --void-fg:#f1f3f6; --restored:#3ee07f;
   --c-edu:#5a8cc4; --c-lab:#71849b; --c-dorm:#c99560; --c-hub:#c9665b; --c-ext:#69707a; --c-misc:#5d6672; --c-build:#b9a35c;
-  --sky:#161d26; --sky-top:#06090d; --viewer:#0b0e12; --tree:#2f4c35; --trunk:#3b3128; --facade-mix:.22; color-scheme:dark}
+  --sky:#232e3b; --sky-top:#0d131a; --viewer:#0b0e12; --tree:#4a7352; --trunk:#5a4a3c; --facade-mix:.34; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;overflow:hidden;-webkit-font-smoothing:antialiased}
 #stage{position:fixed;inset:0;touch-action:none}
@@ -1132,6 +1132,7 @@ function updateSun(){
   sun.intensity = up>0 ? 0.2 + 0.45*k : 0;
   sun.color.setHSL(0.09, 0.6*(1-k), 0.5+0.5*k);
   hemi.intensity = (dark?0.45:0.55) + 0.15*k;
+  if(onCampus){ const kk = Math.max(k, 0.85); sun.intensity = (dark ? 0.45 : 0.3) + 0.35*kk; sun.color.setHSL(0.09, 0.25*(1-kk), 0.92); hemi.intensity = (dark ? 0.95 : 0.68) + 0.15*kk; }   // the campus is a map, not a clock: it stays bright all day (user, 2026-10-23)
   if(typeof W !== 'undefined' && W && W.id==='island'){ const night = 1 - k; if(night > 0) hemi.intensity = Math.max(hemi.intensity, 0.42 + night*0.22);
     if(typeof simOn !== 'undefined' && simOn){ hemi.intensity = 0.22; sun.intensity = 0.04; } }
   sun.position.copy(s.v.clone().multiplyScalar(2400)).add(controls.target.clone().setY(0));
