@@ -244,6 +244,7 @@ body.screen #worlds{top:auto;bottom:24px}
 #meCoord code{font:inherit;font-variant-numeric:tabular-nums}
 #meCoord span{font-size:11.5px;color:var(--muted)}
 @media (max-width:760px){#meCoord{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}
+#meCoord.stale code,#meCoord.stale span{color:#c7792a}
 #screenExit{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:31;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none}
 body.screen #screenExit{display:block}
 #info.off{opacity:0;transform:translateX(12px);pointer-events:none}
@@ -996,6 +997,142 @@ function setEricaGhost(b, on){
   b.mesh.children[0].material = on ? voidEdgeMat : edgeMat;
 }
 
+// ---------- campus dressing (2026-10-26) ----------
+// The campus read as a pile of extruded boxes (user). This block adds what makes it a place: contact shadows under the buildings,
+// a ground-floor band, rooftop plant and an entrance canopy on the ordinary buildings, sidewalks, centre lines, street trees and lamps
+// along the wide roads, meadow patches and flower beds in the parks, pitch markings, parking stripes with a few parked cars, and the
+// diorama fade that dissolves the ground and the off-campus context into the sky. No people on the campus (user). Own PRNG: the
+// shared rnd() sequence is consumed further down and must not shift.
+const DECO = {mats:{}, u:{}};
+(function campusDressing(){
+  let sd = 20261026; const rn = ()=> (sd = (sd*16807) % 2147483647) / 2147483647;
+  const G = greenGroup, add = (geo, mat)=>{ const m = new THREE.Mesh(geo, mat); m.receiveShadow = true; G.add(m); return m; };
+  const lam = (k, o={})=> DECO.mats[k] = new THREE.MeshLambertMaterial(Object.assign({color:0xffffff}, o));
+  const bas = (k, o={})=> DECO.mats[k] = new THREE.MeshBasicMaterial(Object.assign({color:0xffffff}, o));
+  const scaled = (p, cx, cz, k)=> p.map(([x,z])=> [cx+(x-cx)*k, cz+(z-cz)*k]);
+  const area = p=>{ let a=0; for(let i=0,j=p.length-1;i<p.length;j=i++) a += (p[j][0]+p[i][0])*(p[j][1]-p[i][1]); return Math.abs(a/2); };
+  const cent = p=>{ let cx=0,cz=0; p.forEach(([x,z])=>{cx+=x;cz+=z;}); return [cx/p.length, cz/p.length]; };
+  const bbox = p=>{ let x0=Infinity,x1=-Infinity,z0=Infinity,z1=-Infinity; p.forEach(([x,z])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);z0=Math.min(z0,z);z1=Math.max(z1,z);}); return [x0,x1,z0,z1]; };
+  const segDist = (x, z, x1, z1, x2, z2)=>{ const dx=x2-x1, dz=z2-z1, L2=dx*dx+dz*dz||1; let t=((x-x1)*dx+(z-z1)*dz)/L2; t=Math.max(0,Math.min(1,t)); return Math.hypot(x-(x1+dx*t), z-(z1+dz*t)); };
+  // distance from a point to the nearest road edge among roads at least minW wide (negative = on that road)
+  const roadClear = (x, z, minW=4.5)=>{ let d=Infinity; DATA.roads.forEach(([w,pts])=>{ if(w<minW) return; for(let i=0;i<pts.length-1;i++){ const q=segDist(x,z,pts[i][0],pts[i][1],pts[i+1][0],pts[i+1][1]) - w/2; if(q<d) d=q; } }); return d; };
+  const feet = DATA.b.map(b=> b.p), onCampus = (x,z)=> inPoly(x,z,DATA.campus) && !feet.some(p=> inPoly(x,z,p));
+  const postMat = lam('post');
+
+  // 1) contact shadow under every building
+  { const gs = []; B.forEach(b=>{ if(!b.p) return; const k = 1 + 2.4/Math.sqrt((area(b.p)||1)/Math.PI); gs.push(flatGeo(scaled(b.p, b.cx, b.cz, k), 0.11)); });
+    if(gs.length) add(mergeGeometries(gs), bas('ao', {color:0x000000, transparent:true, opacity:0.15, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2})); }
+
+  // 2) ground-floor band and rooftop plant (ordinary buildings only; the mission buildings keep their hologram / restored look)
+  { const gs = [], rb = [];
+    B.forEach(b=>{ if(!b.p || b.mission) return;
+      const g = new THREE.ExtrudeGeometry(shapeOf(scaled(b.p, b.cx, b.cz, 1.012)), {depth:Math.min(FLOOR_H*0.92, b.h*0.45), bevelEnabled:false}); g.rotateX(-Math.PI/2); gs.push(g);
+      const A = area(b.p); if(A < 500) return;
+      let ang = 0, best = 0; for(let i=0;i<b.p.length;i++){ const a=b.p[i], c=b.p[(i+1)%b.p.length], L=Math.hypot(c[0]-a[0], c[1]-a[1]); if(L>best){ best=L; ang=Math.atan2(-(c[1]-a[1]), c[0]-a[0]); } }
+      const n = Math.min(4, 1 + Math.floor(A/1400)), inner = scaled(b.p, b.cx, b.cz, 0.72), [x0,x1,z0,z1] = bbox(inner);
+      for(let k=0, tries=0; k<n && tries<40; tries++){ const x=x0+rn()*(x1-x0), z=z0+rn()*(z1-z0); if(!inPoly(x,z,inner)) continue; k++;
+        const sx = 2.6 + rn()*3.4, sz = 2.2 + rn()*2.4, sy = 1.6 + rn()*2.0, bx = new THREE.BoxGeometry(sx, sy, sz); bx.rotateY(ang); bx.translate(x, b.h + sy/2, z); rb.push(bx); } });
+    if(gs.length) add(mergeGeometries(gs), bas('podium', {transparent:true, opacity:0.2, depthWrite:false}));
+    if(rb.length){ const m = add(mergeGeometries(rb), lam('roofbox')); m.castShadow = true; } }
+
+  // 3) entrance on the side facing the nearest road: canopy on two posts and a dark door
+  { const cg = [], pg = [], dg = [];
+    B.forEach(b=>{ if(!b.p || b.mission || b.h < FLOOR_H*1.5) return;
+      let best = null;
+      for(let i=0;i<b.p.length;i++){ const [x1,z1]=b.p[i],[x2,z2]=b.p[(i+1)%b.p.length], L=Math.hypot(x2-x1,z2-z1); if(L<9) continue;
+        const mx=(x1+x2)/2, mz=(z1+z2)/2, d=roadClear(mx,mz,4.5); if(!best || d<best.d) best={d, mx, mz, dx:(x2-x1)/L, dz:(z2-z1)/L}; }
+      if(!best || best.d > 60) return;
+      let nx=-best.dz, nz=best.dx; if((best.mx-b.cx)*nx+(best.mz-b.cz)*nz < 0){ nx=-nx; nz=-nz; }
+      const ang = Math.atan2(-best.dz, best.dx), yc = Math.min(FLOOR_H*0.95, b.h-0.6);
+      const c = new THREE.BoxGeometry(7.5, 0.35, 3.4); c.rotateY(ang); c.translate(best.mx+nx*1.6, yc, best.mz+nz*1.6); cg.push(c);
+      for(const s of [-1,1]){ const p = new THREE.CylinderGeometry(0.14, 0.14, yc, 6); p.translate(best.mx+nx*3.0+best.dx*2.9*s, yc/2, best.mz+nz*3.0+best.dz*2.9*s); pg.push(p); }
+      const d = new THREE.PlaneGeometry(3.2, 2.7); d.rotateY(Math.atan2(nx, nz)); d.translate(best.mx+nx*0.08, 1.4, best.mz+nz*0.08); dg.push(d); });
+    if(cg.length){ const m = add(mergeGeometries(cg), lam('canopy')); m.castShadow = true; add(mergeGeometries(pg), postMat); add(mergeGeometries(dg), lam('door', {side:THREE.DoubleSide})); } }
+
+  // 4) streets: a pale sidewalk strip beside roads 7 m and wider, a yellow centre line on the main roads
+  { const strip = (w, pts, y, out)=>{ for(let i=0;i<pts.length-1;i++){ const [x1,z1]=pts[i],[x2,z2]=pts[i+1]; let dx=x2-x1, dz=z2-z1; const L=Math.hypot(dx,dz)||1; dx/=L; dz/=L; const nx=-dz*w/2, nz=dx*w/2, ex=dx*w*0.25, ez=dz*w*0.25, b=out.pos.length/3; out.pos.push(x1+nx-ex,y,z1+nz-ez, x1-nx-ex,y,z1-nz-ez, x2+nx+ex,y,z2+nz+ez, x2-nx+ex,y,z2-nz+ez); out.idx.push(b,b+2,b+1, b+1,b+2,b+3); } };
+    const toMesh = (out, mat)=>{ if(!out.pos.length) return; const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(out.pos,3)); g.setIndex(out.idx); const n=new Float32Array(out.pos.length); for(let i=1;i<n.length;i+=3) n[i]=1; g.setAttribute('normal',new THREE.BufferAttribute(n,3)); return add(g, mat); };
+    const sw = {pos:[], idx:[]}, cl = {pos:[], idx:[]};
+    DATA.roads.forEach(([w,pts])=>{ if(w >= 7) strip(w+4.4, pts, 0.16, sw);
+      if(w >= 10) for(let i=0;i<pts.length-1;i++){ const [x1,z1]=pts[i],[x2,z2]=pts[i+1], L=Math.hypot(x2-x1,z2-z1), dx=(x2-x1)/L, dz=(z2-z1)/L; for(let s=2; s<L-4; s+=9) strip(0.3, [[x1+dx*s, z1+dz*s],[x1+dx*(s+4), z1+dz*(s+4)]], 0.26, cl); } });
+    toMesh(sw, lam('sidewalk', {polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}));
+    toMesh(cl, bas('lane', {color:0xf2c14e, polygonOffset:true, polygonOffsetFactor:-5, polygonOffsetUnits:-5})); }
+
+  // 5) street trees and lamp posts along the main roads
+  { const trees2 = [], lamps = [];
+    DATA.roads.forEach(([w,pts])=>{ if(w < 7) return;
+      for(let i=0;i<pts.length-1;i++){ const [x1,z1]=pts[i],[x2,z2]=pts[i+1], L=Math.hypot(x2-x1,z2-z1); if(L<8) continue; const dx=(x2-x1)/L, dz=(z2-z1)/L, nx=-dz, nz=dx;
+        for(let s=8; s<L-4; s+=(w>=10?16:18)) for(const side of [1,-1]){ const off=w/2+(w>=10?3.2:2.9), x=x1+dx*s+nx*off*side, z=z1+dz*s+nz*off*side; if(onCampus(x,z) && roadClear(x,z)>1.6) trees2.push([x,z]); }
+        for(let s=16; s<L-6; s+=44){ const side = Math.round(s/44)%2 ? 1 : -1, off=w/2+1.3, x=x1+dx*s+nx*off*side, z=z1+dz*s+nz*off*side; if(onCampus(x,z) && roadClear(x,z)>0.6) lamps.push([x,z]); } } });
+    const o = new THREE.Object3D();
+    if(trees2.length){ const tm = new THREE.InstancedMesh(treeGeo, lam('streetTree', {flatShading:true}), trees2.length), tk = new THREE.InstancedMesh(trunkGeo, trunks.material, trees2.length);
+      trees2.forEach(([x,z],i)=>{ const r = 3.2 + rn()*0.8, h = 3.0 + rn()*0.6; o.position.set(x,h,z); o.scale.set(r, r*1.1, r); o.rotation.y = rn()*6.28; o.updateMatrix(); tm.setMatrixAt(i,o.matrix); o.position.set(x,0,z); o.scale.set(1,h+0.5,1); o.rotation.y = 0; o.updateMatrix(); tk.setMatrixAt(i,o.matrix); });
+      tm.castShadow = tm.receiveShadow = true; tk.castShadow = true; G.add(tm, tk); }
+    if(lamps.length){ const pole = new THREE.CylinderGeometry(0.12, 0.16, 7, 6); pole.translate(0, 3.5, 0); const head = new THREE.SphereGeometry(0.45, 8, 6); head.translate(0, 7.2, 0);
+      const pm = new THREE.InstancedMesh(pole, postMat, lamps.length), hm = new THREE.InstancedMesh(head, bas('lamp', {color:0xfff4d6}), lamps.length);
+      lamps.forEach(([x,z],i)=>{ o.position.set(x,0,z); o.scale.set(1,1,1); o.rotation.y = 0; o.updateMatrix(); pm.setMatrixAt(i,o.matrix); hm.setMatrixAt(i,o.matrix); }); pm.castShadow = true; G.add(pm, hm); }
+    DECO.counts = {trees:trees2.length, lamps:lamps.length}; window.__decoCounts = DECO.counts; }
+
+  // 6) parks: darker meadow patches, some with a flower bed
+  { const pg = [], fa = [], fb = [];
+    DATA.areas.forEach(([k,pts])=>{ if(k!=='park') return; const A = area(pts); if(A < 400) return; const [x0,x1,z0,z1] = bbox(pts), n = Math.min(5, 1 + Math.floor(A/2500));
+      for(let i=0, tries=0; i<n && tries<60; tries++){ const x=x0+rn()*(x1-x0), z=z0+rn()*(z1-z0), r=6+rn()*Math.min(16, Math.sqrt(A)/4);
+        if(!inPoly(x,z,pts) || !inPoly(x+r*.7,z,pts) || !inPoly(x-r*.7,z,pts) || !inPoly(x,z+r*.7,pts) || !inPoly(x,z-r*.7,pts) || roadClear(x,z,2) < r*0.5) continue; i++;
+        const c = new THREE.CircleGeometry(r, 24); c.rotateX(-Math.PI/2); c.translate(x, 0.13, z); pg.push(c);
+        if(rn() < .45) for(let f=0; f<12; f++){ const a=rn()*6.28, rr=r*0.32*Math.sqrt(rn()), s = new THREE.SphereGeometry(0.5+rn()*0.4, 6, 5); s.translate(x+Math.cos(a)*rr, 0.5, z+Math.sin(a)*rr); (f%2 ? fa : fb).push(s); } } });
+    if(pg.length) add(mergeGeometries(pg), lam('meadow', {polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3}));
+    if(fa.length) add(mergeGeometries(fa), lam('flowerA', {color:0xef8fb8}));
+    if(fb.length) add(mergeGeometries(fb), lam('flowerB', {color:0xf6d365})); }
+
+  // 7) sports pitches: boundary and centre circle; parking lots: stall stripes and a few parked cars
+  { const lines = [], cars = {}, CAR = [0xf4f5f7, 0xc9ced4, 0x2b3038, 0xb8312f, 0x2f4f8a, 0xe8e2c8];
+    DATA.areas.forEach(([k,pts])=>{ const [cx,cz] = cent(pts), A = area(pts);
+      if(k==='pitch' && A > 900){ const inner = scaled(pts, cx, cz, 0.9); for(let i=0;i<inner.length;i++){ const a=inner[i], b=inner[(i+1)%inner.length]; lines.push(a[0],0.3,a[1], b[0],0.3,b[1]); }
+        const r = Math.min(9, Math.sqrt(A)/6); for(let i=0;i<32;i++){ const a0=i/32*6.2832, a1=(i+1)/32*6.2832; lines.push(cx+Math.cos(a0)*r,0.3,cz+Math.sin(a0)*r, cx+Math.cos(a1)*r,0.3,cz+Math.sin(a1)*r); } }
+      if(k==='park_lot' && A > 300){ const [x0,x1,z0,z1] = bbox(pts), alongX = (x1-x0) >= (z1-z0), lo = alongX?z0:x0, hi = alongX?z1:x1;
+        for(let t=(alongX?x0:z0)+2.7; t<(alongX?x1:z1)-1; t+=2.7){ let run=null;
+          for(let s=lo; s<=hi+1; s+=1){ const x = alongX? t : s, z = alongX? s : t, inside = s<=hi && inPoly(x,z,pts);
+            if(inside && !run) run=[s];
+            if(!inside && run){ if(s-1-run[0] >= 4){ const a=run[0]+0.6, b=s-1-0.6; lines.push(alongX?t:a, 0.3, alongX?a:t, alongX?t:b, 0.3, alongX?b:t);
+                if(rn() < .3 && b-a > 5){ const p = a + 1.2 + rn()*((b-a)-2.4), cx2 = alongX? t+1.35 : p, cz2 = alongX? p : t+1.35, c = CAR[Math.floor(rn()*CAR.length)], g = new THREE.BoxGeometry(alongX?1.8:4.3, 1.45, alongX?4.3:1.8); g.translate(cx2, 0.85, cz2); (cars[c] ||= []).push(g); } } run=null; } } } } });
+    if(lines.length){ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(lines, 3)); G.add(new THREE.LineSegments(g, DECO.mats.mark = new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.8}))); }
+    Object.entries(cars).forEach(([c,gs])=>{ const m = add(mergeGeometries(gs), new THREE.MeshLambertMaterial({color:+c})); m.castShadow = true; }); }
+
+  // 8) the diorama: ground and off-campus context dissolve into the sky with distance from the campus OUTLINE (the campus is long, so a
+  //    circle around its centre would cut it). Per-vertex fade attribute on a wide ring and on the merged context buildings.
+  { const P = DATA.campus; let cx=0,cz=0; P.forEach(([x,z])=>{cx+=x;cz+=z;}); cx/=P.length; cz/=P.length;
+    const polyDist = (x,z)=>{ if(inPoly(x,z,P)) return 0; let d=Infinity; for(let i=0,j=P.length-1;i<P.length;j=i++){ const q=segDist(x,z,P[j][0],P[j][1],P[i][0],P[i][1]); if(q<d) d=q; } return d; };
+    const F0 = 60, F1 = 430, fadeOf = (x,z)=> { const d = polyDist(x,z), t = Math.max(0, Math.min(1, (d-F0)/(F1-F0))); return t*t*(3-2*t); };
+    DECO.u = {uSky:{value:new THREE.Color()}};
+    const rg = new THREE.RingGeometry(300, 5200, 160, 28).rotateX(-Math.PI/2), rp = rg.attributes.position, rf = new Float32Array(rp.count);
+    for(let i=0;i<rp.count;i++) rf[i] = fadeOf(rp.getX(i)+cx, rp.getZ(i)+cz);
+    rg.setAttribute('aFade', new THREE.BufferAttribute(rf, 1));
+    const ring = new THREE.Mesh(rg, new THREE.ShaderMaterial({uniforms:DECO.u, transparent:true, depthWrite:false,
+      vertexShader:'attribute float aFade; varying float vF; void main(){ vF = aFade; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+      fragmentShader:'uniform vec3 uSky; varying float vF; void main(){ gl_FragColor = vec4(uSky, vF*0.97); }'}));
+    ring.position.set(cx, 0.4, cz); ring.renderOrder = 1; G.add(ring);
+    // the scattered trees outside the campus thin out with the same fade (an instanced mesh cannot blend per tree, so the far ones go)
+    { const o = new THREE.Object3D(); o.scale.set(0,0,0); o.updateMatrix(); let cut = 0; treeSpots.forEach(([x,z],i)=>{ const f = fadeOf(x,z); if(f > 0.35 + rn()*0.4){ trees.setMatrixAt(i, o.matrix); trunks.setMatrixAt(i, o.matrix); cut++; } }); trees.instanceMatrix.needsUpdate = trunks.instanceMatrix.needsUpdate = true; DECO.cutTrees = cut; }
+    const cg = ctxMesh.geometry, cp = cg.attributes.position, cf = new Float32Array(cp.count);
+    for(let i=0;i<cp.count;i++) cf[i] = 1 - fadeOf(cp.getX(i), cp.getZ(i));
+    cg.setAttribute('aFade', new THREE.BufferAttribute(cf, 1));
+    [ctxRoof, ctxWall].forEach(m=>{ m.transparent = true; m.onBeforeCompile = sh=>{
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aFade; varying float vFade;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvFade = aFade;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vFade;').replace('#include <dithering_fragment>', '#include <dithering_fragment>\ngl_FragColor.a *= vFade;'); }; }); }
+})();
+function campusDecoTheme(){
+  const m = DECO.mats, W = new THREE.Color(0xffffff), road = col('--road'), campus = col('--campus'), park = col('--park'), edge = col('--edge');
+  m.sidewalk && m.sidewalk.color.copy(road).lerp(campus, 0.45);
+  m.meadow && m.meadow.color.copy(park).multiplyScalar(0.88);
+  m.podium && m.podium.color.copy(edge);
+  m.roofbox && m.roofbox.color.copy(col('--c-misc')).lerp(W, 0.35);
+  m.canopy && m.canopy.color.copy(road).lerp(W, 0.3);
+  m.post && m.post.color.copy(edge).lerp(W, 0.25);
+  m.door && m.door.color.copy(edge).lerp(col('--c-edu'), 0.3);
+  m.streetTree && m.streetTree.color.copy(col('--tree'));
+  if(DECO.u.uSky) DECO.u.uSky.value.copy(col('--sky'));
+}
+
 const BARRIER_VS = `
 varying vec2 vUv; varying vec3 vN; varying vec3 vView;
 void main(){
@@ -1104,6 +1241,7 @@ function applyTheme(){
   edgeMat.color.copy(col('--edge'));
   voidEdgeMat.color.copy(col('--void-edge'));
   colorZones(fxE, MISSION_E);
+  campusDecoTheme();
   if(typeof islandTheme==='function') islandTheme();
   okEdgeMat.color.copy(col('--restored')).lerp(WHITE, 0.35);
   restoredCol.copy(col('--restored'));
@@ -1742,6 +1880,7 @@ SCANS.filter(s=>!s.mission && s.x!=null).forEach(s=>{
 });
 // ---------- team positions: GPS from each tablet, shown as dots on the campus twin ----------
 const teamMk = {};
+var geoLastFix = 0, geoRestartAt = 0;
 var myPos = null, lastSent = 0, geoWatch = null, nearSaid = '', follow = false, navDir = {x:0, z:-1}, prevPos = null, geoErrAt = 0;
 var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, compassAt = 0, orientOn = false, navMovedAt = 0;
 // accuracy circle under my own dot (campus scene only)
@@ -1755,7 +1894,7 @@ const meArrow = new THREE.Group();
   const body = new THREE.Mesh(arrowShape(1), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.98, depthTest:false, depthWrite:false, side:THREE.DoubleSide}));
   rim.renderOrder = 4; body.renderOrder = 5; body.position.y = 0.02; meArrow.add(rim, body); }
 meArrow.visible = false; meArrow.position.y = 0.4; sceneE.add(meArrow);
-function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; $('meCoord').hidden = !on; if(on) showMeCoord(); prevPos = null; meArrow.visible = on && !!myPos; if(on) startOrient(); if(myPos) updateTeamDots(LAST_POS, Date.now()); }
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; $('meCoord').hidden = !on; if(on) showMeCoord(); prevPos = null; meArrow.visible = on && !!myPos; if(on){ startOrient(); geoLastFix = Date.now(); $('meCoord').classList.remove('stale'); } if(myPos) updateTeamDots(LAST_POS, Date.now()); }
 function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
 document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
 // which way am I facing: GPS course while walking, the compass when standing, the last movement otherwise
@@ -1837,7 +1976,7 @@ function updateTeamDots(pos, now){
   refreshZones();
 }
 function onGeo(p){
-  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()};
+  myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()}; geoLastFix = Date.now();
   updateTeamDots(LAST_POS, Date.now());
   if(follow){ followMe(); showMeCoord(); }
   // close to an empty record's coordinates? say so once per zone
@@ -1854,6 +1993,15 @@ function startGeo(){
     if(Date.now() - geoErrAt > 60000){ geoErrAt = Date.now(); toast(err.code === 3 ? (myPos ? '위치 신호가 약합니다. 건물 밖으로 나가면 다시 잡힙니다' : '위치를 찾는 중입니다. 야외에서 더 잘 잡힙니다') : '지금은 위치를 알 수 없습니다'); }
   }, {enableHighAccuracy:true, maximumAge:5000, timeout:20000});
 }
+// GPS watchdog (2026-10-26, user: outdoors the marker moved but the coordinates never changed): mobile browsers silently stop delivering
+// watchPosition fixes after the tab was in the background or the screen locked. While 내 시점 is on, the coordinate pill shows the age of
+// the last fix; a fix older than 15 s restarts the watch and asks for one position directly, and so does coming back to the tab.
+function restartGeo(){ if(!navigator.geolocation) return; if(geoWatch != null){ try{ navigator.geolocation.clearWatch(geoWatch); }catch(e){} geoWatch = null; } startGeo(); try{ navigator.geolocation.getCurrentPosition(onGeo, ()=>{}, {enableHighAccuracy:true, maximumAge:0, timeout:15000}); }catch(e){} }
+setInterval(()=>{ if(!follow) return; const now = Date.now(), age = now - geoLastFix;
+  if(myPos){ $('meCoordA').textContent = `${myPos.acc ? `±${Math.round(myPos.acc)}m` : ''} · ${age < 3000 ? '방금' : Math.round(age/1000) + '초 전'}`; $('meCoord').classList.toggle('stale', age > 20000); }
+  if(age > 15000 && now - geoRestartAt > 15000){ geoRestartAt = now; restartGeo(); } }, 1000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && follow) restartGeo(); });
+addEventListener('pageshow', e=>{ if(e.persisted && follow) restartGeo(); });
 // "내 시점" button (campus): toggle the navigation view
 $('lMe').onclick = ()=>{
   if(follow){ setFollow(false); toast('내 시점을 껐습니다'); return; }
