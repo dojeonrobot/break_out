@@ -1747,21 +1747,15 @@ var navMode = 'head', navDirS = {x:0, z:-1}, navAt = null, compassDeg = null, co
 // accuracy circle under my own dot (campus scene only)
 const meRing = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.55, depthWrite:false, side:THREE.DoubleSide}));
 meRing.visible = false; meRing.renderOrder = 3; sceneE.add(meRing);
-// my avatar on the campus: Void, the little white robot (built on first use, since its builders live further down)
-let meAvatar = null;
-function ensureAvatar(){ if(meAvatar) return meAvatar;   // Naty, the little flame spirit (models/naty.glb, the user's model), standing on its feet and about 3 m tall so it reads from the follow view
-  meAvatar = new THREE.Group(); meAvatar.userData = {}; meAvatar.visible = false; sceneE.add(meAvatar);
-  const loader = new GLTFLoader(), onLoad = g=>{ const o = g.scene, box = new THREE.Box3().setFromObject(o), sz = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
-    const k = 3.0/Math.max(sz.y, 0.01); o.scale.setScalar(k); o.position.set(-c.x*k, -box.min.y*k, -c.z*k); o.rotation.y = NATY_YAW;
-    o.traverse(m=>{ if(m.isMesh){ m.castShadow = true; m.frustumCulled = false; } }); meAvatar.add(o); meAvatar.userData.body = o; };
-  // the artifact copy cannot serve .glb: fall back to the same model as base64 text (models/naty.glb.txt)
-  loader.load('models/naty.glb', onLoad, undefined, ()=> fetch('models/naty.glb.txt').then(r=> r.text()).then(t=>{ const bin = Uint8Array.from(atob(t.trim()), c=> c.charCodeAt(0)); loader.parse(bin.buffer, '', onLoad, ()=>{}); }).catch(()=>{}));
-  return meAvatar; }
-const NATY_YAW = 0;   // extra turn so the model faces the way it walks (set after checking the model's forward axis)
-// the heading arrow on the ground in front of Void (the way I am facing)
-const meArrow = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.6, 3).rotateX(Math.PI/2).translate(0, 0, 1.6), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.9, depthTest:false}));
-meArrow.visible = false; meArrow.renderOrder = 4; sceneE.add(meArrow);
-function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; $('meCoord').hidden = !on; if(on) showMeCoord(); prevPos = null; ensureAvatar().visible = meArrow.visible = on && !!myPos; if(on) startOrient(); if(myPos) updateTeamDots(LAST_POS, Date.now()); }
+// my position on the campus: a flat map-style arrow (the 3D figure read badly next to the buildings — user, 2026-10-26).
+// Local +z is forward; navTick turns it the way I face. Drawn over everything so a building never hides it.
+function arrowShape(k){ const sh = new THREE.Shape(); sh.moveTo(0, -4.2*k); sh.lineTo(3.0*k, 2.6*k); sh.lineTo(0, 1.1*k); sh.lineTo(-3.0*k, 2.6*k); sh.closePath(); return new THREE.ShapeGeometry(sh).rotateX(-Math.PI/2); }
+const meArrow = new THREE.Group();
+{ const rim = new THREE.Mesh(arrowShape(1.32), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.95, depthTest:false, depthWrite:false, side:THREE.DoubleSide}));
+  const body = new THREE.Mesh(arrowShape(1), new THREE.MeshBasicMaterial({color:0x5b9be0, transparent:true, opacity:0.98, depthTest:false, depthWrite:false, side:THREE.DoubleSide}));
+  rim.renderOrder = 4; body.renderOrder = 5; body.position.y = 0.02; meArrow.add(rim, body); }
+meArrow.visible = false; meArrow.position.y = 0.4; sceneE.add(meArrow);
+function setFollow(on){ follow = on; $('lMe').setAttribute('aria-pressed', on); $('navSeg').hidden = !on; $('meCoord').hidden = !on; if(on) showMeCoord(); prevPos = null; meArrow.visible = on && !!myPos; if(on) startOrient(); if(myPos) updateTeamDots(LAST_POS, Date.now()); }
 function setNavMode(m){ navMode = m; document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.setAttribute('aria-pressed', b.dataset.nav === m)); if(m !== 'free' && follow && myPos) navJump(); }
 document.querySelectorAll('#navSeg [data-nav]').forEach(b=> b.onclick = ()=> setNavMode(b.dataset.nav));
 // which way am I facing: GPS course while walking, the compass when standing, the last movement otherwise
@@ -1820,9 +1814,10 @@ function navTick(){
   const {x, z} = navAt || navTargetXZ();
   const want = navMode === 'north' ? {x:0, z:-1} : headingDir();
   navDirS.x += (want.x - navDirS.x)*0.08; navDirS.z += (want.z - navDirS.z)*0.08; const L = Math.hypot(navDirS.x, navDirS.z) || 1; navDirS.x /= L; navDirS.z /= L;
-  const av = ensureAvatar(), tt = performance.now()/1000, walking = Date.now() - navMovedAt < 2500; av.visible = true;
-  av.position.set(x, 0.35 + Math.sin(tt*2.2)*0.15 + (walking ? Math.abs(Math.sin(tt*6))*0.1 : 0), z); av.rotation.y = Math.atan2(navDirS.x, navDirS.z);   // the flame hovers, faces the way it walks
-  meArrow.visible = true; meArrow.position.set(x, 0.15, z); meArrow.rotation.y = av.rotation.y;
+  const tt = performance.now()/1000, pulse = 1 + 0.04*Math.sin(tt*2.4);   // a slow breath so the arrow reads as live
+  meArrow.visible = true; meArrow.position.set(x, 0.4, z); meArrow.rotation.y = Math.atan2(navDirS.x, navDirS.z);
+  const dist = camera.position.distanceTo(meArrow.position), sc = Math.max(0.6, Math.min(4, dist/90)); meArrow.scale.setScalar(pulse * sc);   // same size on screen whatever the zoom, like a map puck
+  const mine = teamMk[TEAM || 'me']; if(mine) mine.y = 4 + 14*sc;   // the label floats clear of the arrow tip at any zoom
   if(navMode === 'free') return;                                   // the map stays where the viewer put it; only the marker moves
   const d = Math.max(40, Math.min(420, camera.position.distanceTo(controls.target)));   // pinch zoom changes this distance and we keep it
   const cam = navCam(x, z, navDirS, d);
@@ -1833,7 +1828,7 @@ function updateTeamDots(pos, now){
   Object.keys(list).forEach(t=>{ const v = list[t], [x, z] = toLocal(v.lat, v.lng);
     let mk = teamMk[t];
     if(!mk){ const el = document.createElement('div'); el.className = 'mk team'; LBL.appendChild(el); mk = teamMk[t] = {el, x, y:8, z, team:+t, show:false}; markers.push(mk); }
-    mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? 2.6 : 8;
+    mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? (mk.y > 8 ? mk.y : 11) : 8;   // while following, navTick lifts the label above the arrow
     mk.el.className = 'mk team' + (mine ? ' me' : '') + (age > 90000 ? ' old' : '');
     mk.el.innerHTML = `<i></i>${t === 'me' ? '내 위치' : mine ? `${t}조 · 내 위치` : `${t}조`}${v.acc ? `<small>±${Math.round(v.acc)}m</small>` : ''}`;
     if(mine){ meRing.visible = true; meRing.position.set(x, 0.6, z); meRing.scale.setScalar(Math.max(6, Math.min(400, v.acc || 20))); }
@@ -5538,7 +5533,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meAvatar, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -7092,7 +7087,7 @@ function setWorld(id, instant){
   scene = w.scene; scene.add(sun, sun.target, hemi);
   document.querySelectorAll('#worlds button').forEach(b=> b.setAttribute('aria-pressed', b.dataset.w===id));
   document.body.classList.toggle('island', id==='island'); if(id!=='island' && typeof simOn !== 'undefined' && simOn) setSim(false);
-  if(id!=='erica' && follow) setFollow(false); if(meAvatar) meAvatar.visible = false; meArrow.visible = false;
+  if(id!=='erica' && follow) setFollow(false); meArrow.visible = false;
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('tB').hidden = !isl; $('board').hidden = isl && !SCREEN; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
