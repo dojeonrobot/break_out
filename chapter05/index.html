@@ -1966,7 +1966,7 @@ function updateTeamDots(pos, now){
   const list = Object.assign({}, pos || {}); if(myPos) list[TEAM || 'me'] = Object.assign({}, myPos, {mine:true});
   Object.keys(list).forEach(t=>{ const v = list[t], [x, z] = toLocal(v.lat, v.lng);
     let mk = teamMk[t];
-    if(!mk){ const el = document.createElement('div'); el.className = 'mk team'; LBL.appendChild(el); mk = teamMk[t] = {el, x, y:8, z, team:+t, show:false}; markers.push(mk); }
+    if(!mk){ const el = document.createElement('div'); el.className = 'mk team'; LBL.appendChild(el); mk = teamMk[t] = {el, x, y:8, z, team:t === 'me' ? 0 : +t, isTeam:true, show:false}; markers.push(mk); }
     mk.x = x; mk.z = z; const age = Math.max(0, (now || Date.now()) - (v.t || now)), mine = t === 'me' || +t === TEAM; mk.y = mine && follow ? (mk.y > 8 ? mk.y : 11) : 8;   // while following, navTick lifts the label above the arrow
     mk.el.className = 'mk team' + (mine ? ' me' : '') + (age > 90000 ? ' old' : '');
     mk.el.innerHTML = `<i></i>${t === 'me' ? '내 위치' : mine ? `${t}조 · 내 위치` : `${t}조`}${v.acc ? `<small>±${Math.round(v.acc)}m</small>` : ''}`;
@@ -1977,8 +1977,9 @@ function updateTeamDots(pos, now){
 }
 function onGeo(p){
   myPos = {lat:p.coords.latitude, lng:p.coords.longitude, acc:p.coords.accuracy, heading:p.coords.heading, speed:p.coords.speed, t:Date.now()}; geoLastFix = Date.now();
-  updateTeamDots(LAST_POS, Date.now());
-  if(follow){ followMe(); showMeCoord(); }
+  if(follow) showMeCoord();                                   // first, so a fault further down can never freeze the coordinates (2026-10-26)
+  try{ updateTeamDots(LAST_POS, Date.now()); }catch(e){ console.error(e); }
+  if(follow){ try{ followMe(); }catch(e){ console.error(e); } }
   // close to an empty record's coordinates? say so once per zone
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   const near = MISSION_E.find(m=> m.lat != null && !zoneDone(m) && Math.hypot(m.b.cx - x, m.b.cz - z) < (m.radius || 50) + 20);
@@ -2015,7 +2016,7 @@ var LAST_POS = {};
 const tabShows = st => tab==='v' ? st!=='ok' : tab==='r' ? st==='ok' : false;
 function refreshZones(){
   markers.forEach(mk=>{
-    if(mk.team){ mk.show = W.id==='erica'; return; }
+    if(mk.isTeam){ mk.show = W.id==='erica'; return; }
     if(mk.char){ mk.show = mk.char.g.visible; return; }
     if(mk.free){ mk.show = tabShows('ok') && visibleScan(mk.s); return; }
     const st = zoneState(mk.m), isl = W.id==='island'; mk.show = isl ? st==='ok' : (tabShows(st) && !hiddenZone(mk.m) && !zoneLocked(mk.m));
