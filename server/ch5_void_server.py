@@ -35,7 +35,7 @@ import urllib.error
 import urllib.request
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, parse_qs
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -126,6 +126,24 @@ def is_done(s):
     return s.get('status') == 'ok' and (s.get('kind') == 'orbit' or bool(s.get('splat')))
 
 
+ACTIVE_MS = 10 * 60 * 1000     # a tablet not heard from for this long no longer holds its team back
+
+
+def active_entries(d):
+    now = now_ms()
+    ents = [v for v in d.values() if isinstance(v, dict)]
+    live = [v for v in ents if now - int(v.get('seen') or v.get('tut') or 0) < ACTIVE_MS]
+    return live or ents
+
+
+def team_done(d, q):
+    """조가 미션 q를 끝냈나: 살아 있는 태블릿 전부가 끝냈을 때."""
+    if not d or any(k.startswith('q') for k in d):
+        return False
+    ents = active_entries(d)
+    return bool(ents) and all(q in v for v in ents)
+
+
 def pair_status():
     """짝마다 복구 상태: ok(3D에 들어간 스캔이 보이거나 자체 스캔이 확정됨) / pend(제출됨) / void."""
     hidden = set(DB['hidden'])
@@ -133,7 +151,7 @@ def pair_status():
     quests = DB.get('quests', {})
     for p in PAIRS:
         if p.get('kind') == 'quest':   # 섬 미션으로 복구되는 구역: 그 미션을 끝낸 조가 하나라도 있으면 ok
-            teams = sorted(int(t) for t, d in quests.items() if d and all(p['quest'] in (v if isinstance(v, dict) else {}) for v in d.values()) and not any(k.startswith('q') for k in d))
+            teams = sorted(int(t) for t, d in quests.items() if team_done(d, p['quest']))
             out.append({'id': p['id'], 'kind': 'quest', 'quest': p['quest'], 'island': p['island'], 'status': 'ok' if teams else 'void',
                         'teams': teams, 'scans': [], 'subs': []})
             continue
@@ -326,7 +344,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path == '/api/void/state':
+            qs = parse_qs(urlparse(self.path).query)
+            dev = re.sub(r'[^a-z0-9]', '', (qs.get('dev') or [''])[0])[:16]; team = clean_team((qs.get('team') or [''])[0])
             with lock:
+                if dev and team:      # the tablet is alive: note it (stale tablets drop out of the team's "everyone finished" rule)
+                    tq = DB.setdefault('quests', {}).get(str(team), {})
+                    for l, v in tq.items():
+                        if isinstance(v, dict) and v.get('dev') == dev:
+                            v['seen'] = now_ms()
                 return self.send_json(state())
         if path == '/api/void/admin/state':
             if not self.is_admin():
@@ -491,8 +516,18 @@ class Handler(BaseHTTPRequestHandler):
                 if not letter:
                     raise ValueError('태블릿 정보가 없습니다.')
                 cur = dict(tq.get(letter, {}))
+                if not cur and tq:   # new tablet in a team with progress: start from the team's furthest point
+                    for v in tq.values():
+                        if not isinstance(v, dict):
+                            continue
+                        for k, val in v.items():
+                            if QUEST_ID.match(k) or k == 'tut':
+                                cur[k] = cur.get(k) or val
+                            elif k == 'act':
+                                cur['act'] = max(int(cur.get('act') or 0), int(val or 0))
                 if dev:
                     cur['dev'] = dev
+                cur['seen'] = now_ms()
                 if isinstance(b.get('done'), list):
                     done = [str(x) for x in b['done'] if QUEST_ID.match(str(x))]
                     keep = {k: v for k, v in cur.items() if not QUEST_ID.match(k)}

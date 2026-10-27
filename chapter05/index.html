@@ -950,7 +950,8 @@ let SQUESTS = {}, SQ_JSON = '{}', QDONE = new Set(), questPending = new Set();  
 const DEV = (()=>{ try{ let d = localStorage.getItem('void-dev'); if(!d){ d = Math.random().toString(36).slice(2, 10); localStorage.setItem('void-dev', d); } return d; }catch(e){ return 'x'; } })();   // this tablet
 // SQUESTS[team] = {a:{dev, q1, act, tut}, b:{…}}: one entry per tablet of the team, lettered by the server
 const QID = /^q\d$/;
-const teamDevs = t => Object.keys(SQUESTS[t] || {}).sort();
+let SNOW = Date.now();
+const teamDevs = t => { const d = SQUESTS[t] || {}, ls = Object.keys(d).sort(), live = ls.filter(l=> SNOW - (+d[l].seen || +d[l].tut || 0) < 600000); return live.length ? live : ls; };   // tablets heard from in the last 10 min (a replaced tablet drops out)
 const devQuests = (t, l) => Object.keys((SQUESTS[t] || {})[l] || {}).filter(k=> QID.test(k));
 const myLetter = ()=> { const d = SQUESTS[TEAM] || {}; return Object.keys(d).find(k=> d[k].dev === DEV) || null; };
 const myEntry = ()=> (SQUESTS[TEAM] || {})[myLetter()] || {};
@@ -1436,7 +1437,7 @@ function checkReset(st){
 function applyState(st){
   checkReset(st);
   if(st.version === STATE_VER) return; STATE_VER = st.version;
-  SUBS = st.subs || [];
+  SUBS = st.subs || []; if(st.now) SNOW = st.now;
   AUTO = st.auto !== false;
   if(st.pos){ LAST_POS = st.pos; updateTeamDots(LAST_POS, st.now); }
   if(lastSig !== null) announceChanges();
@@ -1457,7 +1458,7 @@ function applyState(st){
 }
 async function syncState(){
   if(LOCAL) return; if(TEAM && !SCREEN && !ADMIN_KEY && !myLetter() && syncState.hello !== TEAM){ syncState.hello = TEAM; helloTeam(); }
-  try{ applyState(await api('/state')); try{ maybeGuide(); actCheck(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
+  try{ applyState(await api('/state' + (TEAM && !SCREEN && !ADMIN_KEY ? `?team=${TEAM}&dev=${DEV}` : ''))); try{ maybeGuide(); actCheck(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
   catch(e){ if(STATE_VER < 0){ LOCAL = true; SUBS = loadLocal(); refreshSubUI(); } }
 }
 const MSG = {};
@@ -1519,11 +1520,11 @@ function boardRow(p){
 // board rows in activity order: the two island missions sit where they happen between the campus zones
 const flowRows = ps => { const qz = typeof MI !== 'undefined' ? MI.filter(m=> m.quest) : [], by = id => { const m = qz.find(x=> x.quest === id); return m ? {quest:m, island:m} : null; }, c = id => ps.find(p=> p.campus.id === id);
   return [c('z1'), by('q1'), c('z2'), by('q2'), c('z3'), ...ps.filter(p=> !['z1', 'z2', 'z3'].includes(p.campus.id))].filter(Boolean); };
-const RATE = ()=> (M.filter(zoneDone).length + (typeof MI !== 'undefined' ? MI.filter(m=> m.quest && zoneDone(m)).length : 0))*20;   // 복구율: 20% per zone, campus 3 + island 2
+const RATE = ()=> (typeof MI !== 'undefined' ? MI.filter(m=> m.b && zoneDone(m)).length : M.filter(zoneDone).length)*20;   // the same count as the simulator HUD (SIM_LIT)   // 복구율: 20% per zone, campus 3 + island 2
 function teamZones(t, rows){ return rows.map(r=>{ if(r.quest){ const ok = teamQuests(t).includes(r.quest.quest) || (t === TEAM && QDONE.has(r.quest.quest)); return {p:r, st: ok ? 'ok' : 'void'}; }
   const ids = pairIds(r.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)), ok = mine.filter(subDone); const both = ok.some(x=> x.kind === 'orbit') && ok.some(x=> x.kind !== 'orbit'); return {p:r, st: both ? 'ok' : mine.length ? 'pend' : 'void'}; }); }
 function questRow(r){ const m = r.quest, st = zoneDone(m) ? 'ok' : 'void', q = typeof QUESTS === 'object' ? QUESTS.find(x=> x.id === m.quest) : null;
-  return `<button type="button" class="brow is-${st}" data-zone="${esc(m.id)}"><span class="th qth">${st === 'ok' ? '✓' : '섬'}</span><span><h4>${esc(m.name)}</h4><div class="pair">${st === 'ok' ? '섬 미션으로 복구' : `${esc(q ? q.short : '섬 미션')} 미션 뒤 복구`}</div></span></button>`; }
+  return `<button type="button" class="brow is-${st}" data-zone="${esc(m.id)}"><span class="th qth">${st === 'ok' ? '✓' : '섬'}</span><span><h4>${esc(m.name)}</h4><div class="pair">${st === 'ok' ? '섬 미션으로 복구' : '섬 미션 뒤 복구'}</div></span></button>`; }
 function renderBoard(){
   let ps; try{ ps = PAIRS(); }catch(e){ if(e instanceof ReferenceError) return; throw e; }   // island list not built yet on the very first render
   const rows = flowRows(ps);
@@ -1686,7 +1687,7 @@ function statusHTML(m){
 const twinOf = m => m && m.twin ? missionById(m.twin) : null;
 function twinLine(m){
   const t = twinOf(m); if(!t || !zoneDone(m)) return '';
-  return W.id==='island' ? `<div class="twin">ERICA <b>${esc(t.name)}</b>에서 찾아낸 기록이 이곳으로 돌아왔습니다.</div>`
+  return W.id==='island' ? `<div class="twin">돌아온 기록</div>`
                          : `<div class="twin">이 기록은 도로랜드 <b>${esc(t.name)}</b>과 이어져 있었습니다. 섬에서 ${esc(t.name)}을 확인해 보세요.</div>`;
 }
 function zoneCard(m, k){
@@ -2747,9 +2748,9 @@ function rider(parent, x, y, z, i, s=1, rot=0){ const g = new THREE.Group(); g.p
 const MISSIONS_I = [
   {id:'dl-safari',   name:'사파리',            ch:'챕터 1 · 신비한 초대',          brief:'동물 인형, 장난감 자동차, 화분처럼 사파리를 닮은 사물을 스캔해 사라진 사파리를 되살리세요.'},
   {id:'dl-harmonia', name:'하모니아',          ch:'챕터 2 · 멈춰버린 기계의 노래', brief:'톱니바퀴, 악기, 스피커처럼 소리와 기계를 닮은 사물을 스캔해 하모니아를 다시 울리세요.'},
-  {id:'dl-carousel', name:'회전목마',          ch:'챕터 3 · 잊혀진 시간 속으로',   brief:'코덱스와 함께 옛 섬의 빈 점 세 곳을 찾으면 회전목마가 돌아옵니다.', quest:'q2'},
+  {id:'dl-carousel', name:'회전목마',          ch:'챕터 3 · 잊혀진 시간 속으로',   brief:'섬의 미션을 마치면 돌아옵니다.', quest:'q2'},
   {id:'dl-ferris',   name:'관람차',            ch:'챕터 4 · 구름 너머의 진실',     brief:'바퀴, 태양광 패널, 둥근 물건을 스캔해 구름 위 관람차를 다시 돌리세요.'},
-  {id:'dl-coaster',  name:'롤러코스터', ch:'챕터 5 · 코덱스의 선택',        brief:'자일로가 가리킨 바위를 네 면에서 찍으면 롤러코스터가 돌아옵니다.', quest:'q1'}
+  {id:'dl-coaster',  name:'롤러코스터', ch:'챕터 5 · 코덱스의 선택',        brief:'섬의 미션을 마치면 돌아옵니다.', quest:'q1'}
 ];
 const MI = MISSIONS_I.map(m=>({...m, twin: TWIN[m.id] || null, scans: scansFor(m.id)}));
 
@@ -5735,7 +5736,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
+    window.__dbg = {islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -6442,7 +6443,7 @@ $('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
 $('restoreGo').onclick = ()=>{ delete $('restoreDlg').dataset.on; if(SCREEN || QDONE.has('q3')){ playRestore(); return; } if(W.id !== 'island') setWorld('island', true); if(simOn) setSim(false); setTimeout(()=> startWalk('코덱스'), W.id === 'island' ? 0 : 1200); };
 $('restoreBtn').onclick = openRestore;
 $('cinemaV').onended = endRestore; $('cinemaV').onerror = endRestore; $('cinemaSkip').onclick = endRestore;
-$('cinemaX').onclick = ()=>{ const v = $('cinemaV'); v.pause(); v.removeAttribute('src'); v.load(); $('cinema').hidden = true; STAGED = false; if(W.id !== 'island') setWorld('island'); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1600); $('restoreBtn').hidden = false; $('restoreBtn').textContent = '환원하기'; $('restoreBtn').onclick = playRestore; };
+$('cinemaX').onclick = ()=>{ const v = $('cinemaV'); v.pause(); v.removeAttribute('src'); v.load(); $('cinema').hidden = true; STAGED = false; controls.minDistance = 40; if(W.id !== 'island') setWorld('island'); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1600); $('restoreBtn').hidden = false; $('restoreBtn').textContent = '환원하기'; $('restoreBtn').onclick = playRestore; };
 buildSim();
 maybeRestore(7000);
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
@@ -7311,14 +7312,14 @@ $('againBtn').onclick = async ()=>{
     if(walk) stopWalk(); if(simOn) setSim(false); voidHide(); delete $('callDlg').dataset.on; delete $('callPill').dataset.on; delete qRewardEl.dataset.on; delete $('restoreDlg').dataset.on; $('cinemaX').click();
     QDONE.clear(); questPending.clear(); ACT_LOCAL = 0; TUT_LOCAL = false; tutStep = -1; actPending = 0; actBusy = false; SQ_JSON = ''; STAGED = false;
     try{ localStorage.removeItem(QKEY()); Object.keys(sessionStorage).filter(k=> /^void-(vn|restore|simdone)-/.test(k)).forEach(k=> sessionStorage.removeItem(k)); Object.keys(localStorage).filter(k=> k.startsWith('void-seen-lit') || k.startsWith('void-found-')).forEach(k=> localStorage.removeItem(k)); }catch(e){}
-    STATE_VER = -1; applyState(await api('/team_reset', {team:TEAM, confirm:'AGAIN'})); questApply(); renderList(); renderBoard();
+    controls.minDistance = 40; STATE_VER = -1; applyState(await api('/team_reset', {team:TEAM, confirm:'AGAIN'})); questApply(); renderList(); renderBoard();
     if(W.id !== 'erica') setWorld('erica'); toast(`${TEAM}조 처음부터`); setTimeout(()=>{ try{ maybeGuide(); }catch(e){} }, 900);
   }catch(err){ toast(err.message); }
 };
 function saveAct(n){ ACT_LOCAL = Math.max(ACT_LOCAL, n); if(LOCAL || !TEAM) return; api('/quest', {team:TEAM, dev:DEV, act:n}).then(applyState).catch(()=>{}); }
 const campusZone = n => MISSION_E.find(m=> m.id === 'z' + n);   // the n-th campus record (M's order is not the flow order)
 function actCheck(){
-  if(!TEAM || ADMIN_KEY || SCREEN || LOCAL || actBusy || actPending || typeof MI === 'undefined' || intro) return;
+  if(!TEAM || ADMIN_KEY || SCREEN || LOCAL || actBusy || actPending || typeof MI === 'undefined' || intro) return; if(!tutDone() || (tutStep >= 0 && tutStep < 99)) return;
   const seen = actSeen();
   for(let n = 1; n <= 3; n++){ if(seen >= n) continue; const z = campusZone(n); if(!z || !zoneDone(z)) return; playAct(n); return; }
 }
@@ -7326,18 +7327,22 @@ function actCheck(){
 const _sv = new THREE.Vector3();
 function stageAt(zoneId, cast, ms=1600){
   const z = MI.find(m=> m.id === zoneId), b = z && z.b; if(!b) return null;
-  const dx = 0 - b.cx, dz = 67 - b.cz, L = Math.hypot(dx, dz) || 1, ux = dx/L, uz = dz/L, R = (b.r || 24) + 9, fx = b.cx + ux*R, fz = b.cz + uz*R;   // the spot in front of the zone, towards the plaza
-  STAGED = true;
-  cast.forEach((g, i)=>{ const side = (i - (cast.length - 1)/2)*3.4, x = fx - uz*side, zz = fz + ux*side; g.position.set(x, groundY(x, zz) + (g === NATY ? 3 : 0), zz); g.rotation.y = Math.atan2(ux, uz); g.visible = true; });
-  flyTo(new THREE.Vector3(fx + ux*16, G + 7.5, fz + uz*16), new THREE.Vector3(fx, G + 3, fz), ms);
+  // the entrance: the path point nearest the zone that lies outside its lot (paths never cross a ride, so this is where the walk ends)
+  const R0 = (b.r || 24); let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - b.cx, pz - b.cz); if(d > R0 + 2 && d < bd){ bd = d; best = [px, pz]; } }
+  let [fx, fz] = best ? freeSpot(best[0], best[1]) : freeSpot(b.cx + (0 - b.cx)/(Math.hypot(b.cx, 67 - b.cz) || 1)*(R0 + 12), b.cz + (67 - b.cz)/(Math.hypot(b.cx, 67 - b.cz) || 1)*(R0 + 12));
+  const dx = fx - b.cx, dz = fz - b.cz, L = Math.hypot(dx, dz) || 1, ux = dx/L, uz = dz/L;   // facing away from the zone, towards the camera
+  STAGED = true; controls.minDistance = 3;
+  cast.forEach((g, i)=>{ const side = (i - (cast.length - 1)/2)*3.2, x = fx - uz*side, zz = fz + ux*side; g.position.set(x, groundY(x, zz) + (g === NATY ? 3 : 0), zz); g.rotation.y = Math.atan2(ux, uz); g.visible = true; });
+  let cx2 = fx + ux*12, cz2 = fz + uz*12; for(let i = 0; i < 6 && walkBlocked(cx2, cz2); i++){ cx2 += ux*3; cz2 += uz*3; }   // the camera also stays out of any structure
+  flyTo(new THREE.Vector3(cx2, G + 5.5, cz2), new THREE.Vector3(fx, G + 2.6, fz), ms);
   return {fx, fz, ux, uz};
 }
 async function playAct(n){
   actBusy = true; delete $('callPill').dataset.on;
   await voidAsk(n === 3 ? '기록 받았어. 마지막 기록이야.' : '기록 받았어. 비어 있던 자리에 넣는 중이야.', 'joy');
   await voidAsk(n === 1 ? '기록이 돌아온 자리에서는 일루아의 흐름이 보이기 시작해. 시뮬레이션으로 보여 줄게.' : n === 2 ? '흐름이 얼마나 더 보이는지 시뮬레이션으로 보여 줄게.' : '이제 흐름 전체가 보일 거야. 시뮬레이션 돌려 볼게.');
-  if(W.id !== 'island') setWorld('island'); await wait(1500); if(!simOn) setSim(true); await wait(7200);
-  const k = RATE()/20, isl = MI.find(m=> m.id === ACT_ZONE[n]);
+  if(W.id !== 'island') setWorld('island'); await wait(1500); rescan(); if(!simOn) setSim(true); await wait(7200);
+  const k = SIM_LIT, isl = MI.find(m=> m.id === ACT_ZONE[n]);
   if(n === 3){ await voidAsk('사라졌던 기록을 모두 되찾았어. 일루아의 흐름이 처음부터 끝까지 다 보여.', 'joy'); await voidAsk('흐름을 다 알게 됐으니까, 이제 환원을 시험해 볼 수 있어.'); }
   else await voidAsk(`${isl ? isl.name : '이 구역'}의 기록이 돌아왔어. 흐름 다섯 구간 중 ${['', '하나가', '둘이', '셋이', '넷이'][k] || k + '구간이'} 보여. 아직 ${5 - k}구간은 비어 있어.`);
   openCall(n); actBusy = false;
@@ -7372,7 +7377,7 @@ async function actExit(q){
   await new Promise(r=> say(ex.give, r));
   actBusy = false; showReward(q);
 }
-function goBack(){ STAGED = false; setWorld('erica'); const seen = actSeen(), next = campusZone(seen + 1);
+function goBack(){ STAGED = false; controls.minDistance = 40; setWorld('erica'); const seen = actSeen(), next = campusZone(seen + 1);
   setTimeout(async ()=>{ if(next){ if(next.bi != null) select(next.bi, true); setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '마지막 좌표야. 지도에 점으로 찍어 뒀어. 네 좌표를 보면서 점까지 가.' : '좌표를 받았구나. 지도에 점으로 찍어 뒀어. 뭐가 있는 자리인지는 가 봐야 알아.');
       $('lMe').classList.add('pulse'); await voidAsk('밖으로 나가서 「내 시점」을 켜. 네 좌표가 화살표로 보여.'); await voidAsk('네 좌표가 바뀌는 걸 보면서 점까지 가. 카드의 거리가 줄어들면 맞게 가는 거야.', 'idle'); }
     else voidSay('기록 다섯 곳 수집 완료. 보고 대기.', 8000, 'idle'); }, 1200); }
@@ -7396,7 +7401,7 @@ const TUT = [
 const tutDone = ()=> TUT_LOCAL || !!myEntry().tut;
 function maybeGuide(){ if(!TEAM || SCREEN || LOCAL || intro || tutStep >= 0 || tutDone() || $('teamPick').dataset.on || typeof MI === 'undefined') return; tutStep = 0; $('tutSkip').hidden = !ADMIN_KEY; tutShow(); }
 function tutShow(){ const st = TUT[tutStep]; voidShow(st.t, st.pose); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
-function tutEnd(){ voidHide(); $('tutSkip').hidden = true; TUT_LOCAL = true; tutStep = 99; document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
+function tutEnd(){ voidHide(); $('tutSkip').hidden = true; TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
 // ---------- mini missions (user, 2026-10-27): the chapter-5 scene a found character puts you through before the coordinates ----------
 // shoot — 자일로's rock, photographed from all four sides (novel: "뒤쪽도 찍어야 해. 안 찍은 데는 구멍이 나"); hills — three spots of the old island
 // that only 코덱스 remembers, marked where they were; order — the virtual test in the cave: forest, valley, shore, in that order.
