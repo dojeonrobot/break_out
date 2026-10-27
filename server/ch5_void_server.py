@@ -133,7 +133,7 @@ def pair_status():
     quests = DB.get('quests', {})
     for p in PAIRS:
         if p.get('kind') == 'quest':   # 섬 미션으로 복구되는 구역: 그 미션을 끝낸 조가 하나라도 있으면 ok
-            teams = sorted(int(t) for t, d in quests.items() if p['quest'] in d)
+            teams = sorted(int(t) for t, d in quests.items() if d and all(p['quest'] in (v if isinstance(v, dict) else {}) for v in d.values()) and not any(k.startswith('q') for k in d))
             out.append({'id': p['id'], 'kind': 'quest', 'quest': p['quest'], 'island': p['island'], 'status': 'ok' if teams else 'void',
                         'teams': teams, 'scans': [], 'subs': []})
             continue
@@ -472,16 +472,30 @@ class Handler(BaseHTTPRequestHandler):
         self.set_quests(team, b)
 
     def set_quests(self, team, b):
-        # quests[team] = {'q1': ts, ..., 'act': 본 막 번호, 'tut': 튜토리얼 끝낸 시각}
+        # quests[team] = {'a': {'dev': 태블릿 id, 'q1': ts, ..., 'act': 본 막, 'tut': 튜토리얼 끝낸 시각}, 'b': {...}} — 조 안의 태블릿마다 한 칸 (2026-10-27)
+        dev = re.sub(r'[^a-z0-9]', '', str(b.get('dev') or ''))[:16]
+        letter = str(b.get('letter') or '')
         with lock:
             q = DB.setdefault('quests', {})
+            tq = q.get(str(team), {})
+            if any(k.startswith('q') or k in ('act', 'tut') for k in tq):      # 글자 없이 저장된 옛 형식
+                tq = {'a': dict(tq, dev='legacy')}
             if b.get('clear'):
-                q.pop(str(team), None)
+                if letter:
+                    tq.pop(letter, None)
+                else:
+                    tq = {}
             else:
-                cur = dict(q.get(str(team), {}))
+                if not letter and dev:
+                    letter = next((l for l, v in tq.items() if v.get('dev') == dev), None) or next(l for l in 'abcdefghij' if l not in tq)
+                if not letter:
+                    raise ValueError('태블릿 정보가 없습니다.')
+                cur = dict(tq.get(letter, {}))
+                if dev:
+                    cur['dev'] = dev
                 if isinstance(b.get('done'), list):
                     done = [str(x) for x in b['done'] if QUEST_ID.match(str(x))]
-                    keep = {k: v for k, v in cur.items() if k in ('act', 'tut')}
+                    keep = {k: v for k, v in cur.items() if not QUEST_ID.match(k)}
                     cur = dict(keep, **{x: cur.get(x) or now_ms() for x in done})
                 if b.get('act') is not None:
                     try:
@@ -490,7 +504,11 @@ class Handler(BaseHTTPRequestHandler):
                         pass
                 if b.get('tut'):
                     cur['tut'] = cur.get('tut') or now_ms()
-                q[str(team)] = cur
+                tq[letter] = cur
+            if tq:
+                q[str(team)] = tq
+            else:
+                q.pop(str(team), None)
             save()
             self.send_json(state())
 
