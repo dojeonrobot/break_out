@@ -398,7 +398,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/delete': self.admin_delete, '/api/void/admin/reset': self.admin_reset,
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto,
-            '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest,
+            '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
         }
         fn = routes.get(path)
         if not fn:
@@ -439,6 +439,23 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(state())
         threading.Thread(target=fetch_thumb, args=(scan_id,), daemon=True).start()
         threading.Thread(target=convert_scan, args=(sub_id, scan_id), daemon=True).start()
+
+    # 학생: 우리 조 처음부터 — 이 조의 제출(사진 세트 포함)과 미션·막·튜토리얼 진행을 모두 지운다 (2026-10-27)
+    def team_reset(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('우리 조를 먼저 고르세요.')
+        if b.get('confirm') != 'AGAIN':
+            raise ValueError('확인 문구가 필요합니다.')
+        with lock:
+            gone = [s for s in DB['subs'] if s['team'] == team]
+            DB['subs'] = [s for s in DB['subs'] if s['team'] != team]
+            DB.setdefault('quests', {}).pop(str(team), None)
+            save()
+            self.send_json(state())
+        for s in gone:
+            if s.get('kind') == 'orbit':
+                trash_scan(s['scanId'])
 
     # 학생: 우리 조의 섬 미션 진행(끝낸 미션 id 목록 전체를 보냄) — 태블릿을 바꿔도 이어지게 서버에 둔다 (2026-10-27)
     def quest(self, b):
