@@ -6587,12 +6587,28 @@ const CHAR = [
   {g:DARK, s:0.16, n:'그림자', desc:'광장 나무 뒤, 동굴, 전광판 화면에서 몰래 지켜보던 붉은 뿔의 검은 그림자. 정체를 숨긴 코덱스였습니다.', facts:[['등장','챕터 1~4'],['힌트','붉은 뿔, 붉은 눈']]}
 ];
 CHAR.forEach(c=>{ islRoot.add(c.g); charGroups.push(c.g); c.b = pickable(c.g, {n:c.n, c:'char', sub:'등장인물', desc:c.desc, facts:c.facts, cx:0, cz:0, h:2, r:1, s:c.s||0.15, keepSize:true}); prepGroup(c.b); c.g.scale.setScalar(c.s||0.15); });
+// ---------- real character models: the designer's 3D files (shared drive 3d모델/) decimated to models/<name>.glb; models/<name>.glb.txt is the same file as base64 for the artifact copy, which cannot serve .glb.
+// The procedural figure stays as the fallback (file:// copies, a failed fetch) and keeps its userData rig, so the pose code still runs on hidden parts. 제로 has no colour yet (grey placeholder until the painted model arrives).
+{
+  const MODEL = {'제로':['zero', 14.2], '리코':['rico', 14.2], '자일로':['xylo', 14.2], '코덱스':['codex', 14.6], '네이티':['naty', 11.5]};   // file, height in figure units (the procedural people stand 14.2)
+  const loader = new GLTFLoader();
+  const fit = (c, o)=>{ const g = c.g; o.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(o), sz = box.getSize(new THREE.Vector3()), ct = box.getCenter(new THREE.Vector3()), k = MODEL[c.n][1]/sz.y;
+    o.traverse(m=>{ if(!m.isMesh) return; m.castShadow = true; m.receiveShadow = false; const map = m.material && m.material.map;
+      if(map){ map.colorSpace = THREE.NoColorSpace; map.anisotropy = 4; }   // the renderer outputs linear, like every other texture on the page
+      m.material = c.n === '네이티' ? NATY.userData.fm : new THREE.MeshLambertMaterial({map:map || null, color:map ? 0xffffff : (m.material && m.material.color ? m.material.color.clone() : new THREE.Color(0xd9d9d9))}); });
+    o.position.set(-ct.x*k, -box.min.y*k, -ct.z*k); o.scale.setScalar(k); o.userData.y0 = o.position.y;
+    g.children.forEach(ch=>{ if(!(c.n === '네이티' && NATY.userData.bits.includes(ch))) ch.visible = false; });   // Naty keeps its orbiting sparks
+    g.add(o); g.userData.model = o; };
+  CHAR.forEach(c=>{ const m = MODEL[c.n]; if(!m) return; const on = r=> fit(c, r.scene);
+    loader.load(`models/${m[0]}.glb`, on, undefined, ()=> fetch(`models/${m[0]}.glb.txt`).then(r=> r.ok ? r.text() : Promise.reject()).then(t=>{ const bin = Uint8Array.from(atob(t.trim()), ch=> ch.charCodeAt(0)); loader.parse(bin.buffer, '', on, ()=>{}); }).catch(()=>{})); });
+}
 CODEX.position.set(-18, G, -468); CODEX.rotation.y = 2.6;   // Codex keeps watch in front of the eye cave
 XYLO.position.set(-190, G, 200); XYLO.rotation.y = -2.2;
 DARK.position.set(-178*K, G, -128*K); DARK.rotation.y = 0.7;
 const NATY_MOODS = [0x7cc8f0, 0x7fd67a, 0xffd84a, 0xe05a4e, 0xa07ad8, 0xffffff];
 const _c1 = new THREE.Color(), _c2 = new THREE.Color();
-function walkPose(p, t, speed){ const s = Math.sin(t*speed); p.userData.legL.rotation.x = s*0.55; p.userData.legR.rotation.x = -s*0.55; p.userData.armL.rotation.x = -s*0.5; p.userData.armR.rotation.x = s*0.5; p.userData.body.position.y = Math.abs(Math.cos(t*speed))*0.35; }
+function walkPose(p, t, speed){ const s = Math.sin(t*speed); p.userData.legL.rotation.x = s*0.55; p.userData.legR.rotation.x = -s*0.55; p.userData.armL.rotation.x = -s*0.5; p.userData.armR.rotation.x = s*0.5; p.userData.body.position.y = Math.abs(Math.cos(t*speed))*0.35; if(p.userData.model) p.userData.model.position.y = p.userData.model.userData.y0 + Math.abs(Math.cos(t*speed))*0.35; }
 islAnim.push(t=>{
   // Rico and Zero stroll round the plaza side by side, Void hovering just behind them
   const sw = (t*0.018) % 2, fw = sw < 1 ? sw : 2 - sw, dirw = sw < 1 ? 1 : -1, zw = 196 + fw*124;
