@@ -65,6 +65,7 @@ UPLOAD_TTL_MS = 2 * 60 * 60 * 1000    # 올리다 만 세트는 2시간 뒤 정�
 SCAN_ID = re.compile(r'^[a-z0-9]{6,40}$')
 ORBIT_ID = re.compile(r'^o[a-f0-9]{15}$')
 MISSION_ID = re.compile(r'^[a-z0-9_-]{1,40}$')
+QUEST_ID = re.compile(r'^q[1-9]$')          # 섬 미션 id (페이지 QUESTS)
 UA = 'Mozilla/5.0 (DOROLAND void record)'
 
 lock = threading.Lock()
@@ -77,7 +78,7 @@ def now_ms():
 
 
 def fresh_db():
-    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True, 'reset': 0}
+    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True, 'reset': 0, 'quests': {}}
 
 
 def read_db():
@@ -129,7 +130,13 @@ def pair_status():
     """짝마다 복구 상태: ok(3D에 들어간 스캔이 보이거나 자체 스캔이 확정됨) / pend(제출됨) / void."""
     hidden = set(DB['hidden'])
     out = []
+    quests = DB.get('quests', {})
     for p in PAIRS:
+        if p.get('kind') == 'quest':   # 섬 미션으로 복구되는 구역: 그 미션을 끝낸 조가 하나라도 있으면 ok
+            teams = sorted(int(t) for t, d in quests.items() if p['quest'] in d)
+            out.append({'id': p['id'], 'kind': 'quest', 'quest': p['quest'], 'island': p['island'], 'status': 'ok' if teams else 'void',
+                        'teams': teams, 'scans': [], 'subs': []})
+            continue
         ids = {p['campus']['id'], p['island']['id']}
         shown = [s for s in p.get('scans', []) if s not in hidden]
         mine = [s for s in DB['subs'] if s['mission'] in ids]
@@ -150,7 +157,7 @@ def live_pos():
 
 def state():
     return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)), 'reset': int(DB.get('reset', 0)),
-            'pairs': pair_status(), 'pos': live_pos(), 'now': now_ms()}
+            'quests': DB.get('quests', {}), 'pairs': pair_status(), 'pos': live_pos(), 'now': now_ms()}
 
 
 # ---------- Scaniverse 링크 → 스플랫 자동 변환 ----------
@@ -391,6 +398,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/delete': self.admin_delete, '/api/void/admin/reset': self.admin_reset,
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto,
+            '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest,
         }
         fn = routes.get(path)
         if not fn:
@@ -431,6 +439,43 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(state())
         threading.Thread(target=fetch_thumb, args=(scan_id,), daemon=True).start()
         threading.Thread(target=convert_scan, args=(sub_id, scan_id), daemon=True).start()
+
+    # 학생: 우리 조의 섬 미션 진행(끝낸 미션 id 목록 전체를 보냄) — 태블릿을 바꿔도 이어지게 서버에 둔다 (2026-10-27)
+    def quest(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('우리 조를 먼저 고르세요.')
+        self.set_quests(team, b)
+
+    # 운영자: 어느 조든 미션 완료 처리·되돌리기·초기화({team, done:[...]} 또는 {team, clear:true})
+    def admin_quest(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조 번호가 없습니다.')
+        self.set_quests(team, b)
+
+    def set_quests(self, team, b):
+        # quests[team] = {'q1': ts, ..., 'act': 본 막 번호, 'tut': 튜토리얼 끝낸 시각}
+        with lock:
+            q = DB.setdefault('quests', {})
+            if b.get('clear'):
+                q.pop(str(team), None)
+            else:
+                cur = dict(q.get(str(team), {}))
+                if isinstance(b.get('done'), list):
+                    done = [str(x) for x in b['done'] if QUEST_ID.match(str(x))]
+                    keep = {k: v for k, v in cur.items() if k in ('act', 'tut')}
+                    cur = dict(keep, **{x: cur.get(x) or now_ms() for x in done})
+                if b.get('act') is not None:
+                    try:
+                        cur['act'] = max(int(cur.get('act') or 0), min(3, int(b['act'])))
+                    except (TypeError, ValueError):
+                        pass
+                if b.get('tut'):
+                    cur['tut'] = cur.get('tut') or now_ms()
+                q[str(team)] = cur
+            save()
+            self.send_json(state())
 
     # 학생: 조별 현재 위치 (캠퍼스 트윈에 점으로 표시)
     def pos(self, b):
@@ -599,6 +644,7 @@ class Handler(BaseHTTPRequestHandler):
             gone = [s for s in DB['subs'] if s.get('kind') == 'orbit']
             DB['subs'] = []
             DB['hidden'] = sorted(set(DB['hidden']) | set(hide))
+            DB['quests'] = {}
             DB['reset'] = now_ms()   # every tablet forgets its team when it sees a newer reset
             save()
             self.send_json(state())

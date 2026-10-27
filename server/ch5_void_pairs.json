@@ -1,58 +1,27 @@
 [
  {
-  "id": "lions",
+  "id": "z1",
+  "kind": "campus",
   "campus": {
-   "id": "lions",
-   "name": "라이언스홀",
-   "lat": 37.295777,
-   "lng": 126.841176
-  },
-  "island": {
-   "id": "dl-safari",
-   "name": "사파리"
-  },
-  "scans": [
-   "fjpg4hyqcumbeopi"
-  ]
- },
- {
-  "id": "pharm",
-  "campus": {
-   "id": "pharm",
-   "name": "약학대학",
-   "lat": 37.296365,
-   "lng": 126.837851
+   "id": "z1",
+   "name": "융합교육관 전시대",
+   "lat": 37.295655,
+   "lng": 126.838475
   },
   "island": {
    "id": "dl-harmonia",
    "name": "하모니아"
   },
-  "scans": [
-   "7657ldzgdiufi233",
-   "u5aqvwu7kkhmsh2w"
-  ]
- },
- {
-  "id": "library",
-  "campus": {
-   "id": "library",
-   "name": "ERICA학술정보관",
-   "lat": 37.296646,
-   "lng": 126.835103
-  },
-  "island": {
-   "id": "dl-carousel",
-   "name": "회전목마"
-  },
   "scans": []
  },
  {
-  "id": "amphi",
+  "id": "z2",
+  "kind": "campus",
   "campus": {
-   "id": "amphi",
-   "name": "노천극장",
-   "lat": 37.297349,
-   "lng": 126.839506
+   "id": "z2",
+   "name": "하냥이 벤치",
+   "lat": 37.295777,
+   "lng": 126.841176
   },
   "island": {
    "id": "dl-ferris",
@@ -61,13 +30,34 @@
   "scans": []
  },
  {
-  "id": "main",
+  "id": "z3",
+  "kind": "campus",
   "campus": {
-   "id": "main",
-   "name": "본관",
-   "lat": 37.298995,
-   "lng": 126.833072
+   "id": "z3",
+   "name": "카카오데이터센터",
+   "lat": 37.293614,
+   "lng": 126.831854
   },
+  "island": {
+   "id": "dl-safari",
+   "name": "사파리"
+  },
+  "scans": []
+ },
+ {
+  "id": "dl-carousel",
+  "kind": "quest",
+  "quest": "q2",
+  "island": {
+   "id": "dl-carousel",
+   "name": "회전목마"
+  },
+  "scans": []
+ },
+ {
+  "id": "dl-coaster",
+  "kind": "quest",
+  "quest": "q1",
   "island": {
    "id": "dl-coaster",
    "name": "롤러코스터"
