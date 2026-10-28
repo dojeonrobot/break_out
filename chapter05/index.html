@@ -649,7 +649,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 <div id="simHud" aria-live="polite"><div><small>VOID · RESTORATION SIMULATOR</small><h2>일루아 환원 시뮬레이터</h2><span id="simStat"></span></div><b id="simN">0 / 5</b><div class="cells" id="simCells"></div></div>
 <div id="simFx" aria-hidden="true"></div>
 <div id="arrFlash" aria-hidden="true"></div>
-<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다. 문양은 섬에 퍼져 있던 일루아의 모양을 본떠 만든 것이었고, 코덱스조차 몰랐던 일입니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
+<div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
 <div id="toast" role="status"></div>
@@ -2854,11 +2854,11 @@ const PATHS = [
   [[0,95],[0,150],[0,250],[0,300],[0,333]],           // fountain → main street → gate → gate plaza
   [[-60,40],[-100,10],[-120,-10]],                     // → safari
   [[25,-20],[45,-60],[55,-75]],                        // → ancient tree
-  [[70,40],[150,40],[215,25]],                         // → carousel
+  [[70,40],[150,40],[215,25],[236,22]],                // → carousel, on to the teacups' fence
   [[60,0],[100,-60],[118,-100]],                       // → ferris hill path
   [[-55,90],[-85,130],[-104,164]],                     // → coaster (ends at the station's east gate; the track never crosses it)
   [[-40,-15],[-55,-100],[-60,-150]],                   // → castle
-  [[-100,10],[-120,-80],[-200,-150],[-252,-134]],      // → windmill (round the north of the safari)
+  [[-100,10],[-120,-80]],                              // → safari gate junction (the windmill now stands inside the safari; the old leg ran under the enclosure)
   [[50,100],[110,150],[130,175]],                      // → drop tower
   [[150,40],[232,78],[300,120],[400,118],[432,48],[395,-15],[450,-23]],   // → lighthouse (south of the carousel and the licence course), ending at its base
   [[-100,10],[-200,62],[-292,56]],                     // → warehouse (round the safari)
@@ -2869,10 +2869,13 @@ const PATHS = [
   [[100,-60],[160,-70],[176,-84]],                     // → galaxy swing (from the wheel side, not from the lodging); ends at its fence
   [[-120,-80],[-111,-119]],                            // → 4D theatre (off the windmill path)
   [[20,330],[70,326],[104,312]],                       // → maze (east of the gate's right tower)
-  [[-200,-150],[-245,-175],[-262,-190]],               // → tree-house village (off the windmill path)
+  [[-200,62],[-230,30]],                               // → tree-house village (off the warehouse path)
   [[-55,-100],[-90,-150],[-120,-185]],                 // → Ren's door
   [[45,-60],[20,-110],[40,-150],[62,-190]],            // → Codex's box (west of the hologram tree)
-  [[432,48],[360,-40],[296,-100]]                      // → staff lodging (off the lighthouse path, north of the course)
+  [[432,48],[360,-40],[296,-100]],                     // → staff lodging (off the lighthouse path, north of the course)
+  [[172,58],[182,40],[186,27]],                        // → 4D dome entrance (off the carousel path)
+  [[172,58],[190,83]],                                 // → sky flyer
+  [[70,326],[80,299]]                                  // → flying carpet (off the maze path)
 ];
 PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 { const cv = (a, dr)=>{ const v = coveAt(a, dr); return [v.x, v.z]; };
@@ -2881,7 +2884,7 @@ PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 PATHS.push([[405,162],[440,155],[477.39,128.73]], [[230,321],[239,306],[244.25,294.75]]);
 const pathSamples = [];
 // A common rounded ribbon avoids triangular flares at path joins.
-const pathHalfWidth = i => i===0 || i===22 ? 8.5 : [1,3,5,7,9,10,11,24].includes(i) ? 6 : 4.2;
+const pathHalfWidth = i => i===0 || i===25 ? 8.5 : [1,3,5,7,9,10,11,27].includes(i) ? 6 : 4.2;   // 25 = pier, 27 = west ring road (three spurs were added to the literal on 2026-10-28, so the pushed paths moved by 3)
 // Physical fountain basins are shared by the paths and visitor clearance checks.
 const PARK_BASINS=[{x:0,z:67,r:50},{x:0,z:120*K,r:18.5*.55},{x:-64,z:44,r:7.4},{x:64,z:44,r:7.4},{x:-6,z:-172,r:25}];
 PATHS.forEach((pts,i)=>{
@@ -3845,7 +3848,7 @@ const coaster = new THREE.Group();
     add(st, new THREE.ExtrudeGeometry(roof, {depth:46, bevelEnabled:false}).translate(0, 0, -23), mat(0x7a4a2c), 0, 15.2, 0);
     for(let k=0;k<9;k++) add(st, BOX(30.4, 0.3, 0.4), mat(0x6b3f24), 0, 15.3 + Math.abs(k-4)*0.0, -22 + k*5.5);
     add(st, BOX(10, 6, 0.6), mat(0xf4efe4), 0, 15.6, 23.2); add(st, new THREE.CylinderGeometry(2, 2, 0.5, 20).rotateX(Math.PI/2), mat(0xffffff), 0, 18.6, 23.6); add(st, BOX(0.25, 1.4, 0.1), mat(0x1d2f55), 0, 18.8, 23.9); add(st, BOX(1, 0.25, 0.1), mat(0x1d2f55), 0.4, 18.6, 23.9);
-    [1, -1].forEach(sd=> add(st, new THREE.PlaneGeometry(34, 4.6), new THREE.MeshBasicMaterial({map:signTex('TIMBER EXPRESS', {bg:'#7a4a2c', fg:'#ffd400', size:68, w:640, h:100}), side:THREE.DoubleSide}), sd*11.3, 11.5, 0, false).rotation.y = sd*Math.PI/2);
+    [1, -1].forEach(sd=> add(st, new THREE.PlaneGeometry(34, 4.6), new THREE.MeshBasicMaterial({map:signTex('TIMBER EXPRESS', {bg:'#7a4a2c', fg:'#ffd400', size:68, w:640, h:100}), side:THREE.FrontSide}), sd*11.3, 11.5, 0, false).rotation.y = sd*Math.PI/2);
     for(let k=0;k<7;k++){ add(st, BOX(0.3, 2.2, 0.3), steel, 4.6, 1.2, -19 + k*6.2); add(st, BOX(0.15, 0.15, 5), mat(0xffd400), 4.6, 3.2, -16 + k*6.2); }
     for(let i=0;i<14;i++) rider(st, 7 + (i%2)*2.4, 1.2, -19 + Math.floor(i/2)*6.2, i, 0.55, -Math.PI/2);
     for(let i=0;i<8;i++){ add(st, CYL(0.12, 0.12, 2, 5), steel, -9, 1.2, -19 + i*5.4); add(st, SPH(0.45, 6, 5), glowMat(0xfff0b8), -9, 3.6, -19 + i*5.4, false); } }
@@ -6451,8 +6454,8 @@ $('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
 async function restoreShow(){ actBusy = true; if(walk) stopWalk(); try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){}
   await goWorld('island'); await wait(300); if(!simOn) setSim(true); await wait(reduce ? 300 : 1900);
   buildSim(GLYPH_ZONES.map(z=> z.id)); const endT = Math.max(0, ...REVEALS.map(r=> r.delay + r.dur), ...FADES.map(f=> f.delay + f.dur)); await wait((endT + 2.4)*1000);
-  await voidAsk('봐. 이게 섬에 흐르던 일루아의 흐름이야. 원천에서 옛 물길까지 전부 이어졌어.', 'joy');
-  await voidAsk('이 모양, 어디서 본 것 같지 않아? 코덱스 가문의 눈 문양은 이 흐름을 본떠 만든 거였어.');
+  await voidAsk('봐. 이게 원래 섬에 흐르던 일루아의 흐름이야. 원천에서 옛 물길까지 전부 이어졌어.', 'joy');
+  await voidAsk('이 모양, 어디서 본 것 같지 않아? 코덱스 가문의 문양은 일루아의 흐름을 본떠 만든 거였어.');
   $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; restoreNext = ()=>{ actBusy = false; playRestore(); }; }
 let restoreNext = null;
 $('restoreGo').onclick = ()=>{ delete $('restoreDlg').dataset.on; if(SCREEN || QDONE.has('q3')){ restoreShow(); return; } if(W.id !== 'island') setWorld('island', true); if(simOn) setSim(false); setTimeout(()=> startWalk('코덱스'), W.id === 'island' ? 0 : 1200); };
@@ -7519,8 +7522,8 @@ async function actExit(q){
   actBusy = false; showReward(q);
 }
 function goBack(){ STAGED = false; controls.minDistance = 40; setWorld('erica'); const seen = actSeen(), next = campusZone(seen + 1);
-  setTimeout(async ()=>{ if(next){ if(next.bi != null) select(next.bi, true); setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '마지막 좌표야. 지도에 점으로 찍어 뒀어. 네 좌표를 보면서 점까지 가.' : '좌표를 받았구나. 지도에 점으로 찍어 뒀어. 뭐가 있는 자리인지는 가 봐야 알아.');
-      $('lMe').classList.add('pulse'); await voidAsk('밖으로 나가서 「내 시점」을 켜. 네 좌표가 화살표로 보여.'); await voidAsk('네 좌표가 바뀌는 걸 보면서 점까지 가. 카드의 거리가 줄어들면 맞게 가는 거야.', 'idle'); }
+  setTimeout(async ()=>{ if(next){ if(next.bi != null) select(next.bi, true); setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '마지막 좌표야. 지도에 점으로 찍어 뒀어. 네 좌표를 보면서 점까지 가.' : '좌표를 받았구나. 이동하다 보면 그 좌표에 맞는 위치에 도달할 수 있어. 올바른 좌표에 도달하면 무엇을 스캔해야 하는지 알 수 있을 거야.');
+      $('lMe').classList.add('pulse'); await voidAsk('밖으로 나가서 「내 시점」을 켜. 움직일 때마다 좌표가 바뀔 거야.'); await voidAsk('네 좌표가 바뀌는 걸 보면서 좌표에 해당하는 위치까지 가. 카드의 거리가 줄어들면 맞게 가는 거야.', 'idle'); }
     else voidSay('기록 다섯 곳 수집 완료. 보고 대기.', 8000, 'idle'); }, 1200); }
 // ---------- void tutorial (#voidGuide): right after the team is picked, once per team ----------
 const TUT = [
