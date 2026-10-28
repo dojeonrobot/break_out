@@ -1302,7 +1302,7 @@ const fmt = n => n.toLocaleString('ko-KR');
 const hiddenZone = m => !!m && m.lat != null && !zoneDone(m);
 // A zone's coordinates stay locked until the island mission that hands them over is done (QUESTS, with the walk code). Admin and the big screen see everything.
 const zoneQuest = m => (typeof QUESTS === 'object' && m) ? QUESTS.find(q=> q.zones.includes(m.id)) : null;
-const zoneLocked = m => { if(!m || m.lat == null || ADMIN_KEY || SCREEN || typeof QUESTS !== 'object') return false; const q = zoneQuest(m); if(!q) return false; return LOCAL ? !QDONE.has(q.id) : !teamQuests(TEAM).includes(q.id); };   // the next coordinates open for the team, when every tablet has finished
+const zoneLocked = m => { if(!m || m.lat == null || SCREEN || typeof QUESTS !== 'object') return false; const q = zoneQuest(m); if(!q) return false; return LOCAL ? !QDONE.has(q.id) : !teamQuests(TEAM).includes(q.id); };   // the next coordinates open for the team, when every tablet has finished
 const zoneFound = m => { if(!m) return false; if(m.id === 'z1' || zoneDone(m)) return true; try{ return localStorage.getItem(`void-found-${m.id}`) === '1'; }catch(e){ return false; } };
 const ZONE_OBJ = {z1:'가져온 물건', z2:'하냥이', z3:'라이언이랑 어피치'};   // what sits at each spot (said only on arrival)
 const zoneName = m => { const i = MISSION_E.indexOf(m) + 1; return i < 1 ? m.name : zoneFound(m) ? `기록 0${i} · ${m.name}` : `기록 0${i}`; };
@@ -1539,7 +1539,8 @@ function renderBoard(){
   }
   const ok = rows.filter(r=> r.quest ? zoneDone(r.quest) : zoneState(r.campus) === 'ok').length;
   $('bN').textContent = `${ok} / ${rows.length}`; $('bFill').style.width = rows.length ? `${ok/rows.length*100}%` : '0';
-  $('bRows').innerHTML = rows.map(r=> r.quest ? questRow(r) : boardRow(r)).join('');
+  const cut = rows.findIndex(r=> r.quest ? !zoneDone(r.quest) : zoneState(r.campus) !== 'ok');   // one step at a time (user, 2026-10-28): later steps are not listed yet
+  $('bRows').innerHTML = (cut < 0 ? rows : rows.slice(0, cut + 1)).map(r=> r.quest ? questRow(r) : boardRow(r)).join('');
 }
 document.addEventListener('click', e=>{
   const zr = e.target.closest('[data-zone]'); if(zr){ const z = MI.find(x=> x.id === zr.dataset.zone); if(z && z.bi != null){ if(W.id !== 'island') setWorld('island', true); select(z.bi, true); } return; }
@@ -2096,7 +2097,7 @@ function refreshZones(){
       : st==='pend' ? `<i></i>${esc(isl ? m.name : zoneName(m))} <small>복구 중</small>` : `<i></i>${esc(isl ? m.name : zoneName(m))} <em>복구 필요</em>`;
     el.setAttribute('aria-label', `${m.name} ${st==='ok'?'복구됨':st==='pend'?'복구 중':'복구 필요'}`);
   });
-  M.forEach((m,k)=>{ const st = zoneState(m), show = W.id==='island' ? st==='ok' : (tabShows(st) && !hiddenZone(m) && !zoneLocked(m)); beacons[k].visible = rings[k].visible = pads[k].visible = ripples[k].visible = show; barriers[k].visible = show && W.id!=='island'; });
+  M.forEach((m,k)=>{ const st = zoneState(m), show = W.id==='island' ? st==='ok' : ((tabShows(st) && !hiddenZone(m) && !zoneLocked(m)) || TUT_SPOT === m.id); beacons[k].visible = rings[k].visible = pads[k].visible = ripples[k].visible = show; barriers[k].visible = show && W.id!=='island'; });
 }
 const v3 = new THREE.Vector3();
 // Measure the actual label instead of guessing its width from the character count.
@@ -7327,7 +7328,7 @@ $('againBtn').onclick = async ()=>{
 function saveAct(n){ ACT_LOCAL = Math.max(ACT_LOCAL, n); if(LOCAL || !TEAM) return; api('/quest', {team:TEAM, dev:DEV, act:n}).then(applyState).catch(()=>{}); }
 const campusZone = n => MISSION_E.find(m=> m.id === 'z' + n);   // the n-th campus record (M's order is not the flow order)
 function actCheck(){
-  if(!TEAM || ADMIN_KEY || SCREEN || LOCAL || actBusy || actPending || typeof MI === 'undefined' || intro) return; if(!tutDone() || (tutStep >= 0 && tutStep < 99)) return;
+  if(!TEAM || SCREEN || LOCAL || actBusy || actPending || typeof MI === 'undefined' || intro || document.body.classList.contains('admin')) return; if(!tutDone() || (tutStep >= 0 && tutStep < 99)) return;
   const seen = actSeen();
   for(let n = 1; n <= 3; n++){ if(seen >= n) continue; const z = campusZone(n); if(!z || !zoneDone(z)) return; playAct(n); return; }
 }
@@ -7405,8 +7406,8 @@ function goBack(){ STAGED = false; controls.minDistance = 40; setWorld('erica');
 const TUT = [
   {t:'난 보이드. 도로랜드가 세워지기 전부터 이 섬의 모습을 기록해 온 로봇이야.', pose:'say', world:'erica'},
   {t:'섬이 어떻게 생겼는지, 어디에 뭐가 있었는지, 전부 내 기록에 남아 있어야 해.', pose:'idle', world:'erica'},
-  {t:'그런데 지금 그 기록 중 다섯 군데가 사라졌어.', pose:'idle', world:'erica'},
-  {t:'기록이 돌아오면 섬에 흐르는 일루아의 흐름이 보여.', pose:'say', world:'erica'},
+  {t:'그런데 지금 그 기록 중 다섯 군데가 비어서 일루아의 흐름을 파악하기 어려운 상태야.', pose:'idle', world:'erica'},
+  {t:'기록이 돌아오면 섬에 흐르는 일루아의 흐름을 파악하고 환원 시뮬레이터를 가동할 수 있어.', pose:'say', world:'erica'},
   {t:'트윈된 공간 속에서 모든 흐름을 확보하면 일루아를 환원하는 시뮬레이션을 가동시킬 수 있어.', pose:'idle', world:'erica'},
   {t:'여기는 네가 있는 ERICA 캠퍼스야.', pose:'say', world:'erica', do:()=>{ try{ flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1200); }catch(e){} }},
   {t:'그리고 여기는 도로랜드 섬이야.', pose:'say', world:'island'},
@@ -7414,15 +7415,15 @@ const TUT = [
   {t:'캠퍼스에서 짝이 되는 자리를 찾아 기록을 남기면, 섬의 비어 있던 기록이 채워져.', pose:'say', world:'island'},
   {t:'네가 찾는 건 이 섬에 예전에 흐르던 일루아의 흐름이야. 내 기록이 돌아와야 그 흐름을 찾을 수 있어.', pose:'idle', world:'island'},
   {t:'다시 캠퍼스로 가자. 사라진 기록 다섯 개 중 세 개는 캠퍼스에서, 두 개는 섬 안에서 찾을 수 있어.', pose:'say', world:'erica'},
-  {t:'첫 번째 기록은 지금 네가 있는 이 건물에서 반응하고 있어. 전시대로 가 봐.', pose:'say', world:'erica', do:()=>{ const m = MISSION_E.find(x=> x.id === 'z1'); if(m && m.bi != null) select(m.bi, true); }},
+  {t:'첫 번째 기록은 지금 네가 있는 이 건물에서 반응하고 있어. 전시대로 가 봐.', pose:'say', world:'erica', do:()=>{ const m = MISSION_E.find(x=> x.id === 'z1'); TUT_SPOT = 'z1'; paint(); if(m && m.bi != null) select(m.bi, true); setTimeout(()=> qPop('융합교육관'), 900); }},
   {t:'거기 있는 물건을 Scaniverse로 한 바퀴 빙 돌면서 찍어. 제대로 찍지 않으면 기록을 되찾을 수 없으니까 꼼꼼하게.', pose:'shy', world:'erica'},
   {t:'다 찍었으면 Scaniverse에서 「공유」를 누르고 「링크 복사」를 눌러. 이 링크가 네 기록이야.', pose:'say', world:'erica', card:'<ol class="how"><li><i>1</i>Scaniverse에서 스캔 열기</li><li><i>2</i>「공유」 누르기</li><li><i>3</i>「링크 복사」</li></ol>'},
   {t:'다시 여기로 돌아와서 「스캔 링크」 칸에 붙여 넣고 「제출」. 그러면 내가 기록에 넣을게.', pose:'joy', world:'erica', card:'<ol class="how"><li><i>4</i>이 앱으로 돌아오기</li><li><i>5</i>「스캔 링크」 칸에 붙여 넣기</li><li><i>6</i>「제출」</li></ol>', do:()=>{ setPanel(true); const f = document.querySelector('.cardsub input'); if(f) f.classList.add('pulse'); }},
   {t:'막히면 「보이드」 버튼을 눌러서 다시 나를 찾아! 자, 전시대로 가 보자.', pose:'joy', world:'erica'}];
 const tutDone = ()=> TUT_LOCAL || !!myEntry().tut;
 function maybeGuide(){ if(!TEAM || SCREEN || LOCAL || intro || tutStep >= 0 || tutDone() || $('teamPick').dataset.on || typeof MI === 'undefined') return; tutStep = 0; $('tutSkip').hidden = !ADMIN_KEY; tutShow(); }
-function tutShow(){ const st = TUT[tutStep]; if(st.world && W.id !== st.world) tutWorld(st.world); voidShow(st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
-function tutEnd(){ voidHide(); $('tutSkip').hidden = true; if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
+function tutShow(){ const st = TUT[tutStep]; if(TUT_SPOT && tutStep < 11){ TUT_SPOT = null; paint(); } if(st.world && W.id !== st.world) tutWorld(st.world); voidShow(st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
+function tutEnd(){ voidHide(); $('tutSkip').hidden = true; TUT_SPOT = null; try{ paint(); }catch(e){} if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
 // the tutorial shows each space by actually going there: a short fade, then a swoop down onto the home view (user, 2026-10-28: the words 「왼쪽·오른쪽」 alone meant nothing on screen)
 function goWorld(id){ return new Promise(res=>{ if(W.id === id){ res(); return; } const wipe = $('tutWipe'); wipe.dataset.on = '1';
   setTimeout(()=>{ setWorld(id, true); let ms = 0; if(!reduce){ const far = camera.position.clone().sub(controls.target).multiplyScalar(1.7).add(controls.target); far.y += 420; camera.position.copy(far); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1700); ms = 1700; } delete wipe.dataset.on; setTimeout(res, ms + 200); }, 360); }); }
@@ -7523,6 +7524,7 @@ const clamp01 = t=> Math.min(Math.max(t,0),1);
 const homeOff = new THREE.Spherical().setFromVector3(HOME.pos.clone().sub(HOME.tgt));
 const startOff = new THREE.Spherical(Math.min(homeOff.radius*1.75, 3100), 0.12, homeOff.theta - 1.3);
 let intro = null;
+let TUT_SPOT = null;   // the zone the tutorial is pointing at right now (user, 2026-10-28: 「여기서 미션을 해야 한다」 feel on 융합교육관)
 B.forEach(b=>{ b.delay = 1.5 + Math.hypot(b.cx+120, b.cz+120)/800*1.4 + (b.mission ? 0.5 : 0); });
 function setIntroE(t){
   const pk = easeIO(clamp01((t-0.9)/3.4));
