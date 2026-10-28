@@ -6404,7 +6404,7 @@ const eriAnim = [];
         const roof = new THREE.BoxGeometry(34, 0.5, 9); roof.rotateY(-ax.ang); roof.translate(hx, 7.5, hz); roofs.push(roof); for(const e of [-14, 0, 14]){ const [px, pz] = P(e, sd*ax.W*0.47); const col = new THREE.CylinderGeometry(0.22, 0.22, 7.5, 8); col.translate(px, 3.75, pz); roofs.push(col); } }
       else if(meta.kind === 'swimming_pool'){ slabOf(pts, 0.16, 0x6fc3e8); } });
     Object.entries(slabs).forEach(([c, gs])=> addM(mergeGeometries(gs), lam(+c, {polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4}), G, false));
-    if(white.length) addM(mergeGeometries(white), new THREE.MeshBasicMaterial({color:0xffffff}), G, false);
+    if(white.length) addM(mergeGeometries(white), new THREE.MeshBasicMaterial({color:0xffffff, polygonOffset:true, polygonOffsetFactor:-8, polygonOffsetUnits:-8}), G, false);   // the slabs are offset toward the camera; the lines must win at grazing angles
     if(nets.length) addM(mergeGeometries(nets), lam(0x2b3038, {transparent:true, opacity:0.75}), G, false);
     if(hoops.length) addM(mergeGeometries(hoops), lam(0xf2f3f5)); if(goals.length) addM(mergeGeometries(goals), lam(0xffffff)); if(stands.length) addM(mergeGeometries(stands), lam(0x86b06a)); if(roofs.length) addM(mergeGeometries(roofs), lam(0x1d3a6b));
     window.__deco2.sports = {tennisNets:nets.length, hoops:hoops.length/2, goals:goals.length/3, stands:stands.length}; }
