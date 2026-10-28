@@ -628,7 +628,7 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 <div id="orderDlg" role="dialog" aria-modal="true"><div class="in"><small>VIRTUAL TEST</small><h1>가상 시험</h1><p id="odP">환원할 순서대로 누르세요</p><div class="isl"><i class="car"></i><button type="button" data-od="forest"><i></i>안쪽 숲</button><button type="button" data-od="valley"><i></i>계곡</button><button type="button" data-od="shore"><i></i>바닷가</button></div><div class="warn" id="odWarn" hidden>시설 이상 현상 예상</div><div class="row"><button type="button" class="go" id="odGo" disabled>시험</button><button type="button" class="later" id="odReset">다시</button></div></div></div>
 <div id="callDlg" role="dialog" aria-modal="true"><div class="in"><small>CALL</small><div id="callLines"></div><div class="row"><button type="button" class="go" id="callGo">섬으로 가기</button><button type="button" class="later" id="callLater">조금 뒤에</button></div></div></div>
 <button type="button" id="callPill">섬에서 부르고 있어</button>
-<div id="recDone" role="dialog" aria-modal="true"><div class="rays"></div><div class="in"><small>RECORD RESTORED</small><div class="ring"><i></i><b id="rdN">01</b></div><h1 id="rdT">기록 01 복구 완료</h1><p id="rdP"></p><div class="cells" id="rdCells"></div><span class="next" id="rdNext">Space ▸ 계속</span></div></div><div id="voidVn" aria-live="polite"><button type="button" id="tutSkip" hidden>건너뛰기 ›</button><div class="in"><img id="voidImg" src="img/chars/void.png" alt=""><div class="box"><b>보이드</b><p id="voidTxt"></p><div id="voidCard"></div><span class="dots" id="tutDots"></span><span class="nav"><button type="button" id="tutPrev" hidden>‹ 이전</button><i id="voidNext"></i></span></div></div></div><div id="tutWipe"></div>
+<div id="recDone" role="dialog" aria-modal="true"><div class="rays"></div><div class="in"><small>RECORD RESTORED</small><div class="ring"><i></i><b id="rdN">01</b></div><h1 id="rdT">기록 01 복구 완료</h1><p id="rdP"></p><div class="cells" id="rdCells"></div><span class="next" id="rdNext">Space ▸ 계속</span></div></div><div id="voidVn" aria-live="polite"><button type="button" id="tutSkip" hidden>건너뛰기 ›</button><div class="in"><img id="voidImg" src="img/chars/void.png?v=20261028c" alt=""><div class="box"><b>보이드</b><p id="voidTxt"></p><div id="voidCard"></div><span class="dots" id="tutDots"></span><span class="nav"><button type="button" id="tutPrev" hidden>‹ 이전</button><i id="voidNext"></i></span></div></div></div><div id="tutWipe"></div>
 <section id="questHud" hidden aria-live="polite"><i class="mk"></i><div><small>MISSION <em id="qhStep"></em></small><b id="qhT"></b><span id="qhHint"></span></div><div class="nav" aria-hidden="true"><i id="qhArrow"></i><b id="qhDist"></b></div><button type="button" id="qTmp" class="tmp">임시 완료</button></section>
 <div id="qPop" hidden><b></b></div>
 <div id="vn" aria-live="polite"><button type="button" id="vnSkip">건너뛰기 ›</button><div class="in"><img id="vnImg" alt=""><div class="box"><b id="vnName"></b><span class="dots" id="vnDots"></span><p id="vnText"></p><span class="nav"><button type="button" id="vnPrev" hidden>‹ 이전</button><i id="vnNext">Space</i></span></div></div></div>
@@ -6453,7 +6453,7 @@ function maybeRestore(delay){
 }
 function openRestore(){ $('restoreGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 120); const tested = typeof QUESTS === 'object' && QDONE.has('q3'); $('restoreP').textContent = SCREEN || tested ? '일루아를 환원할 준비가 끝났습니다.' : '코덱스와 눈 문양 동굴로 가서 가상 시험을 통과하세요.'; $('restoreGo').textContent = SCREEN || tested ? '환원하기' : '동굴로 가기'; $('restoreDlg').dataset.on = '1'; try{ sessionStorage.setItem(`void-restore-${viewTeam()}`, '1'); }catch(e){} }
 function playRestore(){ const v = $('cinemaV'); $('cinemaEnd').hidden = true; $('cinema').hidden = false; v.src = RESTORE_VIDEO; v.currentTime = 0; v.play().catch(()=>{}); }
-function endRestore(){ $('cinemaV').pause(); const e = $('cinemaEnd'); if(!e.querySelector('.epi')){ e.querySelector('h1').insertAdjacentHTML('beforebegin', `<div class="epig">${glyphSVG(GLYPH_ZONES.map(z=> z.id), 120)}</div>`); e.querySelector('h1').insertAdjacentHTML('afterend', `<div class="epi">${[['zero_hmm', '제로', '……이게 흐름의 모양이야?'], ['rico', '리코', '코덱스의 문양은 이 흐름을 본떠 만든 거였어.'], ['codex', '코덱스', '고맙다. 너희가 아니었으면 끝까지 몰랐을 거다.']].map(([i, w, t])=> `<div class="cl"><span class="pic"><img src="img/chars/${i}.png" alt=""></span><div><b>${w}</b><p>${t}</p></div></div>`).join('')}</div>`); } e.hidden = false; }
+function endRestore(){ $('cinemaV').pause(); const e = $('cinemaEnd'); if(!e.querySelector('.epi')){ e.querySelector('h1').insertAdjacentHTML('beforebegin', `<div class="epig">${glyphSVG(GLYPH_ZONES.map(z=> z.id), 120)}</div>`); e.querySelector('h1').insertAdjacentHTML('afterend', `<div class="epi">${[['zero_hmm', '제로', '……이게 흐름의 모양이야?'], ['rico', '리코', '코덱스의 문양은 이 흐름을 본떠 만든 거였어.'], ['codex', '코덱스', '고맙다. 너희가 아니었으면 끝까지 몰랐을 거다.']].map(([i, w, t])=> `<div class="cl"><span class="pic"><img src="img/chars/${i}.png?v=20261028c" alt=""></span><div><b>${w}</b><p>${t}</p></div></div>`).join('')}</div>`); } e.hidden = false; }
 $('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
 async function restoreShow(){ actBusy = true; if(walk) stopWalk(); try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){}
   await goWorld('island'); await wait(300); if(!simOn) setSim(true); await wait(reduce ? 300 : 1900);
@@ -7176,7 +7176,7 @@ function questApply(){
 }
 function renderWalkPick(){
   $('wpGrid').innerHTML = WALKERS.map(n=>{ const ok = walkerOpen(n), q = questFor(n), mine = q && chainOpen(q) && !questDone(q), imgs = WALK_IMG[n] || [];
-    const pic = imgs.length ? imgs.map(i=> `<img src="img/chars/${i}.png" alt="">`).join('') : '<i class="orb"></i>';
+    const pic = imgs.length ? imgs.map(i=> `<img src="img/chars/${i}.png?v=20261028c" alt="">`).join('') : '<i class="orb"></i>';
     return `<button type="button" class="${n === PAIR ? 'pair' : ''}${ok ? '' : ' lock'}${mine ? ' now' : ''}" data-walk="${n}" ${ok ? '' : 'disabled'}>${mine ? '<span class="tag">지금 할 미션</span>' : ''}<span class="pic">${pic}</span><b>${n}</b>${!ok ? `<em><i class="lk"></i>${esc(walkerWhy(n))}</em>` : mine ? `<em>${esc(q.title)}</em>` : ''}</button>`; }).join('');
 }
 function questRefresh(){
@@ -7266,7 +7266,7 @@ function onTeamComplete(q){   // every tablet of the team has finished q: this o
 function showReward(q){
   const n = QUESTS.indexOf(q) + 1, zs = q.zones.map(id=> MISSION_E.find(m=> m.id === id)).filter(Boolean), isl = MI.find(m=> m.id === q.restores), L = (ACT_EXIT[q.id] || {}).card;
   $('qrS').textContent = `MISSION ${n} CLEAR`; $('qrT').textContent = isl ? `${isl.name}가 돌아왔습니다` : '미션 완료';
-  $('qrP').innerHTML = L ? `<img class="por" src="img/chars/${L.img}.png" alt=""><b>${esc(L.who)}</b> ${esc(L.text)}` : '';
+  $('qrP').innerHTML = L ? `<img class="por" src="img/chars/${L.img}.png?v=20261028c" alt=""><b>${esc(L.who)}</b> ${esc(L.text)}` : '';
   $('qrList').innerHTML = zs.map(m=> `<div class="z"><span>기록 0${MISSION_E.indexOf(m) + 1}</span><code>${coordText(m)}</code></div>`).join('');
   qRewardEl.querySelector('.steps').hidden = true; $('qrMap').textContent = zs.length ? '좌표 받고 돌아가기' : '돌아가기'; $('qrStay').hidden = true;
   qRewardEl.dataset.on = '1';
@@ -7416,7 +7416,7 @@ async function playAct(n){
   say(ACT_STORY[n], ()=>{ actBusy = false; startWalk(ACT_WALKER[n]); });
 }
 function openCall(n){
-  actPending = n; $('callLines').innerHTML = ACT_CALL[n].map(L=> `<div class="cl"><span class="pic">${L.img ? `<img src="img/chars/${L.img}.png" alt="">` : '<img src="img/chars/void_idle.png" alt="">'}</span><div><b>${esc(L.who)}</b><p>${esc(L.text)}</p></div></div>`).join('');
+  actPending = n; $('callLines').innerHTML = ACT_CALL[n].map(L=> `<div class="cl"><span class="pic">${L.img ? `<img src="img/chars/${L.img}.png?v=20261028c" alt="">` : '<img src="img/chars/void_idle.png?v=20261028c" alt="">'}</span><div><b>${esc(L.who)}</b><p>${esc(L.text)}</p></div></div>`).join('');
   $('callDlg').dataset.on = '1';
 }
 $('callGo').onclick = async ()=>{ const n = actPending; if(!n) return; delete $('callDlg').dataset.on; delete $('callPill').dataset.on; saveAct(n); actPending = 0; actBusy = true;
