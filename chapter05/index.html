@@ -3595,8 +3595,8 @@ const SAFARI_GATE_A = 0.339;   // the entrance path reaches the fence at this an
   safari.children.forEach(o=>{ if(!o.isGroup || o === jeep || o === arch || o === tower) return; const rx = o.position.x/47, rz = (o.position.z + 4)/32.5, r = Math.hypot(rx, rz); if(r < 0.86 || r > 1.18) return;
     const k = 1.26/r; o.position.x = rx*k*47; o.position.z = rz*k*32.5 - 4; });
 }
-place(safari, -330/K, -230/K); safari.scale.setScalar(1.35);   // swapped with the treehouse village, kept off the coast (user, 2026-10-28)
-mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-330/K, cz:-230/K, h:26, r:80,
+place(safari, -300/K, -200/K); safari.scale.setScalar(1.55);   // a touch toward the centre and larger (user, 2026-10-28)   // swapped with the treehouse village, kept off the coast (user, 2026-10-28)
+mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-300/K, cz:-200/K, h:26, r:80,
   desc:'초원과 물웅덩이, 아카시아 나무 사이로 기린 · 코끼리 · 얼룩말 · 사자 · 플라밍고가 사는 사파리. 신입사원들은 카메라를 단 호랑이 무늬 도로 카로 운전면허 코스(동물 횡단 STOP, 체크무늬 결승 깃발)를 달렸습니다.',
   facts:[['챕터','1 · 신비한 초대'],['볼거리','동물, 전망대, 운전면허 코스, 도로 카']]});
 
@@ -4715,8 +4715,8 @@ const village = new THREE.Group();
     add(village, new THREE.SphereGeometry(1.2*s, 10, 6, 0, Math.PI*2, 0, Math.PI/2), new THREE.MeshLambertMaterial({color:[0x7fd7ff, 0xb9a6ff, 0x9dffb0][i%3], emissive:[0x2a8ab8, 0x6a4bc4, 0x2f9d63][i%3], emissiveIntensity:0.8}), Math.cos(a)*r, 1.6*s, Math.sin(a)*r, false); }
   add(village, CYL(5, 5, 0.6, 16), mat(0x8a6243), 6, 0, 8); add(village, CONE(2, 3, 6), glowMat(0xffa53b), 6, 0.6, 8, false);
 }
-place(village, -205, -40);   // the old safari lot (user, 2026-10-28)
-pickable(village, {n:'트리하우스 빌리지', c:'place', sub:'숲 속', cx:-205, cz:-40, h:32, r:34,
+place(village, -232, -14); village.scale.setScalar(1.5);   // the old safari lot, grown to fill it (user, 2026-10-28)
+pickable(village, {n:'트리하우스 빌리지', c:'place', sub:'숲 속', cx:-232, cz:-14, h:32, r:34,
   desc:'숲 속 큰 나무 위에 지은 집들을 줄다리로 이은 마을. 발밑에는 빛나는 버섯이 자랍니다.', facts:[['등장','챕터 3 · 4'],['특징','나무 위 집, 줄다리, 빛 버섯']]});
 
 // ---------- story props ----------
