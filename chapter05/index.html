@@ -1699,7 +1699,7 @@ function zoneCard(m, k){
     </div>`; }
   if(W.id==='island') return `
     <div class="ms is-ok ${m.bi===selected?'on':''}" data-m="${k}" role="button" tabindex="0">
-      <div class="top"><h4>${esc(m.name)}</h4><span class="st ok">돌아온 기록 ${m.scans.length}건</span></div>
+      <div class="top"><h4>${esc(m.name)}</h4><span class="st ok">돌아온 기록${m.scans.length ? ` ${m.scans.length}건` : ''}</span></div>
       <div class="chap">${esc(m.ch||'')}</div>
       ${twinLine(m)}${thumbsHTML(m.scans)}
     </div>`;
@@ -2948,6 +2948,8 @@ add(cave, new THREE.TorusGeometry(14, 4.2, 8, 18, Math.PI), flat(C.rock), 0, 0, 
 add(cave, new THREE.CircleGeometry(12.5, 24, 0, Math.PI), glowMat(0x0d0f14), 0, 0, -0.6, false);
 const caveEye = add(cave, new THREE.PlaneGeometry(26, 26), new THREE.MeshBasicMaterial({map:eyeTex('#ffd84a'), transparent:true, depthWrite:false, side:THREE.DoubleSide}), 0, 30, 2, false);
 for(let i=0;i<4;i++) add(cave, ICO(4+i,0), flat(C.rock), -20+i*13, 1, 4+(i%2)*3);
+add(cave, new THREE.SphereGeometry(17, 16, 10, 0, Math.PI*2, 0, Math.PI/2), flat(C.rock), 0, -0.5, -11).scale.set(1.1, 0.95, 0.55);   // the hill the cave is dug into: closes the back
+add(cave, ICO(7, 0), flat(C.rock), -14, 1, -14).rotation.set(0.4, 1.1, 0); add(cave, ICO(6, 0), flat(C.rock), 13, 0.5, -15).rotation.set(0.2, 2.3, 0); add(cave, ICO(5, 0), flat(C.rock), 2, 9, -19);
 place(cave, -31, -391, 0.35);
 islAnim.push(t=>{ caveEye.material.opacity = 0.65 + 0.35*Math.sin(t*1.6); caveEye.position.y = 30 + Math.sin(t*0.9)*1.5; });
 pickable(cave, {n:'눈 문양 동굴', c:'place', sub:'챕터 1', cx:-31, cz:-391, h:40, r:24,
@@ -5749,7 +5751,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     islAnim.push(()=>{ const h = +$('hr').value, up = Math.max(Math.sin(sunDir(h).el), 0), night = 1 - Math.min(up*2.2, 1);
       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
     // camera helper for screenshots: window.__islandCam(x, z, distance)
-    window.__dbg = {THREE, say:(...a)=> say(...a), chars:()=> ({ZERO, RICO, XYLO, CODEX, NATY}), rigPose:(...a)=> rigPose(...a), act:(n)=> playAct(n), tutEnd:()=> tutEnd(), simState:()=> ({simOn, lit:SIM_LIT, reveals:REVEALS.length, busy:actBusy, walk:!!walk, vn:!!vn, cinema:!$('cinema').hidden}), tutState:()=> ({step:tutStep, world:W.id, len:TUT.length, LOCAL, locked:MISSION_E.filter(m=> m.lat != null).map(m=> [m.id, zoneLocked(m), zoneDone(m)]), restoreShow:typeof restoreShow, goWorld:typeof goWorld, vnVoid:VN_IMG['보이드']}), islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
+    window.__dbg = {THREE, say:(...a)=> say(...a), walkTo:(x, z)=>{ if(walk){ walk.x = x; walk.z = z; } }, walkState:()=> walk ? {x:walk.x, z:walk.z, name:walk.name} : null, mini:()=> mini ? {kind:mini.kind, at:mini.at, done:mini.done, spots:mini.spots ? mini.spots.map(sp=> ({id:sp.id, at:sp.at, on:sp.on})) : null} : null, target:()=> questLive ? questTarget(questLive) : null, qdone:()=> [...QDONE], quests:()=> QUESTS.map(q=> ({id:q.id, open:questOpen(q), done:questDone(q)})), act:(n)=> playAct(n), chars:()=> ({ZERO, RICO, XYLO, CODEX, NATY}), rigPose:(...a)=> rigPose(...a), act:(n)=> playAct(n), tutEnd:()=> tutEnd(), simState:()=> ({simOn, lit:SIM_LIT, reveals:REVEALS.length, busy:actBusy, walk:!!walk, vn:!!vn, cinema:!$('cinema').hidden}), tutState:()=> ({step:tutStep, world:W.id, len:TUT.length, LOCAL, locked:MISSION_E.filter(m=> m.lat != null).map(m=> [m.id, zoneLocked(m), zoneDone(m)]), restoreShow:typeof restoreShow, goWorld:typeof goWorld, vnVoid:VN_IMG['보이드']}), islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, CODEX_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -6456,11 +6458,14 @@ $('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
 async function restoreShow(){ actBusy = true; if(walk) stopWalk(); try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){}
   await goWorld('island'); await wait(300); if(!simOn) setSim(true); await wait(reduce ? 300 : 1900);
   buildSim(GLYPH_ZONES.map(z=> z.id)); const endT = Math.max(0, ...REVEALS.map(r=> r.delay + r.dur), ...FADES.map(f=> f.delay + f.dur)); await wait((endT + 2.4)*1000);
-  actBusy = false; playRestore(); }
+  await voidAsk('봐. 이게 섬에 흐르던 일루아의 흐름이야. 원천에서 옛 물길까지 전부 이어졌어.', 'joy');
+  await voidAsk('이 모양, 어디서 본 것 같지 않아? 코덱스 가문의 눈 문양은 이 흐름을 본떠 만든 거였어.');
+  $('simGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 150); $('simDone').dataset.on = '1'; restoreNext = ()=>{ actBusy = false; playRestore(); }; }
+let restoreNext = null;
 $('restoreGo').onclick = ()=>{ delete $('restoreDlg').dataset.on; if(SCREEN || QDONE.has('q3')){ restoreShow(); return; } if(W.id !== 'island') setWorld('island', true); if(simOn) setSim(false); setTimeout(()=> startWalk('코덱스'), W.id === 'island' ? 0 : 1200); };
 $('restoreBtn').onclick = openRestore;
 $('cinemaV').onended = endRestore; $('cinemaV').onerror = endRestore; $('cinemaSkip').onclick = endRestore;
-$('cinemaX').onclick = ()=>{ const v = $('cinemaV'); v.pause(); v.removeAttribute('src'); v.load(); $('cinema').hidden = true; STAGED = false; controls.minDistance = 40; if(simOn) setSim(false); if(W.id !== 'island') setWorld('island'); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1600); $('restoreBtn').hidden = false; $('restoreBtn').textContent = '환원하기'; $('restoreBtn').onclick = playRestore; };
+$('cinemaX').onclick = ()=>{ const v = $('cinemaV'); v.pause(); v.removeAttribute('src'); v.load(); $('cinema').hidden = true; STAGED = false; controls.minDistance = 40; if(simOn) setSim(false); if(W.id !== 'island') setWorld('island'); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1600); $('restoreBtn').hidden = false; };
 buildSim();
 maybeRestore(7000);
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
@@ -6480,6 +6485,7 @@ function arriveFx(ids){
   if(W.id !== 'island'){ const zs = ids.map(id=> MI.find(m=> m.id === id)).filter(Boolean); if(zs.length) toast(`${zs.map(z=> z.name).join('·')} 구역의 기록이 돌아왔습니다`); return; }   // never switch the screen on its own (user): on the campus the void says it, the island shows it when the child goes there
   if(simOn) return;   // the vein sweep is the arrival there
   const zones = ids.map(id=> MI.find(m=> m.id === id)).filter(m=> m && m.b);
+  if(actBusy || vn || $('voidVn').dataset.on || $('recDone').dataset.on || walk) return;   // never during a dialogue, a scene or a walk
   if(zones.length === 1){ const b = zones[0].b, R = (b.r || 24); flyTo(new THREE.Vector3(b.cx + R*2.6 + 90, 150 + R*1.6, b.cz + R*3.2 + 140), new THREE.Vector3(b.cx, G + 12, b.cz), 1300); }
   else flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1300);
   zones.forEach((m, i)=>{
@@ -6542,7 +6548,7 @@ function setSim(on){
   else { clearTimeout(simDoneT); islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
 $('simBtn').onclick = ()=> setSim(!simOn);
-$('simDoneX').onclick = ()=>{ delete $('simDone').dataset.on; };
+$('simDoneX').onclick = ()=>{ delete $('simDone').dataset.on; if(restoreNext){ const f = restoreNext; restoreNext = null; f(); } };
 // ---------- characters ----------
 const SKIN = 0xf8d5bd;
 function limb(parent, r, len, color, x, y, z){
@@ -7012,7 +7018,7 @@ function infoI(i, move){
   const back = m && zoneDone(m);
   $('iS').style.background = back ? 'var(--restored)' : CATS_I[b.c].color;
   $('iC').textContent = back ? '돌아온 기록' : CATS_I[b.c].name;
-  $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록 ${m.scans.length}건</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
+  $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록${m.scans.length ? ` ${m.scans.length}건` : ''}</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
   $('iDl').hidden = true; $('iNote').hidden = true; $('iIsl').hidden = false;
   $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + (b.c==='char' && walkerOf(b.label) && !walk ? (walkerOpen(walkerOf(b.label)) ? `<button class="enter" data-walk="${esc(walkerOf(b.label))}">${esc(walkerOf(b.label))}의 시점으로 탐험</button>` : `<p class="desc" style="opacity:.7">${esc(walkerOf(b.label))}의 시점은 ${esc(walkerWhy(walkerOf(b.label)))} 열립니다.</p>`) : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
   if(move){
@@ -7204,8 +7210,8 @@ const QUEST_INTRO = {
     {who:'자일로', img:'xylo_talk', text:'네이티, 코덱스가 어디에도 보이지 않습니다. 미로 정원 쪽에서 빛이 흔들렸다는 얘기가 있어요.'},
     {who:'네이티', img:'naty_green', nar:true, text:'네이티의 불꽃이 초록으로 바뀌며 미로 정원 쪽으로 기운다.'}],
   q3: ()=> [
-    {who:'코덱스', img:'codex', text:'눈 문양 동굴. 내가 오랫동안 들어가지 못했던 곳이지.'},
-    {who:'코덱스', img:'codex_side', text:'북쪽 해안으로 간다. 그곳에 마지막 기록이 있어.'}],
+    {who:'코덱스', img:'codex', text:'눈 문양 동굴. 우리 가문이 문양을 처음 새긴 곳이다.'},
+    {who:'코덱스', img:'codex_side', text:'북쪽 해안으로 간다. 그곳에서 환원을 시험해 보자.'}],
 };
 const QUEST_FOUND = {
   q1: ()=> [
@@ -7242,7 +7248,7 @@ function questTick(){
 function questComplete(q){
   q.found = false; QDONE.add(q.id); saveQuest(); questLive = null; $('questHud').hidden = true; miniClear();
   questApply(); renderList(); renderBoard();
-  if(q.mini === 'order'){ stopWalk(); setTimeout(playRestore, 400); return; }
+  if(q.mini === 'order'){ stopWalk(); setTimeout(restoreShow, 400); return; }
   if(q.restores){ actExit(q); return; }
   showReward(q);
 }
@@ -7328,6 +7334,7 @@ async function voidHelp(){ if($('voidVn').dataset.on || actBusy || vn) return;
   if(tutStep >= 0 && tutStep < 99) return;
   if(!TEAM){ await voidAsk('먼저 위에서 우리 조를 골라 줘.'); return; }
   if(!tutDone()){ tutStep = 0; $('tutSkip').hidden = false; tutShow(); return; }
+  if(QDONE.has('q3')){ await voidAsk('환원은 끝났어. 섬에 흐르던 일루아의 흐름이 코덱스 가문의 눈 문양이었지.', 'joy'); await voidAsk('영상을 다시 보고 싶으면 한 번 더 눌러 줘.'); if(voidHelp.again){ voidHelp.again = false; playRestore(); } else voidHelp.again = true; return; }
   if(W.id === 'island'){ const q = QUESTS.find(x=> chainOpen(x) && !questDone(x));
     if(q){ await voidAsk(`지금 할 미션은 「${q.title}」이야. 「탐험」을 눌러 ${q.who[0]}의 시점으로 걸어가 봐.`); await voidAsk(`힌트: ${q.hint}.`, 'idle'); }
     else await voidAsk('섬에서는 지금 할 미션이 없어. 「ERICA 캠퍼스」로 돌아가서 기록을 찾자.', 'idle'); return; }
@@ -7448,7 +7455,7 @@ const TUT = [
   {t:'섬이 어떻게 생겼는지, 어디에 뭐가 있었는지, 전부 내 기록에 남아 있어야 해.', pose:'idle', world:'erica'},
   {t:'그런데 지금 그 기록 중 다섯 군데가 비어서 일루아의 흐름을 파악하기 어려운 상태야.', pose:'idle', world:'erica'},
   {t:'기록이 돌아오면 섬에 흐르는 일루아의 흐름을 파악하고 환원 시뮬레이터를 가동할 수 있어.', pose:'say', world:'erica'},
-  {t:'트윈된 공간 속에서 모든 흐름을 확보하면 일루아를 환원하는 시뮬레이션을 가동시킬 수 있어.', pose:'idle', world:'erica'},
+  {t:'그러려면 트윈된 공간 속에서 흐름 다섯 개를 모두 확보해야 해. 그게 우리가 할 일이야.', pose:'idle', world:'erica'},
   {t:'여기는 네가 있는 ERICA 캠퍼스야.', pose:'say', world:'erica', do:()=>{ try{ flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1200); }catch(e){} }},
   {t:'그리고 여기는 도로랜드 섬이야.', pose:'say', world:'island'},
   {t:'이 두 공간은 서로 이어져 있어. 캠퍼스의 어떤 자리는 섬의 어떤 자리와 짝이 되어 있지. 이런 걸 트윈이라고 해.', pose:'idle', world:'island'},
