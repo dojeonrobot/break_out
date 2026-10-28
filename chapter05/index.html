@@ -586,7 +586,6 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
     <div><dt>층수</dt><dd id="iL"></dd></div>
     <div><dt>높이</dt><dd id="iH"></dd></div>
     <div><dt>바닥면적</dt><dd id="iA"></dd></div>
-    <div><dt>연면적 추정</dt><dd id="iG"></dd></div>
   </dl>
   <div id="iIsl" hidden></div>
   <p class="note" id="iNote"></p>
@@ -1851,13 +1850,11 @@ function select(i, move){
   if(b.isSpot){ $('iDl').hidden = true; $('iNote').innerHTML = m ? `좌표로 정해진 지점입니다. 반지름 약 ${m.radius || 20}m 안에서 찍은 기록이 이 지점으로 들어옵니다.` : ''; const it = document.querySelector(`.item[data-i="${i}"], .ms.on`); it && it.scrollIntoView({block:'nearest'});
     if(move){ const tgt = new THREE.Vector3(b.cx, 0, b.cz), dir = camera.position.clone().sub(controls.target).normalize(); if(dir.y<0.45){ dir.y=0.45; dir.normalize(); } flyTo(tgt.clone().add(dir.multiplyScalar(160)), tgt); }
     return; }
-  const est = b.src==='est';
-  $('iL').innerHTML = `${b.lv}층<span class="tag">${est?'추정':'OSM'}</span>`;
+
+  $('iL').textContent = `${b.lv}층`;
   $('iH').textContent = `약 ${Math.round(b.h)}m`;
   $('iA').textContent = `${fmt(b.a)}㎡`;
-  $('iG').textContent = `${fmt(Math.round(b.a*b.lv/100)*100)}㎡`;
-  $('iNote').innerHTML = (est ? '층수는 OSM에 기록이 없어 추정한 값입니다. ' : '')
-    + `바닥면적은 OSM 외곽선으로 계산했습니다. <a href="https://www.openstreetmap.org/way/${b.id}" target="_blank" rel="noopener">OSM에서 보기</a>`;
+  $('iNote').innerHTML = ''; $('iNote').hidden = true;   // no OSM / estimate footnotes on the campus card (user, 2026-10-28)
   const item = document.querySelector(`.item[data-i="${i}"], .ms.on`); item && item.scrollIntoView({block:'nearest'});
   if(move){
     const tgt = new THREE.Vector3(b.cx, b.h*0.45, b.cz);
