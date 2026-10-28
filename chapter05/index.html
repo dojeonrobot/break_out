@@ -7295,7 +7295,7 @@ const ACT_STORY = {
 const ACT_EXIT = {
   q1: {greet:[{who:'자일로', img:'xylo', text:'롤러코스터의 기록까지 돌아왔군요! 비어 있는 기록은 이제 세 개입니다.'}, {who:'리코', img:'rico_hmm', text:'기록이 돌아올 때마다 흐름이 더 보이는 거지?'}], hud:'흐름 두 구간이 이어졌어. 세 구간 남았어.', give:[{who:'자일로', img:'xylo_point', text:'그리고 기록이 돌아오면서 다음 기록이 잠든 자리가 보였어요. 좌표를 드릴게요.'}], card:{who:'자일로', img:'xylo_talk', text:'그 자리에 뭐가 있는지는 저도 모릅니다. 좌표를 따라가서 찾아 주세요. 저는 여기서 기다리겠습니다.'}},
   q2: {wait:[{who:'코덱스', img:'codex', text:'다른 쪽이 아직 끝나지 않았군. 모두 끝나야 기록이 돌아온다. 기다려라.'}], greet:[{who:'코덱스', img:'codex', text:'회전목마의 기록이 돌아왔군. 하나 남았다.'}], hud:'흐름 네 구간. 이제 한 구간만 비어 있어.', give:[{who:'코덱스', img:'codex_side', text:'마지막 기록의 자리다. 좌표를 주지. 무엇이 있는지는 가서 확인해라.'}], card:{who:'코덱스', img:'codex', text:'무엇이 있는지는 가서 확인해라.'}}};
-const VOICE = {'난 보이드. 도로랜드가 세워지기 전부터 이 섬의 모습을 기록해 온 로봇이야.':'tut01'};   // text -> voice/<file>.mp3 (Artlist, 2026-10-28)
+const VOICE = {};   // voice lines off (user, 2026-10-28: the trial voice was too young); voice/tut01.mp3 is kept, add 'text':'file' here to turn one on   // text -> voice/<file>.mp3 (Artlist, 2026-10-28)
 let voidAudio = null;
 function voidVoice(text){ if(voidAudio){ voidAudio.pause(); voidAudio = null; } const f = VOICE[text]; if(!f) return null; const a = new Audio(`voice/${f}.mp3?v=20261028c`); a.play().catch(()=>{}); voidAudio = a; return a; }
 let voidLast = '', voidTyping = null, voidFull = '', voidHold = 0, tutStep = -1, STAGED = false, voidHist = [], voidView = -1;
