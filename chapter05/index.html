@@ -1327,6 +1327,7 @@ function holeBuild(m){
 function holeApply(it, st){
   const b = it.b, mesh = b.mesh, edge = mesh.children[0]; if(it.st === st) return;
   b.restored = zoneDone(it.m);   // built once at load: a record that came back during the session gets the restored look here
+  if(b.restored && b.ghost) setEricaGhost(b, false);   /* a building that came back keeps its real materials (the ghost ones have no emissive) */
   mesh.material = [b.roof, b.wall]; mesh.castShadow = mesh.receiveShadow = true; edge.material = b.restored ? okEdgeMat : edgeMat; b.hole = false;
   it.st = st; it.g.visible = !!st; it.scan.visible = it.ring.visible = it.ring2.visible = st === 'hole' || st === 'pend'; it.holo.visible = it.halo.visible = it.thread.visible = st === 'back';
   if(st === 'hole' || st === 'pend'){ mesh.material = [HOLE.mats.shell, HOLE.mats.shell]; mesh.castShadow = mesh.receiveShadow = false; if(!edge.geometry.attributes.lineDistance) edge.computeLineDistances(); edge.material = HOLE.mats.edge; b.hole = true;
@@ -1574,7 +1575,7 @@ function applyState(st){
     if(TEAM && typeof QUESTS === 'object'){ const now = teamQuests(TEAM); QUESTS.forEach(q=>{ if(now.includes(q.id) && !teamWas.includes(q.id) && teamDevs(TEAM).length > 1) setTimeout(()=> onTeamComplete(q), 0); }); }
     try{ questRefresh(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
   const done = orbitOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
-  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = orbitScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; if(z && !arrived.includes(z)) arrived.push(z); } } });
+  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = orbitScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; const mz = typeof MI !== 'undefined' ? MI.find(m=> m.id === z) : null; if(z && !arrived.includes(z) && !(mz && zoneDone(mz))) arrived.push(z); } } });
   for(let k = SCANS.length - 1; k >= 0; k--){ const x = SCANS[k]; if((x.kind === 'orbit' || x.kind === 'splat') && !x.demo && !doneIds.has(x.id)){ SCANS.splice(k, 1); changed = true; } }
   if(changed && typeof rescan === 'function' && typeof MI !== 'undefined') rescan(arrived.length ? arrived : undefined, arrived.length > 0); else refreshSubUI();
   try{ maybeGuide(); actCheck(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }
@@ -1891,7 +1892,7 @@ function setTab(t){
 }
 function applyVoidView(){
   const on = tab==='v';
-  if(W.id==='erica'){ B.forEach(b=>{ const g = on && !hiddenZone(b.mission); if(b.isVoidB && b.ghost!==g) setEricaGhost(b, g); }); paint(); }
+  if(W.id==='erica'){ B.forEach(b=>{ const g = on && !hiddenZone(b.mission) && !zoneDone(b.mission); if(b.isVoidB && b.ghost!==g) setEricaGhost(b, g); }); paint(); }
   else IB.forEach(b=>{ if(b.mission && b.ghost) setGhost(b, false); });   // the island never shows holograms: nothing there hints at what is missing
 }
 $('tV').onclick=()=>setTab('v'); $('tR').onclick=()=>setTab('r'); $('tB').onclick=()=>setTab('b');
@@ -1968,6 +1969,7 @@ document.addEventListener('keydown', e=>{
 let fly=null;
 let walk = null;   // first-person walk mode (defined with the island, below)
 function flyTo(pos, tgt, ms=900){
+  if(intro) return;   // the entrance owns the camera; a fly queued under it would jump the view when it ends
   if(reduce){ camera.position.copy(pos); controls.target.copy(tgt); return; }
   fly = {p0:camera.position.clone(), t0:controls.target.clone(), p1:pos, t1:tgt, s:performance.now(), ms};
 }
@@ -7904,7 +7906,7 @@ async function playAct(n){
   await voidAsk('도로랜드 섬에서 환원 시뮬레이터를 일부 작동시킬 수 있을 것 같아. 시뮬레이션을 보러 가자!');
   // 2. the whole transition before any more talk: fade, swoop onto the island, then the simulator's own camera move
   await goWorld('island'); await wait(300);
-  if(!simOn) setSim(true); await wait(reduce ? 300 : 1900);
+  if(!simOn) setSim(true); SIM_REVEAL_T = null; await wait(reduce ? 300 : 1900);   // hold the sweep: buildSim below starts it once, on screen
   // 3. only now the new stretch sweeps in, on screen (after the fifth record every stretch sweeps and the glyph closes); wait for the sweep to end
   if(n === 3) try{ sessionStorage.setItem(`void-simdone-${viewTeam()}`, '1'); }catch(e){}   // the glyph closing here is part of the act; the 「시뮬레이션 성공」 card belongs to the ending
   buildSim(n === 3 ? GLYPH_ZONES.map(z=> z.id) : [ACT_ZONE[n]]);
@@ -7950,7 +7952,7 @@ async function actExit(q){
   actBusy = false; showReward(q);
 }
 function goBack(){ STAGED = false; controls.minDistance = 40; setWorld('erica'); const seen = actSeen(), next = campusZone(seen + 1);
-  setTimeout(async ()=>{ if(next){ if(next.bi != null) select(next.bi, true); setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '마지막 좌표야. 지도에 점으로 찍어 뒀어. 네 좌표를 보면서 점까지 가.' : '좌표를 받았구나. 이동하다 보면 그 좌표에 맞는 위치에 도달할 수 있어. 올바른 좌표에 도달하면 무엇을 스캔해야 하는지 알 수 있을 거야.');
+  setTimeout(async ()=>{ if(next){ setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '마지막 좌표야. 지도에 점으로 찍어 뒀어. 네 좌표를 보면서 점까지 가.' : '좌표를 받았구나. 이동하다 보면 그 좌표에 맞는 위치에 도달할 수 있어. 올바른 좌표에 도달하면 무엇을 스캔해야 하는지 알 수 있을 거야.');
       $('lMe').classList.add('pulse'); await voidAsk('밖으로 나가서 「내 시점」을 켜. 움직일 때마다 좌표가 바뀔 거야.'); await voidAsk('네 좌표가 바뀌는 걸 보면서 좌표에 해당하는 위치까지 가. 카드의 거리가 줄어들면 맞게 가는 거야.', 'idle'); }
     else voidSay('기록 다섯 곳 수집 완료. 보고 대기.', 8000, 'idle'); }, 1200); }
 // ---------- void tutorial (#voidGuide): right after the team is picked, once per team ----------
@@ -8200,13 +8202,13 @@ function tick(now){
     const p = 0.55 + 0.4*Math.sin(now/600), g = 0.5 + 0.5*Math.sin(now/900);
     voidEdgeMat.opacity = p; stripeTex.offset.y = -now/4000;
     beacons.forEach((bm,k)=>{ if(isVoid(M[k])) bm.material.opacity = (0.25+0.25*p)*zoneK; else bm.material.opacity = 0.6*zoneK; });
-    B.forEach(b=>{ if(b.restored && b.roof){ b.roof.emissive.copy(restoredCol).multiplyScalar(0.10+0.14*g); b.wall.emissive.copy(b.roof.emissive); } });
+    B.forEach(b=>{ if(b.restored && b.roof && b.roof.emissive){ b.roof.emissive.copy(restoredCol).multiplyScalar(0.10+0.14*g); b.wall.emissive.copy(b.roof.emissive); } });
     ripples.forEach((rp,k)=>{
       const v = isVoid(M[k]), ph = ((now/(v?1800:2600)) + k*0.37) % 1;
       rp.scale.setScalar(1 + ph*(v?0.35:0.6)); rp.material.opacity = (1-ph)*(v?0.5:0.7)*zoneK;
     });
   } else {
-    B.forEach(b=>{ if(b.restored && b.roof){ b.roof.emissive.copy(restoredCol).multiplyScalar(0.18); b.wall.emissive.copy(b.roof.emissive); } });
+    B.forEach(b=>{ if(b.restored && b.roof && b.roof.emissive){ b.roof.emissive.copy(restoredCol).multiplyScalar(0.18); b.wall.emissive.copy(b.roof.emissive); } });
   }
   rings.forEach(rg=> rg.material.opacity = .75*zoneK);
   pads.forEach((p,k)=> p.material.opacity = (isVoid(M[k]) ? .16 : .26)*zoneK);
