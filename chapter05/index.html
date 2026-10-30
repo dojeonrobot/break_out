@@ -238,7 +238,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 body.screen .trow{padding:12px 14px} body.screen .trow b{font-size:18px} body.screen .trow .tn{font-size:18px} body.screen .trow .cells i{width:34px;height:8px} body.screen .trow .tz em{font-size:13px}
 .bfoot a{font-weight:600;text-decoration:none}
 .subline img{width:100%;height:72px;object-fit:cover;border-radius:6px;margin-bottom:4px;display:block}
-body.screen #panel,body.screen #bar,body.screen #credit,body.screen .bfoot,body.screen #info{display:none}
+body.screen #panel,body.screen #bar,body.screen #credit,body.screen .bfoot,body.screen #info,body.screen #simBtn{display:none}
 body.screen #board{width:460px;max-height:calc(100% - 32px)}
 body.screen #board .bh h2{font-size:22px} body.screen #board .bh b{font-size:34px}
 body.screen .brow{padding:12px;grid-template-columns:64px 1fr auto} body.screen .brow .th{width:64px;height:64px} body.screen .brow h4{font-size:16px} body.screen .brow .pair{font-size:13px}
@@ -509,7 +509,7 @@ body.screen #worlds{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto}
 .gcard b{font-size:13px}.gcard small{font-size:11px;color:var(--muted);line-height:1.4}
 .gcard.new{outline:2px solid var(--restored);animation:rise .6s both}
 #gallery .empty{padding:10px 0 4px}
-@media (pointer:coarse){#credit{display:none} #cV,#cR,.cnt,.brow .th,.brow .pair,#iDl dt,#restoreBtn small,#voidNext,#vnNext,#credit,#credit a,.rec2 small,.rec2 b,#rdNext,#walkHud .hint,.ms .st,#board .bh small{font-size:12px!important} input[type=range]{height:44px} .mini{min-width:44px}}
+@media (pointer:coarse){#credit{display:none} #cV,#cR,.cnt,.brow .th,.brow .pair,#iDl dt,#restoreBtn small,#voidNext,#vnNext,#credit,#credit a,.rec2 small,.rec2 b,#rdNext,#walkHud .hint,.ms .st,#board .bh small{font-size:12px!important} input[type=range]{height:44px} .mini{min-width:44px} .adm .autol{min-height:44px} .adm .autol input[type=checkbox]{width:22px;height:22px;flex:none} .adm .autol select{min-height:44px}}
 @media (prefers-reduced-motion:reduce){#info,#toast,#panel,#bar,#credit,#labels,#board{transition:none}#intro{display:none}.mk.void,.mk.void i{animation:none}}
 </style>
 
@@ -1620,7 +1620,7 @@ function adminHTML(){
   const tile = (k, v, sub)=> `<div class="tile"><small>${k}</small><b>${v}</b>${sub ? `<span>${sub}</span>` : ''}</div>`;
   const table = rows.length ? `<table class="qt big"><thead><tr><th>조 · 태블릿</th>${rows.map(r=> `<th>${r.quest ? '<em>섬</em>' : '<em>캠퍼스</em>'}${esc(r.quest ? r.island.name : r.campus.name)}</th>`).join('')}<th>막</th><th>복구율</th><th></th></tr></thead><tbody>${teams.length ? teams.map(t=>{ const zs = teamZones(t, rows), ok = zs.filter(z=> z.st === 'ok').length, ls = teamDevs(t).length ? teamDevs(t) : ['-'];
       return ls.map((l, li)=>{ const sq = (SQUESTS[t] || {})[l] || {}, dq = devQuests(t, l);
-        return `<tr class="${ok === rows.length ? 'full' : ''} ${li ? 'sub' : ''}"><td><b>${t}조</b>${l !== '-' ? `<span class="dev">-${l}</span>` : ''}</td>${zs.map(z=> z.p.quest ? `<td>${l === '-' ? '' : dq.includes(z.p.quest.quest) ? `<button type="button" class="mini on" data-aq="${t}:${l}:${z.p.quest.quest}:0">완료 ✓</button>` : `<button type="button" class="mini" data-aq="${t}:${l}:${z.p.quest.quest}:1">완료 처리</button>`}</td>` : (li ? '<td></td>' : `<td rowspan="${ls.length}"><span class="st ${z.st}">${z.st === 'ok' ? '돌아옴' : z.st === 'pend' ? '돌아오는 중' : '비어 있음'}</span></td>`)).join('')}<td>${l === '-' ? '—' : sq.act ? `${sq.act}막` : '—'}${l !== '-' && !sq.tut ? '<small>튜토리얼 전</small>' : ''}</td>${li ? '' : `<td rowspan="${ls.length}"><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td>`}<td>${l === '-' ? '' : `<button type="button" class="mini" data-aq="${t}:${l}:*:0" title="이 태블릿의 미션 진행을 지우고 조에서 뺍니다">빼기</button>`}${li ? '' : ` <button type="button" class="mini" data-aq="${t}:*:*:0" ${teamDevs(t).length ? '' : 'hidden'}>조 초기화</button>`}</td></tr>`; }).join(''); }).join('') : `<tr><td colspan="${rows.length + 4}" class="empty">아직 시작한 조가 없습니다</td></tr>`}</tbody></table>` : '';
+        return `<tr class="${ok === rows.length ? 'full' : ''} ${li ? 'sub' : ''}"><td><b>${t}조</b>${l !== '-' ? `<span class="dev">-${l}</span>` : ''}</td>${zs.map(z=> z.p.quest ? `<td>${l === '-' ? '' : dq.includes(z.p.quest.quest) ? `<button type="button" class="mini on" data-aq="${t}:${l}:${z.p.quest.quest}:0">완료 ✓</button>` : `<button type="button" class="mini" data-aq="${t}:${l}:${z.p.quest.quest}:1">완료 처리</button>`}</td>` : (li ? '' : `<td rowspan="${ls.length}"><span class="st ${z.st}">${z.st === 'ok' ? '돌아옴' : z.st === 'pend' ? '돌아오는 중' : '비어 있음'}</span></td>`)).join('')}<td>${l === '-' ? '—' : sq.act ? `${sq.act}막` : '—'}${l !== '-' && !sq.tut ? '<small>튜토리얼 전</small>' : ''}</td>${li ? '' : `<td rowspan="${ls.length}"><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td>`}<td>${l === '-' ? '' : `<button type="button" class="mini" data-aq="${t}:${l}:*:0" title="이 태블릿의 미션 진행을 지우고 조에서 뺍니다">빼기</button>`}${li ? '' : ` <button type="button" class="mini" data-aq="${t}:*:*:0" ${teamDevs(t).length ? '' : 'hidden'}>조 초기화</button>`}</td></tr>`; }).join(''); }).join('') : `<tr><td colspan="${rows.length + 4}" class="empty">아직 시작한 조가 없습니다</td></tr>`}</tbody></table>` : '';
   return `<div class="adm dash">
     <div class="tiles">${tile('참여 조', teams.length, '조를 고른 태블릿 기준')}${tile('다 돌아온 조', full)}${tile('제출', n, `복구됨 ${done}${wait ? ` · 확인 대기 ${wait}` : ''}`)}${tile('숨긴 스캔', HIDDEN.size)}</div>
     <div class="cols">
@@ -1912,7 +1912,7 @@ function select(i, move){
   if(phoneUI()) closePanel();
 }
 $('iX').onclick = ()=>select(-1);
-addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(walk){ stopWalk(); return; } if(!$('cinema').hidden){ $('cinemaX').onclick(); return; } if($('restoreDlg').dataset.on){ delete $('restoreDlg').dataset.on; return; } if($('walkPick').dataset.on){ delete $('walkPick').dataset.on; return; } if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(!$('cap').hidden) closeCapture(); else if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(walk){ stopWalk(); return; } if(!$('cinema').hidden){ $('cinemaX').onclick(); return; } if($('restoreDlg').dataset.on){ delete $('restoreDlg').dataset.on; return; } if($('walkPick').dataset.on){ delete $('walkPick').dataset.on; return; } if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
 
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e){
