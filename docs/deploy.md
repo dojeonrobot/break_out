@@ -67,3 +67,7 @@ sudo tail -20 /var/log/nginx/error.log
 
 - `bak/`, `config/`, `scripts/`는 서버에 올라가지 않음 (로컬 관리용)
 - 전체 배포 용량 약 130MB
+
+## 입장 비밀번호 관문 (2026-10-30)
+
+nginx가 `/chapter0N/`을 쿠키 `doro_chN`으로 막는다(`config/nginx-breakout.conf`, 설명은 CLAUDE.md). 설정을 바꾸면 `config/nginx-breakout.conf`와 `config/nginx-snippet-breakout-headers.conf`를 서버에 올리고 certbot 줄을 유지한 채 `sudo nginx -t && sudo systemctl reload nginx`. 이전 설정 백업은 `/home/ubuntu/breakout.nginx.bak_<ts>` 하나만 둔다. 확인: 쿠키 없이 `curl -I https://breakout.doroedu.co.kr/chapter05/index.html` → 302 /gate.html.

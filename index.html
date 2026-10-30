@@ -356,7 +356,7 @@
         </div>
         
         <p class="text-slate-600 text-sm mb-6 leading-relaxed">
-          <span id="modalChapterName" class="font-bold text-slate-800">해당 챕터</span>에 입장하려면 관리자 비밀번호를 입력해야 합니다.
+          <span id="modalChapterName" class="font-bold text-slate-800">해당 챕터</span>에 입장하려면 입장 비밀번호를 입력해야 합니다.<br>한 번 입력하면 이 기기에서는 다시 묻지 않습니다.
         </p>
         
         <div class="relative">
@@ -368,7 +368,7 @@
         </div>
         
         <p id="passwordError" class="text-rose-500 text-sm mt-3 hidden text-center font-medium flex items-center justify-center">
-          <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i> 비밀번호가 일치하지 않습니다.
+          <i data-lucide="alert-circle" class="w-4 h-4 mr-1"></i> 비밀번호를 입력하세요.
         </p>
         
         <div class="mt-8 flex space-x-3">
@@ -441,29 +441,37 @@
       currentTargetChapterId = null;
     }
 
-    // 비밀번호 확인 및 처리
-    function checkPassword() {
+    // 비밀번호 확인 및 처리 (2026-10-30)
+    // 비밀번호는 이 파일에 없다. 입력값을 해시해 챕터 쿠키(doro_chN)에 넣고 이동하면 nginx가 맞는지 본다
+    // (config/nginx-breakout.conf). 틀리면 nginx가 /gate.html?bad=1 로 보내 거기서 다시 입력한다.
+    // 챕터별 비밀번호는 nginx의 map 값(해시)으로 정한다: 1 0101 · 2 2020 · 3 0303 · 4 4040 · 5 0505.
+    async function sha256(s) {
+      const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    async function checkPassword() {
       const input = document.getElementById('chapterPassword');
       const errorMsg = document.getElementById('passwordError');
-      const password = input.value;
-      
-      // 설정된 비밀번호: 0101
-      if (password === '0101') {
-        // 성공: 해당 챕터 URL로 이동
-        if(currentTargetChapterId && chapterData[currentTargetChapterId]) {
-          window.location.href = chapterData[currentTargetChapterId].url;
-        }
+      const password = input.value.trim();
+      const ch = parseInt(currentTargetChapterId, 10);
+
+      if (password && ch >= 1 && ch <= 5 && chapterData[currentTargetChapterId]) {
+        if (!(window.crypto && crypto.subtle)) { alert('https 주소로 접속해 주세요.'); return; }
+        const t = await sha256('doroland-gate:' + ch + ':' + password);
+        const secure = location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = 'doro_ch' + ch + '=' + t + '; Path=/; Max-Age=15552000; SameSite=Lax' + secure;   // 180일
+        window.location.href = chapterData[currentTargetChapterId].url;
       } else {
-        // 실패: 에러 메시지 표시 및 흔들림 애니메이션 효과
+        // 비어 있음: 에러 메시지 표시 및 흔들림 애니메이션 효과
         errorMsg.classList.remove('hidden');
         input.classList.add('border-rose-500', 'ring-1', 'ring-rose-500', 'animate-shake');
         input.value = '';
         input.focus();
-        
+
         // 애니메이션이 끝나면 클래스 제거 (재사용을 위해)
         setTimeout(() => {
           input.classList.remove('animate-shake');
-        }, 400);
+        }, 500);
       }
     }
   </script>

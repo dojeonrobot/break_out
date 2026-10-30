@@ -12,6 +12,14 @@ DOROLAND Break Out Adventure — 교육용 방탈출 웹 애플리케이션. 빌
 - **배포**: `.\scripts\deploy.ps1 -Message "커밋 메시지"` 실행 (PowerShell). 스크립트가 git 커밋+push → tar 압축 → scp 업로드 → 서버의 `/home/ubuntu/breakout/` 에 압축 해제 → 캐시버스팅 → 주요 URL 200 검증까지 수행한다. `-Message` 생략 시 날짜 기반 기본 메시지로 커밋된다. SSH 키는 `C:\Users\pc\Documents\PW\hy_key.pem`. 상세 절차는 `docs/deploy.md` 참고.
 - `bak/`, `config/`, `scripts/`, `docs/` 는 배포에서 제외됨 (로컬 관리용).
 
+## 입장 비밀번호 관문 (2026-10-30, nginx 쿠키)
+
+- `/chapter0N/` 아래 전부(HTML·그림·영상·스캔)와 챕터 5 API(`/api/void/`, `/api/ch5/`)는 쿠키 `doro_chN`이 맞아야 내려간다. 허브(`/`)와 `/gate.html`만 열려 있다. 챕터 페이지 코드에는 관문이 없다(로컬·file: 로 열면 그대로 동작).
+- 비밀번호(2026-10-30 사용자 지정): 챕터 1 `0101` · 2 `2020` · 3 `0303` · 4 `4040` · 5 `0505`. 값은 어느 HTML에도 없고 `config/nginx-breakout.conf`의 `map`에 `sha256("doroland-gate:N:비밀번호")` 해시로만 있다. 바꾸려면 해시를 다시 만들어(파일 머리의 python 한 줄) map을 고치고 서버에 `sudo nginx -t && sudo systemctl reload nginx`.
+- 흐름: 쿠키 없음 → `302 /gate.html?ch=N&next=원래주소`, 틀림 → `...&bad=1`(관문이 쿠키를 지우고 오류를 보임). 관문·허브 모달 모두 입력값을 같은 식으로 해시해 쿠키(Path=/, 180일, SameSite=Lax, Secure)에 넣고 원래 주소로 보낸다. 한 기기는 한 번만 입력한다.
+- 서버 파일: `/etc/nginx/sites-enabled/breakout`(certbot 줄이 더 있음), `/etc/nginx/snippets/breakout-headers.conf`(= `config/nginx-snippet-breakout-headers.conf`, nosniff·Referrer-Policy·HSTS; `add_header`는 상속이 끊겨 location마다 include). `map_hash_bucket_size 128`이 없으면 nginx -t가 실패한다.
+- 챕터 4 안의 NFC 잠금 화면(0101)과 챕터 1 정답 보기(4848)는 게임 요소라 그대로다.
+
 ## 캐시 버스팅 (중요)
 
 배포 시 `scripts/cache-bust.sh`가 **서버에서** 모든 HTML/CSS 내 정적 자산 참조(`.css`, `.js`, `.png`, `.mp3` 등)에 `?v=타임스탬프`를 자동으로 붙인다. 로컬 소스에는 쿼리스트링을 직접 쓰지 말 것 — 배포 파이프라인이 처리한다. nginx는 HTML을 no-cache, CSS/JS/이미지/오디오를 1년 immutable로 캐싱한다 (`config/nginx-breakout.conf`).
