@@ -255,7 +255,8 @@ body.screen #worlds{top:auto;bottom:24px}
 #meCoord small{font:600 10.5px var(--sans);letter-spacing:.1em;color:var(--muted)}
 #meCoord code{font:inherit;font-variant-numeric:tabular-nums}
 #meCoord span{font-size:11.5px;color:var(--muted)}
-@media (max-width:600px),(max-height:480px){#meCoord{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:600px),(max-height:480px){#meCoord{bottom:calc(72px + env(safe-area-inset-bottom,0px));font-size:13px;padding:8px 12px;gap:3px} #meCoord .row{flex-wrap:wrap;gap:6px 8px} #meCoord .row small{width:50px} #meCoord code{white-space:nowrap} #meCoordA,#meGoalN{display:none} #meDiffM{flex-basis:100%;padding-left:58px;white-space:nowrap} #meCoord em{white-space:nowrap;margin-left:auto} #meCoord .row small{width:60px}}
+@media (max-height:480px){#meGoal{display:none} #meDiffM{flex-basis:auto;padding-left:0} #meCoord{max-width:min(100% - 24px,560px)}}
 #meCoord.stale code,#meCoord.stale span{color:#c7792a}
 #screenExit{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:31;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--fg);text-decoration:none}
 body.screen #screenExit{display:block}
