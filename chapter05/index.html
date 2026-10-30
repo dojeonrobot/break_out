@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 body.island .lbl{border-radius:6px;font-size:11.5px;font-weight:500;padding:4px 8px;box-shadow:0 2px 6px -4px rgba(20,30,20,.22)}
-body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-color:var(--line)} #vn{position:fixed;inset:0;z-index:36;display:none;align-items:flex-end;justify-content:center;padding:0 12px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(4,8,16,.78),rgba(4,8,16,.25) 45%,transparent 70%);cursor:pointer;-webkit-user-select:none;user-select:none} #vn[data-on]{display:flex} #vn[data-dark]{background:rgba(2,4,8,.9)} #vn .in{position:relative;width:min(820px,100%)} #vn .in::before{content:'';position:absolute;left:-6%;bottom:40px;width:min(54%,420px);height:min(56vh,460px);background:radial-gradient(ellipse at 50% 85%,rgba(159,246,255,.2),transparent 62%);pointer-events:none} #vn img{position:absolute;left:4px;bottom:calc(118px - .42*min(74vh,620px));height:min(74vh,620px);max-width:48%;object-fit:contain;object-position:left bottom;clip-path:inset(0 0 42% 0);filter:drop-shadow(0 12px 24px rgba(0,0,0,.5));animation:rise .35s both;pointer-events:none} #vn img[hidden]{display:none} #vn .box{position:relative;min-height:124px;border-radius:18px;background:linear-gradient(180deg,rgba(18,28,46,.96),rgba(8,13,24,.97));border:1px solid rgba(159,246,255,.3);color:#f4f7ff;padding:24px 26px 30px;box-sizing:border-box;box-shadow:0 24px 60px -24px #000,inset 0 1px 0 rgba(159,246,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)} #vn .box b{position:absolute;left:22px;top:-15px;padding:7px 16px;border-radius:999px;background:#9ff6ff;color:#06111a;font:700 13px/1 var(--sans);letter-spacing:.02em;box-shadow:0 8px 20px -8px rgba(159,246,255,.7)} #vn .box b[hidden]{display:none} #vn .box p{margin:0;font-size:17px;font-weight:500;line-height:1.7;min-height:3.4em;white-space:pre-wrap;word-break:keep-all} #vn .box p.nar{color:#bfe7ff;font-style:italic} #vn .box .nav{position:absolute;right:18px;bottom:11px;display:flex;gap:8px;align-items:center} #vn .box #vnPrev{border:1px solid rgba(159,246,255,.45);background:transparent;color:#9ff6ff;border-radius:7px;padding:4px 9px 5px;font:600 11px/1 var(--mono);letter-spacing:.06em;cursor:pointer} #vn .box #vnPrev[hidden]{display:none} #vn .box i{position:static;font:600 11px/1 var(--mono);font-style:normal;letter-spacing:.06em;color:#9ff6ff;padding:4px 9px 5px;border:1px solid rgba(159,246,255,.45);border-bottom-width:2px;border-radius:7px;background:rgba(159,246,255,.08);animation:vnBob 1.2s ease-in-out infinite} #vn .dots{position:absolute;right:20px;top:14px;display:flex;gap:5px} #vn .dots i{position:static;width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(159,246,255,.22);animation:none} #vn .dots i.on{background:#9ff6ff} #vn .box i[hidden]{display:none} @keyframes vnBob{50%{transform:translateY(3px)}} #questHud{position:fixed;left:50%;transform:translateX(-50%);top:calc(128px + env(safe-area-inset-top,0px));z-index:21;display:flex;gap:16px;align-items:center;padding:14px 24px 16px 18px;border-radius:20px;box-sizing:border-box;width:max-content;max-width:calc(100% - 32px);background:linear-gradient(180deg,rgba(18,28,46,.94),rgba(8,13,24,.96));border:1px solid rgba(159,246,255,.38);color:#f4f7ff;box-shadow:0 22px 50px -22px #000,inset 0 1px 0 rgba(159,246,255,.24),0 0 0 4px rgba(159,246,255,.07);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:qhIn .7s both} #questHud[hidden]{display:none} #questHud .mk{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#9ff6ff 0 24%,rgba(159,246,255,.22) 26% 42%,transparent 44%),radial-gradient(circle,rgba(159,246,255,.12),transparent 70%);box-shadow:0 0 22px rgba(159,246,255,.4);animation:qhPulse 2.2s ease-in-out infinite} #questHud>div{display:grid;gap:3px;min-width:0} #questHud small em{font-style:normal;margin-left:6px;padding:1px 7px;border-radius:999px;background:rgba(159,246,255,.16);color:#f4f7ff;letter-spacing:.08em} #questHud .nav{display:grid;justify-items:center;gap:2px;margin-left:6px;padding-left:16px;border-left:1px solid rgba(159,246,255,.22)} #questHud .nav small{letter-spacing:.1em;white-space:nowrap} #questHud .nav b{font-size:17px!important}#qMark{position:fixed;left:0;top:0;z-index:20;pointer-events:none;display:grid;justify-items:center;gap:2px;will-change:transform;--a:0deg}#qMark[hidden]{display:none}#qMark i{display:block;width:34px;height:34px;position:relative;filter:drop-shadow(0 0 1.5px #06111a) drop-shadow(0 4px 10px rgba(0,0,0,.45));animation:qmBob 1.3s ease-in-out infinite}#qMark i::before{content:'';position:absolute;inset:0;background:#9ff6ff;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}#qMark i::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:#06111a;transform:translate(-50%,-50%)}#qMark b{font:700 12px/1 var(--mono);color:#06111a;background:#9ff6ff;border-radius:999px;padding:5px 9px 6px;white-space:nowrap;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}#qMark.edge{gap:3px}#qMark.edge i{width:40px;height:40px;animation:none;transform:rotate(var(--a))}#qMark.edge i::before{clip-path:polygon(50% 0,100% 100%,50% 68%,0 100%)}#qMark.edge i::after{display:none}#qMark.near i{width:44px;height:44px}#qMark.near b{background:#fff}@keyframes qmBob{50%{transform:translateY(-7px)}} #questHud .nav i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(159,246,255,.1);border:1px solid rgba(159,246,255,.35);position:relative;transition:transform .12s linear} #questHud .nav i::before{content:'';position:absolute;left:50%;top:50%;width:0;height:0;border:9px solid transparent;border-bottom:16px solid #9ff6ff;transform:translate(-50%,-70%)} #questHud .nav i::after{content:'';position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#06111a;transform:translate(-50%,-50%)} #questHud .nav b{font:600 12px var(--mono);color:#9ff6ff;white-space:nowrap} #questHud.near{border-color:#9ff6ff;box-shadow:0 22px 50px -22px #000,0 0 0 4px rgba(159,246,255,.22),0 0 30px rgba(159,246,255,.35)} #questHud.near .nav i{background:#9ff6ff} #questHud.near .nav i::before{border-bottom-color:#06111a} #qPop{position:fixed;inset:0;z-index:37;display:grid;place-items:center;pointer-events:none} #qPop[hidden]{display:none} #qPop b{font:800 clamp(34px,7vw,64px)/1 var(--sans);color:#fff;letter-spacing:-.02em;text-shadow:0 6px 30px rgba(159,246,255,.8),0 2px 0 #06111a} #questHud small{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:#9ff6ff} #questHud b{font-size:22px;font-weight:800;letter-spacing:-.01em;line-height:1.2;white-space:nowrap} #questHud span{font-size:14px;line-height:1.45;color:#bfe7ff;word-break:keep-all;max-width:46ch} @keyframes qhIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}} @keyframes qhPulse{50%{box-shadow:0 0 36px rgba(159,246,255,.7)}} @media (max-width:600px){#questHud{padding:12px 14px 13px 12px;gap:10px;border-radius:16px} #questHud .mk{display:none} #questHud b{font-size:18px;white-space:normal} #questHud span{font-size:13px} #questHud .nav{padding-left:10px} #questHud .nav i{width:34px;height:34px}} #qReward{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 20%,var(--void)) 0%,color-mix(in srgb,var(--void) 92%,transparent) 70%);color:var(--void-fg);text-align:center} #qReward[data-on]{display:grid} #qReward .in{display:grid;gap:12px;justify-items:center;width:min(520px,88vw);animation:rise .9s both} #qReward small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #qReward h1{margin:0;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em} #qReward p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)} #qReward .zs{display:grid;gap:8px;width:100%} #qReward .steps{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%} #qReward .steps li{display:grid;justify-items:center;gap:8px;padding:12px 8px 11px;border-radius:12px;background:color-mix(in srgb,var(--void-fg) 6%,transparent);font-size:13.5px;font-weight:600;line-height:1.3;word-break:keep-all} #qReward .steps i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 14px var(--sans);font-style:normal} @media (max-width:420px){#qReward .steps li{font-size:12.5px;padding:10px 4px}} #qReward .z{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--void-fg) 8%,transparent);border:1px solid color-mix(in srgb,#9ff6ff 30%,transparent);font-size:14px;text-align:left} #qReward .z{flex-wrap:wrap} #qReward .z code{font-family:var(--mono);font-size:clamp(18px,3.6vw,24px);font-weight:700;letter-spacing:.02em;color:#dffcff;text-shadow:0 0 14px rgba(159,246,255,.45)} #qReward .row{display:flex;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap;justify-content:center} #qReward .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans);box-shadow:0 0 0 6px color-mix(in srgb,#9ff6ff 22%,transparent)} #qReward .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} #walkPick .grid button[disabled]{opacity:.78;cursor:default} #walkPick .grid button em{display:block;margin-top:6px;font:500 10.5px var(--mono);letter-spacing:.04em;line-height:1.35;color:#9ff6ff;font-style:normal;white-space:normal;word-break:keep-all} #walkPick .grid button[disabled] em{color:color-mix(in srgb,var(--void-fg) 70%,transparent)} .ms.is-lock{opacity:.9} .ms .lock{display:grid;gap:10px;justify-items:start;margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel-solid);border:1px dashed var(--line);font-size:13px;line-height:1.55} .ms .lock b{font-weight:700} .brow.is-lock .pair{color:var(--muted)} #miniBox{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:22;display:flex;gap:12px;align-items:center;padding:10px 12px 10px 14px;border-radius:18px;background:rgba(6,17,26,.88);color:#eaf7ff;box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(8px)} #miniBox[hidden]{display:none} #miniBox .dots{display:flex;gap:6px;flex-wrap:wrap;max-width:46vw} #miniBox .dots i{display:grid;place-items:center;min-width:34px;height:26px;padding:0 9px;border-radius:8px;font:600 12px var(--sans);font-style:normal;background:rgba(159,246,255,.12);color:#9ff6ff;outline:1px dashed rgba(159,246,255,.45);outline-offset:-1px;white-space:nowrap} #miniBox .dots i.here{box-shadow:0 0 0 2px #9ff6ff inset} #miniBox .dots i.on{background:#7fd67a;color:#06111a;outline:0;box-shadow:none} #miniBox button{border:0;border-radius:999px;padding:11px 22px;font:700 15px var(--sans);background:#9ff6ff;color:#06111a;white-space:nowrap} #miniBox button:disabled{opacity:.35} #miniBox button.alt{background:transparent;color:#eaf7ff;border:1px solid rgba(234,247,255,.45)} @media (pointer:coarse){#miniBox{bottom:calc(126px + env(safe-area-inset-bottom,0px))}} #flash{position:fixed;inset:0;z-index:38;background:#fff;opacity:0;pointer-events:none} #orderDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 16%,var(--void)) 0%,color-mix(in srgb,var(--void) 94%,transparent) 70%);color:var(--void-fg);text-align:center} #orderDlg[data-on]{display:grid} #orderDlg .in{display:grid;gap:12px;justify-items:center;width:min(520px,88vw);animation:rise .9s both} #orderDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #orderDlg h1{margin:0;font-size:clamp(26px,4.6vw,40px);letter-spacing:-.01em} #orderDlg p{margin:0;font-size:15px;line-height:1.6;min-height:1.6em} #orderDlg .isl{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;padding:18px 14px 14px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(159,246,255,.25);transition:background .4s} #orderDlg .isl button{position:relative;border:1px solid rgba(159,246,255,.35);background:rgba(159,246,255,.08);color:inherit;border-radius:14px;padding:26px 8px 14px;font:700 15px var(--sans)} #orderDlg .isl button i{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 13px/22px var(--sans);font-style:normal;opacity:0;transition:opacity .2s} #orderDlg .isl button.pick{background:rgba(159,246,255,.24)} #orderDlg .isl button.pick i{opacity:1} #orderDlg .car{position:absolute;right:-8px;top:-16px;width:30px;height:30px;border-radius:50%;border:3px solid #ffd84a;border-top-color:transparent;opacity:.45} #orderDlg.fail .car{animation:spin .45s linear infinite;opacity:1} #orderDlg.fail .isl{background:rgba(0,0,0,.6);border-color:#ff3b30;animation:shake .4s} #orderDlg.fail .isl button{opacity:.5} #orderDlg .warn{display:inline-block;padding:6px 14px;border-radius:999px;background:#ff3b30;color:#fff;font:700 13px var(--sans)} #orderDlg .warn[hidden]{display:none} #orderDlg .row{display:flex;gap:10px;margin-top:4px} #orderDlg .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans)} #orderDlg .go:disabled{opacity:.35} #orderDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} @keyframes spin{to{transform:rotate(360deg)}} @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}} .qt{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px} .qt th,.qt td{padding:4px 6px;text-align:left;border-top:1px solid var(--line)} .qt th{font-weight:600;opacity:.7;white-space:nowrap} .qt .mini.on{background:var(--restored);color:#06111a;border-color:transparent} .brow .qth{display:grid;place-items:center;font:800 13px var(--sans);color:#9ff6ff} #callDlg .orb{display:block;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9ff6ff 45%,#1e6c8a 100%);box-shadow:0 0 14px #9ff6ff} #callDlg{position:fixed;inset:0;z-index:35;display:none;place-items:end center;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(4,8,16,.85),rgba(4,8,16,.2) 50%,transparent);color:var(--void-fg)} #callDlg[data-on]{display:grid} #callDlg .in{display:grid;gap:10px;width:min(560px,92vw);padding:16px 18px;border-radius:20px;background:rgba(6,17,26,.92);border:1px solid rgba(159,246,255,.25);animation:rise .7s both} #callDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:11px;color:#9ff6ff} .cl{display:flex;gap:12px;align-items:flex-start} .cl .pic{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;background:rgba(159,246,255,.12);display:grid;place-items:center} .cl .pic img{width:100%;height:100%;object-fit:cover;object-position:top} .cl b{display:block;font-size:12px;color:#9ff6ff;margin-bottom:2px} .cl p{margin:0;font-size:15px;line-height:1.5} #callDlg .row{display:flex;gap:10px;justify-content:flex-end;margin-top:4px} #callDlg .go{border:0;border-radius:999px;padding:12px 26px;background:#9ff6ff;color:#06111a;font:700 15px var(--sans)} #callDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:11px 18px;font:600 14px var(--sans)} #callPill{position:fixed;left:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;display:none;border:0;border-radius:999px;padding:11px 18px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans);box-shadow:0 0 0 6px rgba(159,246,255,.22);animation:pulse 1.6s infinite} #callPill[data-on]{display:block} @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(159,246,255,.08)}} @keyframes pulse-o{50%{opacity:.3}} .cardsub input.pulse{box-shadow:0 0 0 3px rgba(159,246,255,.6);animation:pulse 1.4s infinite} .camfold{margin-top:6px;font-size:12px} .camfold summary{cursor:pointer;opacity:.75} .camfold .capbtn{margin-top:6px} #qReward .por{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;vertical-align:middle;margin-right:8px} #qReward #qrP b{color:#9ff6ff;margin-right:6px} .epig{margin-bottom:8px} .epi{display:grid;gap:10px;width:min(520px,88vw);text-align:left;margin:8px 0 14px} .qt .st{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--line)} .qt .st.ok{background:var(--restored);color:#06111a} .qt .st.pend{background:var(--accent);color:#fff}                 @keyframes rdSpin{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes rdPop{from{transform:scale(.3);opacity:0}} @keyframes rdFill{from{--k:0%}} @keyframes rdBlink{0%,100%{background:#9ff6ff}50%{background:rgba(159,246,255,.3)}} @property --k{syntax:'<percentage>';inherits:false;initial-value:0%} @media (prefers-reduced-motion:reduce){} #adminBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(8px);color:var(--muted);border-radius:999px;padding:7px 12px;font:600 12px var(--sans);cursor:pointer} #adminBtn:hover{color:var(--fg)} body.island #adminBtn{bottom:calc(76px + env(safe-area-inset-bottom,0px))} body.walk #adminBtn,body.screen #adminBtn{display:none} #panel.hl{box-shadow:0 0 0 4px #2f86d6,0 0 0 10px rgba(47,134,214,.25),0 10px 30px -12px rgba(15,25,40,.25);animation:panelHl 1.3s ease-in-out infinite} @keyframes panelHl{50%{box-shadow:0 0 0 6px #2f86d6,0 0 0 16px rgba(47,134,214,.12),0 10px 30px -12px rgba(15,25,40,.25)}} #recDone{position:fixed;inset:0;z-index:38;display:none;place-items:center;align-content:center;overflow:hidden;background:rgba(4,8,16,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:#fff;text-align:center;cursor:pointer;-webkit-user-select:none;user-select:none}#recDone[data-on]{display:grid}#recDone .band{position:relative;width:100vw;padding:36px 0 32px;background:linear-gradient(90deg,transparent,rgba(6,17,26,.97) 12%,rgba(6,17,26,.97) 88%,transparent);overflow:hidden;transform-origin:50% 50%;animation:rdBand .5s cubic-bezier(.16,1,.3,1) both}#recDone .band::before,#recDone .band::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#9ff6ff 18%,#9ff6ff 82%,transparent);animation:rdLine .7s .08s cubic-bezier(.16,1,.3,1) both}#recDone .band::before{top:0}#recDone .band::after{bottom:0}#recDone .sweep{position:absolute;top:0;bottom:0;left:-45%;width:38%;background:linear-gradient(90deg,transparent,rgba(159,246,255,.24),transparent);transform:skewX(-18deg);animation:rdSweep 1s .4s cubic-bezier(.4,0,.2,1) both;pointer-events:none}#recDone .in{position:relative;display:grid;gap:8px;justify-items:center;width:min(680px,92vw);margin:0 auto}#recDone small{font-family:var(--mono);letter-spacing:.36em;font-size:12px;color:#9ff6ff;animation:rise .5s .22s both}#recDone h1{margin:0;font-size:clamp(34px,6vw,56px);font-weight:900;letter-spacing:-.02em;line-height:1.1;text-shadow:0 0 28px rgba(159,246,255,.35);animation:rise .55s .3s both}#recDone p{margin:0;font-size:16px;line-height:1.6;color:rgba(255,255,255,.84);word-break:keep-all;animation:rise .55s .4s both}#recDone .sub{display:grid;gap:16px;justify-items:center;margin-top:24px;animation:rise .6s .75s both}#recDone .cells{display:flex;gap:6px;align-items:center}#recDone .cells i{width:34px;height:7px;border-radius:4px;background:rgba(255,255,255,.16);outline:0;flex:none}#recDone .cells i.ok{background:#9ff6ff;box-shadow:0 0 10px rgba(159,246,255,.7)}#recDone .cells i.now{animation:rdBlink .8s .95s 3 both}#recDone .cells b{font:700 12px var(--mono);color:#9ff6ff;margin-left:10px;letter-spacing:.1em;white-space:nowrap}#recDone .next{font:700 12px/1 var(--mono);letter-spacing:.1em;color:#9ff6ff;padding:9px 16px;border:1px solid rgba(159,246,255,.5);border-radius:999px;animation:pulse-o 1.3s 1.6s infinite}@keyframes rdBand{from{transform:scaleY(.06);opacity:0}}@keyframes rdLine{from{transform:scaleX(0)}}@keyframes rdSweep{to{left:112%}}@media (prefers-reduced-motion:reduce){#recDone .band,#recDone .band::before,#recDone .band::after,#recDone .sweep,#recDone .cells i.now,#recDone .next,#recDone .in>*,#recDone .sub{animation:none}}#voidVn{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(10,20,34,.55),rgba(10,20,34,.12) 45%,transparent 70%);cursor:pointer} #voidVn[data-on]{display:flex} #voidVn .in{position:relative;width:min(900px,100%);padding-top:150px} #voidVn img{position:absolute;left:14px;bottom:76px;height:min(300px,40vh);max-width:40vw;object-fit:contain;object-position:bottom;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));animation:void-in .5s cubic-bezier(.16,1,.3,1) both} @keyframes void-in{from{opacity:0;transform:translateY(18px)}} #voidVn .box{position:relative;min-height:118px;padding:26px 28px 30px 210px;border-radius:18px;background:linear-gradient(180deg,#fffdf6,#fbf3dc);border:2px solid #e4cf93;box-shadow:0 0 0 4px rgba(251,243,220,.35),0 18px 40px -14px rgba(0,0,0,.45);color:#2a2418;animation:rise .45s both} #voidVn .box b{position:absolute;left:184px;top:-16px;padding:7px 18px;border-radius:999px;background:linear-gradient(180deg,#5db2f0,#2f86d6);color:#fff;font:700 14px/1 var(--sans);letter-spacing:.04em;box-shadow:0 6px 14px -6px rgba(47,134,214,.8),inset 0 1px 0 rgba(255,255,255,.5)} #voidVn .box p{margin:0;font-size:17px;font-weight:500;line-height:1.75;min-height:3.5em;word-break:keep-all;white-space:pre-wrap} #voidVn .dots{position:absolute;left:210px;bottom:12px;display:flex;gap:5px} #voidVn .dots i{width:14px;height:4px;border-radius:2px;background:rgba(47,134,214,.2)} #voidVn .dots i.on{background:#2f86d6} #voidVn .box .nav{position:absolute;right:16px;bottom:10px;display:flex;gap:8px;align-items:center} #voidVn .box #tutPrev{border:1px solid rgba(47,134,214,.5);background:transparent;color:#2f86d6;border-radius:6px;padding:4px 9px 5px;font:700 11px/1 var(--mono);letter-spacing:.08em;cursor:pointer} #voidVn .box #tutPrev[hidden]{display:none} #voidVn .box #tutPrev:active{transform:translateY(1px)} #tutWipe{position:fixed;inset:0;z-index:39;background:#0a1422;opacity:0;pointer-events:none;transition:opacity .36s} #tutWipe[data-on]{opacity:1} @media (prefers-reduced-motion:reduce){#tutWipe{transition:none}} #voidVn[data-typing] .box i#voidNext,#vn[data-typing] .box i#vnNext{opacity:.45;animation:none} #voidVn .box i#voidNext{font:700 11px/1 var(--mono);font-style:normal;letter-spacing:.08em;color:#2f86d6;padding:4px 9px 5px;border:1px solid rgba(47,134,214,.5);border-radius:6px;animation:pulse-o 1.3s infinite} #voidVn .box i#voidNext[hidden]{display:none} #voidVn #tutSkip{position:absolute;right:18px;top:calc(14px + env(safe-area-inset-top,0px));border:1px solid rgba(255,255,255,.55);background:rgba(10,20,34,.55);color:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans);backdrop-filter:blur(6px)} #voidVn #tutSkip[hidden]{display:none} #vn #vnSkip{position:absolute;right:18px;top:calc(14px + env(safe-area-inset-top,0px));border:1px solid rgba(255,255,255,.55);background:rgba(10,20,34,.55);color:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans);backdrop-filter:blur(6px);cursor:pointer} @media (max-width:600px),(max-height:480px){#voidVn .in{padding-top:110px} #voidVn img{left:4px;bottom:62px;height:min(210px,30vh)} #voidVn .box{padding:22px 16px 28px 132px;min-height:104px} #voidVn .box b{left:116px;font-size:13px} #voidVn .box p{font-size:15px;line-height:1.65} #voidVn .dots{left:132px}} @media (prefers-reduced-motion:reduce){#voidVn img,#voidVn .box,#voidVn .box i#voidNext{animation:none}} .team .tacts{display:flex;gap:6px} #againBtn[hidden]{display:none} html body #adminDlg{position:fixed;inset:0;top:0;right:0;left:0;bottom:0;width:auto;height:auto;max-height:none;max-width:none;border-radius:0;z-index:45;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--fg);box-shadow:none;border:0;backdrop-filter:none} html body #adminDlg[hidden]{display:none} #adminDlg .ah{padding:14px 28px;border-bottom:1px solid var(--line);background:var(--panel-solid)} #adminDlg .ah h2{font-size:20px} #adminDlg .ah .acts .x{border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;background:transparent;color:var(--fg)} #adminDlg .scroll{flex:1;overflow:auto;padding:20px 28px 40px} .adm.dash{display:grid;gap:18px;padding:0;max-width:1480px;margin:0 auto} .adm .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px} .adm .tile{padding:14px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid)} .adm .tile small{display:block;font-size:12px;color:var(--muted)} .adm .tile b{display:block;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-top:2px} .adm .tile span{font-size:12px;color:var(--muted)} .adm .cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} .adm .card{padding:16px 18px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid);display:grid;gap:10px;margin-bottom:18px} .adm .card h3{margin:0;font-size:15px;font-weight:700} .adm .card .hint{margin:-4px 0 0;font-size:12px;color:var(--muted)} .adm .card .grp h4{margin:10px 0 6px;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center} .adm .card .grp h4 span{font-family:var(--mono);font-weight:400} .adm .sublist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px} .adm .subline{margin:0;font-size:13px} .adm .empty{color:var(--muted);text-align:center;padding:18px;font-size:13px;margin:0} .qt.big{font-size:14px} .qt.big th,.qt.big td{padding:10px 10px;vertical-align:middle;border-top:1px solid var(--line)} .qt.big thead th{border-top:0;border-bottom:2px solid var(--line);font-size:12px;color:var(--muted)} .qt.big th em{display:block;font-style:normal;font-size:10px;letter-spacing:.1em;color:var(--muted);opacity:.8} .qt.big td b{font-size:16px} .qt.big .st{font-size:12px;padding:4px 10px} .qt.big .mini{padding:6px 12px;font-size:12.5px} .qt.big td small{display:block;font-size:11px;color:var(--muted)} .qt.big tr.full td{background:color-mix(in srgb,var(--restored) 10%,transparent)} .qt .rate{position:relative;width:110px;height:22px;border-radius:6px;background:var(--line);overflow:hidden} .qt .rate i{position:absolute;inset:0 auto 0 0;background:var(--restored)} .qt .rate span{position:relative;display:block;line-height:22px;text-align:center;font:700 12px var(--mono)} .adm .arow.col{flex-direction:column;align-items:stretch} .adm .arow.col .mini{padding:9px 12px;font-size:13px;text-align:center} .adm .autol{display:flex;gap:8px;align-items:center;font-size:13px} .adm .autol select{flex:1} @media (max-width:1000px){.adm .cols{grid-template-columns:1fr} .adm .tiles{grid-template-columns:repeat(2,1fr)} #adminDlg .scroll{padding:14px 14px 40px} #adminDlg .ah{padding:12px 14px} .qt.big{display:block;overflow:auto}} body.admin #teamPick,body.admin #panel,body.admin #board,body.admin #bar,body.admin #simBtn,body.admin #restoreBtn,body.admin #callPill,body.admin #voidVn,body.admin #walkPick,body.admin .lbl{display:none !important} @media (pointer:fine){#callGo::after,#qrMap::after,#odGo::after,#cinemaX::after,#miniGo::after{content:'Space';margin-left:8px;font:700 10px var(--mono);opacity:.55;letter-spacing:.08em;vertical-align:middle}} #voidVn .box .how{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px} #voidVn .box .how li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(47,134,214,.1);font:600 13px/1.3 var(--sans);color:#1d3b5c} #voidVn .box .how li i{flex:none;width:22px;height:22px;border-radius:50%;background:#2f86d6;color:#fff;font:800 12px/22px var(--mono);font-style:normal;text-align:center} .ms .unknown{display:flex;gap:10px;align-items:center;margin:4px 0 2px;font-size:12.5px;color:var(--muted)} .ms .unknown b{color:var(--fg);font-size:14px} .ms .dist{margin-left:auto;font:700 13px var(--mono);color:var(--accent)} #lMe.pulse{box-shadow:0 0 0 3px rgba(14,74,132,.45);animation:pulse 1.4s infinite} #questHud html:not(.dbg) #qTmp{display:none} .tmp{border:1px dashed rgba(159,246,255,.5);background:transparent;color:#9ff6ff;border-radius:999px;padding:6px 10px;font:600 11px var(--sans);margin-left:6px} @media (max-width:600px),(max-height:480px){#voidVn .box .how{grid-template-columns:1fr;gap:4px}} .qt.big tr.sub td{border-top-style:dashed} .qt.big td .dev{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:2px} .qt.big td small{display:block;font-size:11px;color:var(--muted);margin-top:3px} .trow b small{font-family:var(--mono);font-weight:400;color:var(--muted)} #yardDlg,#labDlg,#caveDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;overflow:auto;color:var(--void-fg);text-align:center;-webkit-user-select:none;user-select:none} #yardDlg[data-on],#labDlg[data-on],#caveDlg[data-on]{display:grid} #yardDlg .room,#labDlg .room{position:relative;width:100%;min-height:100%;display:grid;place-items:center;padding:24px 16px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 0%,rgba(255,216,74,.12),transparent 55%),linear-gradient(180deg,#0a1018,#05070c 60%,#03050a)} #yardDlg .room{background:radial-gradient(ellipse at 50% 0%,rgba(255,80,60,.16),transparent 50%),linear-gradient(180deg,#0e1218,#05070c 60%)} #yardDlg .lamp{position:absolute;left:50%;top:0;width:200px;height:200px;transform:translateX(-50%);background:radial-gradient(circle at 50% 0%,rgba(255,80,60,.45),transparent 70%);animation:ydLamp 2.4s ease-in-out infinite;pointer-events:none} #yardDlg.win .lamp{background:radial-gradient(circle at 50% 0%,rgba(159,246,255,.5),transparent 70%);animation:none} @keyframes ydLamp{0%,100%{opacity:.5}50%{opacity:1}} #yardDlg .in,#labDlg .in,#caveDlg .in{display:grid;gap:12px;justify-items:center;width:min(640px,94vw);animation:rise .9s both} #caveDlg{background:radial-gradient(ellipse at 50% 60%,#0d1a22 0%,#05070c 70%);padding:24px 12px;box-sizing:border-box} #yardDlg small,#labDlg small,#caveDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #yardDlg h1,#labDlg h1,#caveDlg h1{margin:0;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em} #yardDlg p,#labDlg p,#caveDlg p{margin:0;font-size:15px;line-height:1.6;min-height:1.6em;max-width:46ch;word-break:keep-all} #yardDlg .row,#labDlg .row,#caveDlg .row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:4px} #yardDlg .go,#labDlg .go,#caveDlg .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans)} #yardDlg .go:disabled,#labDlg .go:disabled,#caveDlg .go:disabled{opacity:.35} #yardDlg .later,#labDlg .later,#caveDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} #yardDlg .board{display:grid;gap:4px;width:min(440px,90vw);padding:12px;border-radius:18px;background:#141a22;border:3px solid #2a323c;box-shadow:inset 0 0 0 1px #3a444f,0 20px 50px -20px #000} #yardDlg .board button{aspect-ratio:1;border:0;border-radius:8px;background:#1b222b;padding:0;color:#4a5560;transition:background .2s,color .2s} #yardDlg .board button svg{width:100%;height:100%;display:block} #yardDlg .board button path{fill:none;stroke:currentColor;stroke-width:12;stroke-linecap:round} #yardDlg .board button circle{fill:currentColor} #yardDlg .board button.on{color:#9ff6ff;background:#1a2a34;box-shadow:0 0 14px rgba(159,246,255,.35) inset} #yardDlg .board button.src{box-shadow:0 0 0 3px #ffd84a inset} #yardDlg .board button.src.on{box-shadow:0 0 0 3px #ffd84a inset,0 0 14px rgba(159,246,255,.35) inset} #yardDlg .board button.stn::after{content:'';position:absolute;right:5px;top:5px;width:9px;height:9px;border-radius:2px;background:#ffd84a} #yardDlg .board button{position:relative} #yardDlg .board button.turn svg{animation:ydTurn .22s ease-out} @keyframes ydTurn{from{transform:rotate(-90deg)}to{transform:rotate(0)}} #yardDlg.win .board{border-color:#9ff6ff} #yardDlg .lamps{display:flex;gap:8px;align-items:center;font:600 13px var(--mono);color:#9ff6ff} #yardDlg .lamps i{width:14px;height:14px;border-radius:50%;background:#2a323c;border:1px solid #3a444f} #yardDlg .lamps i.on{background:#ffd84a;box-shadow:0 0 10px #ffd84a} #labDlg .mons{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%} #labDlg .mon{display:grid;gap:0;border-radius:14px;background:#1a2029;border:3px solid #2a323c;overflow:hidden;text-align:left} #labDlg .mon header{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 12px 6px;background:#10151c} #labDlg .mon header small{font-size:10px;letter-spacing:.2em;grid-column:1/-1} #labDlg .mon header b{font-size:14px} #labDlg .mon header em{font:600 12px var(--mono);color:#ffd84a;font-style:normal;align-self:center} #labDlg .mon canvas{width:100%;display:block;background:#0b1422;touch-action:none} #labDlg .mon footer{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:#10151c} #labDlg .mon .st{font:600 12px var(--mono);color:#9ff6ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} #labDlg .mon .play{border:0;border-radius:999px;padding:10px 18px;min-height:40px;background:#9ff6ff;color:#06111a;font:700 13px var(--sans);white-space:nowrap;flex:none} #labDlg .mon.live{border-color:#9ff6ff;box-shadow:0 0 24px rgba(159,246,255,.25)} #labDlg .mon.ok{border-color:#7fd67a} #labDlg .mon.ok .play{display:none} #labDlg .mon.ok header b{color:#7fd67a} #caveDlg .decode{display:grid;grid-template-columns:auto 1fr;gap:14px;width:100%;align-items:start} #caveDlg .tiles{display:grid;grid-template-columns:repeat(2,64px);gap:8px} #caveDlg .tiles button{width:64px;height:64px;border-radius:12px;border:1px solid rgba(255,216,74,.4);background:rgba(255,216,74,.08);color:#ffd84a;padding:6px;transition:transform .15s} #caveDlg .tiles button svg,#caveDlg .slot svg{width:100%;height:100%;display:block} #caveDlg .tiles svg path,#caveDlg .slot svg path,#caveDlg .tiles svg circle,#caveDlg .slot svg circle{stroke:currentColor;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:currentColor} #caveDlg .tiles svg path[fill=none],#caveDlg .slot svg path[fill=none],#caveDlg .tiles svg circle[fill=none],#caveDlg .slot svg circle[fill=none]{fill:none} #caveDlg .tiles button.pick{background:#ffd84a;color:#06111a;transform:scale(1.08)} #caveDlg .tiles button.ok{opacity:.18;pointer-events:none} #caveDlg .map{position:relative;width:100%;max-width:320px;aspect-ratio:4/3;justify-self:center;border-radius:16px;background:rgba(159,246,255,.04);border:1px solid rgba(159,246,255,.2)} #caveDlg .map canvas{width:100%;height:100%;display:block} #caveDlg .slot{position:absolute;width:44px;height:44px;transform:translate(-50%,-50%);border-radius:50%;border:2px dashed rgba(255,216,74,.7);background:rgba(6,17,26,.5);color:#ffd84a;padding:0} #caveDlg .slot span{display:block;width:100%;height:100%;padding:7px;box-sizing:border-box} #caveDlg .slot b{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-size:11px;white-space:nowrap;color:#eaf7ff;opacity:0;transition:opacity .3s} #caveDlg .slot.ok{border-style:solid;background:rgba(255,216,74,.18)} #caveDlg .slot.ok b{opacity:1} #caveDlg .slot.no{animation:shake .4s;border-color:#ff3b30} #caveDlg .sent{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:baseline;min-height:30px;font-size:17px} #caveDlg .sent b{color:#ffd84a;font-size:20px} #caveDlg .sent i{font-style:normal;color:#ffd84a;letter-spacing:.1em;font-size:13px;align-self:start} #caveDlg .test{display:grid;gap:12px;width:100%} #caveDlg .sets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%} #caveDlg .set{display:grid;gap:8px;padding:10px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(159,246,255,.2)} #caveDlg .set b{font-size:13px} #caveDlg .opts{display:grid;gap:6px} #caveDlg .opts button{position:relative;border:1px solid rgba(159,246,255,.35);background:rgba(159,246,255,.08);color:inherit;border-radius:10px;padding:10px 6px;font:700 13px var(--sans)} #caveDlg .opts.ord button{padding-top:22px} #caveDlg .opts button i{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 11px/16px var(--sans);font-style:normal;opacity:0} #caveDlg .opts button.pick{background:rgba(159,246,255,.28)} #caveDlg .opts button.pick i{opacity:1} #caveDlg .run{display:grid;grid-template-columns:320px 1fr;gap:12px;width:100%;align-items:start} #caveDlg .run canvas{width:320px;max-width:100%;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(159,246,255,.25)} #caveDlg .warn{grid-column:1;justify-self:center;display:inline-block;padding:6px 14px;border-radius:999px;background:#ff3b30;color:#fff;font:700 13px var(--sans)} #caveDlg .warn[hidden]{display:none} #caveDlg .log{grid-column:2;grid-row:1/3;margin:0;padding:0;list-style:none;display:grid;gap:6px;align-content:start;max-height:220px;overflow:auto;text-align:left} #caveDlg .log li{padding:8px 10px;border-radius:10px;background:rgba(255,59,48,.12);border-left:3px solid #ff3b30;font-size:12.5px;line-height:1.45;word-break:keep-all} #caveDlg .log li.ok{background:rgba(127,214,122,.14);border-left-color:#7fd67a} #caveDlg .log li b{display:block;font:700 11px var(--mono);color:#9ff6ff;margin-bottom:2px} #caveDlg.fail .run canvas{animation:shake .5s} #miniBox button.hot{box-shadow:0 0 0 4px rgba(159,246,255,.35),0 0 24px #9ff6ff;animation:pulse 1s infinite} @media (max-width:700px){#labDlg .mons{grid-template-columns:1fr} #caveDlg .decode{grid-template-columns:1fr} #caveDlg .tiles{grid-template-columns:repeat(6,1fr)} #caveDlg .tiles button{width:auto;height:auto;aspect-ratio:1} #caveDlg .sets{grid-template-columns:1fr} #caveDlg .run{grid-template-columns:1fr} #caveDlg .log{grid-column:1;grid-row:auto;max-height:160px} #caveDlg .warn{grid-column:1}}
+body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-color:var(--line)} #vn{position:fixed;inset:0;z-index:36;display:none;align-items:flex-end;justify-content:center;padding:0 12px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(4,8,16,.78),rgba(4,8,16,.25) 45%,transparent 70%);cursor:pointer;-webkit-user-select:none;user-select:none} #vn[data-on]{display:flex} #vn[data-dark]{background:rgba(2,4,8,.9)} #vn .in{position:relative;width:min(820px,100%)} #vn .in::before{content:'';position:absolute;left:-6%;bottom:40px;width:min(54%,420px);height:min(56vh,460px);background:radial-gradient(ellipse at 50% 85%,rgba(159,246,255,.2),transparent 62%);pointer-events:none} #vn img{position:absolute;left:4px;bottom:calc(118px - .42*min(74vh,620px));height:min(74vh,620px);max-width:48%;object-fit:contain;object-position:left bottom;clip-path:inset(0 0 42% 0);filter:drop-shadow(0 12px 24px rgba(0,0,0,.5));animation:rise .35s both;pointer-events:none} #vn img[hidden]{display:none} #vn .box{position:relative;min-height:124px;border-radius:18px;background:linear-gradient(180deg,rgba(18,28,46,.96),rgba(8,13,24,.97));border:1px solid rgba(159,246,255,.3);color:#f4f7ff;padding:24px 26px 30px;box-sizing:border-box;box-shadow:0 24px 60px -24px #000,inset 0 1px 0 rgba(159,246,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)} #vn .box b{position:absolute;left:22px;top:-15px;padding:7px 16px;border-radius:999px;background:#9ff6ff;color:#06111a;font:700 13px/1 var(--sans);letter-spacing:.02em;box-shadow:0 8px 20px -8px rgba(159,246,255,.7)} #vn .box b[hidden]{display:none} #vn .box p{margin:0;font-size:17px;font-weight:500;line-height:1.7;min-height:3.4em;white-space:pre-wrap;word-break:keep-all} #vn .box p.nar{color:#bfe7ff;font-style:italic} #vn .box .nav{position:absolute;right:18px;bottom:11px;display:flex;gap:8px;align-items:center} #vn .box #vnPrev{border:1px solid rgba(159,246,255,.45);background:transparent;color:#9ff6ff;border-radius:7px;padding:4px 9px 5px;font:600 11px/1 var(--mono);letter-spacing:.06em;cursor:pointer} #vn .box #vnPrev[hidden]{display:none} #vn .box i{position:static;font:600 11px/1 var(--mono);font-style:normal;letter-spacing:.06em;color:#9ff6ff;padding:4px 9px 5px;border:1px solid rgba(159,246,255,.45);border-bottom-width:2px;border-radius:7px;background:rgba(159,246,255,.08);animation:vnBob 1.2s ease-in-out infinite} #vn .dots{position:absolute;right:20px;top:14px;display:flex;gap:5px} #vn .dots i{position:static;width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(159,246,255,.22);animation:none} #vn .dots i.on{background:#9ff6ff} #vn .box i[hidden]{display:none} @keyframes vnBob{50%{transform:translateY(3px)}} #questHud{position:fixed;left:50%;transform:translateX(-50%);top:calc(128px + env(safe-area-inset-top,0px));z-index:21;display:flex;gap:16px;align-items:center;padding:14px 24px 16px 18px;border-radius:20px;box-sizing:border-box;width:max-content;max-width:calc(100% - 32px);background:linear-gradient(180deg,rgba(18,28,46,.94),rgba(8,13,24,.96));border:1px solid rgba(159,246,255,.38);color:#f4f7ff;box-shadow:0 22px 50px -22px #000,inset 0 1px 0 rgba(159,246,255,.24),0 0 0 4px rgba(159,246,255,.07);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:qhIn .7s both} #questHud[hidden]{display:none} #questHud .mk{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#9ff6ff 0 24%,rgba(159,246,255,.22) 26% 42%,transparent 44%),radial-gradient(circle,rgba(159,246,255,.12),transparent 70%);box-shadow:0 0 22px rgba(159,246,255,.4);animation:qhPulse 2.2s ease-in-out infinite} #questHud>div{display:grid;gap:3px;min-width:0} #questHud small em{font-style:normal;margin-left:6px;padding:1px 7px;border-radius:999px;background:rgba(159,246,255,.16);color:#f4f7ff;letter-spacing:.08em} #questHud .nav{display:grid;justify-items:center;gap:2px;margin-left:6px;padding-left:16px;border-left:1px solid rgba(159,246,255,.22)} #questHud .nav small{letter-spacing:.1em;white-space:nowrap} #questHud .nav b{font-size:17px!important}#qMark{position:fixed;left:0;top:0;z-index:20;pointer-events:none;display:grid;justify-items:center;gap:2px;will-change:transform;--a:0deg}#qMark[hidden]{display:none}#qMark i{display:block;width:34px;height:34px;position:relative;filter:drop-shadow(0 0 1.5px #06111a) drop-shadow(0 4px 10px rgba(0,0,0,.45));animation:qmBob 1.3s ease-in-out infinite}#qMark i::before{content:'';position:absolute;inset:0;background:#9ff6ff;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}#qMark i::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:#06111a;transform:translate(-50%,-50%)}#qMark b{font:700 12px/1 var(--mono);color:#06111a;background:#9ff6ff;border-radius:999px;padding:5px 9px 6px;white-space:nowrap;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}#qMark.edge{gap:3px}#qMark.edge i{width:40px;height:40px;animation:none;transform:rotate(var(--a))}#qMark.edge i::before{clip-path:polygon(50% 0,100% 100%,50% 68%,0 100%)}#qMark.edge i::after{display:none}#qMark.near i{width:44px;height:44px}#qMark.near b{background:#fff}@keyframes qmBob{50%{transform:translateY(-7px)}} #questHud .nav i{display:block;width:40px;height:40px;border-radius:50%;background:rgba(159,246,255,.1);border:1px solid rgba(159,246,255,.35);position:relative;transition:transform .12s linear} #questHud .nav i::before{content:'';position:absolute;left:50%;top:50%;width:0;height:0;border:9px solid transparent;border-bottom:16px solid #9ff6ff;transform:translate(-50%,-70%)} #questHud .nav i::after{content:'';position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#06111a;transform:translate(-50%,-50%)} #questHud .nav b{font:600 12px var(--mono);color:#9ff6ff;white-space:nowrap} #questHud.near{border-color:#9ff6ff;box-shadow:0 22px 50px -22px #000,0 0 0 4px rgba(159,246,255,.22),0 0 30px rgba(159,246,255,.35)} #questHud.near .nav i{background:#9ff6ff} #questHud.near .nav i::before{border-bottom-color:#06111a} #qPop{position:fixed;inset:0;z-index:37;display:grid;place-items:center;pointer-events:none} #qPop[hidden]{display:none} #qPop b{font:800 clamp(34px,7vw,64px)/1 var(--sans);color:#fff;letter-spacing:-.02em;text-shadow:0 6px 30px rgba(159,246,255,.8),0 2px 0 #06111a} #questHud small{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:#9ff6ff} #questHud b{font-size:22px;font-weight:800;letter-spacing:-.01em;line-height:1.2;white-space:nowrap} #questHud span{font-size:14px;line-height:1.45;color:#bfe7ff;word-break:keep-all;max-width:46ch} @keyframes qhIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}} @keyframes qhPulse{50%{box-shadow:0 0 36px rgba(159,246,255,.7)}} @media (max-width:600px){#questHud{padding:12px 14px 13px 12px;gap:10px;border-radius:16px} #questHud .mk{display:none} #questHud b{font-size:18px;white-space:normal} #questHud span{font-size:13px} #questHud .nav{padding-left:10px} #questHud .nav i{width:34px;height:34px}} #qReward{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 20%,var(--void)) 0%,color-mix(in srgb,var(--void) 92%,transparent) 70%);color:var(--void-fg);text-align:center} #qReward[data-on]{display:grid} #qReward .in{display:grid;gap:12px;justify-items:center;width:min(520px,88vw);animation:rise .9s both} #qReward small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #qReward h1{margin:0;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em} #qReward p{margin:0;font-size:15px;line-height:1.6;color:color-mix(in srgb,var(--void-fg) 80%,transparent)} #qReward .zs{display:grid;gap:8px;width:100%} #qReward .steps{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%} #qReward .steps li{display:grid;justify-items:center;gap:8px;padding:12px 8px 11px;border-radius:12px;background:color-mix(in srgb,var(--void-fg) 6%,transparent);font-size:13.5px;font-weight:600;line-height:1.3;word-break:keep-all} #qReward .steps i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 14px var(--sans);font-style:normal} @media (max-width:420px){#qReward .steps li{font-size:12.5px;padding:10px 4px}} #qReward .z{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:color-mix(in srgb,var(--void-fg) 8%,transparent);border:1px solid color-mix(in srgb,#9ff6ff 30%,transparent);font-size:14px;text-align:left} #qReward .z{flex-wrap:wrap} #qReward .z code{font-family:var(--mono);font-size:clamp(18px,3.6vw,24px);font-weight:700;letter-spacing:.02em;color:#dffcff;text-shadow:0 0 14px rgba(159,246,255,.45)} #qReward .row{display:flex;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap;justify-content:center} #qReward .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans);box-shadow:0 0 0 6px color-mix(in srgb,#9ff6ff 22%,transparent)} #qReward .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} #walkPick .grid button[disabled]{opacity:.78;cursor:default} #walkPick .grid button em{display:block;margin-top:6px;font:500 10.5px var(--mono);letter-spacing:.04em;line-height:1.35;color:#9ff6ff;font-style:normal;white-space:normal;word-break:keep-all} #walkPick .grid button[disabled] em{color:color-mix(in srgb,var(--void-fg) 70%,transparent)} .ms.is-lock{opacity:.9} .ms .lock{display:grid;gap:10px;justify-items:start;margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--panel-solid);border:1px dashed var(--line);font-size:13px;line-height:1.55} .ms .lock b{font-weight:700} .brow.is-lock .pair{color:var(--muted)} #miniBox{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:22;display:flex;gap:12px;align-items:center;padding:10px 12px 10px 14px;border-radius:18px;background:rgba(6,17,26,.88);color:#eaf7ff;box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(8px)} #miniBox[hidden]{display:none} #miniBox .dots{display:flex;gap:6px;flex-wrap:wrap;max-width:46vw} #miniBox .dots i{display:grid;place-items:center;min-width:34px;height:26px;padding:0 9px;border-radius:8px;font:600 12px var(--sans);font-style:normal;background:rgba(159,246,255,.12);color:#9ff6ff;outline:1px dashed rgba(159,246,255,.45);outline-offset:-1px;white-space:nowrap} #miniBox .dots i.here{box-shadow:0 0 0 2px #9ff6ff inset} #miniBox .dots i.on{background:#7fd67a;color:#06111a;outline:0;box-shadow:none} #miniBox button{border:0;border-radius:999px;padding:11px 22px;font:700 15px var(--sans);background:#9ff6ff;color:#06111a;white-space:nowrap} #miniBox button:disabled{opacity:.35} #miniBox button.alt{background:transparent;color:#eaf7ff;border:1px solid rgba(234,247,255,.45)} @media (pointer:coarse){#miniBox{bottom:calc(126px + env(safe-area-inset-bottom,0px))}} #flash{position:fixed;inset:0;z-index:38;background:#fff;opacity:0;pointer-events:none} #orderDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 55%,color-mix(in srgb,#9ff6ff 16%,var(--void)) 0%,color-mix(in srgb,var(--void) 94%,transparent) 70%);color:var(--void-fg);text-align:center} #orderDlg[data-on]{display:grid} #orderDlg .in{display:grid;gap:12px;justify-items:center;width:min(520px,88vw);animation:rise .9s both} #orderDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #orderDlg h1{margin:0;font-size:clamp(26px,4.6vw,40px);letter-spacing:-.01em} #orderDlg p{margin:0;font-size:15px;line-height:1.6;min-height:1.6em} #orderDlg .isl{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;padding:18px 14px 14px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(159,246,255,.25);transition:background .4s} #orderDlg .isl button{position:relative;border:1px solid rgba(159,246,255,.35);background:rgba(159,246,255,.08);color:inherit;border-radius:14px;padding:26px 8px 14px;font:700 15px var(--sans)} #orderDlg .isl button i{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 13px/22px var(--sans);font-style:normal;opacity:0;transition:opacity .2s} #orderDlg .isl button.pick{background:rgba(159,246,255,.24)} #orderDlg .isl button.pick i{opacity:1} #orderDlg .car{position:absolute;right:-8px;top:-16px;width:30px;height:30px;border-radius:50%;border:3px solid #ffd84a;border-top-color:transparent;opacity:.45} #orderDlg.fail .car{animation:spin .45s linear infinite;opacity:1} #orderDlg.fail .isl{background:rgba(0,0,0,.6);border-color:#ff3b30;animation:shake .4s} #orderDlg.fail .isl button{opacity:.5} #orderDlg .warn{display:inline-block;padding:6px 14px;border-radius:999px;background:#ff3b30;color:#fff;font:700 13px var(--sans)} #orderDlg .warn[hidden]{display:none} #orderDlg .row{display:flex;gap:10px;margin-top:4px} #orderDlg .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans)} #orderDlg .go:disabled{opacity:.35} #orderDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} @keyframes spin{to{transform:rotate(360deg)}} @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}} .qt{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px} .qt th,.qt td{padding:4px 6px;text-align:left;border-top:1px solid var(--line)} .qt th{font-weight:600;opacity:.7;white-space:nowrap} .qt .mini.on{background:var(--restored);color:#06111a;border-color:transparent} .brow .qth{display:grid;place-items:center;font:800 13px var(--sans);color:#9ff6ff} #callDlg .orb{display:block;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9ff6ff 45%,#1e6c8a 100%);box-shadow:0 0 14px #9ff6ff} #callDlg{position:fixed;inset:0;z-index:35;display:none;place-items:end center;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(4,8,16,.85),rgba(4,8,16,.2) 50%,transparent);color:var(--void-fg)} #callDlg[data-on]{display:grid} #callDlg .in{display:grid;gap:10px;width:min(560px,92vw);padding:16px 18px;border-radius:20px;background:rgba(6,17,26,.92);border:1px solid rgba(159,246,255,.25);animation:rise .7s both} #callDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:11px;color:#9ff6ff} .cl{display:flex;gap:12px;align-items:flex-start} .cl .pic{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;background:rgba(159,246,255,.12);display:grid;place-items:center} .cl .pic img{width:100%;height:100%;object-fit:cover;object-position:top} .cl b{display:block;font-size:12px;color:#9ff6ff;margin-bottom:2px} .cl p{margin:0;font-size:15px;line-height:1.5} #callDlg .row{display:flex;gap:10px;justify-content:flex-end;margin-top:4px} #callDlg .go{border:0;border-radius:999px;padding:12px 26px;background:#9ff6ff;color:#06111a;font:700 15px var(--sans)} #callDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:11px 18px;font:600 14px var(--sans)} #callPill{position:fixed;left:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;display:none;border:0;border-radius:999px;padding:11px 18px;background:#9ff6ff;color:#06111a;font:700 14px var(--sans);box-shadow:0 0 0 6px rgba(159,246,255,.22);animation:pulse 1.6s infinite} #callPill[data-on]{display:block} @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(159,246,255,.08)}} @keyframes pulse-o{50%{opacity:.3}} .cardsub input.pulse{box-shadow:0 0 0 3px rgba(159,246,255,.6);animation:pulse 1.4s infinite} #qReward .por{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;vertical-align:middle;margin-right:8px} #qReward #qrP b{color:#9ff6ff;margin-right:6px} .epig{margin-bottom:8px} .epi{display:grid;gap:10px;width:min(520px,88vw);text-align:left;margin:8px 0 14px} .qt .st{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--line)} .qt .st.ok{background:var(--restored);color:#06111a} .qt .st.pend{background:var(--accent);color:#fff}                 @keyframes rdSpin{to{transform:translate(-50%,-50%) rotate(360deg)}} @keyframes rdPop{from{transform:scale(.3);opacity:0}} @keyframes rdFill{from{--k:0%}} @keyframes rdBlink{0%,100%{background:#9ff6ff}50%{background:rgba(159,246,255,.3)}} @property --k{syntax:'<percentage>';inherits:false;initial-value:0%} @media (prefers-reduced-motion:reduce){} #adminBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:21;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(8px);color:var(--muted);border-radius:999px;padding:7px 12px;font:600 12px var(--sans);cursor:pointer} #adminBtn:hover{color:var(--fg)} body.island #adminBtn{bottom:calc(76px + env(safe-area-inset-bottom,0px))} body.walk #adminBtn,body.screen #adminBtn{display:none} #panel.hl{box-shadow:0 0 0 4px #2f86d6,0 0 0 10px rgba(47,134,214,.25),0 10px 30px -12px rgba(15,25,40,.25);animation:panelHl 1.3s ease-in-out infinite} @keyframes panelHl{50%{box-shadow:0 0 0 6px #2f86d6,0 0 0 16px rgba(47,134,214,.12),0 10px 30px -12px rgba(15,25,40,.25)}} #recDone{position:fixed;inset:0;z-index:38;display:none;place-items:center;align-content:center;overflow:hidden;background:rgba(4,8,16,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:#fff;text-align:center;cursor:pointer;-webkit-user-select:none;user-select:none}#recDone[data-on]{display:grid}#recDone .band{position:relative;width:100vw;padding:36px 0 32px;background:linear-gradient(90deg,transparent,rgba(6,17,26,.97) 12%,rgba(6,17,26,.97) 88%,transparent);overflow:hidden;transform-origin:50% 50%;animation:rdBand .5s cubic-bezier(.16,1,.3,1) both}#recDone .band::before,#recDone .band::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#9ff6ff 18%,#9ff6ff 82%,transparent);animation:rdLine .7s .08s cubic-bezier(.16,1,.3,1) both}#recDone .band::before{top:0}#recDone .band::after{bottom:0}#recDone .sweep{position:absolute;top:0;bottom:0;left:-45%;width:38%;background:linear-gradient(90deg,transparent,rgba(159,246,255,.24),transparent);transform:skewX(-18deg);animation:rdSweep 1s .4s cubic-bezier(.4,0,.2,1) both;pointer-events:none}#recDone .in{position:relative;display:grid;gap:8px;justify-items:center;width:min(680px,92vw);margin:0 auto}#recDone small{font-family:var(--mono);letter-spacing:.36em;font-size:12px;color:#9ff6ff;animation:rise .5s .22s both}#recDone h1{margin:0;font-size:clamp(34px,6vw,56px);font-weight:900;letter-spacing:-.02em;line-height:1.1;text-shadow:0 0 28px rgba(159,246,255,.35);animation:rise .55s .3s both}#recDone p{margin:0;font-size:16px;line-height:1.6;color:rgba(255,255,255,.84);word-break:keep-all;animation:rise .55s .4s both}#recDone .sub{display:grid;gap:16px;justify-items:center;margin-top:24px;animation:rise .6s .75s both}#recDone .cells{display:flex;gap:6px;align-items:center}#recDone .cells i{width:34px;height:7px;border-radius:4px;background:rgba(255,255,255,.16);outline:0;flex:none}#recDone .cells i.ok{background:#9ff6ff;box-shadow:0 0 10px rgba(159,246,255,.7)}#recDone .cells i.now{animation:rdBlink .8s .95s 3 both}#recDone .cells b{font:700 12px var(--mono);color:#9ff6ff;margin-left:10px;letter-spacing:.1em;white-space:nowrap}#recDone .next{font:700 12px/1 var(--mono);letter-spacing:.1em;color:#9ff6ff;padding:9px 16px;border:1px solid rgba(159,246,255,.5);border-radius:999px;animation:pulse-o 1.3s 1.6s infinite}@keyframes rdBand{from{transform:scaleY(.06);opacity:0}}@keyframes rdLine{from{transform:scaleX(0)}}@keyframes rdSweep{to{left:112%}}@media (prefers-reduced-motion:reduce){#recDone .band,#recDone .band::before,#recDone .band::after,#recDone .sweep,#recDone .cells i.now,#recDone .next,#recDone .in>*,#recDone .sub{animation:none}}#voidVn{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,rgba(10,20,34,.55),rgba(10,20,34,.12) 45%,transparent 70%);cursor:pointer} #voidVn[data-on]{display:flex} #voidVn .in{position:relative;width:min(900px,100%);padding-top:150px} #voidVn img{position:absolute;left:14px;bottom:76px;height:min(300px,40vh);max-width:40vw;object-fit:contain;object-position:bottom;filter:drop-shadow(0 14px 18px rgba(0,0,0,.35));animation:void-in .5s cubic-bezier(.16,1,.3,1) both} @keyframes void-in{from{opacity:0;transform:translateY(18px)}} #voidVn .box{position:relative;min-height:118px;padding:26px 28px 30px 210px;border-radius:18px;background:linear-gradient(180deg,#fffdf6,#fbf3dc);border:2px solid #e4cf93;box-shadow:0 0 0 4px rgba(251,243,220,.35),0 18px 40px -14px rgba(0,0,0,.45);color:#2a2418;animation:rise .45s both} #voidVn .box b{position:absolute;left:184px;top:-16px;padding:7px 18px;border-radius:999px;background:linear-gradient(180deg,#5db2f0,#2f86d6);color:#fff;font:700 14px/1 var(--sans);letter-spacing:.04em;box-shadow:0 6px 14px -6px rgba(47,134,214,.8),inset 0 1px 0 rgba(255,255,255,.5)} #voidVn .box p{margin:0;font-size:17px;font-weight:500;line-height:1.75;min-height:3.5em;word-break:keep-all;white-space:pre-wrap} #voidVn .dots{position:absolute;left:210px;bottom:12px;display:flex;gap:5px} #voidVn .dots i{width:14px;height:4px;border-radius:2px;background:rgba(47,134,214,.2)} #voidVn .dots i.on{background:#2f86d6} #voidVn .box .nav{position:absolute;right:16px;bottom:10px;display:flex;gap:8px;align-items:center} #voidVn .box #tutPrev{border:1px solid rgba(47,134,214,.5);background:transparent;color:#2f86d6;border-radius:6px;padding:4px 9px 5px;font:700 11px/1 var(--mono);letter-spacing:.08em;cursor:pointer} #voidVn .box #tutPrev[hidden]{display:none} #voidVn .box #tutPrev:active{transform:translateY(1px)} #tutWipe{position:fixed;inset:0;z-index:39;background:#0a1422;opacity:0;pointer-events:none;transition:opacity .36s} #tutWipe[data-on]{opacity:1} @media (prefers-reduced-motion:reduce){#tutWipe{transition:none}} #voidVn[data-typing] .box i#voidNext,#vn[data-typing] .box i#vnNext{opacity:.45;animation:none} #voidVn .box i#voidNext{font:700 11px/1 var(--mono);font-style:normal;letter-spacing:.08em;color:#2f86d6;padding:4px 9px 5px;border:1px solid rgba(47,134,214,.5);border-radius:6px;animation:pulse-o 1.3s infinite} #voidVn .box i#voidNext[hidden]{display:none} #voidVn #tutSkip{position:absolute;right:18px;top:calc(14px + env(safe-area-inset-top,0px));border:1px solid rgba(255,255,255,.55);background:rgba(10,20,34,.55);color:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans);backdrop-filter:blur(6px)} #voidVn #tutSkip[hidden]{display:none} #vn #vnSkip{position:absolute;right:18px;top:calc(14px + env(safe-area-inset-top,0px));border:1px solid rgba(255,255,255,.55);background:rgba(10,20,34,.55);color:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans);backdrop-filter:blur(6px);cursor:pointer} @media (max-width:600px),(max-height:480px){#voidVn .in{padding-top:110px} #voidVn img{left:4px;bottom:62px;height:min(210px,30vh)} #voidVn .box{padding:22px 16px 28px 132px;min-height:104px} #voidVn .box b{left:116px;font-size:13px} #voidVn .box p{font-size:15px;line-height:1.65} #voidVn .dots{left:132px}} @media (prefers-reduced-motion:reduce){#voidVn img,#voidVn .box,#voidVn .box i#voidNext{animation:none}} .team .tacts{display:flex;gap:6px} #againBtn[hidden]{display:none} html body #adminDlg{position:fixed;inset:0;top:0;right:0;left:0;bottom:0;width:auto;height:auto;max-height:none;max-width:none;border-radius:0;z-index:45;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--fg);box-shadow:none;border:0;backdrop-filter:none} html body #adminDlg[hidden]{display:none} #adminDlg .ah{padding:14px 28px;border-bottom:1px solid var(--line);background:var(--panel-solid)} #adminDlg .ah h2{font-size:20px} #adminDlg .ah .acts .x{border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;background:transparent;color:var(--fg)} #adminDlg .scroll{flex:1;overflow:auto;padding:20px 28px 40px} .adm.dash{display:grid;gap:18px;padding:0;max-width:1480px;margin:0 auto} .adm .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px} .adm .tile{padding:14px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid)} .adm .tile small{display:block;font-size:12px;color:var(--muted)} .adm .tile b{display:block;font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-top:2px} .adm .tile span{font-size:12px;color:var(--muted)} .adm .cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} .adm .card{padding:16px 18px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel-solid);display:grid;gap:10px;margin-bottom:18px} .adm .card h3{margin:0;font-size:15px;font-weight:700} .adm .card .hint{margin:-4px 0 0;font-size:12px;color:var(--muted)} .adm .card .grp h4{margin:10px 0 6px;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center} .adm .card .grp h4 span{font-family:var(--mono);font-weight:400} .adm .sublist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px} .adm .subline{margin:0;font-size:13px} .adm .empty{color:var(--muted);text-align:center;padding:18px;font-size:13px;margin:0} .qt.big{font-size:14px} .qt.big th,.qt.big td{padding:10px 10px;vertical-align:middle;border-top:1px solid var(--line)} .qt.big thead th{border-top:0;border-bottom:2px solid var(--line);font-size:12px;color:var(--muted)} .qt.big th em{display:block;font-style:normal;font-size:10px;letter-spacing:.1em;color:var(--muted);opacity:.8} .qt.big td b{font-size:16px} .qt.big .st{font-size:12px;padding:4px 10px} .qt.big .mini{padding:6px 12px;font-size:12.5px} .qt.big td small{display:block;font-size:11px;color:var(--muted)} .qt.big tr.full td{background:color-mix(in srgb,var(--restored) 10%,transparent)} .qt .rate{position:relative;width:110px;height:22px;border-radius:6px;background:var(--line);overflow:hidden} .qt .rate i{position:absolute;inset:0 auto 0 0;background:var(--restored)} .qt .rate span{position:relative;display:block;line-height:22px;text-align:center;font:700 12px var(--mono)} .adm .arow.col{flex-direction:column;align-items:stretch} .adm .arow.col .mini{padding:9px 12px;font-size:13px;text-align:center} .adm .autol{display:flex;gap:8px;align-items:center;font-size:13px} .adm .autol select{flex:1} @media (max-width:1000px){.adm .cols{grid-template-columns:1fr} .adm .tiles{grid-template-columns:repeat(2,1fr)} #adminDlg .scroll{padding:14px 14px 40px} #adminDlg .ah{padding:12px 14px} .qt.big{display:block;overflow:auto}} body.admin #teamPick,body.admin #panel,body.admin #board,body.admin #bar,body.admin #simBtn,body.admin #restoreBtn,body.admin #callPill,body.admin #voidVn,body.admin #walkPick,body.admin .lbl{display:none !important} @media (pointer:fine){#callGo::after,#qrMap::after,#odGo::after,#cinemaX::after,#miniGo::after{content:'Space';margin-left:8px;font:700 10px var(--mono);opacity:.55;letter-spacing:.08em;vertical-align:middle}} #voidVn .box .how{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px} #voidVn .box .how li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(47,134,214,.1);font:600 13px/1.3 var(--sans);color:#1d3b5c} #voidVn .box .how li i{flex:none;width:22px;height:22px;border-radius:50%;background:#2f86d6;color:#fff;font:800 12px/22px var(--mono);font-style:normal;text-align:center} .ms .unknown{display:flex;gap:10px;align-items:center;margin:4px 0 2px;font-size:12.5px;color:var(--muted)} .ms .unknown b{color:var(--fg);font-size:14px} .ms .dist{margin-left:auto;font:700 13px var(--mono);color:var(--accent)} #lMe.pulse{box-shadow:0 0 0 3px rgba(14,74,132,.45);animation:pulse 1.4s infinite} #questHud html:not(.dbg) #qTmp{display:none} .tmp{border:1px dashed rgba(159,246,255,.5);background:transparent;color:#9ff6ff;border-radius:999px;padding:6px 10px;font:600 11px var(--sans);margin-left:6px} @media (max-width:600px),(max-height:480px){#voidVn .box .how{grid-template-columns:1fr;gap:4px}} .qt.big tr.sub td{border-top-style:dashed} .qt.big td .dev{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:2px} .qt.big td small{display:block;font-size:11px;color:var(--muted);margin-top:3px} .trow b small{font-family:var(--mono);font-weight:400;color:var(--muted)} #yardDlg,#labDlg,#caveDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;overflow:auto;color:var(--void-fg);text-align:center;-webkit-user-select:none;user-select:none} #yardDlg[data-on],#labDlg[data-on],#caveDlg[data-on]{display:grid} #yardDlg .room,#labDlg .room{position:relative;width:100%;min-height:100%;display:grid;place-items:center;padding:24px 16px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 0%,rgba(255,216,74,.12),transparent 55%),linear-gradient(180deg,#0a1018,#05070c 60%,#03050a)} #yardDlg .room{background:radial-gradient(ellipse at 50% 0%,rgba(255,80,60,.16),transparent 50%),linear-gradient(180deg,#0e1218,#05070c 60%)} #yardDlg .lamp{position:absolute;left:50%;top:0;width:200px;height:200px;transform:translateX(-50%);background:radial-gradient(circle at 50% 0%,rgba(255,80,60,.45),transparent 70%);animation:ydLamp 2.4s ease-in-out infinite;pointer-events:none} #yardDlg.win .lamp{background:radial-gradient(circle at 50% 0%,rgba(159,246,255,.5),transparent 70%);animation:none} @keyframes ydLamp{0%,100%{opacity:.5}50%{opacity:1}} #yardDlg .in,#labDlg .in,#caveDlg .in{display:grid;gap:12px;justify-items:center;width:min(640px,94vw);animation:rise .9s both} #caveDlg{background:radial-gradient(ellipse at 50% 60%,#0d1a22 0%,#05070c 70%);padding:24px 12px;box-sizing:border-box} #yardDlg small,#labDlg small,#caveDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff} #yardDlg h1,#labDlg h1,#caveDlg h1{margin:0;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em} #yardDlg p,#labDlg p,#caveDlg p{margin:0;font-size:15px;line-height:1.6;min-height:1.6em;max-width:46ch;word-break:keep-all} #yardDlg .row,#labDlg .row,#caveDlg .row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:4px} #yardDlg .go,#labDlg .go,#caveDlg .go{border:0;border-radius:999px;padding:13px 28px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans)} #yardDlg .go:disabled,#labDlg .go:disabled,#caveDlg .go:disabled{opacity:.35} #yardDlg .later,#labDlg .later,#caveDlg .later{border:1px solid color-mix(in srgb,var(--void-fg) 30%,transparent);background:transparent;color:var(--void-fg);border-radius:999px;padding:12px 22px;font:600 14px var(--sans)} #yardDlg .board{display:grid;gap:4px;width:min(440px,90vw);padding:12px;border-radius:18px;background:#141a22;border:3px solid #2a323c;box-shadow:inset 0 0 0 1px #3a444f,0 20px 50px -20px #000} #yardDlg .board button{aspect-ratio:1;border:0;border-radius:8px;background:#1b222b;padding:0;color:#4a5560;transition:background .2s,color .2s} #yardDlg .board button svg{width:100%;height:100%;display:block} #yardDlg .board button path{fill:none;stroke:currentColor;stroke-width:12;stroke-linecap:round} #yardDlg .board button circle{fill:currentColor} #yardDlg .board button.on{color:#9ff6ff;background:#1a2a34;box-shadow:0 0 14px rgba(159,246,255,.35) inset} #yardDlg .board button.src{box-shadow:0 0 0 3px #ffd84a inset} #yardDlg .board button.src.on{box-shadow:0 0 0 3px #ffd84a inset,0 0 14px rgba(159,246,255,.35) inset} #yardDlg .board button.stn::after{content:'';position:absolute;right:5px;top:5px;width:9px;height:9px;border-radius:2px;background:#ffd84a} #yardDlg .board button{position:relative} #yardDlg .board button.turn svg{animation:ydTurn .22s ease-out} @keyframes ydTurn{from{transform:rotate(-90deg)}to{transform:rotate(0)}} #yardDlg.win .board{border-color:#9ff6ff} #yardDlg .lamps{display:flex;gap:8px;align-items:center;font:600 13px var(--mono);color:#9ff6ff} #yardDlg .lamps i{width:14px;height:14px;border-radius:50%;background:#2a323c;border:1px solid #3a444f} #yardDlg .lamps i.on{background:#ffd84a;box-shadow:0 0 10px #ffd84a} #labDlg .mons{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%} #labDlg .mon{display:grid;gap:0;border-radius:14px;background:#1a2029;border:3px solid #2a323c;overflow:hidden;text-align:left} #labDlg .mon header{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 12px 6px;background:#10151c} #labDlg .mon header small{font-size:10px;letter-spacing:.2em;grid-column:1/-1} #labDlg .mon header b{font-size:14px} #labDlg .mon header em{font:600 12px var(--mono);color:#ffd84a;font-style:normal;align-self:center} #labDlg .mon canvas{width:100%;display:block;background:#0b1422;touch-action:none} #labDlg .mon footer{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;background:#10151c} #labDlg .mon .st{font:600 12px var(--mono);color:#9ff6ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} #labDlg .mon .play{border:0;border-radius:999px;padding:10px 18px;min-height:40px;background:#9ff6ff;color:#06111a;font:700 13px var(--sans);white-space:nowrap;flex:none} #labDlg .mon.live{border-color:#9ff6ff;box-shadow:0 0 24px rgba(159,246,255,.25)} #labDlg .mon.ok{border-color:#7fd67a} #labDlg .mon.ok .play{display:none} #labDlg .mon.ok header b{color:#7fd67a} #caveDlg .decode{display:grid;grid-template-columns:auto 1fr;gap:14px;width:100%;align-items:start} #caveDlg .tiles{display:grid;grid-template-columns:repeat(2,64px);gap:8px} #caveDlg .tiles button{width:64px;height:64px;border-radius:12px;border:1px solid rgba(255,216,74,.4);background:rgba(255,216,74,.08);color:#ffd84a;padding:6px;transition:transform .15s} #caveDlg .tiles button svg,#caveDlg .slot svg{width:100%;height:100%;display:block} #caveDlg .tiles svg path,#caveDlg .slot svg path,#caveDlg .tiles svg circle,#caveDlg .slot svg circle{stroke:currentColor;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:currentColor} #caveDlg .tiles svg path[fill=none],#caveDlg .slot svg path[fill=none],#caveDlg .tiles svg circle[fill=none],#caveDlg .slot svg circle[fill=none]{fill:none} #caveDlg .tiles button.pick{background:#ffd84a;color:#06111a;transform:scale(1.08)} #caveDlg .tiles button.ok{opacity:.18;pointer-events:none} #caveDlg .map{position:relative;width:100%;max-width:320px;aspect-ratio:4/3;justify-self:center;border-radius:16px;background:rgba(159,246,255,.04);border:1px solid rgba(159,246,255,.2)} #caveDlg .map canvas{width:100%;height:100%;display:block} #caveDlg .slot{position:absolute;width:44px;height:44px;transform:translate(-50%,-50%);border-radius:50%;border:2px dashed rgba(255,216,74,.7);background:rgba(6,17,26,.5);color:#ffd84a;padding:0} #caveDlg .slot span{display:block;width:100%;height:100%;padding:7px;box-sizing:border-box} #caveDlg .slot b{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-size:11px;white-space:nowrap;color:#eaf7ff;opacity:0;transition:opacity .3s} #caveDlg .slot.ok{border-style:solid;background:rgba(255,216,74,.18)} #caveDlg .slot.ok b{opacity:1} #caveDlg .slot.no{animation:shake .4s;border-color:#ff3b30} #caveDlg .sent{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:baseline;min-height:30px;font-size:17px} #caveDlg .sent b{color:#ffd84a;font-size:20px} #caveDlg .sent i{font-style:normal;color:#ffd84a;letter-spacing:.1em;font-size:13px;align-self:start} #caveDlg .test{display:grid;gap:12px;width:100%} #caveDlg .sets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%} #caveDlg .set{display:grid;gap:8px;padding:10px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(159,246,255,.2)} #caveDlg .set b{font-size:13px} #caveDlg .opts{display:grid;gap:6px} #caveDlg .opts button{position:relative;border:1px solid rgba(159,246,255,.35);background:rgba(159,246,255,.08);color:inherit;border-radius:10px;padding:10px 6px;font:700 13px var(--sans)} #caveDlg .opts.ord button{padding-top:22px} #caveDlg .opts button i{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:#9ff6ff;color:#06111a;font:800 11px/16px var(--sans);font-style:normal;opacity:0} #caveDlg .opts button.pick{background:rgba(159,246,255,.28)} #caveDlg .opts button.pick i{opacity:1} #caveDlg .run{display:grid;grid-template-columns:320px 1fr;gap:12px;width:100%;align-items:start} #caveDlg .run canvas{width:320px;max-width:100%;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(159,246,255,.25)} #caveDlg .warn{grid-column:1;justify-self:center;display:inline-block;padding:6px 14px;border-radius:999px;background:#ff3b30;color:#fff;font:700 13px var(--sans)} #caveDlg .warn[hidden]{display:none} #caveDlg .log{grid-column:2;grid-row:1/3;margin:0;padding:0;list-style:none;display:grid;gap:6px;align-content:start;max-height:220px;overflow:auto;text-align:left} #caveDlg .log li{padding:8px 10px;border-radius:10px;background:rgba(255,59,48,.12);border-left:3px solid #ff3b30;font-size:12.5px;line-height:1.45;word-break:keep-all} #caveDlg .log li.ok{background:rgba(127,214,122,.14);border-left-color:#7fd67a} #caveDlg .log li b{display:block;font:700 11px var(--mono);color:#9ff6ff;margin-bottom:2px} #caveDlg.fail .run canvas{animation:shake .5s} #miniBox button.hot{box-shadow:0 0 0 4px rgba(159,246,255,.35),0 0 24px #9ff6ff;animation:pulse 1s infinite} @media (max-width:700px){#labDlg .mons{grid-template-columns:1fr} #caveDlg .decode{grid-template-columns:1fr} #caveDlg .tiles{grid-template-columns:repeat(6,1fr)} #caveDlg .tiles button{width:auto;height:auto;aspect-ratio:1} #caveDlg .sets{grid-template-columns:1fr} #caveDlg .run{grid-template-columns:1fr} #caveDlg .log{grid-column:1;grid-row:auto;max-height:160px} #caveDlg .warn{grid-column:1}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,6 +294,10 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .sep{width:1px;height:22px;background:var(--line)}
 #credit{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font-size:11px;color:var(--muted)}
 #credit a{color:inherit;display:inline-block;padding:13px 4px;margin:-13px -4px}
+#notice{position:fixed;left:12px;right:12px;margin-inline:auto;width:fit-content;max-width:min(680px,calc(100% - 24px));top:calc(74px + env(safe-area-inset-top,0px));z-index:39;display:flex;align-items:center;gap:12px;padding:12px 18px;border-radius:14px;background:#1d2f55;color:#fff;border:0;font:inherit;text-align:left;box-shadow:0 10px 30px -12px rgba(0,0,0,.5);animation:rise .4s both;cursor:pointer}
+#notice[hidden]{display:none} #notice small{font:700 12px var(--mono);letter-spacing:.14em;color:#9ff6ff;white-space:nowrap} #notice b{font-size:15px;line-height:1.4} #notice span{font-size:12px;opacity:.7;white-space:nowrap}
+body.screen #notice{top:24px;padding:18px 28px;max-width:min(1100px,calc(100% - 48px))} body.screen #notice b{font-size:26px}
+#noticeIn{flex:1;min-width:0;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);color:var(--fg);font:inherit;font-size:13px} .adm .nnow{margin:0 0 8px;font-size:13px;line-height:1.5} .adm [data-npre]{white-space:normal;line-height:1.35;text-align:left!important} .adm .nrow{display:flex;gap:6px;min-width:0} .adm .nrow .mini{white-space:nowrap;flex:none}
 #loading{position:fixed;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
 #loading[hidden]{display:none}
 #toast{position:fixed;left:0;right:0;margin-inline:auto;width:fit-content;bottom:calc(84px + env(safe-area-inset-bottom,0px));padding:8px 14px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -448,77 +452,13 @@ svg.glyph.done{box-shadow:0 0 0 1px #9ff6ff inset,0 0 18px color-mix(in srgb,#9f
 .subline.conv span{color:var(--accent)}
 .subline.err{background:color-mix(in srgb,var(--c-hub) 10%,transparent)}
 .subline.err span{color:var(--c-hub)}
-/* own camera scan: capture button on a zone card, the full-screen capture flow, the photo-ring viewer */
+/* zone card: the link task row */
 .capwrap{display:grid;gap:8px;margin-top:2px;padding-top:10px;border-top:1px solid var(--line);cursor:auto}
-.capbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:10px;padding:11px 14px;background:var(--accent);color:var(--accent-fg);font:600 13.5px var(--sans);cursor:pointer}
-.capbtn:active{transform:scale(.98)}
-.capbtn svg{width:18px;height:18px;flex:none}
 .task{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;min-height:22px}
-.capbtn.again{background:transparent;border:1px solid var(--line);color:var(--fg)}
 .task b{font-weight:600}
-.task+.cardsub,.capbtn+.task{margin-top:2px}
+.task+.cardsub{margin-top:2px}
 .capwrap .cardsub{border-top:0;padding-top:0}
-.orbbtn{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;width:100%;border:0;background:transparent;padding:0;text-align:left;font:inherit;color:inherit;cursor:pointer}
-.orbbtn img{width:56px;height:56px;border-radius:8px;object-fit:cover;display:block;margin:0;background:var(--void)}
-.orbbtn span{font-weight:600;font-size:12.5px;line-height:1.4}
-.subline.orb{grid-template-columns:1fr}
 .autol{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer}
-#cap{position:fixed;inset:0;background:#0b0e12;color:#eef1f4;display:grid;grid-template-rows:auto 1fr;z-index:32}
-#cap[hidden]{display:none}
-.cbody{position:relative;min-height:0;overflow:hidden}
-.cstep{position:absolute;inset:0;display:grid}
-.cstep[hidden]{display:none}
-#cs1{grid-template-rows:1fr}
-#capV{width:100%;height:100%;object-fit:cover;display:block;background:#000}
-.cguide{position:absolute;left:0;right:0;top:12px;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px;z-index:2}
-.cguide p{margin:0;font-size:13.5px;font-weight:600;text-align:center;line-height:1.45;padding:7px 12px;border-radius:999px;background:rgba(11,14,18,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-/* coverage map: columns = turning left/right, rows = tilting up/down (top row = looking up) */
-.cmap{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(11,14,18,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.cmap svg{display:block;width:min(300px,52vw);height:auto;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
-.cmap rect{fill:rgba(255,255,255,.18)}
-.cmap rect.on{fill:var(--restored)}
-.cmap .pt{fill:#fff;stroke:#0b0e12;stroke-width:1}
-.cmap .pt.off{display:none}
-.cnum{text-align:center;font-family:var(--mono);min-width:56px}
-.cnum b{display:block;font-size:26px;font-weight:500;line-height:1}
-.cnum span{font-size:11px;color:#a8b2bd}
-.crot{position:absolute;inset:0;z-index:3;display:grid;place-items:center;background:rgba(11,14,18,.86);text-align:center}
-.crot[hidden]{display:none}
-.crot svg{width:72px;height:72px;margin-bottom:14px;animation:rotHint 1.6s ease-in-out infinite}
-.crot b{display:block;font-size:19px;margin-bottom:6px}
-.crot span{font-size:13px;color:#a8b2bd}
-@keyframes rotHint{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
-.dome{position:absolute;inset:0;background:#000;touch-action:none}
-.dome canvas{display:block}
-.dload{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:#a8b2bd;pointer-events:none}
-.cctl{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(11,14,18,.85))}
-.cmode{display:flex;border:1px solid rgba(255,255,255,.25);border-radius:999px;overflow:hidden;justify-self:start}
-.cmode button{border:0;background:transparent;color:#eef1f4;padding:7px 11px;font-size:12px;font-weight:600;white-space:nowrap}
-.cmode button[aria-pressed=true]{background:#fff;color:#0b0e12}
-#capShot{width:66px;height:66px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.25);padding:0;justify-self:center}
-#capShot:active{background:#fff}
-.cprimary{border:0;border-radius:999px;padding:10px 18px;background:var(--restored);color:#fff;font:600 14px var(--sans);justify-self:end;white-space:nowrap}
-.cprimary:disabled{opacity:.4}
-.cprimary:active:not(:disabled){transform:scale(.97)}
-#cs2{grid-template-rows:1fr auto}
-#capPrev{position:relative;min-height:0}
-.cform{display:grid;gap:10px;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.1)}
-.cstat{font-family:var(--mono);font-size:12px;color:#a8b2bd}
-.cform input,.cform select{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#eef1f4;font:inherit;font-size:14px}
-.cform select option{color:#0b0e12}
-.cteam{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;font-size:13px}
-.crow{display:flex;gap:8px;justify-content:space-between;align-items:center}
-.crow .vb{padding:9px 14px}
-.cform .subhelp{color:#a8b2bd}
-.cform .subhelp[data-kind=err]{color:#ff8a7a}
-#cs3{place-items:center}
-.cup{display:grid;gap:12px;width:min(320px,80%);text-align:center}
-.cup p{margin:0;font-size:14px}
-.cbar{height:6px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden}
-.cbar i{display:block;height:100%;width:0;background:var(--restored);transition:width .2s}
-.orbit{position:absolute;inset:0;background:#000;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize}
-.orbit img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
-.chint{position:absolute;left:0;right:0;bottom:12px;margin-inline:auto;width:fit-content;font-size:12px;padding:6px 12px;border-radius:999px;background:rgba(11,14,18,.72);color:#eef1f4;pointer-events:none}
 @media (max-width:600px),(max-height:480px){
   #worlds{top:calc(12px + env(safe-area-inset-top,0px))}
   #panel{left:12px;right:12px;width:auto;top:calc(62px + env(safe-area-inset-top,0px));max-height:calc(58% - 50px)}
@@ -695,6 +635,7 @@ body.screen #worlds{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto}
 <div id="simFx" aria-hidden="true"></div>
 <div id="arrFlash" aria-hidden="true"></div>
 <div id="simDone" role="dialog" aria-modal="true"><div class="in"><small>SIMULATION COMPLETE</small><div id="simGlyph"></div><h1>환원 시뮬레이션 성공</h1><p id="simDoneP">다섯 기록이 모두 돌아왔습니다. 섬 아래 일루아의 흐름이 원천에서 옛 물길까지 다시 이어졌습니다.<br>그 모양은 코덱스 가문이 대대로 써 온 눈 문양과 같습니다.</p><button type="button" id="simDoneX">흐름 보기</button></div></div>
+<button id="notice" type="button" hidden><small>선생님 공지</small><b id="noticeT"></b><span>탭하면 닫힘</span></button>
 <button id="meCoord" class="glass" type="button" hidden title="누르면 복사"><small>내 좌표</small><code id="meCoordV">--</code><span id="meCoordA"></span></button>
 <section id="gallery" class="glass" aria-live="polite"><div class="gh"><small>RETURNED</small><h2>돌아온 기록</h2><b id="gN">0</b></div><div class="gs"></div></section>
 <a id="screenExit" class="glass" href="index.html">큰 화면 끝내기</a>
@@ -710,7 +651,6 @@ body.screen #worlds{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto}
   <div class="vh">
     <div><h2 id="vT"></h2><p id="vS"></p></div>
     <div class="acts">
-      <button class="vb" id="vPhoto" type="button" hidden>사진으로 보기</button>
       <button class="vb" id="vX">닫기</button>
     </div>
   </div>
@@ -718,46 +658,6 @@ body.screen #worlds{top:calc(16px + env(safe-area-inset-top,0px));bottom:auto}
   <div class="vf" id="vF">드래그해서 돌리고, 휠이나 두 손가락으로 확대합니다. 오른쪽 드래그로 이동합니다.</div>
 </section>
 
-<!-- own camera scan: shoot a ring of photos around the thing (1) → check it spinning (2) → upload to our server (3) -->
-<section id="cap" hidden aria-modal="true" role="dialog" aria-labelledby="capT">
-  <div class="vh">
-    <div><h2 id="capT">구역 스캔</h2><p id="capZone"></p></div>
-    <div class="acts"><button class="vb" id="capX" type="button">닫기</button></div>
-  </div>
-  <div class="cbody">
-    <div class="cstep" id="cs1">
-      <video id="capV" playsinline muted autoplay></video>
-      <div class="cguide">
-        <div class="cmap"><svg viewBox="0 0 180 50" id="capMap" aria-hidden="true"></svg><div class="cnum"><b id="capN">0</b><span id="capNt">/ 68장</span></div></div>
-        <p id="capMsg">카메라를 여는 중입니다</p>
-      </div>
-      <div class="crot" id="capRot" hidden><div>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>
-        <b>태블릿을 가로로 돌려 주세요</b><span>가로로 돌리면 바로 시작합니다.</span>
-      </div></div>
-      <div class="cctl">
-        <div class="cmode" role="group" aria-label="찍는 방법"><button type="button" data-mode="object" aria-pressed="true">사물 한 바퀴</button><button type="button" data-mode="space" aria-pressed="false">공간 둘러보기</button></div>
-        <button id="capShot" type="button" aria-label="직접 한 장 찍기"></button>
-        <button id="capDone" class="cprimary" type="button" disabled>완료</button>
-      </div>
-    </div>
-    <div class="cstep" id="cs2" hidden>
-      <div id="capPrev"></div>
-      <div class="cform">
-        <div class="cstat" id="capStat"></div>
-        <label class="cteam">우리 조
-          <select id="capTeam"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
-        </label>
-        <input id="capNote" type="text" maxlength="60" placeholder="무엇을 찍었나요? (예: 벤치, 조형물)" autocomplete="off" aria-label="찍은 것">
-        <div class="crow"><button class="vb" id="capRetry" type="button">다시 찍기</button><button class="vb" id="capPhoto" type="button">사진으로 보기</button><button class="cprimary" id="capUp" type="button">올리기</button></div>
-        <p class="subhelp" id="capHelp"></p>
-      </div>
-    </div>
-    <div class="cstep" id="cs3" hidden>
-      <div class="cup"><p id="capUpMsg">기록을 올리는 중입니다</p><div class="cbar"><i id="capBar"></i></div></div>
-    </div>
-  </div>
-</section>
 
 <script>
 addEventListener('error', e=>{ const l=document.getElementById('loading'); if(l && !document.querySelector('#stage canvas')){ document.getElementById('intro')?.remove(); document.body.classList.remove('intro'); l.hidden=false; l.textContent='화면을 그리지 못했습니다: '+(e.message||'스크립트 오류'); } });
@@ -796,27 +696,20 @@ const HIDDEN = (()=>{ try{
     return new Set(JSON.parse(localStorage.getItem('void-hidden') || '[]'));
   }catch(e){ return new Set(BOOT ? BOOT.hidden || [] : []); } })();
 const SCANS = SCANS_ALL.slice();   // the admin's hidden list is applied when the visible index is built (visibleScan)
-// Records shot with the page's own camera (kind "orbit": a ring of photos around the thing, stored on our server).
-// Once the server marks one restored it joins the scans before the map is built, so the zone renders restored like a splat would.
-const orbitThumb = s => s.thumb || `${API}/scan/${s.scanId || s.id}/thumb.jpg`;
-const orbitScan = s => s.splat
-  ? ({id:s.scanId, kind:'splat', caption:s.note || s.splat.caption || '이름 없는 기록', author:s.team ? s.team+'조' : (s.splat.author || ''), captured:s.splat.captured || s.createdAt,
+// A submission the server has converted (Scaniverse link → splat) joins the scans before the map is built, so the zone renders restored.
+const subScan = s => ({id:s.scanId, kind:'splat', caption:s.note || s.splat.caption || '이름 없는 기록', author:s.team ? s.team+'조' : (s.splat.author || ''), captured:s.splat.captured || s.createdAt,
       file:`${API}/splat/${s.scanId}.txt`, thumb:`${API}/thumb/${s.scanId}`, center:s.splat.center || [0,0,0], radius:s.splat.radius || 1, yaw:s.splat.yaw || 0, pitch:s.splat.pitch || -0.5,
-      points:s.splat.points, mission:s.mission, url:s.url, team:s.team})
-  : ({id:s.scanId, kind:'orbit', caption:s.note || '이름 없는 기록', author:s.team ? s.team+'조' : '', captured:s.createdAt,
-      frames:s.frames || 0, mode:s.mode, sensor:s.sensor, urls:s.urls || null, items:s.items || null, thumb:orbitThumb(s), mission:s.mission, url:'', team:s.team});
-// a submission counts as restored once the server says ok: a converted Scaniverse scan, or a camera set
-const subDone = s => s.status==='ok' && (s.kind==='orbit' || !!s.splat);
-const orbitOk = list => (list || []).filter(subDone);
-const orbitSig = list => orbitOk(list).map(s=>s.scanId).sort().join(',');
-orbitOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(orbitScan(s)));
+      points:s.splat.points, mission:s.mission, url:s.url, team:s.team});
+// a submission counts as restored once the server says ok and the splat is in
+const subDone = s => s.status==='ok' && !!s.splat;
+const subsOk = list => (list || []).filter(subDone);
+subsOk(BOOT && BOOT.subs).forEach(s=> SCANS.push(subScan(s)));
 // Preview records (admin, this device only): zones ticked under "복구 미리보기" count as restored with a stand-in record,
 // so the island, the flow and the 5/5 ending can be checked without submitting five real links. Stored in localStorage 'void-demo'.
 const DEMO = (()=>{ try{ return new Set(JSON.parse(localStorage.getItem('void-demo') || '[]')); }catch(e){ return new Set(); } })();
 const demoScan = id=>{ const base = SCANS_ALL[0] || {}; return {...base, id:`demo-${id}`, mission:id, caption:'미리보기 기록', author:'관리자', captured:Date.now(), demo:true, url:'', thumb:base.thumb || '', file:base.file || ''}; };
 { let adm = false; try{ adm = !!sessionStorage.getItem('void-admin'); }catch(e){} if(!adm){ DEMO.clear(); try{ localStorage.removeItem('void-demo'); }catch(e){} } }   // a preview only lives while the admin is logged in on this device
 DEMO.forEach(id=>{ if(!SCANS.some(s=> s.mission === id)) SCANS.push(demoScan(id)); });
-const ORBIT_SIG = orbitSig(BOOT && BOOT.subs);
 let AUTO = BOOT ? BOOT.auto !== false : true;
 const FLOOR_H = 3.6;
 let CAT_ORDER = ['edu','lab','hub','dorm','ext','build','misc'];
@@ -1031,9 +924,8 @@ const scansFor = id => pairIds(id).flatMap(k=> byMission[k] || []);
 let M = MISSIONS.filter(m=> m.campus !== false).map(m=>({...m, scans: scansFor(m.id)}));   // 2026-10-27: three campus zones; the other two island zones come back through the island missions
 const MISSION_E = M;
 const missionOfBuilding = {}; M.forEach(m=> missionOfBuilding[m.building] = m);
-// The mission at a zone (user, 2026-10-15): two records, a real photo set shot with this page's camera (kind "orbit") and a 3D scan
-// (a Scaniverse link the server converts, or a built-in splat). The zone counts as restored only when both are in. A preview record counts as both.
-const zoneParts = m => { const sc = m ? m.scans : []; const demo = sc.some(x=> x.demo); return {photo: demo || sc.some(x=> x.kind === 'orbit'), scan: demo || sc.some(x=> x.kind !== 'orbit')}; };
+// A zone is restored by one record: a Scaniverse link the server converts (or a built-in splat; a preview record counts too). 2026-10-27
+const zoneParts = m => ({scan: !!(m && m.scans.length)});
 // Island zones with quest:'qN' are restored by finishing that island mission (web), not by a campus record. Progress lives on the server per team
 // (SQUESTS: team -> {q1:ts,...}); file:// copies keep it in localStorage. QDONE (this device's team) is unioned in so a just-finished mission counts before the server answers.
 let SUBS = [];   // declared here: zoneDone() runs before the server block below fills it
@@ -1437,7 +1329,7 @@ const zoneLocked = m => { if(!m || m.lat == null || SCREEN || typeof QUESTS !== 
 const zoneFound = m => { if(!m) return false; if(m.id === 'z1' || zoneDone(m)) return true; try{ return localStorage.getItem(`void-found-${m.id}`) === '1'; }catch(e){ return false; } };
 const ZONE_OBJ = {z1:'가져온 물건', z2:'하냥이', z3:'라이언이랑 어피치'};   // what sits at each spot (said only on arrival)
 const zoneName = m => { const i = MISSION_E.indexOf(m) + 1; return i < 1 ? m.name : zoneFound(m) ? `기록 ${i} · ${m.name}` : `기록 ${i}`; };
-const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾아가세요. 그곳의 사물이나 공간을 휴대폰 카메라로 스캔하면 기록이 되살아납니다.' : (m.brief || '');
+const zoneBrief = m => hiddenZone(m) ? '좌표가 가리키는 곳을 직접 찾아가세요. 그곳의 사물이나 공간을 Scaniverse로 스캔해 링크를 올리면 기록이 되살아납니다.' : (m.brief || '');
 // Ilua: the energy that once flowed through the whole island. Each restored record gives back one fragment of its course.
 // The Codex glyph, piece by piece. The Ilua flow under the island runs in this exact shape (see the simulator);
 // the five zones are the five gaps in it, and the glyph the family has worn for generations was copied from the flow.
@@ -1549,7 +1441,7 @@ const saveLocal = list=>{ try{ localStorage.setItem(SUB_KEY, JSON.stringify(list
 SUBS = LOCAL ? loadLocal() : [];
 let STATE_VER = -1;
 async function api(path, body, admin){
-  const h = {'Content-Type':'application/json'}; if(admin) h['X-Admin-Key'] = ADMIN_KEY;
+  const h = {'Content-Type':'application/json'}; if(admin) h['X-Admin-Key'] = typeof admin === 'string' ? admin : ADMIN_KEY;   /* a string is a one-off key (the 「처음부터」 prompt) */
   const r = await fetch(API + path, body ? {method:'POST', headers:h, body:JSON.stringify(body)} : {headers:h, cache:'no-store'});
   let j = {}; try{ j = await r.json(); }catch(e){}
   if(!r.ok) throw new Error(j.error || `서버 오류 (${r.status})`);
@@ -1573,6 +1465,7 @@ function applyState(st){
   if(st.version === STATE_VER) return; STATE_VER = st.version;
   SUBS = st.subs || []; if(st.now) SNOW = st.now;
   AUTO = st.auto !== false;
+  noticeApply(st.notice);
   if(st.pos){ LAST_POS = st.pos; updateTeamDots(LAST_POS, st.now); }
   if(lastSig !== null) announceChanges();
   // the hidden list and the restored records are applied live, no reload: the 3D side (markers, monuments, flow) rebuilds through rescan()
@@ -1584,9 +1477,9 @@ function applyState(st){
     if(typeof MI !== 'undefined') MI.forEach(m=>{ if(m.quest && zoneDone(m) && !was.includes(m.id)) arrived.push(m.id); });
     if(TEAM && typeof QUESTS === 'object'){ const now = teamQuests(TEAM); QUESTS.forEach(q=>{ if(now.includes(q.id) && !teamWas.includes(q.id) && teamDevs(TEAM).length > 1) setTimeout(()=> onTeamComplete(q), 0); }); }
     try{ questRefresh(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
-  const done = orbitOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
-  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = orbitScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; const mz = typeof MI !== 'undefined' ? MI.find(m=> m.id === z) : null; if(z && !arrived.includes(z) && !(mz && zoneDone(mz))) arrived.push(z); } } });
-  for(let k = SCANS.length - 1; k >= 0; k--){ const x = SCANS[k]; if((x.kind === 'orbit' || x.kind === 'splat') && !x.demo && !doneIds.has(x.id)){ SCANS.splice(k, 1); changed = true; } }
+  const done = subsOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
+  done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = subScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; const mz = typeof MI !== 'undefined' ? MI.find(m=> m.id === z) : null; if(z && !arrived.includes(z) && !(mz && zoneDone(mz))) arrived.push(z); } } });
+  for(let k = SCANS.length - 1; k >= 0; k--){ const x = SCANS[k]; if(x.kind === 'splat' && !x.demo && !doneIds.has(x.id)){ SCANS.splice(k, 1); changed = true; } }
   if(changed && typeof rescan === 'function' && typeof MI !== 'undefined') rescan(arrived.length ? arrived : undefined, arrived.length > 0); else refreshSubUI();
   try{ maybeGuide(); actCheck(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }
 }
@@ -1595,6 +1488,18 @@ async function syncState(){
   try{ applyState(await api('/state' + (TEAM && !SCREEN && !ADMIN_KEY && !AUX ? `?team=${TEAM}&dev=${DEV}` : ''))); try{ maybeGuide(); actCheck(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
   catch(e){ if(STATE_VER < 0){ LOCAL = true; SUBS = loadLocal(); refreshSubUI(); } }
 }
+// ---------- operator notice (user, 2026-10-30): one line the operator sends from the admin screen; every tablet gets it with its next state poll ----------
+const NOTICE_PRESETS = ['10분 남았어요. 지금 하는 기록만 마무리하고 돌아오세요.', '지금 바로 모이는 곳으로 돌아오세요.', '잠깐 멈추고 선생님 말을 들어 주세요.', '서버를 잠깐 손보는 중이에요. 1분만 기다려 주세요.'];
+let NOTICE = null;
+function noticeApply(n){
+  const id = n && n.text ? +n.id : 0; if((NOTICE ? +NOTICE.id : 0) === id) return; NOTICE = id ? n : null;
+  const el = $('notice'); if(!id){ el.hidden = true; return; }
+  let seen = 0; try{ seen = +sessionStorage.getItem('void-notice-seen') || 0; }catch(e){}
+  $('noticeT').textContent = n.text; el.hidden = seen >= id;
+  if(seen < id && !ADMIN_KEY && !SCREEN){ try{ voidSay(n.text, 9000, 'say'); }catch(e){} }
+}
+$('notice').onclick = ()=>{ $('notice').hidden = true; try{ sessionStorage.setItem('void-notice-seen', String(NOTICE ? NOTICE.id : 0)); }catch(e){} };
+async function sendNotice(text){ text = (text || '').trim(); try{ STATE_VER = -1; applyState(await api('/admin/notice', {text}, true)); toast(text ? '공지를 보냈습니다' : '공지를 내렸습니다'); renderAdmin(); }catch(err){ toast(err.message); } }
 const MSG = {};
 const subsFor = m => { const v = viewTeam(); return SUBS.filter(s=> pairIds(m.id).includes(s.mission) && !inMap.has(s.scanId) && (v === 0 || s.team === v)); };
 function zoneState(m){ return zoneDone(m) ? 'ok' : (m.scans.length || subsFor(m).length) ? 'pend' : 'void'; }
@@ -1603,10 +1508,6 @@ const cancelBtn = s => (LOCAL || s.team===TEAM) ? `<button type="button" class="
 function subLines(m){
   return subsFor(m).map(s=>{
     const who = s.team ? s.team+'조가 ' : '';
-    if(s.kind==='orbit') return `<div class="subline orb">
-      <button type="button" class="orbbtn" data-orbit="${esc(s.id)}"><img src="${esc(orbitThumb(s))}" alt="" loading="lazy"><span>${who}찍은 기록${s.note ? ' · '+esc(s.note) : ''}<br><small>사진 ${s.frames || '?'}장</small></span></button>
-      <span>${timeText(s.createdAt)} 올림 · ${s.status==='ok' ? '반영 중' : '확인 대기'} ${ADMIN_KEY && s.status!=='ok' ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${cancelBtn(s)}</span>
-    </div>`;
     const st = s.splat ? (s.status==='ok' ? '반영 중' : '확인 대기') : s.error ? `변환 실패 · ${esc(s.error)}` : '변환 중';
     return `<div class="subline ${s.splat ? '' : s.error ? 'err' : 'conv'}">
       ${LOCAL ? '' : `<img src="${API}/thumb/${esc(s.scanId)}" alt="" loading="lazy" onerror="this.remove()">`}
@@ -1619,7 +1520,7 @@ const CAM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 // The zone card's two tasks: ① a real photo set with this page's camera, ② a Scaniverse scan link. Each shows done / not yet.
 function formHTML(m, pre=''){
   const msg = MSG[m.id] || {text:'', kind:''}, q = zoneParts(m), pend = subsFor(m);
-  const photoPend = pend.some(x=> x.kind === 'orbit'), scanPend = pend.some(x=> x.kind !== 'orbit');
+  const scanPend = pend.length > 0;
   const chip = (done, p)=> done ? '<span class="st ok">완료</span>' : p ? '<span class="st pend">확인 중</span>' : '';
   return `<div class="capwrap">
       <div class="task"><b>스캔 링크</b>${chip(q.scan, scanPend)}</div>
@@ -1631,17 +1532,17 @@ function formHTML(m, pre=''){
       </form>
     </div>`;
 }
-const subThumb = s => s.kind==='orbit' ? orbitThumb(s) : `${API}/thumb/${esc(s.scanId)}`;
+const subThumb = s => `${API}/thumb/${esc(s.scanId)}`;
 // ---------- restoration board (right) ----------
 const PAIRS = ()=> MISSION_E.filter(m=>m.twin).map(m=>({campus:m, island: MI.find(x=>x.id===m.twin) || {id:m.twin, name:m.twin}}));
 function boardRow(p){
   const st = zoneState(p.campus), subs = subsFor(p.campus), teams = [...new Set(subs.map(s=>s.team).filter(Boolean))];
   const half = p.campus.scans[0];   // one of the two records is already in (photo or scan)
   const thumb = st==='ok' && p.campus.scans[0] ? `<img src="${esc(p.campus.scans[0].thumb)}" alt="">`
-    : st==='ok' && subs[0] && (!LOCAL || subs[0].kind==='orbit') ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
+    : st==='ok' && subs[0] && !LOCAL ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
     : st==='ok' ? '···'
     : st==='pend' && half ? `<img src="${esc(half.thumb)}" alt="">`
-    : st==='pend' && subs[0] && (!LOCAL || subs[0].kind==='orbit') ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
+    : st==='pend' && subs[0] && !LOCAL ? `<img src="${esc(subThumb(subs[0]))}" alt="" loading="lazy" onerror="this.replaceWith('···')">`
     : st==='pend' ? '···' : '?';
   const lock = st!=='ok' && zoneLocked(p.campus);
   const where = st==='ok' ? `${esc(p.campus.name)}에서 복구` : lock ? `${esc(zoneName(p.campus))} · 섬의 미션을 마치면 열립니다` : `${esc(zoneName(p.campus))}${p.campus.lat!=null ? ' · '+coordText(p.campus) : ''}`;
@@ -1707,16 +1608,12 @@ function adminHTML(){
   const isDone = s => inMap.has(s.scanId) || subDone(s);
   const row = s=>{ const m = missionById(s.mission), done = isDone(s);
     const where = `${esc(m ? m.name : s.mission)}${m && m.twin && missionById(m.twin) ? ' ↔ '+esc(missionById(m.twin).name) : ''}`;
-    if(s.kind==='orbit') return `<div class="subline orb ${done ? 'done' : ''}">
-      <button type="button" class="orbbtn" data-orbit="${esc(s.id)}"><img src="${esc(orbitThumb(s))}" alt="" loading="lazy"><span>${where}${s.note ? ' · '+esc(s.note) : ''}<br><small>카메라 기록 · 사진 ${s.frames || '?'}장</small></span></button>
-      <span>${timeText(s.createdAt)} 올림 · ${done ? '복구됨' : '확인 대기'} ${done ? `<button type="button" class="mini" data-approve="${esc(s.id)}" data-ok="0">되돌리기</button>` : `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>`} <button type="button" class="mini" data-adel="${esc(s.id)}">삭제</button></span>
-    </div>`;
     const st = done ? '복구됨' : s.splat ? '변환 완료 · 확인 대기' : s.error ? `변환 실패 · ${esc(s.error)}` : '변환 중';
     return `<div class="subline ${done ? 'done' : s.error ? 'err' : ''}">
       <a href="${esc(s.url)}" target="_blank" rel="noopener">${where}${s.caption ? ' · '+esc(s.caption) : ''}${s.note ? ' · '+esc(s.note) : ''}</a>
       <span>${timeText(s.createdAt)} 링크 제출 · ${st} ${done ? `<button type="button" class="mini" data-approve="${esc(s.id)}" data-ok="0">되돌리기</button>` : s.splat ? `<button type="button" class="mini" data-approve="${esc(s.id)}">복구 확정</button>` : ''} ${s.error || (!s.splat && Date.now()-s.createdAt > 240000) ? `<button type="button" class="mini" data-reconv="${esc(s.id)}">다시 변환</button>` : ''} <button type="button" class="mini" data-adel="${esc(s.id)}">삭제</button></span>
     </div>`; };
-  const n = SUBS.length, done = SUBS.filter(isDone).length, wait = SUBS.filter(s=>s.kind==='orbit' && s.status!=='ok').length;
+  const n = SUBS.length, done = SUBS.filter(isDone).length, wait = SUBS.filter(s=> s.splat && s.status!=='ok').length;
   let rows = []; try{ rows = flowRows(PAIRS()); }catch(e){}
   const teams = [...new Set([...SUBS.map(s=> s.team || 0), ...Object.keys(SQUESTS).map(Number)])].filter(Boolean).sort((a,b)=> a-b);
   const full = teams.filter(t=> teams.length && teamZones(t, rows).every(z=> z.st === 'ok')).length;
@@ -1732,9 +1629,13 @@ function adminHTML(){
         <section class="card"><h3>제출 기록</h3>${teams.length ? teams.map(t=>{ const list = SUBS.filter(s=>(s.team || 0)===t); if(!list.length) return ''; return `<div class="grp"><h4>${t}조 <span>${list.length}</span></h4><div class="sublist">${list.map(row).join('')}</div></div>`; }).join('') : '<p class="empty">아직 제출이 없습니다</p>'}</section>
       </div>
       <aside class="side">
+        <section class="card"><h3>전체 공지</h3><p class="hint">모든 태블릿에 보이드가 한 줄을 전합니다. 다음 상태 갱신(15초 안)에 도착합니다.</p>
+          ${NOTICE ? `<p class="nnow">지금 공지: <b>${esc(NOTICE.text)}</b> <button type="button" class="mini" data-aact="noticeClear">내리기</button></p>` : ''}
+          <div class="arow col">${NOTICE_PRESETS.map(t=> `<button type="button" class="mini" data-npre="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+          <div class="nrow"><input id="noticeIn" type="text" maxlength="120" placeholder="직접 쓰기" autocomplete="off" aria-label="공지 내용"><button type="button" class="mini on" data-aact="noticeSend">보내기</button></div></section>
         <section class="card"><h3>보기</h3>
           <label class="autol">이 화면에 보이는 기록 <select data-aview><option value="0" ${VIEW_ADMIN ? '' : 'selected'}>모든 조</option>${Array.from({length:12}, (_,i)=> `<option value="${i+1}" ${VIEW_ADMIN === i+1 ? 'selected' : ''}>${i+1}조가 보는 대로</option>`).join('')}</select></label>
-          <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 카메라 기록 자동 승인</label></section>
+          <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 링크가 변환되면 바로 복구됨 <small>(끄면 운영자가 「복구 확정」)</small></label></section>
         <section class="card"><h3>복구 미리보기</h3><p class="hint">이 기기에서만 켜지는 가짜 기록. 모든 조 보기에서만 보입니다.</p>
           ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
           ${(typeof MI !== 'undefined' ? MI.filter(m=> m.quest) : []).map(m=> `<label class="autol"><input type="checkbox" data-demo="${esc(m.id)}" ${DEMO.has(m.id) ? 'checked' : ''}> ${esc(m.name)} <small>섬 미션</small></label>`).join('')}
@@ -1763,8 +1664,8 @@ async function adminAct(act){
     if(act==='logout'){ clearLocalDemo(); ADMIN_KEY=''; VIEW_ADMIN = 0; try{ sessionStorage.removeItem('void-admin'); sessionStorage.removeItem('void-view'); }catch(e){} closeAdmin(); rescan(); return; }
     if(act==='copy'){
       const lines = SUBS.slice().sort((a,b)=>(a.team||0)-(b.team||0) || a.createdAt-b.createdAt)
-        .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || (s.kind==='orbit' && s.status==='ok');
-          return [`${s.team || '-'}조`, m ? m.name : s.mission, s.note || '', s.kind==='orbit' ? `${location.origin}${API}/scan/${s.scanId}/0.jpg (사진 ${s.frames}장)` : s.url, timeText(s.createdAt), done ? (s.kind==='orbit' ? '복구됨' : '3D 반영됨') : (s.kind==='orbit' ? '확인 대기' : '반영 대기')].join('\t'); });
+        .map(s=>{ const m = missionById(s.mission); const done = inMap.has(s.scanId) || subDone(s);
+          return [`${s.team || '-'}조`, m ? m.name : s.mission, s.note || '', s.url, timeText(s.createdAt), done ? '3D 반영됨' : '반영 대기'].join('\t'); });
       const ok = await copyText(['조\t구역\t찍은 것\t링크\t제출 시각\t상태', ...lines].join('\n')); toast(ok ? `${lines.length}건을 복사했습니다` : '복사할 수 없는 브라우저입니다'); return;
     }
     if(act==='reset'){
@@ -1778,6 +1679,8 @@ async function adminAct(act){
       STATE_VER = -1; applyState(await api('/admin/unhide', {}, true)); return;
     }
     if(act==='demoAll' || act==='demoNone'){ demoTick([...document.querySelectorAll('[data-demo]')].map(c=> c.dataset.demo), act==='demoAll'); return; }
+    if(act==='noticeSend'){ sendNotice($('noticeIn').value); return; }
+    if(act==='noticeClear'){ sendNotice(''); return; }
     if(act==='auto'){ const on = $('autoChk').checked; STATE_VER = -1; applyState(await api('/admin/auto', {auto:on}, true)); toast(on ? '자동 승인 켬' : '자동 승인 끔'); return; }
   }catch(err){ toast(err.message); }
 }
@@ -1824,8 +1727,7 @@ document.addEventListener('submit', e=>{
 });
 function statusHTML(m){
   const s = zoneState(m);
-  const q = zoneParts(m), n = (q.photo ? 1 : 0) + (q.scan ? 1 : 0);
-  return s==='ok' ? `<span class="st ok">복구됨</span>` : s==='pend' ? `<span class="st pend">복구 중 ${n} / 2</span>` : `<span class="st void">복구 필요</span>`;
+  return s==='ok' ? `<span class="st ok">복구됨</span>` : s==='pend' ? `<span class="st pend">복구 중</span>` : `<span class="st void">복구 필요</span>`;
 }
 const twinOf = m => m && m.twin ? missionById(m.twin) : null;
 function twinLine(m){
@@ -1945,7 +1847,7 @@ document.addEventListener('click', e=>{
     }); return; }
   const un = e.target.closest('[data-unsub]');
   if(un){ e.stopPropagation(); const key = un.dataset.unsub;
-    if(LOCAL){ SUBS = SUBS.filter(x=>(x.id || x.scanId)!==key); saveLocal(SUBS.filter(x=>x.kind!=='orbit')); refreshSubUI(); }
+    if(LOCAL){ SUBS = SUBS.filter(x=>(x.id || x.scanId)!==key); saveLocal(SUBS); refreshSubUI(); }
     else api('/unsubmit', {id:key, team:TEAM}).then(st=>{ STATE_VER = -1; applyState(st); }).catch(err=> toast(err.message));
     return; }
   const ad = e.target.closest('[data-adel]');
@@ -1955,12 +1857,10 @@ document.addEventListener('click', e=>{
   if(dm){ e.stopPropagation(); demoTick([dm.dataset.demo], dm.checked); return; }
   const aa = e.target.closest('[data-aact]');
   if(aa){ e.stopPropagation(); adminAct(aa.dataset.aact); return; }
+  const np = e.target.closest('[data-npre]');
+  if(np){ e.stopPropagation(); sendNotice(np.dataset.npre); return; }
   const aq = e.target.closest('[data-aq]');
   if(aq){ e.stopPropagation(); adminQuest(aq.dataset.aq); return; }
-  const cb = e.target.closest('[data-cap]');
-  if(cb){ e.stopPropagation(); openCapture(M.find(x=>x.id===cb.dataset.cap) || missionById(cb.dataset.cap)); return; }
-  const ob = e.target.closest('[data-orbit]');
-  if(ob){ e.stopPropagation(); const s = SUBS.find(x=>x.id===ob.dataset.orbit); if(s) openScan(orbitScan(s)); return; }
   const rc = e.target.closest('[data-reconv]');
   if(rc){ e.stopPropagation(); api('/admin/convert', {id:rc.dataset.reconv}, true).then(()=> toast('다시 변환을 시작했습니다')).catch(err=> toast(err.message)); return; }
   const ap = e.target.closest('[data-approve]');
@@ -2430,24 +2330,11 @@ async function openScan(s){
   lastFocus = document.activeElement;
   openId = s.id;
   const m = M.find(x=>x.id===s.mission);
-  const orbit = s.kind==='orbit';
   $('vT').textContent = s.caption || '이름 없는 기록';
-  $('vS').textContent = [s.author && (orbit ? s.author : '@'+s.author), dateText(s.captured), m ? `${m.name} 복구 기록` : (s.near ? `${s.near} 부근` : ''), orbit && s.frames ? `사진 ${s.frames}장` : ''].filter(Boolean).join('  /  ');
+  $('vS').textContent = [s.author && '@'+s.author, dateText(s.captured), m ? `${m.name} 복구 기록` : (s.near ? `${s.near} 부근` : '')].filter(Boolean).join('  /  ');
   $('viewer').hidden = false; $('vLoad').hidden = false;
   $('vX').focus();
   if(viewer){ viewer.dispose(); viewer = null; }
-  $('vPhoto').hidden = !orbit;
-  if(orbit){
-    $('vLoad').hidden = true;
-    const rec = await orbitRecord(s); if(openId !== s.id) return;
-    let photo = !rec.sensor || rec.mode !== 'space'; $('vPhoto').hidden = !rec.sensor;
-    const build = ()=>{ if(viewer) viewer.dispose(); viewer = photo ? makeOrbitViewer($('vRoot'), s) : makeDomeViewer($('vRoot'), rec);
-      $('vPhoto').textContent = photo ? '점구름으로 보기' : '사진으로 보기';
-      $('vF').textContent = photo ? '좌우로 끌어서 한 장씩 넘겨 봅니다.' : (rec.mode==='space' ? '끌어서 둘러봅니다. 찍은 사진을 방향대로 점구름 돔에 펼친 기록입니다.' : '끌어서 돌리고, 휠이나 두 손가락으로 확대합니다. 찍은 방향대로 점구름을 쌓은 기록입니다.'); };
-    $('vPhoto').onclick = ()=>{ photo = !photo; build(); };
-    build();
-    return;
-  }
   $('vF').textContent = '드래그해서 돌리고, 휠이나 두 손가락으로 확대합니다. 오른쪽 드래그로 이동합니다.';
   try{
     const data = await loadSplat(s, t=>{ if(openId===s.id) $('vLoad').textContent = t; });
@@ -2466,335 +2353,6 @@ function closeScan(){
   lastFocus && lastFocus.focus && lastFocus.focus();
 }
 $('vX').onclick = closeScan;
-
-// ---------- photo viewer: flip through the photos one by one (drag left/right) ----------
-function makeOrbitViewer(root, s){
-  const urls = s.urls || Array.from({length:s.frames || 0}, (_,i)=> `${API}/scan/${s.id}/${i}.jpg`);
-  const wrap = document.createElement('div'); wrap.className = 'orbit';
-  const img = new Image(); img.alt = ''; img.draggable = false; wrap.appendChild(img);
-  const hint = document.createElement('div'); hint.className = 'chint'; hint.textContent = urls.length > 1 ? '좌우로 끌어서 넘겨 보세요' : '사진 한 장짜리 기록입니다'; wrap.appendChild(hint);
-  root.appendChild(wrap);
-  const n = urls.length; let idx = 0, spin = n > 1, sx = null, si = 0;
-  const show = i => { if(!n) return; idx = ((i % n) + n) % n; img.src = urls[idx]; };
-  const pre = urls.map(u=>{ const im = new Image(); im.src = u; return im; });   // warm the cache so dragging is smooth
-  show(0);
-  const timer = setInterval(()=>{ if(spin) show(idx+1); }, 150);
-  wrap.onpointerdown = e=>{ spin = false; hint.remove(); sx = e.clientX; si = idx; try{ wrap.setPointerCapture(e.pointerId); }catch(x){} };
-  wrap.onpointermove = e=>{ if(sx==null) return; show(si + Math.round((e.clientX - sx) / Math.max(wrap.clientWidth, 200) * n)); };
-  wrap.onpointerup = wrap.onpointercancel = ()=>{ sx = null; };
-  return { dispose(){ clearInterval(timer); pre.length = 0; wrap.remove(); } };
-}
-
-// ---------- point-cloud dome: every photo is sprayed as coloured points in the direction it was taken ----------
-// "space" records are looked at from the inside (a dome around the viewer); "object" records are stacked at the centre
-// and looked at from the outside, so each side of the thing shows up when you orbit round to it.
-const CAM_HFOV = 62;                 // assumed horizontal field of view of a tablet rear camera, degrees
-const SAMPLE_W = 96;                 // points per photo = SAMPLE_W x (SAMPLE_W / aspect)
-function loadImg(url){ return new Promise((res, rej)=>{ const im = new Image(); im.onload = ()=>res(im); im.onerror = ()=>rej(new Error('사진을 열지 못했습니다')); im.src = url; }); }
-async function buildCloud(items, mode, onStep){
-  const d = Math.PI/180, R = mode==='space' ? 10 : 3;
-  const pos = [], col = [];
-  const c = document.createElement('canvas'), g = c.getContext('2d', {willReadFrequently:true});
-  const ray = new THREE.Vector3(), tmp = new THREE.Vector3();
-  for(let k=0; k<items.length; k++){
-    const it = items[k]; let im; try{ im = await loadImg(it.url); }catch(e){ continue; }
-    const w = im.naturalWidth || im.width, h = im.naturalHeight || im.height; if(!w || !h) continue;
-    const land = w >= h, hf = (land ? CAM_HFOV : CAM_HFOV*h/w) * d;           // portrait photos cover less sideways
-    const vf = 2*Math.atan(Math.tan(hf/2) * h/w);
-    const sw = land ? SAMPLE_W : Math.round(SAMPLE_W*w/h), sh = Math.round(sw*h/w);
-    c.width = sw; c.height = sh; g.drawImage(im, 0, 0, sw, sh);
-    const px = g.getImageData(0, 0, sw, sh).data;
-    const yaw = (it.yaw || 0)*d, pitch = (it.pitch || 0)*d;
-    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
-    // where the camera stood (object mode): opposite the direction it looked, R away from the centre
-    const look = tmp.set(sy*cp, sp, -cy*cp), camX = -look.x*R, camY = -look.y*R, camZ = -look.z*R;
-    const tx = Math.tan(hf/2), ty = Math.tan(vf/2);
-    for(let j=0; j<sh; j++) for(let i=0; i<sw; i++){
-      const u = (i+0.5)/sw - 0.5, v = (j+0.5)/sh - 0.5;
-      ray.set(u*2*tx, -v*2*ty, -1).normalize();
-      // tilt (about X) then turn (about Y)
-      const y1 = ray.y*cp - ray.z*sp, z1 = ray.y*sp + ray.z*cp;
-      const x2 = ray.x*cy + z1*sy, z2 = -ray.x*sy + z1*cy;
-      const jx = (Math.random()-0.5)*R*0.012, jy = (Math.random()-0.5)*R*0.012, jz = (Math.random()-0.5)*R*0.012;
-      if(mode==='space') pos.push(x2*R+jx, y1*R+jy, z2*R+jz); else pos.push(camX + x2*R+jx, camY + y1*R+jy, camZ + z2*R+jz);
-      const o = (j*sw+i)*4; col.push(px[o]/255, px[o+1]/255, px[o+2]/255);
-    }
-    if(onStep) onStep(`점구름을 만드는 중입니다 (${k+1} / ${items.length})`);
-    await new Promise(r=> setTimeout(r, 0));
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-  return geo;
-}
-function makeDomeViewer(root, rec){
-  const wrap = document.createElement('div'); wrap.className = 'dome';
-  const load = document.createElement('div'); load.className = 'dload'; load.textContent = '점구름을 만드는 중입니다'; wrap.appendChild(load);
-  root.appendChild(wrap);
-  const space = rec.mode==='space';
-  const vr = new THREE.WebGLRenderer({antialias:false}); vr.setPixelRatio(Math.min(devicePixelRatio, 2));
-  vr.setClearColor(new THREE.Color(tok('--viewer')), 1); wrap.appendChild(vr.domElement);
-  const cam = new THREE.PerspectiveCamera(space ? 75 : 50, 1, 0.01, 100);
-  if(space) cam.position.set(0, 0, 0.4); else cam.position.set(0, 1.6, 5.2);
-  const ctl = new OrbitControls(cam, vr.domElement);
-  ctl.enableDamping = true; ctl.dampingFactor = 0.08; ctl.enablePan = false;
-  if(space){ ctl.enableZoom = false; ctl.rotateSpeed = -0.35; ctl.minDistance = ctl.maxDistance = 0.4; }
-  else { ctl.minDistance = 1.2; ctl.maxDistance = 14; ctl.autoRotate = true; ctl.autoRotateSpeed = 1.2; }
-  ctl.update();
-  const sc = new THREE.Scene(); let pts = null, alive = true, raf = 0;
-  function size(){ const w = root.clientWidth, h = root.clientHeight; if(!w || !h) return; vr.setSize(w, h); cam.aspect = w/h; cam.updateProjectionMatrix(); }
-  const ro = new ResizeObserver(size); ro.observe(root); size();
-  function frame(){ if(!alive) return; raf = requestAnimationFrame(frame); ctl.update(); vr.render(sc, cam); }
-  frame();
-  vr.domElement.addEventListener('pointerdown', ()=>{ ctl.autoRotate = false; }, {once:true});
-  buildCloud(rec.items, rec.mode, t=>{ load.textContent = t; }).then(geo=>{
-    if(!alive){ geo.dispose(); return; }
-    const mat = new THREE.PointsMaterial({size: space ? 0.13 : 0.05, vertexColors:true, sizeAttenuation:true});
-    pts = new THREE.Points(geo, mat); sc.add(pts); load.remove();
-    if(!geo.getAttribute('position').count){ load.textContent = '사진을 열지 못해 점구름을 만들 수 없습니다.'; wrap.appendChild(load); }
-  }).catch(err=>{ console.error(err); load.textContent = '점구름을 만들지 못했습니다: ' + err.message; });
-  return { dispose(){ alive = false; cancelAnimationFrame(raf); ro.disconnect(); ctl.dispose(); if(pts){ pts.geometry.dispose(); pts.material.dispose(); } vr.dispose(); vr.forceContextLoss(); wrap.remove(); } };
-}
-// a saved record: its photos plus the direction each was taken in (meta.json on the server, or in-memory for a fresh capture)
-async function orbitRecord(s){
-  if(s.items) return {items:s.items, mode:s.mode || 'object', sensor:s.sensor !== false};
-  const n = s.frames || 0; let dirs = null, mode = s.mode || 'object', sensor = true;
-  try{ const meta = await (await fetch(`${API}/scan/${s.id}/meta.json`, {cache:'no-store'})).json(); dirs = meta.dirs || (meta.headings || []).map(h=>[h, 0]); mode = meta.mode || mode; sensor = meta.sensor !== false; }catch(e){}
-  const urls = s.urls || Array.from({length:n}, (_,i)=> `${API}/scan/${s.id}/${i}.jpg`);
-  return {mode, sensor, items: urls.map((url,i)=> ({url, yaw: dirs && dirs[i] ? +dirs[i][0] : i*360/Math.max(n,1), pitch: dirs && dirs[i] ? +dirs[i][1] : 0}))};
-}
-
-// =====================================================================
-// ---------- own camera scan: shoot all round (left/right and up/down) → check → upload (no outside app, nothing public) ----------
-// Coverage is a grid of directions: 5 tilt bands (+60 … -60) with 9/16/18/16/9 turning columns = 68 cells, one photo per cell.
-const BANDS = [60, 30, 0, -30, -60], COLS = [9, 16, 18, 16, 9], CAPN = COLS.reduce((a,b)=>a+b, 0);
-const BAND_ORDER = [2, 1, 3, 0, 4];   // horizon first, then a little up, a little down, far up, far down
-const NOSENSOR_N = 24;                // without a motion sensor we only know the order the photos were taken in, so fewer, timed frames
-const cap = {m:null, frames:[], cells:new Set(), stream:null, dir:null, base:null, mode:'object', ori:false, lastShot:0, startT:0, raf:0, pos:null, prev:null, busy:false, step:0, photo:false, seq:0};
-const capCanvas = document.createElement('canvas');
-const MAP_W = 180, MAP_H = 50, cellEls = {};
-{ let s = '';
-  BANDS.forEach((b, r)=>{ const cw = MAP_W/COLS[r]; for(let c=0; c<COLS[r]; c++) s += `<rect data-k="${r}:${c}" x="${(c*cw+0.6).toFixed(2)}" y="${r*10+0.6}" width="${(cw-1.2).toFixed(2)}" height="8.8" rx="1.2"/>`; });
-  $('capMap').innerHTML = s + '<circle class="pt off" id="capPt" r="2.6" cx="90" cy="25"/>';
-  $('capMap').querySelectorAll('rect').forEach(el=> cellEls[el.dataset.k] = el);
-  $('capNt').textContent = `/ ${CAPN}장`; }
-function capStep(n){ ['cs1','cs2','cs3'].forEach((id,i)=> $(id).hidden = i !== n-1); cap.step = n; }
-const capSay = t => { $('capMsg').textContent = t; };
-// Three ways to learn where the camera points, best first: the Generic Sensor API (gyro quaternion, Chrome on Android, no compass needed),
-// the absolute orientation event (needs a magnetometer — many tablets never fire it), then the plain relative orientation event.
-const ORI_EVTS = ['deviceorientationabsolute', 'deviceorientation'];
-const ORI_PRI = {sensor:3, deviceorientationabsolute:2, deviceorientation:1};
-let oriSensor = null;
-function startOri(){
-  cap.src = '';
-  try{
-    const S = window.RelativeOrientationSensor || window.AbsoluteOrientationSensor;
-    if(S){ oriSensor = new S({frequency:30, referenceFrame:'device'});
-      oriSensor.addEventListener('reading', ()=>{ const q = oriSensor.quaternion; if(!q) return;
-        _q.set(q[0], q[1], q[2], q[3]); _v.set(0, 0, -1).applyQuaternion(_q);                    // the rear camera looks out of the device's -z
-        const d = 180/Math.PI, yaw = ((Math.atan2(_v.x, _v.y)*d) % 360 + 360) % 360, pitch = Math.asin(Math.max(-1, Math.min(1, _v.z)))*d;   // sensor frame: x east, y north, z up
-        cap.dir = {yaw, pitch}; cap.ori = true; cap.src = 'sensor'; });
-      oriSensor.addEventListener('error', ()=>{ oriSensor = null; });
-      oriSensor.start(); }
-  }catch(e){ oriSensor = null; }
-  ORI_EVTS.forEach(ev=> addEventListener(ev, onOri));
-}
-function stopOri(){ ORI_EVTS.forEach(ev=> removeEventListener(ev, onOri)); if(oriSensor){ try{ oriSensor.stop(); }catch(e){} oriSensor = null; } }
-const oriName = ()=> ({sensor:'자이로 센서', deviceorientationabsolute:'나침반 방향', deviceorientation:'기기 방향'})[cap.src] || '없음';
-window.__capdbg = ()=> ({ori:cap.ori, src:cap.src, cells:[...cap.cells], dir:cap.dir, base:cap.base, frames:cap.frames.length, busy:cap.busy, step:cap.step, lastShot:cap.lastShot, now:performance.now()});
-const Q_BACK = new THREE.Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2), Z_AXIS = new THREE.Vector3(0, 0, 1);
-const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _v = new THREE.Vector3();
-function screenAngle(){ try{ if(screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle; }catch(e){} return +window.orientation || 0; }
-// device tilt → where the rear camera points: yaw (0-360, turning) and pitch (-90…90, looking up is +)
-function onOri(e){
-  if(e.alpha == null || e.beta == null || e.gamma == null) return;
-  if(cap.src && cap.src !== e.type && ORI_PRI[cap.src] > ORI_PRI[e.type]) return;   // a better source is already feeding us
-  cap.src = e.type;
-  const d = Math.PI/180;
-  _e.set(e.beta*d, e.alpha*d, -e.gamma*d, 'YXZ');
-  _q.setFromEuler(_e).multiply(Q_BACK).multiply(_q2.setFromAxisAngle(Z_AXIS, -screenAngle()*d));
-  _v.set(0, 0, -1).applyQuaternion(_q);
-  const yaw = ((Math.atan2(_v.x, -_v.z)/d) % 360 + 360) % 360, pitch = Math.asin(Math.max(-1, Math.min(1, _v.y)))/d;
-  cap.dir = {yaw, pitch}; cap.ori = true;
-}
-function stopStream(){ if(cap.stream){ cap.stream.getTracks().forEach(t=>t.stop()); cap.stream = null; } const v = $('capV'); if(v.srcObject) v.srcObject = null; }
-function dropFrames(){ cap.frames.forEach(f=> URL.revokeObjectURL(f.url)); cap.frames = []; cap.cells = new Set(); cap.seq = 0; }
-const portrait = ()=> innerHeight > innerWidth;
-function modeText(){ return cap.mode==='object' ? '사물을 가운데에 두고 한 바퀴' : '제자리에서 한 바퀴'; }
-async function openCapture(m){
-  if(!m) return;
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ toast('이 브라우저에서는 카메라를 쓸 수 없습니다'); return; }
-  // iOS grants motion access only from inside a tap handler, before anything async
-  if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){ try{ DeviceOrientationEvent.requestPermission().catch(()=>{}); }catch(e){} }
-  if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
-  dropFrames();
-  Object.assign(cap, {m, dir:null, base:null, ori:false, src:'', srcShown:false, lastShot:0, pos:null, busy:false, photo:false});
-  Object.values(cellEls).forEach(el=> el.classList.remove('on')); $('capPt').classList.add('off'); $('capN').textContent = '0'; $('capDone').disabled = true;
-  $('capZone').textContent = `${zoneName(m)} · 가로로 들고 상하좌우를 모두 비춰요`;
-  try{ if(navigator.xr && navigator.xr.isSessionSupported) navigator.xr.isSessionSupported('immersive-ar').then(ok=>{ $('capZone').textContent += ok ? ' · AR 지원 기기' : ' · AR 미지원 기기'; }).catch(()=>{}); }catch(e){}
-  lastFocus = document.activeElement;
-  $('cap').hidden = false; capStep(1); $('capX').focus(); rotCheck();
-  capSay('카메라를 여는 중입니다');
-  try{ cap.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080}}, audio:false}); }
-  catch(err){ console.error(err); capSay(location.protocol==='http:' && location.hostname!=='localhost' ? '카메라는 https 주소에서만 열립니다.' : '카메라를 열지 못했습니다. 브라우저의 카메라 권한을 허용한 뒤 다시 눌러 주세요.'); return; }
-  if($('cap').hidden){ stopStream(); return; }   // closed while the permission prompt was up
-  const v = $('capV'); v.srcObject = cap.stream; try{ await v.play(); }catch(e){}
-  startOri();
-  if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>{ cap.pos = {lat:p.coords.latitude, lng:p.coords.longitude}; }, ()=>{}, {timeout:8000, maximumAge:60000});
-  cap.startT = performance.now();
-  capSay(modeText());
-  cancelAnimationFrame(cap.raf); capTick();
-}
-// landscape only: in portrait the camera is paused behind a "turn the tablet" card
-function rotCheck(){ const p = portrait(); $('capRot').hidden = !p || cap.step !== 1; return p; }
-addEventListener('resize', ()=>{ if(!$('cap').hidden) rotCheck(); });
-function bandOf(pitch){ return Math.max(0, Math.min(BANDS.length-1, Math.round((BANDS[0] - pitch)/30))); }
-function curCell(){
-  if(!cap.dir) return null;
-  if(cap.base == null) cap.base = cap.dir.yaw;
-  const rel = ((cap.dir.yaw - cap.base) % 360 + 360) % 360, r = bandOf(cap.dir.pitch), c = Math.floor(rel/360*COLS[r]) % COLS[r];
-  return {key:`${r}:${c}`, r, c, rel, yaw: rel, pitch: cap.dir.pitch};
-}
-function nextSeqCell(){   // no sensor: fill the grid in order, horizon first
-  let k = cap.seq++;
-  for(const r of BAND_ORDER){ if(k < COLS[r]) return {key:`${r}:${k}`, r, c:k, yaw:(k+0.5)*360/COLS[r], pitch:BANDS[r]}; k -= COLS[r]; }
-  return null;
-}
-function guide(){
-  if(!cap.ori){ capSay('움직임 센서가 없어 0.8초마다 찍힙니다. 천천히 돌면서 위아래로도 비춰요'); return; }
-  const fill = BANDS.map((b,r)=>{ let n=0; for(let c=0;c<COLS[r];c++) if(cap.cells.has(`${r}:${c}`)) n++; return n/COLS[r]; });
-  const txt = {2:'수평으로 한 바퀴', 1:'조금 위를 보며 한 바퀴', 3:'조금 아래를 보며 한 바퀴', 0:'더 위를 보며 한 바퀴', 4:'더 아래를 보며 한 바퀴'};
-  const r = BAND_ORDER.find(r=> fill[r] < 0.6);
-  capSay(r == null ? '거의 다 됐어요. 남은 칸을 채우거나 완료를 누르세요' : txt[r]);
-}
-function capTick(){
-  if($('cap').hidden || cap.step !== 1 || !cap.stream) return;
-  cap.raf = requestAnimationFrame(capTick);
-  if(rotCheck()) return;                       // portrait: wait
-  const now = performance.now();
-  if(cap.ori){
-    if(!cap.srcShown){ cap.srcShown = true; $('capZone').textContent += ` · 센서: ${oriName()}`; $('capNt').textContent = `/ ${CAPN}장`; }
-    const cell = curCell(); if(!cell) return;
-    const pt = $('capPt'); pt.classList.remove('off');
-    pt.setAttribute('cx', (cell.rel/360*MAP_W).toFixed(1)); pt.setAttribute('cy', ((BANDS[0] - Math.max(-75, Math.min(75, cell.pitch)))/150*MAP_H + 0).toFixed(1));
-    if(!cap.cells.has(cell.key) && now - cap.lastShot > 350 && !cap.busy) shoot(cell);
-  } else if(now - cap.startT > 1800 && now - cap.lastShot > 800 && !cap.busy && cap.cells.size < NOSENSOR_N){
-    // no motion sensor (desktop, or permission refused): one photo per 0.8 s while the student moves the camera around
-    if($('capNt').textContent !== `/ ${NOSENSOR_N}장`) $('capNt').textContent = `/ ${NOSENSOR_N}장`;
-    const cell = nextSeqCell(); if(cell) shoot(cell);
-  }
-}
-async function shoot(cell){
-  const v = $('capV'); if(!v.videoWidth || cap.cells.has(cell.key)) return;
-  cap.busy = true; cap.lastShot = performance.now();
-  try{
-    const k = Math.min(1, 1280/Math.max(v.videoWidth, v.videoHeight));
-    capCanvas.width = Math.round(v.videoWidth*k); capCanvas.height = Math.round(v.videoHeight*k);
-    capCanvas.getContext('2d').drawImage(v, 0, 0, capCanvas.width, capCanvas.height);
-    const blob = await new Promise(r=> capCanvas.toBlob(r, 'image/jpeg', .8));
-    if(!blob || cap.step !== 1 || cap.cells.has(cell.key)) return;
-    cap.cells.add(cell.key); cap.frames.push({key:cell.key, yaw:Math.round(cell.yaw), pitch:Math.round(cell.pitch), blob, url:URL.createObjectURL(blob)});
-    cellEls[cell.key].classList.add('on'); $('capN').textContent = cap.frames.length;
-    try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
-    const n = cap.frames.length;
-    $('capDone').disabled = n < 8;
-    if(n >= (cap.ori ? CAPN : NOSENSOR_N)) finishCapture(); else guide();
-  } finally { cap.busy = false; }
-}
-$('capShot').onclick = ()=>{
-  if(cap.step !== 1 || cap.cells.size >= CAPN || rotCheck()) return;
-  let cell = cap.ori ? curCell() : null;
-  if(!cell || cap.cells.has(cell.key)) cell = nextSeqCell();
-  while(cell && cap.cells.has(cell.key)) cell = nextSeqCell();
-  if(cell) shoot(cell);
-};
-document.querySelectorAll('.cmode button').forEach(b=> b.onclick = ()=>{
-  cap.mode = b.dataset.mode; document.querySelectorAll('.cmode button').forEach(x=> x.setAttribute('aria-pressed', x===b));
-  if(cap.step === 1 && cap.stream) capSay(modeText());
-});
-function capItems(){ return cap.frames.map(f=> ({url:f.url, yaw:f.yaw, pitch:f.pitch})); }
-function showPreview(){
-  if(cap.prev) cap.prev.dispose();
-  cap.prev = cap.photo ? makeOrbitViewer($('capPrev'), {urls: cap.frames.map(f=>f.url)}) : makeDomeViewer($('capPrev'), {items: capItems(), mode: cap.mode});
-  $('capPhoto').textContent = cap.photo ? '점구름으로 보기' : '사진으로 보기';
-}
-function finishCapture(){
-  if(cap.step !== 1 || !cap.frames.length) return;
-  cancelAnimationFrame(cap.raf); stopOri(); stopStream();
-  cap.frames.sort((a,b)=> a.pitch - b.pitch || a.yaw - b.yaw);
-  capStep(2); $('capRot').hidden = true;
-  const cov = Math.round(cap.cells.size/CAPN*100);
-  $('capStat').textContent = cap.ori ? `사진 ${cap.frames.length}장 · 상하좌우 ${cov}% 채움 · 센서: ${oriName()}` : `사진 ${cap.frames.length}장 · 이 기기에는 움직임 센서가 없어 방향을 알 수 없습니다. 사진 기록으로 저장됩니다 (점구름은 태블릿에서 만들어집니다)`;
-  $('capPhoto').hidden = !cap.ori;
-  $('capTeam').value = TEAM || '';
-  const help = $('capHelp'); help.dataset.kind = '';
-  help.textContent = LOCAL ? '서버 연결 전이라 이 기기에서만 보이고 새로고침하면 사라집니다.' : AUTO ? '올리면 바로 이 구역이 복구됩니다.' : '올리면 관리자가 확인한 뒤 복구됩니다.';
-  cap.photo = !cap.ori || cap.mode !== 'space'; showPreview();   // the dome needs real directions; for an object the photo turntable reads better
-}
-$('capDone').onclick = finishCapture;
-$('capPhoto').onclick = ()=>{ cap.photo = !cap.photo; showPreview(); };
-$('capRetry').onclick = ()=> openCapture(cap.m);
-$('capTeam').onchange = ()=>{ teamSel.value = $('capTeam').value; teamSel.onchange(); };
-async function putJpeg(path, blob){
-  let last;
-  for(let t=0; t<3; t++){
-    try{
-      const r = await fetch(API + path, {method:'POST', headers:{'Content-Type':'image/jpeg'}, body:blob});
-      const j = await r.json().catch(()=>({}));
-      if(r.ok) return j;
-      last = new Error(j.error || `서버 오류 (${r.status})`); if(r.status < 500) break;
-    }catch(e){ last = e; }
-    await new Promise(r=> setTimeout(r, 600*(t+1)));
-  }
-  throw last;
-}
-async function makeThumb(blob){
-  let bm = null; try{ bm = await createImageBitmap(blob); }catch(e){}
-  if(!bm) bm = await new Promise((res, rej)=>{ const im = new Image(); im.onload = ()=>res(im); im.onerror = rej; im.src = URL.createObjectURL(blob); });
-  const w = bm.width || bm.naturalWidth, h = bm.height || bm.naturalHeight, k = Math.min(1, 480/Math.max(w, h));
-  const c = document.createElement('canvas'); c.width = Math.round(w*k); c.height = Math.round(h*k);
-  c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height); if(bm.close) bm.close();
-  return new Promise(r=> c.toBlob(r, 'image/jpeg', .78));
-}
-async function uploadCapture(){
-  const m = cap.m, note = $('capNote').value.trim(), help = $('capHelp');
-  const say = (t, kind)=>{ help.textContent = t; help.dataset.kind = kind || ''; };
-  if(!cap.frames.length) return say('찍은 사진이 없습니다. 다시 찍어 주세요.', 'err');
-  // the photo nearest to straight ahead at the start becomes the thumbnail
-  const cover = cap.frames.slice().sort((a,b)=> Math.abs(a.pitch)+Math.min(a.yaw,360-a.yaw) - Math.abs(b.pitch)-Math.min(b.yaw,360-b.yaw))[0];
-  if(LOCAL){
-    // no server (opened as a file): keep the record in this tab only
-    const id = 'o' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b=> b.toString(16).padStart(2,'0')).join('').slice(0,15);
-    SUBS = SUBS.concat({id, scanId:id, kind:'orbit', url:'', mission:m.id, team:TEAM, note, caption:note, frames:cap.frames.length, mode:cap.mode, sensor:cap.ori, status:'pend', createdAt:Date.now(), urls:cap.frames.map(f=>f.url), items:capItems(), thumb:cover.url});
-    cap.frames = []; cap.cells = new Set();           // the object URLs now belong to the record
-    closeCapture(); refreshSubUI(); toast('이 기기에만 저장됐습니다'); return;
-  }
-  if(!TEAM) return say('우리 조를 먼저 고르세요.', 'err');
-  capStep(3);
-  const bar = $('capBar'), msg = $('capUpMsg'), total = cap.frames.length + 2; let done = 0;
-  const prog = t=>{ done++; bar.style.width = `${Math.round(done/total*100)}%`; if(t) msg.textContent = t; };
-  bar.style.width = '0'; msg.textContent = '기록을 올리는 중입니다';
-  try{
-    const {id} = await api('/scan/start', {team:TEAM, mission:m.id, note, count:cap.frames.length, dirs:cap.frames.map(f=>[f.yaw, f.pitch]), mode:cap.mode, sensor:cap.ori, lat:cap.pos && cap.pos.lat, lng:cap.pos && cap.pos.lng});
-    for(let i=0; i<cap.frames.length; i++){ await putJpeg(`/scan/${id}/frame/${i}`, cap.frames[i].blob); prog(`사진을 올리는 중입니다 (${i+1} / ${cap.frames.length})`); }
-    await putJpeg(`/scan/${id}/thumb`, await makeThumb(cover.blob)); prog('기록을 마무리하는 중입니다');
-    let st = await api('/scan/finish', {id, team:TEAM, note});
-    if(st.missing){ for(const i of st.missing) await putJpeg(`/scan/${id}/frame/${i}`, cap.frames[i].blob); st = await api('/scan/finish', {id, team:TEAM, note}); }
-    if(st.missing) throw new Error('사진 일부가 올라가지 않았습니다');
-    prog();
-    closeCapture(); toast(`기록을 올렸습니다 (${TEAM}조)`); STATE_VER = -1; applyState(st);
-  }catch(err){ console.error(err); capStep(2); say(`올리지 못했습니다: ${err.message}. 다시 눌러 주세요.`, 'err'); }
-}
-$('capUp').onclick = uploadCapture;
-function closeCapture(){
-  cancelAnimationFrame(cap.raf); stopOri(); stopStream();
-  if(cap.prev){ cap.prev.dispose(); cap.prev = null; }
-  dropFrames(); cap.step = 0;
-  $('capNote').value = ''; $('cap').hidden = true; $('capRot').hidden = true;
-  lastFocus && lastFocus.focus && lastFocus.focus();
-}
-$('capX').onclick = closeCapture;
-addEventListener('pagehide', stopStream);
 
 // =====================================================================
 // DOROLAND island: a stylised theme-park island rebuilt from the camp story (chapters 1-5).
@@ -7902,11 +7460,14 @@ $('againBtn').onclick = async ()=>{
   if(!confirm(`${TEAM}조의 기록을 처음부터 다시 시작합니다.
 올린 링크 ${mine}건과 섬 미션 진행이 모두 지워집니다.${teamDevs(TEAM).length > 1 ? `
 같은 조의 다른 태블릿(${teamDevs(TEAM).length}대)도 함께 처음으로 돌아갑니다.` : ''}`)) return;
+  let key = ADMIN_KEY;   /* (user, 2026-10-30) the teacher walking with the team types the password; the admin device skips the prompt */
+  if(!key){ key = prompt('같이 다니는 선생님께 비밀번호를 받아 입력하세요.'); if(key == null) return; key = key.trim(); if(!key) return; }
   try{
+    const st = await api('/team_reset', {team:TEAM, confirm:'AGAIN'}, key);   /* the server (and the password) go first: a refused reset leaves this tablet untouched */
     if(walk) stopWalk(); if(simOn) setSim(false); voidHide(); delete $('callDlg').dataset.on; delete $('callPill').dataset.on; delete qRewardEl.dataset.on; delete $('restoreDlg').dataset.on; $('cinemaX').click();
     QDONE.clear(); questPending.clear(); ACT_LOCAL = 0; TUT_LOCAL = false; tutStep = -1; actPending = 0; actBusy = false; SQ_JSON = ''; STAGED = false;
     try{ localStorage.removeItem(QKEY()); Object.keys(sessionStorage).filter(k=> /^void-(vn|restore|simdone)-/.test(k)).forEach(k=> sessionStorage.removeItem(k)); Object.keys(localStorage).filter(k=> k.startsWith('void-seen-lit') || k.startsWith('void-found-')).forEach(k=> localStorage.removeItem(k)); }catch(e){}
-    controls.minDistance = 40; STATE_VER = -1; applyState(await api('/team_reset', {team:TEAM, confirm:'AGAIN'})); questApply(); renderList(); renderBoard();
+    controls.minDistance = 40; STATE_VER = -1; applyState(st); questApply(); renderList(); renderBoard();
     if(W.id !== 'erica') setWorld('erica'); toast(`${TEAM}조 처음부터`); setTimeout(()=>{ try{ maybeGuide(); }catch(e){} }, 900);
   }catch(err){ toast(err.message); }
 };
