@@ -28,7 +28,7 @@ b = p.chromium.launch(channel="chrome", headless=True)
 
 ## 챕터 진입 경로
 
-- 허브(`index.html`) 카드 클릭 → 비밀번호 모달 → **전 챕터 공통 `0101`** (`checkPassword()`가 단일 값 비교) → `chapterData[id].url` 로 이동.
+- 허브(`index.html`) 카드 클릭 → 비밀번호 모달 → **챕터별 입장 비밀번호(담당자 보관, 저장소에 없음)** (`checkPassword()`가 단일 값 비교) → `chapterData[id].url` 로 이동.
 - 카드 셀렉터: `div[onclick*='handleEnterChapter(4']`
 
 ## chapter04 (트레이스 브레이크) 구동 시 함정

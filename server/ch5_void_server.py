@@ -15,7 +15,7 @@ chapter05/index.html(보이드의 기록)과 chapter05/feed.html(도로그램 �
 실행:
     python server/ch5_void_server.py           # http://localhost:8096/chapter05/index.html
 환경변수:
-    VOID_PORT=8096  VOID_HOST=127.0.0.1  CH5_ADMIN_KEY=0101  VOID_STATIC=1 (저장소 파일도 서빙, 로컬 확인용)
+    VOID_PORT=8096  VOID_HOST=127.0.0.1  CH5_ADMIN_KEY=<운영자 비밀번호>  VOID_STATIC=1 (저장소 파일도 서빙, 로컬 확인용)
 - 링크 자동 변환(v3, 2026-10-13): Scaniverse 링크가 제출되면 백그라운드 스레드가 스캔 페이지의 __NEXT_DATA__에서 가우시안 SPZ 주소·카메라 정보를 읽어
   내려받고 spz2splat.py(numpy)로 .splat(32B/점)로 바꾼 뒤 gzip+base64 텍스트 data/splats/<id>.splat.txt 로 둔다(페이지의 loadSplat이 그대로 읽음).
   제출 기록에 splat:{center,radius,yaw,pitch,points,...}가 붙고 auto면 status ok(복구됨), 아니면 pend(운영자 확정). 실패하면 error 문구.
@@ -50,7 +50,11 @@ PAIRS_PATH = os.path.join(HERE, 'ch5_void_pairs.json')
 
 PORT = int(os.environ.get('VOID_PORT', '8096'))
 HOST = os.environ.get('VOID_HOST', '127.0.0.1')
-ADMIN_KEY = os.environ.get('CH5_ADMIN_KEY', '0101')
+ADMIN_KEY = os.environ.get('CH5_ADMIN_KEY') or ''
+if not ADMIN_KEY:   # 고정 기본값 없음 (2026-10-30 보안 점검): 미설정이면 시작마다 임시 값을 만들어 로그에 찍는다
+    import secrets
+    ADMIN_KEY = secrets.token_hex(3)
+    print('CH5_ADMIN_KEY 미설정: 이번 실행의 임시 운영자 비밀번호 = ' + ADMIN_KEY, flush=True)
 SERVE_STATIC = os.environ.get('VOID_STATIC', '1') == '1'
 
 MAX_TEAM = 12

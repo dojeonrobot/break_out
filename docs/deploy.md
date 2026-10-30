@@ -7,7 +7,7 @@
 | 사이트 | https://breakout.doroedu.co.kr |
 | 서버 IP | 210.109.15.216 |
 | 계정 | ubuntu |
-| 키 파일 | `C:\Users\pc\Documents\PW\hy_key.pem` |
+| 키 파일 | 담당자 PC에 따로 보관 (저장소에 넣지 않는다, `.gitignore`의 `*.pem`) |
 | 서버 경로 | `/home/ubuntu/breakout/` |
 | GitHub | https://github.com/dojeonrobot/break_out |
 
@@ -44,7 +44,7 @@ cd C:\Users\pc\Documents\BREAK-OUT
 ## SSH 접속
 
 ```powershell
-ssh -i "C:\Users\pc\Documents\PW\hy_key.pem" ubuntu@210.109.15.216
+ssh -i <키 파일> ubuntu@<서버>
 ```
 
 서버에서 nginx 상태 확인:
