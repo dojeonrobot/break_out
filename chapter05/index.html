@@ -939,11 +939,12 @@ const devQuests = (t, l) => Object.keys((SQUESTS[t] || {})[l] || {}).filter(k=> 
 const myLetter = ()=> { const d = SQUESTS[TEAM] || {}; return Object.keys(d).find(k=> d[k].dev === DEV) || null; };
 const myEntry = ()=> (SQUESTS[TEAM] || {})[myLetter()] || {};
 const teamQuests = t => { if(location.protocol === 'file:'){ try{ return JSON.parse(localStorage.getItem(`void-quest-${t}`) || '[]'); }catch(e){ return []; } }
-  const ls = teamDevs(t); if(!ls.length) return []; return ['q1', 'q2', 'q3'].filter(q=> ls.every(l=> devQuests(t, l).includes(q))); };   // done for the team = done on every tablet
-const questWaiting = (t, q) => teamDevs(t).filter(l=> !devQuests(t, l).includes(q));   // tablets still on it
+  // (user, 2026-10-30) tablets in a team are independent: on a student tablet this is what THIS tablet finished; for the admin, the big screen or another team, what any of its tablets finished
+  const mine = t === TEAM && !ADMIN_KEY && !SCREEN, ls = mine ? [myLetter()].filter(Boolean) : Object.keys(SQUESTS[t] || {});
+  return ['q1', 'q2', 'q3'].filter(q=> ls.some(l=> devQuests(t, l).includes(q)) || (mine && QDONE.has(q))); };
 const questDoneView = id => { const v = viewTeam();
   if(v === 0) return Object.keys(SQUESTS).some(t=> teamQuests(t).includes(id)) || (location.protocol === 'file:' && QDONE.has(id));
-  if(v < 0) return false; return teamQuests(v).includes(id) || (location.protocol === 'file:' && v === TEAM && QDONE.has(id)); };   // the island zone comes back for the whole team at once
+  if(v < 0) return false; return teamQuests(v).includes(id) || (location.protocol === 'file:' && v === TEAM && QDONE.has(id)); };   // the island zone comes back for this tablet when it finishes the mission
 const zonePending = m => { const v = viewTeam(); return SUBS.some(x=> pairIds(m.id).includes(x.mission) && (v === 0 || x.team === v)); };   // a submission is in (converting or converted)
 const zoneDone = m => { if(!m) return false; if(m.quest) return m.scans.some(x=> x.demo) || questDoneView(m.quest); return m.scans.length > 0 || zonePending(m); };   // 2026-10-27: one scan link restores a zone
 const isVoid = m => m && !zoneDone(m);
@@ -1325,7 +1326,7 @@ const fmt = n => n.toLocaleString('ko-KR');
 const hiddenZone = m => !!m && m.lat != null && !zoneDone(m);
 // A zone's coordinates stay locked until the island mission that hands them over is done (QUESTS, with the walk code). Admin and the big screen see everything.
 const zoneQuest = m => (typeof QUESTS === 'object' && m) ? QUESTS.find(q=> q.zones.includes(m.id)) : null;
-const zoneLocked = m => { if(!m || m.lat == null || SCREEN || typeof QUESTS !== 'object') return false; const q = zoneQuest(m); if(!q) return false; return LOCAL ? !QDONE.has(q.id) : !teamQuests(TEAM).includes(q.id); };   // the next coordinates open for the team, when every tablet has finished
+const zoneLocked = m => { if(!m || m.lat == null || SCREEN || typeof QUESTS !== 'object') return false; const q = zoneQuest(m); if(!q) return false; return LOCAL ? !QDONE.has(q.id) : !teamQuests(TEAM).includes(q.id); };   // the next coordinates open on this tablet when it has finished the mission
 const zoneFound = m => { if(!m) return false; if(m.id === 'z1' || zoneDone(m)) return true; try{ return localStorage.getItem(`void-found-${m.id}`) === '1'; }catch(e){ return false; } };
 const ZONE_OBJ = {z1:'가져온 물건', z2:'하냥이', z3:'라이언이랑 어피치'};   // what sits at each spot (said only on arrival)
 const zoneName = m => { const i = MISSION_E.indexOf(m) + 1; return i < 1 ? m.name : zoneFound(m) ? `기록 ${i} · ${m.name}` : `기록 ${i}`; };
@@ -1473,9 +1474,8 @@ function applyState(st){
   if([...hid].sort().join() !== [...HIDDEN].sort().join()){ HIDDEN.clear(); hid.forEach(x=> HIDDEN.add(x)); try{ localStorage.setItem('void-hidden', JSON.stringify([...hid])); }catch(e){} changed = true; }
   const arrived = [];
   const qj = JSON.stringify(st.quests || {});
-  if(qj !== SQ_JSON){ const was = typeof MI !== 'undefined' ? MI.filter(m=> m.quest && zoneDone(m)).map(m=> m.id) : [], teamWas = TEAM ? teamQuests(TEAM) : []; SQ_JSON = qj; SQUESTS = st.quests || {}; changed = true;
+  if(qj !== SQ_JSON){ const was = typeof MI !== 'undefined' ? MI.filter(m=> m.quest && zoneDone(m)).map(m=> m.id) : []; SQ_JSON = qj; SQUESTS = st.quests || {}; changed = true;
     if(typeof MI !== 'undefined') MI.forEach(m=>{ if(m.quest && zoneDone(m) && !was.includes(m.id)) arrived.push(m.id); });
-    if(TEAM && typeof QUESTS === 'object'){ const now = teamQuests(TEAM); QUESTS.forEach(q=>{ if(now.includes(q.id) && !teamWas.includes(q.id) && teamDevs(TEAM).length > 1) setTimeout(()=> onTeamComplete(q), 0); }); }
     try{ questRefresh(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; } }
   const done = subsOk(SUBS), doneIds = new Set(done.map(s=> s.scanId));
   done.forEach(s=>{ if(!SCANS.some(x=> x.id === s.scanId)){ const sc = subScan(s); SCANS.push(sc); changed = true; if(visibleScan(sc)){ const z = MISSIONS.find(m=> m.id === s.mission) ? TWIN[s.mission] : s.mission; const mz = typeof MI !== 'undefined' ? MI.find(m=> m.id === z) : null; if(z && !arrived.includes(z) && !(mz && zoneDone(mz))) arrived.push(z); } } });
@@ -1620,7 +1620,7 @@ function adminHTML(){
   const tile = (k, v, sub)=> `<div class="tile"><small>${k}</small><b>${v}</b>${sub ? `<span>${sub}</span>` : ''}</div>`;
   const table = rows.length ? `<table class="qt big"><thead><tr><th>조 · 태블릿</th>${rows.map(r=> `<th>${r.quest ? '<em>섬</em>' : '<em>캠퍼스</em>'}${esc(r.quest ? r.island.name : r.campus.name)}</th>`).join('')}<th>막</th><th>복구율</th><th></th></tr></thead><tbody>${teams.length ? teams.map(t=>{ const zs = teamZones(t, rows), ok = zs.filter(z=> z.st === 'ok').length, ls = teamDevs(t).length ? teamDevs(t) : ['-'];
       return ls.map((l, li)=>{ const sq = (SQUESTS[t] || {})[l] || {}, dq = devQuests(t, l);
-        return `<tr class="${ok === rows.length ? 'full' : ''} ${li ? 'sub' : ''}"><td><b>${t}조</b>${l !== '-' ? `<span class="dev">-${l}</span>` : ''}</td>${zs.map(z=> z.p.quest ? `<td>${l === '-' ? '' : dq.includes(z.p.quest.quest) ? `<button type="button" class="mini on" data-aq="${t}:${l}:${z.p.quest.quest}:0">완료 ✓</button>` : `<button type="button" class="mini" data-aq="${t}:${l}:${z.p.quest.quest}:1">완료 처리</button>`}${z.st === 'ok' ? '' : (dq.includes(z.p.quest.quest) && questWaiting(t, z.p.quest.quest).length) ? `<small>${questWaiting(t, z.p.quest.quest).map(x=> t + '조-' + x).join(' ')} 기다리는 중</small>` : ''}</td>` : (li ? '<td></td>' : `<td rowspan="${ls.length}"><span class="st ${z.st}">${z.st === 'ok' ? '돌아옴' : z.st === 'pend' ? '돌아오는 중' : '비어 있음'}</span></td>`)).join('')}<td>${l === '-' ? '—' : sq.act ? `${sq.act}막` : '—'}${l !== '-' && !sq.tut ? '<small>튜토리얼 전</small>' : ''}</td>${li ? '' : `<td rowspan="${ls.length}"><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td>`}<td>${l === '-' ? '' : `<button type="button" class="mini" data-aq="${t}:${l}:*:0" title="이 태블릿의 미션 진행을 지우고 조에서 뺍니다">빼기</button>`}${li ? '' : ` <button type="button" class="mini" data-aq="${t}:*:*:0" ${teamDevs(t).length ? '' : 'hidden'}>조 초기화</button>`}</td></tr>`; }).join(''); }).join('') : `<tr><td colspan="${rows.length + 4}" class="empty">아직 시작한 조가 없습니다</td></tr>`}</tbody></table>` : '';
+        return `<tr class="${ok === rows.length ? 'full' : ''} ${li ? 'sub' : ''}"><td><b>${t}조</b>${l !== '-' ? `<span class="dev">-${l}</span>` : ''}</td>${zs.map(z=> z.p.quest ? `<td>${l === '-' ? '' : dq.includes(z.p.quest.quest) ? `<button type="button" class="mini on" data-aq="${t}:${l}:${z.p.quest.quest}:0">완료 ✓</button>` : `<button type="button" class="mini" data-aq="${t}:${l}:${z.p.quest.quest}:1">완료 처리</button>`}</td>` : (li ? '<td></td>' : `<td rowspan="${ls.length}"><span class="st ${z.st}">${z.st === 'ok' ? '돌아옴' : z.st === 'pend' ? '돌아오는 중' : '비어 있음'}</span></td>`)).join('')}<td>${l === '-' ? '—' : sq.act ? `${sq.act}막` : '—'}${l !== '-' && !sq.tut ? '<small>튜토리얼 전</small>' : ''}</td>${li ? '' : `<td rowspan="${ls.length}"><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td>`}<td>${l === '-' ? '' : `<button type="button" class="mini" data-aq="${t}:${l}:*:0" title="이 태블릿의 미션 진행을 지우고 조에서 뺍니다">빼기</button>`}${li ? '' : ` <button type="button" class="mini" data-aq="${t}:*:*:0" ${teamDevs(t).length ? '' : 'hidden'}>조 초기화</button>`}</td></tr>`; }).join(''); }).join('') : `<tr><td colspan="${rows.length + 4}" class="empty">아직 시작한 조가 없습니다</td></tr>`}</tbody></table>` : '';
   return `<div class="adm dash">
     <div class="tiles">${tile('참여 조', teams.length, '조를 고른 태블릿 기준')}${tile('다 돌아온 조', full)}${tile('제출', n, `복구됨 ${done}${wait ? ` · 확인 대기 ${wait}` : ''}`)}${tile('숨긴 스캔', HIDDEN.size)}</div>
     <div class="cols">
@@ -7353,17 +7353,6 @@ function questComplete(q){
   if(q.restores){ actExit(q); return; }
   showReward(q);
 }
-function showWait(q, others){
-  const n = QUESTS.indexOf(q) + 1, isl = MI.find(m=> m.id === q.restores);
-  $('qrS').textContent = `MISSION ${n} · 기다리는 중`; $('qrT').textContent = `${others.map(l=> `${TEAM}조-${l}`).join(', ')} 태블릿이 끝나면 ${isl ? isl.name + '가 돌아옵니다' : '다음으로 갑니다'}`;
-  $('qrP').innerHTML = '같은 조의 다른 태블릿이 이 미션을 마칠 때까지 기다립니다. 끝나는 순간 여기로 알려 드려요.'; $('qrList').innerHTML = '';
-  qRewardEl.querySelector('.steps').hidden = true; $('qrMap').textContent = '돌아가기'; $('qrStay').hidden = true; qRewardEl.dataset.on = '1'; qRewardEl.dataset.wait = q.id;
-}
-function onTeamComplete(q){   // every tablet of the team has finished q: this one was waiting (or not) — the ride's arrival plays through rescan(), the coordinates open here
-  if(!QDONE.has(q.id) || !TEAM || AUX) return; delete qRewardEl.dataset.wait;
-  voidSay(`${TEAM}조 태블릿이 다 끝냈어. 기록이 돌아왔어.`, 6000, 'joy');
-  if(q.zones.length) setTimeout(()=>{ if(!walk && !actBusy && !simOn) showReward(q); }, 6000);
-}
 function showReward(q){
   const n = QUESTS.indexOf(q) + 1, zs = q.zones.map(id=> MISSION_E.find(m=> m.id === id)).filter(Boolean), isl = MI.find(m=> m.id === q.restores), L = (ACT_EXIT[q.id] || {}).card;
   $('qrS').textContent = `MISSION ${n} CLEAR`; $('qrT').textContent = isl ? `${isl.name}가 돌아왔습니다` : '미션 완료';
@@ -7372,7 +7361,7 @@ function showReward(q){
   qRewardEl.querySelector('.steps').hidden = true; $('qrMap').textContent = zs.length ? '좌표 받고 돌아가기' : '돌아가기'; $('qrStay').hidden = true;
   qRewardEl.dataset.on = '1';
 }
-$('qrMap').onclick = ()=>{ const waiting = qRewardEl.dataset.wait; delete qRewardEl.dataset.on; delete qRewardEl.dataset.wait; stopWalk(); if(waiting){ STAGED = false; setWorld('erica'); setTimeout(()=> voidSay('같은 조의 다른 태블릿을 기다리는 중이야. 끝나면 바로 알려 줄게.', 7000, 'idle'), 1200); return; } goBack(); };
+$('qrMap').onclick = ()=>{ delete qRewardEl.dataset.on; stopWalk(); goBack(); };
 $('qrStay').onclick = ()=>{ delete qRewardEl.dataset.on; };
 
 // ---------- acts (user, 2026-10-27): a restored campus record calls the team to the island ----------
@@ -7539,14 +7528,7 @@ $('callPill').onclick = ()=>{ if(actPending) openCall(actPending); };
 async function actExit(q){
   const n = QUESTS.indexOf(q) + 1, ex = ACT_EXIT[q.id]; if(!ex){ showReward(q); return; }
   actBusy = true; stopWalk();
-  // the server answers saveQuest() within a moment; wait for it so we know whether the whole team is done
-  for(let i = 0; i < 12 && questPending.has(q.id) && !LOCAL; i++) await wait(250);
-  const others = TEAM ? questWaiting(TEAM, q.id) : [];
-  if(others.length && !LOCAL){   // the other tablets of the team are still on it: no ride yet, the cast says so, the tablet waits
-    stageAt(ACT_ZONE[n], ACT_CAST[n]()); await wait(900);
-    await new Promise(r=> say(ex.wait || [{who:'자일로', img:'xylo_talk', text:'다른 친구들이 아직 끝내지 못했군요. 다 모이면 기록이 돌아올 겁니다. 조금만 기다려 주세요.'}], r));
-    actBusy = false; showWait(q, others); return;
-  }
+  // (user, 2026-10-30) each tablet goes on by itself — no waiting for the other tablets of the team
   rescan([q.restores], true); await wait(5400);
   stageAt(q.restores, ACT_CAST[n]()); await wait(1700);
   await new Promise(r=> say(ex.greet, r));

@@ -117,22 +117,13 @@ def is_done(s):
     return s.get('status') == 'ok' and bool(s.get('splat'))
 
 
-ACTIVE_MS = 10 * 60 * 1000     # a tablet not heard from for this long no longer holds its team back
-
-
-def active_entries(d):
-    now = now_ms()
-    ents = [v for v in d.values() if isinstance(v, dict)]
-    live = [v for v in ents if now - int(v.get('seen') or v.get('tut') or 0) < ACTIVE_MS]
-    return live or ents
-
-
 def team_done(d, q):
-    """조가 미션 q를 끝냈나: 살아 있는 태블릿 전부가 끝냈을 때."""
-    if not d or any(k.startswith('q') for k in d):
+    """조가 미션 q를 끝냈나(현황판·큰 화면용): 조의 태블릿 중 하나라도 끝냈으면. 태블릿끼리는 독립이다 (2026-10-30)."""
+    if not d:
         return False
-    ents = active_entries(d)
-    return bool(ents) and all(q in v for v in ents)
+    if any(k.startswith('q') for k in d):      # 글자 없이 저장된 옛 형식
+        return q in d
+    return any(isinstance(v, dict) and q in v for v in d.values())
 
 
 def pair_status():
