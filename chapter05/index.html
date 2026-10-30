@@ -288,7 +288,7 @@ input[type=range]{accent-color:var(--accent);width:150px}
 .layers button:active,.seg button:active,.item:active,.ms:active{transform:scale(.98)}
 .sep{width:1px;height:22px;background:var(--line)}
 #credit{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font-size:11px;color:var(--muted)}
-#credit a{color:inherit}
+#credit a{color:inherit;display:inline-block;padding:13px 4px;margin:-13px -4px}
 #loading{position:fixed;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
 #loading[hidden]{display:none}
 #toast{position:fixed;left:0;right:0;margin-inline:auto;width:fit-content;bottom:calc(84px + env(safe-area-inset-bottom,0px));padding:8px 14px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -537,7 +537,7 @@ html.aux #lWalk,html.aux #callPill,html.aux #callDlg,html.aux #questHud,html.aux
 .auxnote{margin:8px 18px 0;padding:8px 10px;border-radius:8px;background:var(--panel-solid);border:1px dashed var(--line);font-size:12.5px;color:var(--muted);line-height:1.5}
 .auxnote[hidden]{display:none}
 #bBtn{display:none}
-@media (max-width:1000px){#restoreBtn,#callPill,#simBtn,#adminBtn,body.island #adminBtn{bottom:calc(var(--barH,54px) + 24px + env(safe-area-inset-bottom,0px));top:auto} #simBtn{bottom:calc(var(--barH,54px) + 88px + env(safe-area-inset-bottom,0px))} #restoreBtn,#callPill,#simBtn{left:12px} #meCoord{bottom:calc(var(--barH,54px) + 20px + env(safe-area-inset-bottom,0px))} #miniBox{bottom:calc(var(--barH,54px) + 70px + env(safe-area-inset-bottom,0px))} #credit{display:none}} body.island #credit{left:210px} @media (max-width:600px),(max-height:480px){#bBtn{display:inline-block} body.island #bBtn{display:none} #adminBtn{right:12px} html.phone #bar > .seg.erica-only:not(#navSeg),html.phone #bar .sep{display:none} body.sheet #restoreBtn,body.sheet #adminBtn,body.sheet #simBtn,body.sheet #callPill,body.sheet #meCoord{visibility:hidden} body.sheet #board{display:flex;position:fixed;left:12px;right:12px;bottom:calc(var(--barH,54px) + 20px + env(safe-area-inset-bottom,0px));top:auto;width:auto;max-width:none;max-height:58%;z-index:33;transform:none;opacity:1} body.sheet #board.closed{max-height:none} body.sheet #info{display:none}}
+@media (max-width:1000px){#restoreBtn,#callPill,#simBtn,#adminBtn,body.island #adminBtn{bottom:calc(var(--barH,54px) + 24px + env(safe-area-inset-bottom,0px));top:auto} #simBtn{bottom:calc(var(--barH,54px) + 88px + env(safe-area-inset-bottom,0px))} #restoreBtn,#callPill,#simBtn{left:12px} #meCoord{bottom:calc(var(--barH,54px) + 20px + env(safe-area-inset-bottom,0px))} #miniBox{bottom:calc(var(--barH,54px) + 70px + env(safe-area-inset-bottom,0px))} #credit{display:none}} body.island #credit{display:none} @media (max-width:600px),(max-height:480px){#bBtn{display:inline-block} body.island #bBtn{display:none} #adminBtn{right:12px} html.phone #bar > .seg.erica-only:not(#navSeg),html.phone #bar .sep{display:none} body.sheet #restoreBtn,body.sheet #adminBtn,body.sheet #simBtn,body.sheet #callPill,body.sheet #meCoord{visibility:hidden} body.sheet #board{display:flex;position:fixed;left:12px;right:12px;bottom:calc(var(--barH,54px) + 20px + env(safe-area-inset-bottom,0px));top:auto;width:auto;max-width:none;max-height:58%;z-index:33;transform:none;opacity:1} body.sheet #board.closed{max-height:none} body.sheet #info{display:none}}
 @media (max-height:480px){body.sheet #panel{display:none} #panel{top:calc(64px + env(safe-area-inset-top,0px));max-height:calc(100% - 64px - var(--barH,54px) - 22px - env(safe-area-inset-top,0px))} .ph{padding:8px 14px} #pSub{display:none} .auxnote{margin-top:4px;padding:6px 10px} #info{max-height:calc(100% - 54px - var(--barH,54px) - 22px)} #worlds{top:calc(8px + env(safe-area-inset-top,0px))} #bar{bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:6px 8px;gap:6px} body.sheet #board{max-height:calc(100% - 54px - var(--barH,54px) - 28px)} #voidVn .in{padding-top:0} #voidVn img{height:min(150px,56vh)} #vn .in{padding-bottom:6px} #vn img{height:min(150px,56vh)}}
 @media (min-width:601px) and (max-width:1000px) and (min-height:481px){#panel,#info,#board{width:300px}}
 /* the record card, before and after (지시서 4절) */
@@ -3113,6 +3113,7 @@ for(let i=0;i<14000 && treeSpotsI.length<420;i++){
   if(forest && rr() > 0.6) continue;
   treeSpotsI.push([x, z, rr()]);
 }
+if(PHONE) for(let i=treeSpotsI.length-1;i>0;i-=2) treeSpotsI.splice(i,1);   /* phone: every other tree, same seed so the rest stays put */
 const pineSpots = treeSpotsI.filter(s=>s[2] < 0.38), roundSpots = treeSpotsI.filter(s=>s[2] >= 0.38);
 const roundTree = new THREE.InstancedMesh(ICO(1,1).translate(0,1,0), new THREE.MeshLambertMaterial({color:0xffffff, flatShading:true}), roundSpots.length);
 const pineTree = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 2.2, 7).translate(0,1.1,0), new THREE.MeshLambertMaterial({color:0xffffff, flatShading:true}), pineSpots.length*2);
@@ -3171,6 +3172,7 @@ for(let i=0;i<40;i++){
     const n = 4 + Math.floor(rr()*6);
     for(let k=0;k<n;k++) spots.push([x + (rr()-0.5)*8, z + (rr()-0.5)*8, k]);
   }
+  if(PHONE) spots.splice(Math.ceil(spots.length/2));   /* phone: half the flower clusters */
   const f = new THREE.InstancedMesh(ICO(0.9,0), new THREE.MeshLambertMaterial({color:0xffffff}), spots.length);
   const o = new THREE.Object3D(), FC = [0xffffff, 0xfff0a0, 0xffb7d0, 0xc7b8ff].map(c=>new THREE.Color(c));
   spots.forEach(([x,z,k],i)=>{ o.position.set(x, G+0.5, z); o.updateMatrix(); f.setMatrixAt(i, o.matrix); f.setColorAt(i, FC[(k+i)%4]); });
@@ -4483,12 +4485,12 @@ sceneI.add(balloon); SIM_DIM.push(balloon);   // nothing flies over the simulato
 
 // Visitors share the final path network, with width-aware lanes and connected junctions.
 {
-  const NW=640,walkers=[],nodes=[],edges=[],buckets=new Map();
+  const NW=PHONE?320:640,walkers=[],nodes=[],edges=[],buckets=new Map();
   const body=new THREE.InstancedMesh(new THREE.CapsuleGeometry(.85,1.8,3,8).translate(0,1.75,0),new THREE.MeshLambertMaterial({color:0xffffff}),NW);
   const head=new THREE.InstancedMesh(SPH(.75,8,6).translate(0,4.05,0),mat(0xf8d5bd),NW);
   const colors=[0xe2574c,0x5aa0e6,0xffd400,0x58b368,0xb07ad8,0xff9fcf,0xf39a3b,0xffffff,0x1d2f55];
   for(let i=0;i<NW;i++)body.setColorAt(i,new THREE.Color(colors[i%colors.length]));
-  body.name='park-visitors-body';head.name='park-visitors-head';body.castShadow=true;islRoot.add(body,head);
+  body.name='park-visitors-body';head.name='park-visitors-head';body.castShadow=!PHONE;islRoot.add(body,head);
   function node(p){
     const bx=Math.floor(p.x/3),bz=Math.floor(p.z/3);
     for(let x=bx-1;x<=bx+1;x++)for(let z=bz-1;z<=bz+1;z++)for(const n of buckets.get(x+','+z)||[])
