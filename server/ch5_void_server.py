@@ -351,6 +351,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto,
             '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
+            '/api/void/admin/skip': self.admin_skip,
         }
         fn = routes.get(path)
         if not fn:
@@ -518,6 +519,26 @@ class Handler(BaseHTTPRequestHandler):
         with lock:
             DB['subs'] = [s for s in DB['subs'] if s['id'] != sid]
             save()
+            self.send_json(state())
+
+    # 운영자: 조의 캠퍼스 기록 한 곳을 스캔 없이 복구 처리 — 진행 확인·시연용. 제출 목록에 kind=skip, splat.skip 항목으로 남아
+    # 현황판·페이지에서는 복구됨으로 보이고 3D는 없다. 아이 화면에는 이 길이 없고(/admin/ 아래, 비밀번호), 같은 조·구역에 이미 복구된 기록이 있으면 그대로 둔다 (2026-11-02)
+    def admin_skip(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조 번호가 없습니다.')
+        mission = str(b.get('mission') or '')
+        if not MISSION_ID.match(mission):
+            raise ValueError('구역 정보가 없습니다.')
+        with lock:
+            if not any(s['team'] == team and s['mission'] == mission and is_done(s) for s in DB['subs']):
+                sid = uuid.uuid4().hex[:12]
+                DB['subs'].append({
+                    'id': sid, 'scanId': 'skip' + sid, 'kind': 'skip', 'url': '', 'mission': mission, 'team': team,
+                    'note': '', 'caption': '운영자 건너뜀', 'author': '', 'status': 'ok', 'createdAt': now_ms(),
+                    'splat': {'skip': True, 'caption': '운영자 건너뜀', 'points': 0},
+                })
+                save()
             self.send_json(state())
 
     # 운영자: 자체 스캔을 복구됨으로 확정(ok=false면 다시 확인 대기로)
