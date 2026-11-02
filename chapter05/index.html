@@ -745,13 +745,14 @@ THREE.ColorManagement.enabled = false;
 
 // ---------- scene ----------
 const stage = $('stage');
-const renderer = new THREE.WebGLRenderer({antialias:!PHONE});
+const renderer = new THREE.WebGLRenderer({antialias:!(COARSE && devicePixelRatio >= 1.5)});   // a dense touch screen hides the aliasing; MSAA at pixel ratio 2 cost a tablet a third of its frame (2026-11-02)
 renderer.localClippingEnabled = true;   // the ride sweep (rideSweep) clips per material
-renderer.setPixelRatio(Math.min(devicePixelRatio, PHONE ? 1.5 : 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, COARSE ? 1.5 : 2));
 renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 renderer.useLegacyLights = true;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PHONE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = COARSE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false; let shadowFrame = 0;   // redrawn every 3rd frame in tick() (and at once after a world/sun change): the shadow pass re-renders the whole world, 2026-11-02
 stage.appendChild(renderer.domElement);
 
 const sceneE = new THREE.Scene();
@@ -1310,7 +1311,9 @@ function applyTheme(){
 const LAT = DATA.origin[0], LON = DATA.origin[1];
 const today = new Date();
 const DOY = Math.round((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()) - Date.UTC(today.getFullYear(),0,0))/864e5);
-function sunDir(hour){
+const _sunMemo = {h:null, v:null};
+function sunDir(hour){ if(_sunMemo.h === hour && _sunMemo.v) return _sunMemo.v; const v = sunDir0(hour); _sunMemo.h = hour; _sunMemo.v = v; return v; }
+function sunDir0(hour){
   const rad=Math.PI/180, dec = 23.44*Math.sin(2*Math.PI*(284+DOY)/365)*rad;
   const Bq = 2*Math.PI*(DOY-81)/364, eot = 9.87*Math.sin(2*Bq)-7.53*Math.cos(Bq)-1.5*Math.sin(Bq);
   const solar = hour + (4*(LON-135)+eot)/60, H = 15*(solar-12)*rad, lat = LAT*rad;
@@ -2189,7 +2192,9 @@ const v3 = new THREE.Vector3();
 function mapLabelBox(el,x,y,W,H){
   if(x<0||x>W||y<0||y>H){el.style.display='none';return null;}
   el.style.display='';
-  const w=el.offsetWidth,h=el.offsetHeight,pad=8;
+  const key = el.className + '|' + el.textContent + '|' + W;   // measured once per look (2026-11-02: offsetWidth per label per frame forced ~60 layouts a frame on the campus)
+  if(el._szk !== key){ el._szk = key; el._sz = [el.offsetWidth, el.offsetHeight]; }
+  const w=el._sz[0],h=el._sz[1],pad=8;
   const left=Math.max(pad,Math.min(W-pad-w,x-w/2)),top=Math.max(pad,Math.min(H-pad-h,y-h));
   el.style.transform=`translate(${left}px,${top}px)`;
   return [left-4,top-4,left+w+4,top+h+4];
@@ -4132,9 +4137,11 @@ sceneI.add(balloon); SIM_DIM.push(balloon);   // nothing flies over the simulato
     islRoot.userData.visitorAudit={nodes,edges,walkers,body,head};
   }
   const o=new THREE.Object3D();
+  let vFrame=0;
   islAnim.push(t=>{
-    if(!walkers.length)init();
+    if(!walkers.length)init(); vFrame++; const half=vFrame&1;
     walkers.forEach((w,i)=>{
+      if((i&1)!==half) return;   // alternate halves: 320 visitors per frame instead of 640 (2026-11-02)
       const clock=(t+w.phase)%w.total,l=w.legs.find(l=>clock<l.start+l.wait+l.duration)||w.legs[w.legs.length-1],u=Math.max(0,Math.min(1,(clock-l.start-l.wait)/l.duration));
       const dx=l.b.x-l.a.x,dz=l.b.z-l.a.z,len=Math.hypot(dx,dz)||1,off=w.lane*Math.min(1,Math.max(0,l.width/2-.7))*Math.min(1,u*4,(1-u)*4);
       let x=l.a.x+dx*u-dz/len*off,z=l.a.z+dz*u+dx/len*off;
@@ -8052,11 +8059,12 @@ questApply();
 // ---------- loop ----------
 // adaptive quality (2026-10-29): frames are counted in 4 s windows; under 22 fps the device steps down — pixel ratio, then the shadow map, then the
 // sun's shadow. Phones start one step down. Never in a headless check (navigator.webdriver), where the software renderer would always step down.
-let perfTier = PHONE ? 1 : 0, perfT0 = 0, perfN = 0;
+let perfTier = COARSE ? 1 : 0, perfT0 = 0, perfN = 0;   // every touch device starts one step down (2026-11-02: tablets lagged at tier 0)
 const PERF = [[2, 4096], [1.5, 2048], [1, 1024], [1, 1024]];
 function perfApply(){ const [pr, sz] = PERF[perfTier]; renderer.setPixelRatio(Math.min(devicePixelRatio, pr)); if(sun.shadow.mapSize.x !== sz){ sun.shadow.mapSize.set(sz, sz); if(sun.shadow.map){ sun.shadow.map.dispose(); sun.shadow.map = null; } } if(perfTier >= 3) sun.castShadow = false; resize(); }
 function perfTick(now){ if(perfTier >= 3 || navigator.webdriver || document.hidden || intro || reduce){ perfT0 = now; perfN = 0; return; } if(!perfT0) perfT0 = now; perfN++; if(now - perfT0 < 4000) return;
   const fps = perfN*1000/(now - perfT0); perfT0 = now; perfN = 0; if(fps < 22){ perfTier++; perfApply(); } }
+if(perfTier > 0) perfApply();   // the starting tier must actually be applied (2026-11-02: phones and tablets started at tier 1 on paper but kept the 4096 shadow map)
 window.__perf = ()=> ({tier:perfTier, pr:renderer.getPixelRatio(), shadow:sun.shadow.mapSize.x});
 function resize(){ const w=innerWidth,h=innerHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); if(composer){ composer.setSize(w,h); bloomPass.resolution.set(Math.round(w/2), Math.round(h/2)); } }
 addEventListener('resize', resize); resize();
@@ -8129,7 +8137,7 @@ function setWorld(id, instant){
   W = w;
   ({M, B, pickables, markers, named, lblEls, HOME, CATS, CAT_ORDER} = w);
   ({beacons, rings, pads, ripples, barriers} = w.fx);
-  scene = w.scene; scene.add(sun, sun.target, hemi, fill, fill.target);
+  scene = w.scene; scene.add(sun, sun.target, hemi, fill, fill.target); shadowDirty = labelsDirty = true;
   document.querySelectorAll('#worlds button').forEach(b=> b.setAttribute('aria-pressed', b.dataset.w===id)); try{ flowLockUI(); }catch(e){}
   document.body.classList.toggle('island', id==='island'); if(id==='island') loadCharModels(); if(document.body.classList.contains('sheet')) setSheet(false); if(id!=='island' && typeof simOn !== 'undefined' && simOn) setSim(false);
   if(id!=='erica' && follow) setFollow(false); meArrow.visible = false;
@@ -8150,7 +8158,7 @@ function setWorld(id, instant){
 }
 document.querySelectorAll('#worlds button').forEach(b=> b.onclick = ()=>{ const sw = stepWorld(); if(sw && b.dataset.w !== sw){ toast(sw === 'island' ? '지금 할 미션은 도로랜드 섬에 있어요. 미션을 끝내면 캠퍼스로 돌아와요.' : '지금은 캠퍼스에서 다음 기록을 찾을 차례예요.'); return; } setWorld(b.dataset.w); });
 
-const lastT = new THREE.Vector3();
+const lastT = new THREE.Vector3(); let shadowDirty = true, labelsDirty = true;
 function tick(now){
   requestAnimationFrame(tick);
   if(!$('viewer').hidden) return;
@@ -8194,9 +8202,10 @@ function tick(now){
   });
   if(W.update) W.update(reduce ? 0 : now, zoneK);
   if(walk) walkTick(now); else controls.update();
-  if(lastT.distanceToSquared(controls.target)>400){ lastT.copy(controls.target); updateSun(); }
+  if(lastT.distanceToSquared(controls.target)>400){ lastT.copy(controls.target); updateSun(); shadowDirty = true; }
+  if(!renderer.shadowMap.autoUpdate){ shadowFrame++; if(shadowFrame % 3 === 0 || shadowDirty){ renderer.shadowMap.needsUpdate = true; shadowDirty = false; } }
   if(simOn && composer) composer.render(); else renderer.render(scene, camera);
-  placeLabels();
+  if((shadowFrame & 1) === 0 || labelsDirty){ placeLabels(); labelsDirty = false; }   // labels every other frame: each placement is a layout pass
 }
 
 const mq = matchMedia('(prefers-color-scheme: dark)');
