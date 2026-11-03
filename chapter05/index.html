@@ -543,7 +543,7 @@ body.walk #walkHud b{font-size:13px}
 body.walk #walkHud button{min-width:44px;min-height:44px;padding:8px 10px}
 body.walk #walkHud .hint{position:absolute;right:0;top:calc(100% + 6px);width:240px;padding:12px;background:#101d30;border:1px solid #456078;border-radius:12px;line-height:1.6;box-sizing:border-box}
 body.walk #walkHud .hint[hidden]{display:none}
-body.walk #questHud{left:calc(12px + env(safe-area-inset-left,0px));right:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:none;animation:none;width:280px;max-width:calc(100vw - 24px);padding:10px 12px;gap:10px;border-radius:14px;box-sizing:border-box;align-items:center}
+body.walk #questHud{left:50%;right:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);animation:none;width:280px;max-width:calc(100vw - 24px);padding:10px 12px;gap:10px;border-radius:14px;box-sizing:border-box;align-items:center}
 body.walk #questHud .mk{display:none}
 body.walk #questHud>div:not(.nav){min-width:0;flex:1}
 body.walk #questHud small{font-size:10px;letter-spacing:.08em}
@@ -554,7 +554,7 @@ body.walk #questHud .nav small{display:none}
 body.walk #questHud .nav b{font-size:14px}
 body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-height:44px}
 #walkHelp:focus-visible,#walkX:focus-visible{outline:3px solid #9ff6ff;outline-offset:3px}
-@media(max-width:600px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(280px,calc(100vw - 24px))}}
+@media(max-width:760px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(280px,calc(100vw - 24px))}}
 #ydSuccess{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 0;padding:12px;border-radius:10px;background:#123f34;border:1px solid #7de7b7;color:#d9fff0;font-size:12px}
 #ydSuccess[hidden]{display:none}
 #ydSuccess b{font-size:16px;color:#a8ffd0}
@@ -563,6 +563,11 @@ body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-heigh
 #yardDlg.win .lamps i{background:#a8ffd0;box-shadow:0 0 12px #7de7b7}
 @keyframes power-arrive{0%{background:#16332d;box-shadow:inset 0 0 0 1px #366353}45%{background:#357c5c;box-shadow:inset 0 0 0 2px #b4ffd9,0 0 12px #60eeb777}100%{background:#204b3b;box-shadow:inset 0 0 0 1px #7de7b7}}
 @media(prefers-reduced-motion:reduce){#yardDlg.win .board button{animation:none;background:#204b3b;box-shadow:inset 0 0 0 1px #7de7b7}}
+
+/* Naty's face is low in the artwork, so show the whole flame above the dialogue. */
+#vn[data-speaker="네이티"] img{position:relative;left:0;bottom:auto;display:block;height:clamp(100px,30dvh,220px);max-width:min(40vw,240px);margin:0 0 14px 12px;object-position:left center;clip-path:none}
+#vn[data-speaker="네이티"] .in::before{display:none}
+body:has(#vn[data-on]) #walkHud,body:has(#vn[data-on]) #questHud{visibility:hidden}
 </style>
 
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');</script>
@@ -4466,10 +4471,10 @@ const obsTower = new THREE.Group();
 place(obsTower, -78, -40);   // clear of the windmill path (it used to stand on it)
 pickable(obsTower, {n:'클라우드 타워', c:'ride', sub:'전망 타워', cx:-78, cz:-40, h:100, r:12, desc:'둥근 유리 전망실이 천천히 돌며 90m 높이까지 올라가는 타워. 꼭대기에서는 섬과 바다가 한눈에 보입니다.', facts:[['높이','약 100m']]});
 
-// hedge maze — a real maze (2026-10-29, mission 2): one way in from the park path, every corridor leads somewhere, the heart holds the golden orb
+// hedge maze — a real maze (2026-10-29, mission 2): one way in from the park path, every corridor leads somewhere, the heart holds the traces of the old watercourse
 const maze = new THREE.Group(); let MAZE = null;
 {
-  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36), MX = 165, MZ = 420, MR = 0.2;
+  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36).clone(), MX = 165, MZ = 420, MR = 0.2;
   let s2 = 7; const r2 = ()=> (s2 = (s2*16807) % 2147483647) / 2147483647;
   add(maze, BOX(S+2, 0.3, S+2), mat(0xd8c9a3));
   // H[i][j]: the wall on the north side of cell (i,j), i = 0..n; V[i][j]: the wall on the west side of cell (i,j), j = 0..n — carved by a randomised DFS from the centre
@@ -4483,17 +4488,23 @@ const maze = new THREE.Group(); let MAZE = null;
   let ent; if(Math.abs(lx) > Math.abs(lz)){ if(lx < 0){ V[4][0] = 0; ent = [4, 0, 'W']; } else { V[4][n] = 0; ent = [4, n - 1, 'E']; } } else { if(lz < 0){ H[0][4] = 0; ent = [0, 4, 'N']; } else { H[n][4] = 0; ent = [n - 1, 4, 'S']; } }
   for(let i=0;i<=n;i++) for(let j=0;j<n;j++) if(H[i][j]) add(maze, BOX(cell + TH, 3.6, TH), hedge, -S/2 + j*cell + cell/2, 0, -S/2 + i*cell);
   for(let i=0;i<n;i++) for(let j=0;j<=n;j++) if(V[i][j]) add(maze, BOX(TH, 3.6, cell + TH), hedge, -S/2 + j*cell, 0, -S/2 + i*cell + cell/2);
-  add(maze, CYL(1.2, 1.5, 0.6, 10), mat(0xffffff), 0, 0, 0); add(maze, SPH(1.4, 12, 10), glowMat(0xffd400), 0, 1.8, 0, false);
+  // A dry stone channel marks the missing record, without a floating prize orb.
+  const trace = new THREE.Group(); trace.name = 'old-watercourse'; maze.add(trace);
+  add(trace, BOX(2.8, 0.08, 3.6), mat(0xb6aa90), 0, 0.32, 0);
+  add(trace, BOX(0.55, 0.04, 3.3), mat(0x655d4f), 0, 0.41, 0);
+  for(const side of [-1, 1]){ add(trace, BOX(0.28, 0.18, 3.5), mat(0xc7c0ad), side*0.55, 0.36, 0); }
+  add(trace, new THREE.PlaneGeometry(2.6, 0.7).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({map:signTex('옛 물길 터', {bg:'#b6aa90', fg:'#302b23', size:58, w:384, h:96})}), 0, 0.48, -1.25, false);
+  const clip = new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e6); hedge.clippingPlanes = [clip];
   // distance of every cell to the heart (BFS through the carved walls): 네이티's colour follows it during the mission
   const dist = Array.from({length:n}, ()=> Array(n).fill(-1)); dist[4][4] = 0; const q = [[4, 4]];
   while(q.length){ const [i, j] = q.shift(); [[i-1, j, !H[i][j]], [i+1, j, i + 1 < n && !H[i+1][j]], [i, j-1, !V[i][j]], [i, j+1, j + 1 < n && !V[i][j+1]]].forEach(([a, b, open])=>{ if(open && a >= 0 && a < n && b >= 0 && b < n && dist[a][b] < 0){ dist[a][b] = dist[i][j] + 1; q.push([a, b]); } }); }
   const marks = new THREE.InstancedMesh(new THREE.CircleGeometry(1.1, 12).rotateX(-Math.PI/2), glowMat(0x9ff6ff, 0.35), n*n); marks.count = 0; marks.frustumCulled = false; islRoot.add(marks);
-  MAZE = {S, n, cell, TH, H, V, ent, dist, cx:MX, cz:MZ, rot:MR, marks, seen:new Set()};
+  MAZE = {S, n, cell, TH, H, V, ent, dist, cx:MX, cz:MZ, rot:MR, marks, clip, seen:new Set()};
 }
 place(maze, 165/K, 420/K, 0.2);
-pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:165/K, cz:420/K, h:8, r:36, desc:'키 높은 생울타리로 만든 미로 정원. 가운데 황금 구슬까지 길을 찾아가 보세요.', facts:[['위치','정문 동쪽']]});
+pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:165/K, cz:420/K, h:8, r:36, desc:'키 높은 생울타리로 만든 미로 정원. 네이티를 따라 가운데 남아 있는 옛 물길 흔적을 찾아가 보세요.', facts:[['위치','정문 동쪽']]});
 // a walker inside the maze is stopped by the hedges (point-to-wall distance), never by the maze lot itself
-function mazeInside(x, z){ const M = MAZE; if(!M) return false; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); return Math.abs(lx) < M.S/2 + 1 && Math.abs(lz) < M.S/2 + 1; }
+function mazeInside(x, z, margin = 1){ const M = MAZE; if(!M) return false; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); return Math.abs(lx) < M.S/2 + margin && Math.abs(lz) < M.S/2 + margin; }
 function mazeHeart(x, z){ const M = MAZE; if(!M) return true; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); const i = Math.floor((lz + M.S/2)/M.cell), j = Math.floor((lx + M.S/2)/M.cell); return i >= 0 && j >= 0 && i < M.n && j < M.n && M.dist[i][j] === 0; }
 function mazeBlocked(x, z){ const M = MAZE; if(!M) return false; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot), h = M.S/2;
   if(Math.abs(lx) > h + 2 || Math.abs(lz) > h + 2) return false;
@@ -7463,7 +7474,7 @@ function startWalk(name){
 function placeQuestHud(){ $('questHud').style.removeProperty('top'); }
 $('walkHelp').onclick = ()=>{ const open = $('walkHint').hidden; $('walkHint').hidden = !open; $('walkHelp').setAttribute('aria-expanded', String(open)); };
 addEventListener('resize', placeQuestHud);
-function stopWalk(byUser){ document.body.classList.remove('inmaze'); const left = walk && questLive && !questDone(questLive) && mini ? questLive : null; if(left) try{ miniSavePos(); }catch(e){}
+function stopWalk(byUser){ if(MAZE) MAZE.clip.constant = 1e6; document.body.classList.remove('inmaze'); const left = walk && questLive && !questDone(questLive) && mini ? questLive : null; if(left) try{ miniSavePos(); }catch(e){}
   if(typeof mini !== 'undefined' && mini) miniClear();
   if(!walk) return;
   if(left && byUser) setTimeout(()=>{ try{ voidSay('미션 진행은 저장해 뒀어. 왼쪽 아래 「미션 이어하기」를 누르면 하던 데서 다시 시작해.', 7000, 'say'); }catch(e){} }, 400);
@@ -7493,16 +7504,18 @@ function walkTick(now){
   const gy = groundY(w.x, w.z), moving = w.x !== oldX || w.z !== oldZ;
   const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : 0;
   // third person: the characters stand where you walk and face the way you go (side by side for the pair); the camera follows from behind and above
-  const inMaze = mazeInside(w.x, w.z);   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
+  const inMaze = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1); w.mazeCamera = inMaze;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
   w.mates.forEach((m, i)=>{ const k = i - (w.mates.length - 1)/2; let side = k*(inMaze ? 0.9 : 2.4), back = inMaze ? Math.abs(k)*1.6 : 0;
     let px = w.x + cy*side - sy*back, pz = w.z - sy*side - cy*back; if(inMaze && mazeBlocked(px, pz)){ px = w.x; pz = w.z; }
     m.g.position.set(px, gy + lift, pz); m.g.rotation.y = w.yaw; if(m.g.userData.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
-  let cpi = w.pitch; if(inMaze) cpi = Math.max(-0.12, Math.min(0.2, cpi));   // in the maze the camera stays below the hedge tops: you only see the corridor ahead
+  const cpi = inMaze ? -0.12 : w.pitch;   // in the maze the camera stays below the hedge tops: you only see the corridor ahead
   const ease = 1 - Math.pow(0.002, dt);
-  if(w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }
+  if(inMaze || w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }
   else { w.camYaw += Math.atan2(Math.sin(w.yaw - w.camYaw), Math.cos(w.yaw - w.camYaw))*ease; w.camPitch += (cpi - w.camPitch)*ease; }
   const cs = Math.sin(w.camYaw), cc = Math.cos(w.camYaw), cp = Math.cos(w.camPitch), sp = Math.sin(w.camPitch); let D = inMaze ? 5.6 : Math.max(7.5, w.eye*3.4), H = inMaze ? Math.min(2.4, w.eye*1.05) : w.eye*1.1; document.body.classList.toggle('inmaze', inMaze);
-  if(inMaze){ for(let t = 0.4; t <= 1.001; t += 0.15){ if(mazeBlocked(w.x - cs*cp*D*t, w.z - cc*cp*D*t)){ D *= Math.max(0.15, t - 0.15); break; } } }   // pulled in rather than through a hedge
+  // Keep the resting distance and tilt. Cut only foreground hedge geometry instead of zooming the camera.
+  if(inMaze){ MAZE.clip.normal.set(cs, 0, cc); MAZE.clip.constant = -cs*(w.x - cs*0.75) - cc*(w.z - cc*0.75); }
+  else if(MAZE) MAZE.clip.constant = 1e6;
   _ct.set(w.x - cs*cp*D, gy + H - sp*D, w.z - cc*cp*D);
   _ct.y = Math.max(_ct.y, groundY(_ct.x, _ct.z) + 0.9);
   camera.position.copy(_ct); w.snap = false;
@@ -7611,7 +7624,7 @@ $('walkX').onclick = ()=> stopWalk(true);
 // once that zone is restored 코덱스 opens and enters the eye cave → the last two. The chain is remembered per team on this device.
 const QUESTS = [
   {id:'q1', who:[PAIR], short:'스카이 루프', title:'자일로를 찾아라', hint:'롤러코스터가 제일 잘 보이는 자리', needs:['z1'], zones:['z2'], restores:'dl-coaster', mini:'loop', r:7, pop:'자일로 발견!'},
-  {id:'q2', who:[PAIR], short:'미로와 연구실', title:'네이티를 찾아라', hint:'미로 정원 한가운데, 울타리 너머의 빛', needs:['z2'], zones:['z3'], restores:'dl-carousel', mini:'maze', r:6, pop:'네이티 발견!'},
+  {id:'q2', who:[PAIR], short:'미로와 연구실', title:'네이티를 찾아라', hint:'미로 정원 한가운데, 울타리 너머의 빛', needs:['z2'], zones:['z3'], restores:'dl-carousel', mini:'maze', r:6, pop:'옛 물길 터 발견!'},
   {id:'q3', who:[PAIR], short:'선대의 기록', title:'코덱스를 찾아라', hint:'북쪽 해안, 눈이 빛나는 곳', needs:['z3'], zones:[], mini:'cave', r:9, dark:true, pop:'코덱스 발견!'},
 ];
 // progress: the server keeps each team's done list (quests in every /state); this device unions what it just finished until the server echoes it
@@ -7638,7 +7651,7 @@ function stepWorld(){ if(flowFree() || !TEAM || AUX || (tutStep >= 0 && tutStep 
 function flowLockUI(){ const sw = stepWorld(); document.querySelectorAll('#worlds button').forEach(b=>{ const lock = !!sw && b.dataset.w !== sw; b.classList.toggle('lock', lock); b.setAttribute('aria-disabled', lock); }); }
 
 // where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
-const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [165, 420];   // 네이티 waits over the maze's golden orb (mission 2)
+const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [165, 420];   // 네이티 waits over the old watercourse (mission 2)
 let XYLO_HIDE = null, NATY_HOME = null;
 function questTarget(q){ if(mini && mini.q === q){ const t = miniTarget(); if(t) return t; } return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? NATY_HIDE : CAVE_MOUTH; }
 function questApply(){ try{ flowLockUI(); }catch(e){}
@@ -7671,7 +7684,7 @@ function vnNext(){
   if(vn.typing){ clearInterval(vn.typing); vn.typing = null; $('vnText').textContent = vn.full; delete $('vn').dataset.typing; return; }
   vn.i++;
   if(vn.i >= vn.lines.length){ const d = vn.done; vn = null; delete $('vn').dataset.on; VN_CLOSED = performance.now(); if(d) d(); return; }
-  const L = vn.lines[vn.i], img = $('vnImg'); img.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; img.alt = L.who || ''; img.hidden = !L.who;
+  const L = vn.lines[vn.i], img = $('vnImg'); $('vn').dataset.speaker = L.who || ''; img.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; img.alt = L.who || ''; img.hidden = !L.who;
   $('vnName').textContent = L.who || ''; $('vnName').hidden = !L.who; $('vnPrev').hidden = vn.i === 0; $('vnDots').innerHTML = vn.lines.map((_, j)=> `<i class="${j <= vn.i ? 'on' : ''}"></i>`).join(''); const p = $('vnText'); p.classList.toggle('nar', !!L.nar); p.textContent = ''; $('vnNext').hidden = false;
   vn.full = L.text; let k = 0;
   $('vn').dataset.typing = '1'; vn.typing = setInterval(()=>{ k++; p.textContent = L.text.slice(0, k); if(k >= L.text.length){ clearInterval(vn.typing); vn.typing = null; delete $('vn').dataset.typing; } }, 26);
@@ -7700,9 +7713,9 @@ const QUEST_FOUND = {
     {who:'리코', img:'rico_hmm', text:'그럼 먼저 정비동부터 가 봐요. 예비 배전반이 있을 거예요.'},
     {who:'제로', img:'zero_brave', text:'전기 잇는 거라면 우리가 해 볼게요!'}],
   q2: ()=> [
-    {who:'네이티', img:'naty', nar:true, text:'불꽃이 붉고 거칠게 흔들린다. 황금 구슬 위, 바로 그 자리다.'},
-    {who:'리코', img:'rico_hmm', text:'여기…… 보이드의 빈 자리야. 옛 물길의 머리가 있던 곳.'},
-    {who:'제로', img:'zero_brave', text:'보이드, 기록!'}],
+    {who:'네이티', img:'naty_red', nar:true, text:'네이티가 끊어진 물길 흔적 위에서 멈춘다. 불꽃이 붉게 흔들린다.'},
+    {who:'리코', img:'rico_hmm', text:'옛 물길이 시작되던 자리야. 보이드의 기록에서 빠져 있던 곳이 여기였어.'},
+    {who:'제로', img:'zero_brave', text:'보이드, 이 물길 흔적을 기록해 줘!'}],
   q3: ()=> [
     {who:'코덱스', img:'codex', text:'왔군. 들어와라.'},
     {who:'보이드', nar:true, text:'보이드의 불빛만 비치는 동굴 안. 안쪽 벽에 눈 문양과 닳은 그림 글자가 새겨져 있다.'}],
@@ -7728,7 +7741,7 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
     else miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); }
   else if(q.mini === 'maze'){ buildLabDoor();
     if(st === 'lab'){ mini = {q, kind:'maze', phase:'walk', cellD:null, labDone:cp.lab || []}; NATY.userData.hold = {color:0x7cc8f0, t:performance.now(), keep:true}; miniWalkTo(3, '관람차 아래 연구실로', '관람차 언덕 아래 출입금지 문', LAB_DOOR, 8, labOpen); }
-    else { mini = {q, kind:'maze', phase:'record', cellD:null}; miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '빈 자리 기록', '황금 구슬 위, 네이티가 있는 자리'); } }
+    else { mini = {q, kind:'maze', phase:'record', cellD:null}; miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '네이티 아래 물길 흔적에서 「기록」 누르기'); } }
   else if(q.mini === 'cave'){ mini = {q, kind:'cave', decoded:!!cp.decoded}; caveOpen(); }
   else return false;
   qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say'); return true; }
@@ -8118,7 +8131,7 @@ function miniStart(q){
   if(q.mini === 'loop'){ mini = {q, kind:'loop'}; buildStation(); miniSave('yard');
     miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); return; }
   if(q.mini === 'maze'){ mini = {q, kind:'maze', phase:'record', cellD:null}; buildLabDoor(); miniSave('record');
-    miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '빈 자리 기록', '황금 구슬 위, 네이티가 있는 자리'); return; }
+    miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '네이티 아래 물길 흔적에서 「기록」 누르기'); return; }
   if(q.mini === 'cave'){ mini = {q, kind:'cave'}; miniSave('cave'); caveOpen(); }
 }
 function miniTarget(){ if(!mini) return null; if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(mini.phase === 'walk' && mini.target) return mini.target; if(mini.kind === 'maze' && mini.phase === 'record') return NATY_HIDE; return null; }
