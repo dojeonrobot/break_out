@@ -2461,10 +2461,11 @@ function canvasTex(w, h, draw){
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; t.anisotropy = 8;
   const run = ()=>{ const g = c.getContext('2d'); g.clearRect(0,0,w,h); draw(g, w, h); t.needsUpdate = true; };
-  run(); TEXTS.push(run); return t;
+  run(); TEXTS.push(run); t.userData.redraw = run; return t;
 }
 function signTex(text, {w=512, h=128, bg='#1d2f55', fg='#ffd400', size=78, dots=false, weight=700}={}){
-  return canvasTex(w, h, (g)=>{
+  const st = {text, k:null};   // k: letters lit from the left (null = the whole sign as usual) — a ride's name lights up letter by letter when it comes back
+  const t = canvasTex(w, h, (g)=>{
     if(bg){ g.fillStyle = bg; g.fillRect(0,0,w,h); }
     g.fillStyle = fg; const F = px => `${weight} ${px}px "IBM Plex Sans KR", system-ui, sans-serif`; g.font = F(size);
     let fitted = Math.min(size, h*.72, size*(w-32)/Math.max(1, g.measureText(text).width));
@@ -2472,9 +2473,15 @@ function signTex(text, {w=512, h=128, bg='#1d2f55', fg='#ffd400', size=78, dots=
     const ink = ()=>{ const m = g.measureText(text); return [m.actualBoundingBoxAscent || fitted*.8, m.actualBoundingBoxDescent || fitted*.2]; };
     g.font = F(fitted); let [asc, desc] = ink();
     if(asc + desc > h - 10){ fitted *= (h - 10)/(asc + desc); g.font = F(fitted); [asc, desc] = ink(); }
-    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText(text, w/2, h/2 + (asc - desc)/2);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    if(st.k == null) g.fillText(text, w/2, h/2 + (asc - desc)/2);
+    else { const ch = [...text], tw = g.measureText(text).width; let x = w/2 - tw/2; g.textAlign = 'left';
+      ch.forEach((c, i)=>{ const on = i < st.k; g.globalAlpha = on ? 1 : 0.28; g.shadowColor = on ? 'rgba(255,236,170,.95)' : 'transparent'; g.shadowBlur = on ? 12 : 0;
+        g.fillText(c, x, h/2 + (asc - desc)/2); x += g.measureText(c).width; });
+      g.globalAlpha = 1; g.shadowBlur = 0; g.shadowColor = 'transparent'; }
     if(dots){ g.fillStyle = bg; for(let x=0;x<w;x+=7) g.fillRect(x,0,2,h); for(let y=0;y<h;y+=7) g.fillRect(0,y,w,2); }
   });
+  t.userData.sign = st; return t;
 }
 function eyeTex(col='#ffd84a', bg=null){
   return canvasTex(256, 256, (g)=>{
@@ -2514,6 +2521,13 @@ const MISSIONS_I = [
   {id:'dl-coaster',  name:'롤러코스터', ch:'챕터 5 · 코덱스의 선택',        brief:'섬의 미션을 마치면 돌아옵니다.', quest:'q1'}
 ];
 const MI = MISSIONS_I.map(m=>({...m, twin: TWIN[m.id] || null, scans: scansFor(m.id)}));
+// ---------- ride power (2026-11-03, 구역복귀연출 요청서) ----------
+// A ride whose record has not come back stands still with its lights down. Each ride runs on its own clock RIDE[id].tau, advanced in updateI by
+// speed s × dt (dt capped at 1/20 s), so it can stand still and then pick up speed. uLv/uPow drive the bulb shader (bulbMat): lit below uLv.
+const RIDE = {}; MI.forEach(m=>{ RIDE[m.id] = {s:0, tau:0, pow:0, on:false, chain:null, U:{uLv:{value:-1e4}, uPow:{value:0}}}; });
+let RIDE_PROBE = false, RIDE_READY = false;   // batchIsland runs the animations at fixed times: every ride must move then, or its moving parts get baked
+function rideClock(id, from){ for(let i = from; i < islAnim.length; i++){ const f = islAnim[i]; islAnim[i] = t=> f(RIDE_PROBE ? t : RIDE[id].tau); } }
+const GATE_SIGNS = {}, SIGNS = {};
 
 // void hologram for un-restored attractions: world-space scan lines + rim glow, independent of UVs
 const ghostU = {uColor:{value:new THREE.Color()}, uTime:{value:0}};
@@ -3165,6 +3179,7 @@ islAnim.push(t=> gulls.forEach(b=>{ const a = t*b.sp + b.ph; b.g.position.set(Ma
 
 // ---------- chapter attractions (missions) ----------
 // chapter 1 · safari: savanna, watering hole, acacias, animals, the driving course and the tiger-striped Doro car
+const _rk_safari = islAnim.length;   // ride clock: every animation built from here to place() below runs on RIDE['dl-safari'].tau
 const safari = new THREE.Group();
 const SAFARI_GATE_A = 0.339;   // the entrance path reaches the fence at this angle (north-east of due east)
 {
@@ -3360,12 +3375,14 @@ const SAFARI_GATE_A = 0.339;   // the entrance path reaches the fence at this an
   safari.children.forEach(o=>{ if(!o.isGroup || o === jeep || o === arch || o === tower) return; const rx = o.position.x/47, rz = (o.position.z + 4)/32.5, r = Math.hypot(rx, rz); if(r < 0.86 || r > 1.18) return;
     const k = 1.26/r; o.position.x = rx*k*47; o.position.z = rz*k*32.5 - 4; });
 }
+rideClock('dl-safari', _rk_safari);
 place(safari, -300/K, -200/K); safari.scale.setScalar(1.55);   // a touch toward the centre and larger (user, 2026-10-28)   // swapped with the treehouse village, kept off the coast (user, 2026-10-28)
 mission(safari, 'dl-safari', {n:'사파리', sub:'챕터 1', cx:-300/K, cz:-200/K, h:26, r:80,
   desc:'초원과 물웅덩이, 아카시아 나무 사이로 기린 · 코끼리 · 얼룩말 · 사자 · 플라밍고가 사는 사파리. 신입사원들은 카메라를 단 호랑이 무늬 도로 카로 운전면허 코스(동물 횡단 STOP, 체크무늬 결승 깃발)를 달렸습니다.',
   facts:[['챕터','1 · 신비한 초대'],['볼거리','동물, 전망대, 운전면허 코스, 도로 카']]});
 
 // chapter 2 · Harmonia: the music machine at the island's heart
+const _rk_harmonia = islAnim.length;   // ride clock: every animation built from here to place() below runs on RIDE['dl-harmonia'].tau
 const harmonia = new THREE.Group();
 {
   const LAV = 0xc4b0ec, LAV2 = 0x9d85d6, LAVL = 0xe9e0fb;   // lavender family (user, 2026-10-28)
@@ -3429,12 +3446,14 @@ const harmonia = new THREE.Group();
     notes.forEach((n,i)=>{ const u = ((t*0.05) + i/6) % 1; n.position.set(-36 + u*72, 56 + Math.sin(u*Math.PI)*22 + (i%5)*2, 15 + Math.sin(u*Math.PI)*-8); });
   });
 }
+rideClock('dl-harmonia', _rk_harmonia);
 place(harmonia, 0, 67/K); harmonia.position.y = G + 2.4;
 mission(harmonia, 'dl-harmonia', {n:'하모니아', sub:'챕터 2', cx:0, cz:67/K, base:2.4, h:70, r:40,
   desc:'도로랜드 정중앙, 중앙 광장에 선 음악 에너지 장치. 거대한 톱니바퀴가 돌고, 소용돌이 레일 위로 구슬이 굴러가며, 서커스 천막 위로 오선지 빛줄기가 흐릅니다.',
   facts:[['챕터','2 · 멈춰버린 기계의 노래'],['볼거리','톱니바퀴, 마블 레일, 서커스 천막, 오선지 빛줄기']]});
 
 // chapter 3 · sunset carousel with three floating blue cubes
+const _rk_carousel = islAnim.length;   // ride clock: every animation built from here to place() below runs on RIDE['dl-carousel'].tau
 const carousel = new THREE.Group();
 {
   const spin = new THREE.Group(); carousel.add(spin);
@@ -3469,6 +3488,7 @@ const carousel = new THREE.Group();
     const a2 = (i+1)/12*Math.PI*2, tp = add(carousel, BOX(0.15, 1, 2*32*Math.sin(Math.PI/12)), mat(0xffd400), Math.cos((a+a2)/2)*31.6, 4, Math.sin((a+a2)/2)*31.6, false); tp.rotation.y = -(a+a2)/2; }
   islAnim.push(t=>{ spin.rotation.y = t*0.25; horses.forEach((h,i)=> h.position.y = 6 + Math.sin(t*2 + i)*1.5); cubes.forEach((c,i)=>{ c.rotation.y = t*0.3 + i; c.rotation.x = Math.sin(t*0.4+i)*0.2; c.position.y = 48 + i*4 + Math.sin(t*0.9+i)*2; }); });
 }
+rideClock('dl-carousel', _rk_carousel);
 place(carousel, 135, 100); carousel.scale.setScalar(0.72);   // swapped with the tea cups (user, 2026-10-28)   // 2× (user, 2026-10-15)
 mission(carousel, 'dl-carousel', {n:'회전목마', sub:'챕터 3', cx:135, cz:100, h:58, r:34,
   desc:'노을빛 지붕 아래 목마들이 오르내리는 회전목마. 그 위에 숲을 품은 파란 큐브 세 개가 떠 있고, 둘레에는 노란 출입금지 테이프가 둘러져 있습니다.',
@@ -3490,6 +3510,7 @@ const ferrisHill = new THREE.Group();
   for(let i=0;i<10;i++){ const a = i/10*Math.PI*2 + 0.3; add(ferrisHill, ICO(4.5, 1), flat(i%2 ? C.leaf : C.leaf2), Math.cos(a)*57, 19 + 4, Math.sin(a)*57); add(ferrisHill, CYL(0.5, 0.7, 4, 6), mat(C.trunk), Math.cos(a)*57, 16, Math.sin(a)*57); }
 }
 place(ferrisHill, FERRIS_X, FERRIS_Z);
+const _rk_ferris = islAnim.length;   // ride clock: every animation built from here to place() below runs on RIDE['dl-ferris'].tau
 const ferris = new THREE.Group();
 {
   add(ferris, CYL(40, 41, 1.6, 40), mat(0xe9e4f2));
@@ -3523,12 +3544,14 @@ const ferris = new THREE.Group();
     bulbs.forEach((b,i)=> (b.userData.mat||b.material).color.setHSL(((i>>1) % 6 === k) ? 0.12 : 0.13, 1, ((i>>1) % 6 === k) ? 0.85 : 0.6));
   });
 }
+rideClock('dl-ferris', _rk_ferris);
 place(ferris, FERRIS_X, FERRIS_Z, -0.55); ferris.position.y = G + FERRIS_BASE;
 mission(ferris, 'dl-ferris', {n:'관람차', sub:'챕터 4', cx:FERRIS_X, cz:FERRIS_Z, base:FERRIS_BASE, h:112, r:40,
   desc:'섬에서 가장 높은 언덕 위에 선 태양광 관람차. 꼭대기에 오르면 구름 사이로 섬 전체가 내려다보입니다.',
   facts:[['챕터','4 · 구름 너머의 진실'],['볼거리','언덕 위 전망, 태양광 패널, 스카이 크루즈']]});
 
 // chapter 5 · TIMBER EXPRESS: lift hill, first drop, vertical loop and LED rings, plus the viking ship
+const _rk_coaster = islAnim.length;   // ride clock: every animation built from here to place() below runs on RIDE['dl-coaster'].tau
 const coaster = new THREE.Group();
 {
   // TIMBER EXPRESS, a big wooden coaster: the station sits on the east edge of the lot so the entrance path never passes under track;
@@ -3633,6 +3656,7 @@ const coaster = new THREE.Group();
     leds.forEach((r,i)=>{ const d = (i - head + leds.length) % leds.length; (r.userData.mat||r.material).color.setHSL(0.55 + d/leds.length*0.4, 0.9, d < 4 ? 0.85 : 0.6); });
   });
 }
+rideClock('dl-coaster', _rk_coaster);
 place(coaster, -200, 190);
 mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz:190, h:80, r:132,
   desc:'나무 트러스로 지은 대형 우든 코스터. 78m 리프트 힐을 체인으로 기어올라 가파른 첫 낙하 뒤 언덕을 연달아 넘고(에어타임), 동쪽 끝을 크게 돌아 토끼뜀 언덕과 나무 터널을 지나 역사로 돌아옵니다. 열차 두 편성이 교대로 달리고 밤이면 LED가 레일을 따라 흐릅니다.',
@@ -5456,7 +5480,8 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
     const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = rot; islRoot.add(g);
     [-6, 6].forEach(px=>{ add(g, CYL(0.5, 0.6, 7.5, 8), mat(0x8a6243), px, 0, 0); add(g, ICO(1.6, 1), flat(px < 0 ? C.leaf : C.leaf2), px, 8, 0); });
     add(g, BOX(13.4, 1.8, 0.7), mat(0x9a6b45), 0, 6.6, 0);
-    add(g, new THREE.PlaneGeometry(12.6, 1.5), new THREE.MeshBasicMaterial({map:signTex(name, {bg:'#9a6b45', fg:'#fff7d6', size:64, w:512, h:70}), side:THREE.DoubleSide}), 0, 6.75, 0.4, false);
+    const stx = signTex(name, {bg:'#9a6b45', fg:'#fff7d6', size:64, w:512, h:70}); GATE_SIGNS[name] = stx;
+    add(g, new THREE.PlaneGeometry(12.6, 1.5), new THREE.MeshBasicMaterial({map:stx, side:THREE.DoubleSide}), 0, 6.75, 0.4, false);
     for(let i=0;i<7;i++) add(g, new THREE.ConeGeometry(0.45, 1.1, 3).rotateX(Math.PI), mat([0xe2574c, 0xffd400, 0x5aa0e6, 0xff9fcf][i%4]), -5.4 + i*1.8, 5.6, 0.35, false);
     return g;
   }
@@ -6510,6 +6535,7 @@ function rescan(revealIds, arrive){
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
   const arriving = arrive && revealIds && revealIds.length;
   if(arriving) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
+  try{ rideSync(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }   // the rides are set up after batching, below the first rescan
   maybeRestore(arriving ? 5600 : 1500);
   try{ questRefresh(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }   // the characters are not built yet on the very first scan
 }
@@ -6531,7 +6557,7 @@ function rideSweep(m, at){
   const swapped = [];
   root.traverse(o=>{ if(!(o.isMesh || o.isInstancedMesh || o.isPoints || o.isLine) || !o.material) return;
     const arr = Array.isArray(o.material), mats = arr ? o.material : [o.material];
-    const cl = mats.map(mt=>{ const c = mt.clone(); c.clippingPlanes = planes; c.clipShadows = true; c.clipIntersection = false; return c; });
+    const cl = mats.map(mt=>{ const c = mt.clone(); c.clippingPlanes = planes; c.clipShadows = true; c.clipIntersection = false; if(mt.userData.bulb){ c.onBeforeCompile = mt.onBeforeCompile; c.customProgramCacheKey = mt.customProgramCacheKey; } return c; });
     swapped.push({o, mat:o.material, cl}); o.material = arr ? cl : cl[0]; });
   const ghostMat = new THREE.MeshBasicMaterial({color:0x8fe3ff, wireframe:true, transparent:true, opacity:0.5, depthWrite:false, fog:false});
   const ghost = new THREE.Group(); ghost.matrixAutoUpdate = false; ghost.matrix.copy(root.matrixWorld); sceneI.add(ghost);
@@ -6562,40 +6588,193 @@ function rideSweep(m, at){
     end(){ if(done) return; done = true; SWEEPS.delete(sw); swapped.forEach(s=>{ s.o.material = s.mat; s.cl.forEach(c=> c.dispose()); }); sceneI.remove(ghost); ghostMat.dispose(); sceneI.remove(pc); pg.dispose(); pm.dispose(); }};
   sw.n = swapped.length; sw.ghosts = ghost.children.length; sw.planes = planes; sw.pg = pg; SWEEPS.add(sw); return sw;
 }
-window.__dbg && (window.__dbg.sweep = (id, at=0.2)=>{ const m = MI.find(x=> x.id === id); if(!m) return null; const sw = rideSweep(m, at); if(!sw) return null; window.__dbg.lastSweep = sw; const t0 = performance.now()/1000; islAnim.push(function f(t){ sw.tick(t - t0); if(t - t0 > sw.until + 0.5){ sw.end(); const i = islAnim.indexOf(f); if(i >= 0) islAnim.splice(i, 1); } }); return true; });
-// A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground,
-// sparks rising, the ride drawing itself in (rideSweep) and the camera moving to watch it. The simulator has its own arrival (the vein sweeping in).
+// ---------- effect chains on their own clock (2026-11-03, 구역복귀연출 요청서 3절) ----------
+// A chain is a list of steps; a step starts only when the one before has finished on screen. Chains advance by the frame's dt capped at 1/20 s
+// (fxStep, called from updateI), so a device that stalls plays slower instead of skipping a stage. FXLOG keeps every step's start and end.
+let FX_T = 0;
+const FXR = new Set(), FXLOG = [];
+function fxLog(r, n, ev){ FXLOG.push({c:r.name, n, ev, k:+r.clock.toFixed(2)}); if(FXLOG.length > 400) FXLOG.shift(); }
+function fxChain(name, steps){ const r = {name, steps, i:-1, k:0, clock:0, side:[], dead:false}; FXR.add(r); fxNext(r); return r; }
+function fxNext(r){
+  const s0 = r.steps[r.i]; if(s0){ try{ s0.end && s0.end(r); }catch(e){ console.error(e); } fxLog(r, s0.n, 'end'); }
+  r.i++; r.k = 0; const st = r.steps[r.i];
+  if(!st){ fxKill(r, true); return; }
+  fxLog(r, st.n, 'start'); try{ st.start && st.start(r); }catch(e){ console.error(e); }
+}
+function fxKill(r, done){
+  if(r.dead) return; r.dead = true; FXR.delete(r);
+  if(!done){ const st = r.steps[r.i]; try{ st && st.end && st.end(r); }catch(e){} fxLog(r, st ? st.n : '-', 'cut'); }
+  r.side.forEach(f=>{ try{ f(-1); }catch(e){} }); r.side = []; if(r.onEnd) r.onEnd(done);
+}
+function fxStep(dt){
+  FXR.forEach(r=>{
+    const st = r.steps[r.i]; if(!st || r.dead) return;
+    if(st.gate && !st.gate(r)) return;
+    r.k += dt; r.clock += dt;
+    r.side = r.side.filter(f=> f(r.clock) !== false);
+    let fin = true; try{ fin = st.tick ? !!st.tick(r.k, r) : r.k >= (st.dur || 0); }catch(e){ console.error(e); }
+    if(fin) fxNext(r);
+  });
+}
+// shaders first: the clipped clones of the sweep and the new wake materials compile before the effect clock starts (a weak device stalls here, not mid-effect)
+function fxCompile(r){ let fired = false; const done = ()=>{ if(!fired){ fired = true; r.ok = true; } };
+  try{ if(renderer.compileAsync) renderer.compileAsync(sceneI, camera).then(done, done); else { renderer.compile(sceneI, camera); done(); } }catch(e){ done(); }
+  setTimeout(done, 5000); }   // a safety only: a compile promise that never settles must not leave the ride dark
+const fxFree = ()=> W.id === 'island' && !fly && !intro && !simOn && !actBusy && !vn && !walk && !$('voidVn').dataset.on && !$('recDone').dataset.on;
+const fxTier = ()=> typeof perfTier === 'number' ? perfTier : 0;
+
+// bulbs: the ride's light materials, lit from the ground up to uLv with a bright edge (uPow) where the light is climbing
+function bulbMat(mt, U){
+  const c = mt.clone(); c.userData.bulb = true;
+  c.onBeforeCompile = sh=>{ sh.uniforms.uLv = U.uLv; sh.uniforms.uPow = U.uPow;
+    sh.vertexShader = 'varying float vBy;\n' + sh.vertexShader.replace('#include <project_vertex>', `#include <project_vertex>
+      vec4 bwp = vec4(transformed, 1.0);
+      #ifdef USE_INSTANCING
+      bwp = instanceMatrix * bwp;
+      #endif
+      vBy = (modelMatrix * bwp).y;`);
+    sh.fragmentShader = 'uniform float uLv; uniform float uPow; varying float vBy;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', `#include <dithering_fragment>
+      float bOn = smoothstep(uLv + 1.4, uLv - 1.4, vBy);
+      float bEdge = exp(-pow((vBy - uLv) / 1.8, 2.0)) * uPow;
+      gl_FragColor.rgb = gl_FragColor.rgb * mix(0.3, 1.0, bOn) + vec3(1.0, 0.93, 0.75) * bEdge * 0.7;`); };
+  c.customProgramCacheKey = ()=> 'bulbY1'; return c;
+}
+const ARCH_TEXT = /^(SAFARI|HARMONIA|TIMBER EXPRESS)/;
+function rideInit(){
+  MI.forEach(m=>{ const R = RIDE[m.id], root = m.b && m.b.mesh; if(!root) return; const cache = new Map(); R.bulbs = 0; SIGNS[m.id] = [];
+    root.traverse(o=>{ if(!(o.isMesh || o.isInstancedMesh) || Array.isArray(o.material) || !o.material) return; const mt = o.material, sg = mt.map && mt.map.userData && mt.map.userData.sign;
+      if(sg){ if(ARCH_TEXT.test(sg.text) && !SIGNS[m.id].includes(mt.map)) SIGNS[m.id].push(mt.map); return; }
+      if(mt.type !== 'MeshBasicMaterial') return;
+      let c = cache.get(mt); if(!c){ c = bulbMat(mt, R.U); cache.set(mt, c); } if(o.userData.mat === mt) o.userData.mat = c; o.material = c; R.bulbs++; });
+    const gs = GATE_SIGNS[m.b.label] || GATE_SIGNS[m.name]; if(gs) SIGNS[m.id].push(gs);
+    rideSet(m.id, !isVoid(m)); });
+  RIDE_READY = true;
+}
+function signsLit(id, f){ (SIGNS[id] || []).forEach(t=>{ const st = t.userData.sign, n = [...st.text].length, k = f >= 1 ? null : Math.floor(f*n + 1e-6); if(st.k === k) return; st.k = k; t.userData.redraw(); }); }
+function rideSet(id, on){ const R = RIDE[id]; if(!R) return; if(R.chain){ const c = R.chain; R.chain = null; fxKill(c, false); }
+  R.on = on; R.s = on ? 1 : 0; R.pow = on ? 1 : 0; R.U.uLv.value = on ? 1e4 : -1e4; R.U.uPow.value = 0; signsLit(id, on ? 1 : 0); }
+// a record that came back while no arrival effect could play (another screen, a dialogue, a walk, the simulator, the page loading it later):
+// the ride powers up the next time the island is free — never "just on"
+function rideSync(){
+  if(!RIDE_READY) return;
+  MI.forEach(m=>{ const R = RIDE[m.id]; if(!R || !m.b) return; const on = !isVoid(m);
+    if(!on){ if(R.on || R.chain) rideSet(m.id, false); return; }
+    if(R.on || R.chain) return;
+    if(reduce) rideSet(m.id, true); else ridePowerQuiet(m); });
+}
+// how fast a ride turns while it starts (0 → 1): the coaster lurches then pulls away, the wheel moves one gondola at a time, the rest ease in
+const RUN_SFX = {'dl-carousel':'organ', 'dl-ferris':'wheel', 'dl-coaster':'chain', 'dl-safari':'engine', 'dl-harmonia':'fountain'};
+const RUN_D = id=> id === 'dl-ferris' ? 4.2 : 3.0;
+function rideSpeed(id, p){ const D = RUN_D(id), e = x=> x <= 0 ? 0 : x >= 1 ? 1 : x*x*(3 - 2*x);
+  if(id === 'dl-coaster') return p < 0.22 ? 1.6 : p < 0.75 ? 0 : e((p - 0.75)/(D - 0.75));
+  if(id === 'dl-ferris') return p < 2.4 ? 0.9*Math.pow(Math.sin(Math.PI*p/0.8), 2) : e((p - 2.4)/(D - 2.4));
+  return e(p/D); }
+// the zone wakes round the ride: a ring runs out over the ground and the path tiles, the lamps and the fence line light in order of distance
+function buildWake(m){
+  const b = m.b, cx = b.cx, cz = b.cz, R0 = (b.r || 24), RW = Math.min(260, R0*1.6 + 60), stride = 1 + fxTier(), P = [];
+  const push = (x, y, z, kind)=>{ const d = Math.hypot(x - cx, z - cz); if(d < RW) P.push([x, y, z, d, kind]); };
+  (islRoot.userData.lamps || []).forEach(([x, z, hx, hy, hz])=> push(hx, hy, hz, 1));
+  pathSamples.forEach(([x, z], i)=>{ if(i % stride === 0) push(x, G + 0.5, z, 0); });
+  for(let i=0;i<48;i+=stride){ const a = i/48*Math.PI*2; push(cx + Math.cos(a)*(R0 + 9), G + 1.2, cz + Math.sin(a)*(R0 + 9), 2); }
+  const n = P.length, pos = new Float32Array(n*3), aD = new Float32Array(n), aK = new Float32Array(n);
+  P.forEach((q, i)=>{ pos[i*3] = q[0]; pos[i*3+1] = q[1]; pos[i*3+2] = q[2]; aD[i] = q[3]; aK[i] = q[4]; });
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aD', new THREE.BufferAttribute(aD, 1)); g.setAttribute('aK', new THREE.BufferAttribute(aK, 1));
+  const U = {uR:{value:-50}, uFade:{value:1}, uMap:{value:sparkTex}, uScale:{value:renderer.getPixelRatio()*innerHeight/2}};
+  const mt = new THREE.ShaderMaterial({uniforms:U, transparent:true, depthWrite:false, fog:false,   // normal blending: additive points vanish on the sunlit ground
+    vertexShader:`attribute float aD; attribute float aK; uniform float uR; uniform float uFade; uniform float uScale; varying float vA; varying vec3 vC;
+      void main(){ float x = uR - aD; float on = clamp(x / 6.0, 0.0, 1.0); float burst = exp(-max(x, 0.0) / 30.0); bool lamp = aK > 0.5 && aK < 1.5;
+        float hold = lamp ? 0.7 : 0.25; vA = on * (burst * 0.9 + hold) * uFade;
+        vC = lamp ? vec3(1.0, 0.78, 0.3) : aK > 1.5 ? vec3(1.0, 0.86, 0.35) : vec3(0.25, 0.75, 1.0);
+        float sz = (lamp ? 24.0 : 15.0) * (0.7 + burst * 1.3);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_PointSize = vA > 0.001 ? sz * uScale / max(1.0, -mv.z) : 0.0; gl_Position = projectionMatrix * mv; }`,
+    fragmentShader:`uniform sampler2D uMap; varying float vA; varying vec3 vC; void main(){ vec4 t = texture2D(uMap, gl_PointCoord); gl_FragColor = vec4(mix(vC, vec3(1.0), t.a * 0.35), min(1.0, t.a * vA * 1.3)); }`});
+  const pts = new THREE.Points(g, mt); pts.frustumCulled = false; pts.renderOrder = 11; sceneI.add(pts);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 96).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color:0x3fb6ff, transparent:true, opacity:0, depthWrite:false, side:THREE.DoubleSide, fog:false}));
+  ring.position.set(cx, G + 0.6, cz); ring.scale.setScalar(0.01); ring.renderOrder = 11; sceneI.add(ring);
+  let gone = false;
+  return {U, RW, n, ring, dispose(){ if(gone) return; gone = true; sceneI.remove(pts); sceneI.remove(ring); g.dispose(); mt.dispose(); ring.geometry.dispose(); ring.material.dispose(); }};
+}
+function wakeStart(r, m, w){
+  if(!w) { r.wakeDone = true; return true; }
+  sfx('wake'); const k0 = r.clock, speed = 32, end = w.RW/speed;   // slow enough to follow with the eye
+  r.side.push(c=>{ if(c < 0){ w.dispose(); return false; }
+    const k = c - k0, rad = k*speed;
+    w.U.uR.value = rad; w.ring.scale.setScalar(Math.max(0.01, Math.min(rad, w.RW))); w.ring.material.opacity = 0.85*Math.max(0, 1 - rad/w.RW);
+    signsLit(m.id, Math.min(1, k/Math.max(1.2, end*0.8)));
+    const fade = Math.max(0, (k - end - 1.6)/2.2); w.U.uFade.value = 1 - Math.min(1, fade);
+    if(fade >= 1){ signsLit(m.id, 1); r.wakeDone = true; w.dispose(); return false; } });
+  fxLog(r, 'wake-fx', 'start'); return true;
+}
+// the power-up after the ride is drawn: a beat of silence, the bulbs climb, the ride starts moving, the zone wakes round it
+function powerSteps(m, wake){
+  const id = m.id, R = RIDE[id], b = m.b, y0 = b.y0 ?? G, top = y0 + (b.h || 40) + 4;
+  return [
+    {n:'hush', tick:k=> k >= 0.45},
+    {n:'bulbs', start(){ sfx('bulbs'); R.U.uPow.value = 1; },
+      tick(k){ const e = Math.min(1, k/1.7); R.U.uLv.value = y0 - 2 + (top - y0 + 4)*e; R.pow = e; return k >= 1.7; },
+      end(){ R.U.uLv.value = 1e4; R.U.uPow.value = 0; R.pow = 1; }},
+    {n:'run', start(){ sfx(RUN_SFX[id] || 'power'); },
+      tick(k, r){ R.s = rideSpeed(id, k); if(k >= 0.8 && !r.waked) r.waked = wakeStart(r, m, wake()); return k >= RUN_D(id); },
+      end(){ R.s = 1; }},
+    {n:'wake', tick(k, r){ if(!r.waked) r.waked = wakeStart(r, m, wake()); return !!r.wakeDone; }, end(){ R.on = true; signsLit(id, 1); }}
+  ];
+}
+function ridePowerQuiet(m){
+  const R = RIDE[m.id]; let w = null;
+  const steps = [{n:'ready', start(r){ w = buildWake(m); r.side.push(c=>{ if(c < 0){ w.dispose(); return false; } }); r.ok = false; r.f = 0; fxCompile(r); },
+      gate:r=> fxFree() && (++r.f > 2) && r.ok, tick:()=> true},
+    ...powerSteps(m, ()=> w)];
+  R.chain = fxChain('power:' + m.id, steps); const me = R.chain; me.onEnd = ()=>{ if(R.chain === me) R.chain = null; };
+}
+// A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground, sparks rising,
+// the ride drawing itself in (rideSweep) and the camera moving to watch it — then the power-up (powerSteps). One chain per zone.
 function arriveFx(ids){
   if(!ids.length) return; sfx('sparkle');
   if(W.id !== 'island'){ const zs = ids.map(id=> MI.find(m=> m.id === id)).filter(Boolean); if(zs.length) toast(`${zs.map(z=> z.name).join('·')} 구역의 기록이 돌아왔습니다`); return; }   // never switch the screen on its own (user): on the campus the void says it, the island shows it when the child goes there
   if(simOn) return;   // the vein sweep is the arrival there
   const zones = ids.map(id=> MI.find(m=> m.id === id)).filter(m=> m && m.b);
-  if(actBusy || vn || $('voidVn').dataset.on || $('recDone').dataset.on || walk) return;   // never during a dialogue, a scene or a walk
+  if(actBusy || vn || $('voidVn').dataset.on || $('recDone').dataset.on || walk) return;   // never during a dialogue, a scene or a walk (rideSync powers it up later)
+  if(reduce){ zones.forEach(m=> rideSet(m.id, true)); toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`); return; }
   if(zones.length === 1){ const b = zones[0].b, R = (b.r || 24); flyTo(new THREE.Vector3(b.cx + R*2.6 + 90, 150 + R*1.6, b.cz + R*3.2 + 140), new THREE.Vector3(b.cx, G + 12, b.cz), 1300); }
   else flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1300);
+  const many = zones.length > 1, tier = fxTier();
   zones.forEach((m, i)=>{
-    const b = m.b, R = (b.r || 24), g = new THREE.Group(); g.position.set(b.cx, G, b.cz); sceneI.add(g);
+    rideSet(m.id, false);
+    const RD = RIDE[m.id], b = m.b, R = (b.r || 24), g = new THREE.Group(); g.position.set(b.cx, G, b.cz); g.visible = false; sceneI.add(g);
     const beam = add(g, CYL(R*0.3, R*0.75, 480, 20), glowMat(0x7fd9ff, 0, true), 0, 0, 0, false); beam.material.depthWrite = false; beam.renderOrder = 10;
     const beam2 = add(g, CYL(R*0.08, R*0.2, 480, 12), glowMat(0xffffff, 0, true), 0, 0, 0, false); beam2.material.depthWrite = false; beam2.renderOrder = 10;
     const rings = [0, 1, 2].map(j=>{ const r = add(g, new THREE.TorusGeometry(1, 0.035, 8, 72).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color:j ? 0x2aa7ff : 0xffffff, transparent:true, opacity:0.95, depthWrite:false, depthTest:false}), 0, 4 + j*0.3, 0, false); r.renderOrder = 10; r.visible = false; return r; });
     const flash = new THREE.Sprite(new THREE.SpriteMaterial({map:sparkTex, color:0xffffff, transparent:true, opacity:0, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending})); flash.position.y = 14; flash.renderOrder = 11; g.add(flash);
-    const n = zones.length > 1 ? 60 : 160, pts = new Float32Array(n*3), seeds = Array.from({length:n}, ()=> ({a:Math.random()*6.283, r:R*(0.3 + Math.random()*0.9), v:22 + Math.random()*40, w:1.2 + Math.random()*2.2, d:Math.random()*1.6}));
+    const n = Math.round((many ? 60 : 160)/(1 + tier)), pts = new Float32Array(n*3), seeds = Array.from({length:n}, ()=> ({a:Math.random()*6.283, r:R*(0.3 + Math.random()*0.9), v:22 + Math.random()*40, w:1.2 + Math.random()*2.2, d:Math.random()*1.6}));
     const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pts, 3));
     const pm = new THREE.PointsMaterial({size:3.2, map:sparkTex, color:0x2aa7ff, transparent:true, opacity:0.95, depthWrite:false, sizeAttenuation:true}); const pc = new THREE.Points(pg, pm); pc.renderOrder = 11; g.add(pc);
-    const t0 = performance.now()/1000 + 1.1 + i*(zones.length > 1 ? 1.1 : 0.35), sw = rideSweep(m, 0.35), life = Math.max(5.2, sw ? sw.until + 0.4 : 0); let flashed = false;
-    islAnim.push(function fx(t){ const k = t - t0;
-      if(k < 0) return; if(k > life){ if(sw) sw.end(); sceneI.remove(g); const at = islAnim.indexOf(fx); if(at >= 0) islAnim.splice(at, 1); return; }
-      if(sw) sw.tick(k);
-      const e = Math.min(1, k/0.35), f = Math.max(0, 1 - (k - 0.35)/2.8);
-      if(!flashed){ flashed = true; const fl = $('arrFlash'); fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on'); }
-      beam.material.opacity = 0.32*e*f; beam2.material.opacity = 0.45*e*f; beam.scale.set(1 + k*0.35, 1, 1 + k*0.35); beam.rotation.y = k*0.6;
+    const life = 5.2; let sw = null, w = null;
+    const beamSide = k0=> c=>{ if(c < 0) return false; const k = c - k0; if(k > life){ g.visible = false; return false; }
+      beam.material.opacity = 0.32*Math.min(1, k/0.35)*Math.max(0, 1 - (k - 0.35)/2.8); beam2.material.opacity = beam.material.opacity*1.4; beam.scale.set(1 + k*0.35, 1, 1 + k*0.35); beam.rotation.y = k*0.6;
       rings.forEach((r, j)=>{ const rk = (k - j*0.7)/2.2; r.visible = rk > 0 && rk < 1; if(!r.visible) return; const ee = 1 - Math.pow(1 - rk, 3); r.scale.setScalar(1 + ee*R*3); r.material.opacity = 0.95*(1 - rk*rk); });
       flash.scale.setScalar(R*1.2 + k*R*3); flash.material.opacity = 0.7*Math.max(0, 1 - k/0.7);
       for(let j=0;j<n;j++){ const sd = seeds[j], kk = Math.max(0, k - sd.d), a = sd.a + kk*sd.w, rr = sd.r*(1 - kk*0.12); pts[j*3] = Math.cos(a)*rr; pts[j*3+1] = kk > 0 ? 1 + sd.v*kk : -50; pts[j*3+2] = Math.sin(a)*rr; }
-      pg.attributes.position.needsUpdate = true; pm.opacity = 0.95*Math.max(0, 1 - k/life); });
+      pg.attributes.position.needsUpdate = true; pm.opacity = 0.95*Math.max(0, 1 - k/life); };
+    const steps = [
+      {n:'ready', start(r){ sw = rideSweep(m, 0.35); w = buildWake(m);
+          r.side.push(c=>{ if(c >= 0) return; if(sw) sw.end(); if(w) w.dispose(); sceneI.remove(g); pg.dispose(); pm.dispose(); return false; });
+          r.ok = false; r.f = 0; fxCompile(r); },
+        gate:r=> !fly && !intro && (++r.f > 2) && r.ok, tick:()=> true},
+      {n:'wait', tick:k=> k >= i*(many ? 1.1 : 0)},
+      {n:'draw', start(r){ g.visible = true; const fl = $('arrFlash'); fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on'); r.side.push(beamSide(r.clock)); },
+        tick(k){ if(sw) sw.tick(k); return k >= (sw ? sw.until : 1.2); }, end(){ if(sw) sw.end(); }},
+      ...powerSteps(m, ()=> w)];
+    RD.chain = fxChain('arrive:' + m.id, steps); const me = RD.chain; me.onEnd = ()=>{ if(RD.chain === me) RD.chain = null; };
   });
   toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`);
 }
+window.__dbg && Object.assign(window.__dbg, {
+  sweep:(id)=>{ const m = MI.find(x=> x.id === id); if(!m || !m.b) return null; rideSet(id, false); arriveFx([id]); return !!RIDE[id].chain; },
+  fxlog:()=> FXLOG.slice(), fxClear:()=>{ FXLOG.length = 0; },
+  rideState:()=> Object.fromEntries(Object.entries(RIDE).map(([k, R])=> [k, {on:R.on, s:+R.s.toFixed(2), tau:+R.tau.toFixed(2), pow:+R.pow.toFixed(2), chain:R.chain ? R.chain.name + ':' + (R.chain.steps[R.chain.i] || {}).n : null, bulbs:R.bulbs, signs:(SIGNS[k] || []).length}])),
+  rideSet:(id, on)=> rideSet(id, on),
+  wakePeek:(id, rad)=>{ const m = MI.find(x=> x.id === id); if(window.__wk) window.__wk.dispose(); if(rad == null) return; const w = buildWake(m); window.__wk = w;
+    w.U.uR.value = rad; w.ring.scale.setScalar(Math.min(rad, w.RW)); w.ring.material.opacity = 0.85*Math.max(0, 1 - rad/w.RW); signsLit(id, Math.min(1, rad/w.RW)); return {RW:w.RW, n:w.n}; }});
 // preview records on/off (this device only; stored in localStorage 'void-demo')
 function setDemo(ids, on){
   const added = [];
@@ -6841,7 +7020,9 @@ const BAKED = [];
 function batchIsland(){
   const snap = ()=>{ const m = new Map(); sceneI.traverse(o=>{ o.updateMatrix(); const mt = o.material && !Array.isArray(o.material) ? o.material : null;
     m.set(o, o.matrix.elements.join(',') + '|' + o.visible + '|' + (mt ? (mt.color ? mt.color.getHex() : '') + ',' + mt.opacity : '')); }); return m; };
-  const snaps = [0, 2.71, 5.33, 8.9, 13.7, 21.3, 34.1, 47.9, 63.2, 78.5, 96.4, 117.7].map(t=>{ islAnim.forEach(f=> f(t)); return snap(); });   // 12 moments across the longest cycle (the ferry, 120 s): 4 missed an organ pipe that happened to rest at all of them (2026-11-02)
+  RIDE_PROBE = true;
+  const snaps = [0, 2.71, 5.33, 8.9, 13.7, 21.3, 34.1, 47.9, 63.2, 78.5, 96.4, 117.7].map(t=>{ islAnim.forEach(f=> f(t)); return snap(); });
+  RIDE_PROBE = false;   // 12 moments across the longest cycle (the ferry, 120 s): 4 missed an organ pipe that happened to rest at all of them (2026-11-02)
   const DYN = new Set(); snaps[0].forEach((v,o)=>{ if(snaps.some(sn=> sn.get(o)!==v)) DYN.add(o); });
   const sig = m => [m.type, m.color ? m.color.getHex() : '', m.opacity, m.transparent, m.side, m.map ? m.map.uuid : '', m.flatShading, m.vertexColors, m.blending, m.depthWrite, m.polygonOffset ? m.polygonOffsetFactor : ''].join('|');
   const keep = ['position','normal','uv','color'];
@@ -7075,12 +7256,15 @@ function islandTheme(){
 const _em = new THREE.Color();
 function updateI(now, zoneK){
   const t = now/1000;
+  const dtF = Math.min(1/20, Math.max(0, t - FX_T)); FX_T = t;   // effect time: a stalled frame plays on slower, it never jumps ahead
+  for(const id in RIDE){ const R = RIDE[id]; R.tau += R.s*dtF; }
+  fxStep(dtF);
   islAnim.forEach(f=> f(t));
   waterU.uTime.value = t; ghostU.uTime.value = t; waterU.uSun.value.copy(sun.position).sub(sun.target.position).normalize();
   const g = 0.5 + 0.5*Math.sin(now/900);
   IB.forEach((b,i)=>{
     if(!b.mats || b.ghost) return;
-    const hi = (i===hovered || i===selected) ? 0.22 : 0, glow = b.restored ? 0.10 + 0.14*g : 0;
+    const hi = (i===hovered || i===selected) ? 0.22 : 0, glow = (b.mission && RIDE[b.mission.id] ? RIDE[b.mission.id].pow : b.restored ? 1 : 0)*(0.10 + 0.14*g);
     if(!hi && !glow && !b._lit) return;
     _em.setRGB(hi,hi,hi).add(_c1.copy(restoredCol).multiplyScalar(glow));
     b.mats.forEach(m=> m.emissive.copy(_em));
@@ -7623,6 +7807,13 @@ function sfx(name){
     case 'sparkle':   for(let i = 0; i < 6; i++) tone({f:1500 + Math.random() * 2500, t0:t + i * .06, dur:.25, g:.07}); break;
     case 'power':     tone({f:80, f2:320, type:'sawtooth', dur:.9, g:.16, lp:1200}); noise({f0:200, f1:1800, dur:.9, g:.08}); break;
     case 'powerdown': tone({f:320, f2:60, type:'sawtooth', dur:.7, g:.14, lp:900}); break;
+    case 'bulbs':     for(let i = 0; i < 8; i++) tone({f:520*Math.pow(1.09, i*1.6), type:'square', t0:t + i*.2, dur:.09, g:.035, lp:2400}); tone({f:110, f2:220, type:'sawtooth', dur:1.6, a:.3, g:.05, lp:500}); break;
+    case 'organ':     [0, 4, 7, 12].forEach((sv, i)=> tone({f:midiHz(60 + sv), type:'square', t0:t + i*.18, dur:1.4 - i*.18, a:.06, g:.045, lp:1800})); [0, 4, 7].forEach(sv=> tone({f:midiHz(48 + sv), type:'triangle', t0:t + .72, a:.1, dur:1.6, g:.06})); break;
+    case 'chain':     noise({f0:140, f1:90, dur:.3, g:.25, q:1.2}); tone({f:70, f2:40, type:'sawtooth', dur:.25, g:.12, lp:300}); for(let i = 0; i < 12; i++) noise({t0:t + .8 + i*.12, f0:1800, f1:2200, dur:.05, g:.08, q:6}); break;
+    case 'wheel':     for(let i = 0; i < 3; i++){ noise({t0:t + i*.8, f0:600, f1:400, dur:.12, g:.08, q:3}); tone({f:880 + i*110, type:'triangle', t0:t + i*.8 + .05, dur:.5, g:.06}); } break;
+    case 'engine':    tone({f:55, f2:110, type:'sawtooth', dur:1.8, a:.2, g:.1, lp:400}); tone({f:82, f2:165, type:'square', dur:1.8, a:.3, g:.04, lp:300}); tone({f:660, type:'triangle', t0:t + .1, dur:.18, g:.06}); tone({f:660, type:'triangle', t0:t + .32, dur:.18, g:.06}); break;
+    case 'fountain':  noise({f0:400, f1:3000, dur:1.8, a:.4, g:.1, q:.6}); [784, 988, 1175].forEach((f, i)=> tone({f, t0:t + .5 + i*.15, dur:.9, g:.05})); break;
+    case 'wake':      for(let i = 0; i < 5; i++) tone({f:900 + i*180, t0:t + i*.16, a:.05, dur:.7, g:.035}); break;
     case 'success':   [262, 330, 392, 523, 659].forEach(f=> tone({f, type:'triangle', a:.4, dur:2.4, g:.08})); [.3, .9].forEach(d=>{ for(let i = 0; i < 6; i++) tone({f:1500 + Math.random() * 2500, t0:t + d + i * .06, dur:.25, g:.06}); }); break;
     case 'error':     tone({f:220, type:'square', dur:.13, g:.08, lp:900}); tone({f:175, type:'square', t0:t + .15, dur:.22, g:.08, lp:800}); break;
     case 'notice':    [880, 1100, 880].forEach((f, i)=> tone({f, t0:t + i * .2, dur:.5, g:.11})); break;
@@ -8262,6 +8453,7 @@ new MutationObserver(applyTheme).observe(document.documentElement, {attributes:t
 const h0 = today.getHours()+today.getMinutes()/60;
 if(h0>=7 && h0<=18) $('hr').value = Math.round(h0*4)/4;
 if(!/[?&]nobatch/.test(location.search)) batchIsland();   // ?nobatch=1 keeps every mesh separate (overlap audit)
+rideInit();   // after batching: the bulb shader goes on the merged materials
 if(!PHONE) setTimeout(loadCharModels, 6000);   // tablets and PCs: the character models arrive in the background while the campus is on screen
 let startWorld = QS.get('world') === 'island' ? 'island' : 'erica';   // every visit opens on the campus so the first record is where the child stands (user, 2026-10-28); ?world=island only for checks
 if(startWorld==='island') setWorld('island', true);

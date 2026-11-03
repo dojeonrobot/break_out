@@ -37,3 +37,6 @@ dist/
 # 챕터 5 도로그램 서버 런타임 데이터 (게시물·업로드)
 server/data/
 __pycache__/
+
+# 헤드리스 점검 스크린샷
+scripts/pending/shots_*/
