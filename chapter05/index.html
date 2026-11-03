@@ -6,6 +6,7 @@ body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-colo
 #adminBtn,#sndBtn{height:44px;box-sizing:border-box;display:flex;align-items:center}
 #sndBtn{right:84px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--fg)} #sndBtn .x{display:none} #sndBtn.off .w{display:none} #sndBtn.off .x{display:block} #sndBtn.off{color:var(--muted)}
 body.admin #sndBtn,body.screen #sndBtn{display:none}
+
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -534,6 +535,34 @@ html.phone #restoreBtn img{width:36px;height:36px}
 html.phone #restoreBtn small{font-size:12px}
 @media(max-height:480px){html.phone #panel.closed{width:280px;max-width:calc(100vw - 24px)} html.phone #panel.closed .auxnote{display:none} html.phone #islandActions{gap:8px}}
 @media(prefers-reduced-motion:reduce){#callPill,#questPill,#restoreBtn.hl,#restoreBtn.hl::before,#restoreBtn.hl::after,#labDlg .in{animation:none}#restoreBtn{transition:none}}
+/* Keep the play area open, including landscape tablets. */
+body.walk #worlds{display:none}
+body.walk #walkHud{left:auto;right:calc(12px + env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));margin:0;gap:8px;padding:7px 8px 7px 14px;border-radius:16px;max-width:calc(100vw - 24px)}
+body.walk #walkHud small{display:none}
+body.walk #walkHud b{font-size:13px}
+body.walk #walkHud button{min-width:44px;min-height:44px;padding:8px 10px}
+body.walk #walkHud .hint{position:absolute;right:0;top:calc(100% + 6px);width:240px;padding:12px;background:#101d30;border:1px solid #456078;border-radius:12px;line-height:1.6;box-sizing:border-box}
+body.walk #walkHud .hint[hidden]{display:none}
+body.walk #questHud{left:calc(12px + env(safe-area-inset-left,0px));right:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:none;animation:none;width:280px;max-width:calc(100vw - 24px);padding:10px 12px;gap:10px;border-radius:14px;box-sizing:border-box;align-items:center}
+body.walk #questHud .mk{display:none}
+body.walk #questHud>div:not(.nav){min-width:0;flex:1}
+body.walk #questHud small{font-size:10px;letter-spacing:.08em}
+body.walk #questHud b#qhT{font-size:15px;line-height:1.35}
+body.walk #questHud #qhHint{font-size:11px;line-height:1.4;margin-top:3px}
+body.walk #questHud .nav{padding-left:10px;flex-shrink:0}
+body.walk #questHud .nav small{display:none}
+body.walk #questHud .nav b{font-size:14px}
+body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-height:44px}
+#walkHelp:focus-visible,#walkX:focus-visible{outline:3px solid #9ff6ff;outline-offset:3px}
+@media(max-width:600px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(280px,calc(100vw - 24px))}}
+#ydSuccess{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 0;padding:12px;border-radius:10px;background:#123f34;border:1px solid #7de7b7;color:#d9fff0;font-size:12px}
+#ydSuccess[hidden]{display:none}
+#ydSuccess b{font-size:16px;color:#a8ffd0}
+#yardDlg.win .board button{animation:power-arrive 700ms var(--power-delay,0ms) both}
+#yardDlg.win .board button path{stroke:#d6ffec}
+#yardDlg.win .lamps i{background:#a8ffd0;box-shadow:0 0 12px #7de7b7}
+@keyframes power-arrive{0%{background:#16332d;box-shadow:inset 0 0 0 1px #366353}45%{background:#357c5c;box-shadow:inset 0 0 0 2px #b4ffd9,0 0 12px #60eeb777}100%{background:#204b3b;box-shadow:inset 0 0 0 1px #7de7b7}}
+@media(prefers-reduced-motion:reduce){#yardDlg.win .board button{animation:none;background:#204b3b;box-shadow:inset 0 0 0 1px #7de7b7}}
 </style>
 
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');</script>
@@ -628,10 +657,10 @@ html.phone #restoreBtn small{font-size:12px}
   <div class="grid" id="wpGrid"></div>
   <button type="button" class="skip" id="wpSkip">나중에</button>
 </div></div>
-<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><span class="hint" id="walkHint"></span><button type="button" id="walkX">나가기</button></section>
+<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-expanded="false" aria-controls="walkHint">조작법</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkX">나가기</button></section>
 <div id="walkPad" hidden aria-hidden="true"><i></i></div>
 <div id="miniBox" hidden><div class="dots" id="miniDots"></div><button type="button" id="miniGo">찍기</button><button type="button" id="miniDone" class="alt" hidden>완료</button></div><div id="flash"></div>
-<div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전반</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이 루프, 이렇게 기록해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>보이드가 지붕에서 지금의 섬을 기록해요. 열차는 저절로 달리니까 운전은 안 해도 돼요.</span></li><li><i>2</i><b>선로에 빛나는 고리가 6개</b><span>고리는 기록이 비어 있는 자리예요. 화면 위 카드에 다음 고리까지 몇 초 남았는지 떠요.</span></li><li><i>3</i><b>열차가 고리 안에 있는 동안 「기록」을 꾹</b><span>버튼이 초록으로 꽉 차면 기록 완료. 너무 일찍 누르면 흐리게 찍히고, 지나치면 한 바퀴 더 돌 때 다시 찍으면 돼요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「기록」을 꾹!</span><span>기록 완료 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>기록</b></div></div><p class="sub">여섯 자리를 다 찍으면 열차가 역으로 돌아와요. 못 찍은 자리는 다음 바퀴에 다시 와요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
+<div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전반</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><p id="ydSuccess" role="status" hidden><b>전력 복구 완료</b><span>스카이 루프에 전원이 들어왔어요</span></p><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이 루프, 이렇게 기록해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>보이드가 지붕에서 지금의 섬을 기록해요. 열차는 저절로 달리니까 운전은 안 해도 돼요.</span></li><li><i>2</i><b>선로에 빛나는 고리가 6개</b><span>고리는 기록이 비어 있는 자리예요. 화면 위 카드에 다음 고리까지 몇 초 남았는지 떠요.</span></li><li><i>3</i><b>열차가 고리 안에 있는 동안 「기록」을 꾹</b><span>버튼이 초록으로 꽉 차면 기록 완료. 너무 일찍 누르면 흐리게 찍히고, 지나치면 한 바퀴 더 돌 때 다시 찍으면 돼요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「기록」을 꾹!</span><span>기록 완료 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>기록</b></div></div><p class="sub">여섯 자리를 다 찍으면 열차가 역으로 돌아와요. 못 찍은 자리는 다음 바퀴에 다시 와요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
 <div id="labDlg" role="dialog" aria-modal="true" aria-labelledby="lbT"><div class="room"><div class="in"><small>UNDER THE WHEEL · XYLO'S LAB</small><h1 id="lbT">관람차 아래 연구실</h1><p id="lbP"></p><div class="mons" id="lbMons"></div><div class="row"><button type="button" class="go" id="lbGo" hidden>설계도 보기</button></div></div></div></div>
 <div id="caveDlg" role="dialog" aria-modal="true" aria-labelledby="cvT"><div class="in"><small id="cvK">EYE CAVE · OLD RECORD</small><h1 id="cvT">선대의 기록</h1><p id="cvP"></p><div class="decode" id="cvDecode"><div class="tiles" id="cvTiles"></div><div class="map" id="cvMap"></div><div class="sent" id="cvSent"></div></div><div class="test" id="cvTest" hidden><div class="sets"><div class="set"><b>선대의 장치</b><div class="opts" data-set="dev"><button type="button" data-v="on">켜 둠</button><button type="button" data-v="off">끔</button></div></div><div class="set"><b>환원 순서</b><div class="opts ord" data-set="ord"><button type="button" data-v="forest"><i></i>안쪽 숲</button><button type="button" data-v="valley"><i></i>계곡</button><button type="button" data-v="shore"><i></i>바닷가</button></div></div><div class="set"><b>한 번에 환원하는 양</b><div class="opts" data-set="amt"><button type="button" data-v="small">조금</button><button type="button" data-v="big">많이</button></div></div></div><div class="run"><canvas id="cvIsl" width="320" height="200" aria-label="가상의 섬"></canvas><div class="warn" id="cvWarn" hidden></div><ol class="log" id="cvLog"></ol></div><div class="row"><button type="button" class="go" id="cvGo" disabled>시험</button><button type="button" class="later" id="cvReset">순서 다시</button></div></div><div class="row"><button type="button" class="go" id="cvNext" hidden>시험으로</button></div></div></div>
 <div id="callDlg" role="dialog" aria-modal="true"><div class="in"><small>CALL</small><div id="callLines"></div><div class="row"><button type="button" class="go" id="callGo">섬으로 가기</button><button type="button" class="later" id="callLater">조금 뒤에</button></div></div></div>
@@ -768,7 +797,7 @@ renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 renderer.useLegacyLights = true;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = COARSE ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
-renderer.shadowMap.autoUpdate = false; let shadowFrame = 0;   // redrawn every 3rd frame in tick() (and at once after a world/sun change): the shadow pass re-renders the whole world, 2026-11-02
+renderer.shadowMap.autoUpdate = false; let shadowFrame = 0;   // walking shadows follow every rendered pose; overview shadows update every third frame
 stage.appendChild(renderer.domElement);
 
 const sceneE = new THREE.Scene();
@@ -4949,7 +4978,6 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
   const corr = new THREE.MeshLambertMaterial({map:stripeTexI('#9aa3ad', '#b9c0c8', 24)});
   add(g, BOX(24, 10, 16), corr, -14, 0, 0); add(g, BOX(24.6, 1, 16.6), mat(0x4a5058), -14, 10, 0);
   add(g, BOX(8, 6.6, 0.2), mat(0x1a1d22), -14, 0, 8.05, false);
-  const lift = add(g, BOX(4.6, 1.2, 3), mat(0xffd400), -14, 1.2, 10); add(g, BOX(3.4, 1.4, 4.2), mat(0x5aa0e6), -14, 2.4, 10);
   add(g, new THREE.PlaneGeometry(7, 1.4), new THREE.MeshBasicMaterial({map:signTex('정비동', {bg:'#1d2f55', fg:'#ffffff', size:60, w:384, h:80})}), -14, 8.4, 8.1, false);
   add(g, BOX(14, 8, 12), mat(0xe6e1d6), 12, 0, -2); add(g, CONE(10, 4, 4).rotateY(Math.PI/4), mat(0x6e4a2f), 12, 8, -2);
   add(g, new THREE.PlaneGeometry(6, 1.3), new THREE.MeshBasicMaterial({map:signTex('관리동', {bg:'#ffffff', fg:'#1d2f55', size:60, w:384, h:80})}), 12, 6, 4.05, false);
@@ -4957,7 +4985,6 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
   for(let i=0;i<5;i++) add(g, CYL(0.4, 0.4, 1.1, 10), mat([0x2f62b8, 0xe2574c][i%2]), -2 + (i%3)*1, 0, 12 + Math.floor(i/3)*1);
   for(let i=0;i<4;i++) add(g, BOX(1.2, 1.2, 1.2), mat(0x9a6b45), 2, i < 2 ? 0 : 1.2, 16 + (i%2)*1.3);
   add(g, BOX(0.6, 14, 0.6), mat(0xffd400), -2, 0, -10); const arm = add(g, BOX(12, 0.5, 0.5), mat(0xffd400), 3, 14, -10); add(g, CYL(0.04, 0.04, 6, 4), mat(0x333333), 8.6, 8, -10, false);
-  islAnim.push(t=>{ lift.position.y = 1.2 + Math.max(0, Math.sin(t*0.4))*1.4; });
   pickable(g, {abs:true, n:'관리동 · 정비동', c:'place', sub:'챕터 5', cx:-400, cz:150, h:14, r:26, desc:'롤러코스터 차량을 손보는 정비동과 관리동, 작업실이 모인 구역입니다.', facts:[['용도','차량 정비 · 관리']]});
 }
 // white capsule robots drifting over the plaza
@@ -7428,11 +7455,13 @@ function startWalk(name){
   camera.near = 0.2; camera.fov = 68; camera.updateProjectionMatrix(); controls.enabled = false;
   document.body.classList.add('walk'); $('walkName').textContent = `${name} 시점`;
   $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '패드로 걷기 · 끝까지 밀면 달리기 · 화면 끌어 둘러보기' : '방향키로 걷기 · Shift 달리기 · 화면 끌어 둘러보기';
+  $('walkHint').hidden = true; $('walkHelp').setAttribute('aria-expanded', 'false');
   $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none'); placeQuestHud();
   if(phoneUI()) closePanel();
   walkTick(performance.now()); questOnWalk(name);
 }
-function placeQuestHud(){ const h = $('walkHud'); if(h.hidden) return; const r = h.getBoundingClientRect(); $('questHud').style.top = Math.round(r.bottom + 10) + 'px'; }   // the mission card always sits under the walk bar, whatever wraps
+function placeQuestHud(){ $('questHud').style.removeProperty('top'); }
+$('walkHelp').onclick = ()=>{ const open = $('walkHint').hidden; $('walkHint').hidden = !open; $('walkHelp').setAttribute('aria-expanded', String(open)); };
 addEventListener('resize', placeQuestHud);
 function stopWalk(byUser){ document.body.classList.remove('inmaze'); const left = walk && questLive && !questDone(questLive) && mini ? questLive : null; if(left) try{ miniSavePos(); }catch(e){}
   if(typeof mini !== 'undefined' && mini) miniClear();
@@ -7455,12 +7484,13 @@ function walkTick(now){
   let mx = fwd - walkPad.dz*hold, mz = strafe + walkPad.dx*hold; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
   const speed = (k.ShiftLeft || k.ShiftRight || walkPad.run ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
   const dx = (sy*mx - cy*mz)*speed*dt, dz = (cy*mx + sy*mz)*speed*dt;   // right = forward × up = (-cy, sy): pad right / E goes screen-right (2026-10-30, was mirrored)
+  const oldX = w.x, oldZ = w.z;
   if(dx || dz){
     if(!walkBlocked(w.x + dx, w.z + dz)){ w.x += dx; w.z += dz; } else if(!walkBlocked(w.x + dx, w.z)) w.x += dx; else if(!walkBlocked(w.x, w.z + dz)) w.z += dz;
-    w.bob += Math.hypot(dx, dz);
+    w.bob += Math.hypot(w.x - oldX, w.z - oldZ);
   }
   w.pitch = Math.max(-1.2, Math.min(0.45, w.pitch));
-  const gy = groundY(w.x, w.z), moving = !!(dx || dz);
+  const gy = groundY(w.x, w.z), moving = w.x !== oldX || w.z !== oldZ;
   const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : 0;
   // third person: the characters stand where you walk and face the way you go (side by side for the pair); the camera follows from behind and above
   const inMaze = mazeInside(w.x, w.z);   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
@@ -7468,11 +7498,14 @@ function walkTick(now){
     let px = w.x + cy*side - sy*back, pz = w.z - sy*side - cy*back; if(inMaze && mazeBlocked(px, pz)){ px = w.x; pz = w.z; }
     m.g.position.set(px, gy + lift, pz); m.g.rotation.y = w.yaw; if(m.g.userData.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
   let cpi = w.pitch; if(inMaze) cpi = Math.max(-0.12, Math.min(0.2, cpi));   // in the maze the camera stays below the hedge tops: you only see the corridor ahead
-  const cp = Math.cos(cpi), sp = Math.sin(cpi); let D = inMaze ? 5.6 : Math.max(7.5, w.eye*3.4), H = inMaze ? Math.min(2.4, w.eye*1.05) : w.eye*1.1; document.body.classList.toggle('inmaze', inMaze);
-  if(inMaze){ for(let t = 0.4; t <= 1.001; t += 0.15){ if(mazeBlocked(w.x - sy*cp*D*t, w.z - cy*cp*D*t)){ D *= Math.max(0.15, t - 0.15); break; } } }   // pulled in rather than through a hedge
-  _ct.set(w.x - sy*cp*D, gy + H - sp*D, w.z - cy*cp*D);
+  const ease = 1 - Math.pow(0.002, dt);
+  if(w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }
+  else { w.camYaw += Math.atan2(Math.sin(w.yaw - w.camYaw), Math.cos(w.yaw - w.camYaw))*ease; w.camPitch += (cpi - w.camPitch)*ease; }
+  const cs = Math.sin(w.camYaw), cc = Math.cos(w.camYaw), cp = Math.cos(w.camPitch), sp = Math.sin(w.camPitch); let D = inMaze ? 5.6 : Math.max(7.5, w.eye*3.4), H = inMaze ? Math.min(2.4, w.eye*1.05) : w.eye*1.1; document.body.classList.toggle('inmaze', inMaze);
+  if(inMaze){ for(let t = 0.4; t <= 1.001; t += 0.15){ if(mazeBlocked(w.x - cs*cp*D*t, w.z - cc*cp*D*t)){ D *= Math.max(0.15, t - 0.15); break; } } }   // pulled in rather than through a hedge
+  _ct.set(w.x - cs*cp*D, gy + H - sp*D, w.z - cc*cp*D);
   _ct.y = Math.max(_ct.y, groundY(_ct.x, _ct.z) + 0.9);
-  if(w.snap){ camera.position.copy(_ct); w.snap = false; } else camera.position.lerp(_ct, 1 - Math.pow(0.002, dt));
+  camera.position.copy(_ct); w.snap = false;
   _wt.set(w.x + (inMaze ? sy*4 : 0), gy + w.eye*(inMaze ? 0.7 : 0.85) + lift, w.z + (inMaze ? cy*4 : 0));   // in the maze the camera looks past the pair down the corridor
   camera.lookAt(_wt); controls.target.copy(_wt);
   questNav(); questTick();
@@ -8076,9 +8109,9 @@ const tutWorld = goWorld;
 const miniRoot = new THREE.Group(); islRoot.add(miniRoot);
 const miniBox = $('miniBox'), miniGo = $('miniGo'), miniDoneBtn = $('miniDone'), miniDots = $('miniDots');
 let ride = null, labGame = null, LAB_DOOR = null, STATION = null;
-function miniClear(){ while(miniRoot.children.length) miniRoot.remove(miniRoot.children[0]); if(ride) rideEnd(false); mini = null; miniBox.hidden = true; ['yardDlg', 'labDlg', 'caveDlg', 'rideDlg'].forEach(id=> delete $(id).dataset.on); labStop(); NATY.userData.hold = null; if(MAZE){ MAZE.marks.count = 0; MAZE.marks.instanceMatrix.needsUpdate = true; MAZE.seen.clear(); } }
+function miniClear(){ if(yard?.timer) clearTimeout(yard.timer); yard = null; $('yardDlg').classList.remove('win'); while(miniRoot.children.length) miniRoot.remove(miniRoot.children[0]); if(ride) rideEnd(false); mini = null; miniBox.hidden = true; ['yardDlg', 'labDlg', 'caveDlg', 'rideDlg'].forEach(id=> delete $(id).dataset.on); labStop(); NATY.userData.hold = null; if(MAZE){ MAZE.marks.count = 0; MAZE.marks.instanceMatrix.needsUpdate = true; MAZE.seen.clear(); } }
 function flash(){ const f = $('flash'); f.animate([{opacity:0.95}, {opacity:0}], {duration:420, easing:'ease-out'}); }
-function miniHud(step, title, hint){ $('qhStep').textContent = `${step} / 3 ${title}`; $('qhT').textContent = title; $('qhHint').textContent = hint; $('questHud').hidden = false; placeQuestHud(); }
+function miniHud(step, title, hint){ $('qhStep').textContent = `${step} / 3`; $('qhT').textContent = title; $('qhHint').textContent = hint; $('questHud').hidden = false; placeQuestHud(); }
 function miniWalkTo(step, title, hint, target, r, onArrive){ mini.phase = 'walk'; mini.target = target; mini.r = r; mini.onArrive = onArrive; mini.arrived = false; miniBox.hidden = true; miniHud(step, title, hint); }
 function miniStart(q){
   const w = walk; if(!w) return; q.found = false; questLive = q;
@@ -8101,6 +8134,9 @@ function yardOpen(){ miniBox.hidden = true;
   fadeThrough('#05070c', ()=>{ yardBuild(); $('yardDlg').dataset.on = '1'; sfx('open'); });
   setTimeout(()=> say([{who:'리코', img:'rico_hmm', text:'비상등만 켜져 있어. 저기, 예비 배전반이야.'}, {who:'자일로', img:'xylo_point', text:'눌린 변전실 대신 이 배전반으로 전기를 돌려야 해요. 칸을 돌려서 발전기부터 모든 칸까지 선을 이어 주세요. 다 이어지면 선로에 불이 들어옵니다.'}]), 900); }
 function yardBuild(){
+  if(yard?.timer) clearTimeout(yard.timer);
+  $('yardDlg').classList.remove('win'); $('ydSuccess').hidden = true; $('ydMix').disabled = false;
+  $('ydP').textContent = '칸을 돌려 발전기부터 모든 전선을 이어 주세요.';
   const W = 5, H = 4, src = [0, 1]; let s = (Date.now() % 1000) + 11; const rnd = ()=> (s = (s*16807) % 2147483647) / 2147483647;
   const con = Array.from({length:H}, ()=> Array.from({length:W}, ()=> new Set())), seen = Array.from({length:H}, ()=> Array(W).fill(false)), st = [src]; seen[src[1]][src[0]] = true;
   const D = {N:[0,-1,'S'], E:[1,0,'W'], S:[0,1,'N'], W:[-1,0,'E']};
@@ -8122,8 +8158,19 @@ function yardPaint(){ const {W, H, tiles} = yard, on = yardPower(); let lit = 0;
     const L = [...t].map(k=> ({N:'M50 50 V0', E:'M50 50 H100', S:'M50 50 V100', W:'M50 50 H0'})[k]).join(' ');
     b.classList.toggle('on', p); const key = [...t].sort().join(''); if(b.dataset.t !== key){ b.dataset.t = key; b.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${L}"/><circle cx="50" cy="50" r="${t.size === 1 ? 11 : 7}"/></svg>`; } });
   const all = lit === W*H; $('ydLamps').innerHTML = yard.stations.map(k=> `<i class="${on[+k.split(',')[1]][+k.split(',')[0]] ? 'on' : ''}"></i>`).join('') + `<b>${lit} / ${W*H}</b>`;
-  if(all && !yard.done){ yard.done = true; $('ydP').textContent = '전부 이어졌다. 선로에 불이 들어온다.'; $('yardDlg').classList.add('win'); setTimeout(yardDone, 1500); } }
-$('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || !yard || yard.done) return; const x = +b.dataset.x, y = +b.dataset.y; yard.tiles[y][x] = yard.rot(yard.tiles[y][x]); $('ydBoard').querySelectorAll('button.turn').forEach(o=> o.classList.remove('turn')); yardPaint(); void b.offsetWidth; b.classList.add('turn'); sfx('tap'); });
+  if(all && !yard.done){
+    const solved = yard, queue = [[...yard.src, 0]], seen = new Set([yard.src.join(',')]); yard.done = true;
+    for(let i = 0; i < queue.length; i++){ const [x, y, depth] = queue[i];
+      $('ydBoard').querySelector(`[data-x="${x}"][data-y="${y}"]`).style.setProperty('--power-delay', `${depth*55}ms`);
+      for(const k of tiles[y][x]){ const [dx, dy] = yard.D[k], nx = x + dx, ny = y + dy, key = `${nx},${ny}`;
+        if(nx >= 0 && nx < W && ny >= 0 && ny < H && !seen.has(key)){ seen.add(key); queue.push([nx, ny, depth + 1]); } }
+    }
+    $('ydP').textContent = '전부 이어졌다. 선로에 불이 들어온다.'; $('ydSuccess').hidden = false; $('ydMix').disabled = true;
+    $('yardDlg').classList.add('win'); sfx('success');
+    yard.timer = setTimeout(()=>{ if(yard === solved && $('yardDlg').dataset.on) yardDone(); }, 2400);
+  } }
+
+$('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || !yard || yard.done) return; const x = +b.dataset.x, y = +b.dataset.y; yard.tiles[y][x] = yard.rot(yard.tiles[y][x]); $('ydBoard').querySelectorAll('button.turn').forEach(o=> o.classList.remove('turn')); yardPaint(); void b.offsetWidth; if(!yard.done){ b.classList.add('turn'); sfx('tap'); } });
 $('ydMix').onclick = ()=>{ if(yard && !yard.done) yardBuild(); };
 function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true; });
   setTimeout(()=> say([{who:'자일로', img:'xylo', text:'됐어요! 스카이 루프가 깨어났습니다. 선로 조명이 섬을 한 바퀴 돌고 있어요.'}, {who:'제로', img:'zero_joy', text:'우리가 살렸다!'}, {who:'자일로', img:'xylo_point', text:'역으로 가요. 보이드를 지붕에 태우고 한 바퀴 돌면서 빈 자리를 기록합시다.'}],
@@ -8463,7 +8510,7 @@ function tick(now){
   if(W.update) W.update(reduce ? 0 : now, zoneK);
   if(walk) walkTick(now); else controls.update();
   if(lastT.distanceToSquared(controls.target)>400){ lastT.copy(controls.target); updateSun(); shadowDirty = true; }
-  if(!renderer.shadowMap.autoUpdate){ shadowFrame++; if(shadowFrame % 3 === 0 || shadowDirty){ renderer.shadowMap.needsUpdate = true; shadowDirty = false; } }
+  if(!renderer.shadowMap.autoUpdate){ shadowFrame++; if(walk || shadowFrame % 3 === 0 || shadowDirty){ renderer.shadowMap.needsUpdate = true; shadowDirty = false; } }
   if(simOn && composer) composer.render(); else renderer.render(scene, camera);
   if((shadowFrame & 1) === 0 || labelsDirty){ placeLabels(); labelsDirty = false; }   // labels every other frame: each placement is a layout pass
 }
