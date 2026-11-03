@@ -537,24 +537,28 @@ html.phone #restoreBtn small{font-size:12px}
 @media(prefers-reduced-motion:reduce){#callPill,#questPill,#restoreBtn.hl,#restoreBtn.hl::before,#restoreBtn.hl::after,#labDlg .in{animation:none}#restoreBtn{transition:none}}
 /* Keep the play area open, including landscape tablets. */
 body.walk #worlds{display:none}
-body.walk #walkHud{left:auto;right:calc(12px + env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));margin:0;gap:8px;padding:7px 8px 7px 14px;border-radius:16px;max-width:calc(100vw - 24px)}
+body.walk #walkHud{left:auto;right:calc(12px + env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));margin:0;gap:6px;padding:5px 6px 5px 10px;border-radius:14px;max-width:calc(100vw - 24px)}
 body.walk #walkHud small{display:none}
-body.walk #walkHud b{font-size:13px}
-body.walk #walkHud button{min-width:44px;min-height:44px;padding:8px 10px}
+body.walk #walkHud b{font-size:12px}
+body.walk #walkHud button{min-width:44px;min-height:44px;padding:8px 6px;font-size:12px}
+body.walk #walkHelp{width:44px;padding:0;font:600 16px var(--sans);border-color:transparent;background:transparent}
 body.walk #walkHud .hint{position:absolute;right:0;top:calc(100% + 6px);width:240px;padding:12px;background:#101d30;border:1px solid #456078;border-radius:12px;line-height:1.6;box-sizing:border-box}
 body.walk #walkHud .hint[hidden]{display:none}
-body.walk #questHud{left:50%;right:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);animation:none;width:280px;max-width:calc(100vw - 24px);padding:10px 12px;gap:10px;border-radius:14px;box-sizing:border-box;align-items:center}
+body.walk #questHud{left:50%;right:auto;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);animation:none;width:min(520px,calc(100vw - 400px));max-width:calc(100vw - 24px);min-height:76px;padding:12px 16px;gap:16px;border-radius:16px;box-sizing:border-box;align-items:center;background:rgba(12,29,45,.96);border:1px solid rgba(159,246,255,.32);box-shadow:0 8px 24px rgba(2,12,22,.22),inset 0 1px 0 rgba(255,255,255,.06)}
 body.walk #questHud .mk{display:none}
-body.walk #questHud>div:not(.nav){min-width:0;flex:1}
-body.walk #questHud small{font-size:10px;letter-spacing:.08em}
-body.walk #questHud b#qhT{font-size:15px;line-height:1.35}
-body.walk #questHud #qhHint{font-size:11px;line-height:1.4;margin-top:3px}
-body.walk #questHud .nav{padding-left:10px;flex-shrink:0}
-body.walk #questHud .nav small{display:none}
-body.walk #questHud .nav b{font-size:14px}
+body.walk #questHud>div:not(.nav){min-width:0;flex:1;display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:14px;row-gap:3px;align-items:center}
+body.walk #questHud small{font-size:9px;letter-spacing:.12em;color:#a6c3d3}
+body.walk #questHud>div:not(.nav)>small{grid-column:1;grid-row:1 / span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:48px;border-radius:10px;background:rgba(159,246,255,.07);border:1px solid rgba(159,246,255,.15)}
+body.walk #questHud small em{margin:0;padding:0;background:none;font:700 13px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:0;color:#b9f7ff}
+body.walk #questHud b#qhT{grid-column:2;font-size:17px;font-weight:750;line-height:1.3;letter-spacing:-.025em;white-space:normal;text-wrap:balance}
+body.walk #questHud #qhHint{grid-column:2;font-size:12px;line-height:1.45;margin:0;color:#b4c9d6}
+body.walk #questHud .nav{padding-left:16px;margin:0;min-width:56px;flex-shrink:0;gap:4px;align-content:center;border-left:1px solid rgba(159,246,255,.18)}
+body.walk #questHud .nav small{display:block;font-size:10px;letter-spacing:0;color:#94b1c2}
+body.walk #questHud .nav b{font-size:18px!important;line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:-.04em;color:#b9f7ff}
+body.walk #questHud.near{border-color:rgba(159,246,255,.62);box-shadow:0 8px 24px rgba(2,12,22,.22),inset 0 1px 0 rgba(255,255,255,.08)}
 body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-height:44px}
 #walkHelp:focus-visible,#walkX:focus-visible{outline:3px solid #9ff6ff;outline-offset:3px}
-@media(max-width:760px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(280px,calc(100vw - 24px))}}
+@media(max-width:760px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(520px,calc(100vw - 24px))}}
 #ydSuccess{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 0;padding:12px;border-radius:10px;background:#123f34;border:1px solid #7de7b7;color:#d9fff0;font-size:12px}
 #ydSuccess[hidden]{display:none}
 #ydSuccess b{font-size:16px;color:#a8ffd0}
@@ -568,6 +572,7 @@ body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-heigh
 #vn[data-speaker="네이티"] img{position:relative;left:0;bottom:auto;display:block;height:clamp(100px,30dvh,220px);max-width:min(40vw,240px);margin:0 0 14px 12px;object-position:left center;clip-path:none}
 #vn[data-speaker="네이티"] .in::before{display:none}
 body:has(#vn[data-on]) #walkHud,body:has(#vn[data-on]) #questHud{visibility:hidden}
+body.island #panel,body.sim #panel{display:none}
 </style>
 
 <script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches) document.body.classList.add('intro');</script>
@@ -662,12 +667,12 @@ body:has(#vn[data-on]) #walkHud,body:has(#vn[data-on]) #questHud{visibility:hidd
   <div class="grid" id="wpGrid"></div>
   <button type="button" class="skip" id="wpSkip">나중에</button>
 </div></div>
-<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-expanded="false" aria-controls="walkHint">조작법</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkX">나가기</button></section>
+<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-label="조작법" title="조작법" aria-expanded="false" aria-controls="walkHint">?</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkX">나가기</button></section>
 <div id="walkPad" hidden aria-hidden="true"><i></i></div>
 <div id="miniBox" hidden><div class="dots" id="miniDots"></div><button type="button" id="miniGo">찍기</button><button type="button" id="miniDone" class="alt" hidden>완료</button></div><div id="flash"></div>
 <div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전반</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><p id="ydSuccess" role="status" hidden><b>전력 복구 완료</b><span>스카이 루프에 전원이 들어왔어요</span></p><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이 루프, 이렇게 기록해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>보이드가 지붕에서 지금의 섬을 기록해요. 열차는 저절로 달리니까 운전은 안 해도 돼요.</span></li><li><i>2</i><b>선로에 빛나는 고리가 6개</b><span>고리는 기록이 비어 있는 자리예요. 화면 위 카드에 다음 고리까지 몇 초 남았는지 떠요.</span></li><li><i>3</i><b>열차가 고리 안에 있는 동안 「기록」을 꾹</b><span>버튼이 초록으로 꽉 차면 기록 완료. 너무 일찍 누르면 흐리게 찍히고, 지나치면 한 바퀴 더 돌 때 다시 찍으면 돼요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「기록」을 꾹!</span><span>기록 완료 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>기록</b></div></div><p class="sub">여섯 자리를 다 찍으면 열차가 역으로 돌아와요. 못 찍은 자리는 다음 바퀴에 다시 와요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
 <div id="labDlg" role="dialog" aria-modal="true" aria-labelledby="lbT"><div class="room"><div class="in"><small>UNDER THE WHEEL · XYLO'S LAB</small><h1 id="lbT">관람차 아래 연구실</h1><p id="lbP"></p><div class="mons" id="lbMons"></div><div class="row"><button type="button" class="go" id="lbGo" hidden>설계도 보기</button></div></div></div></div>
-<div id="caveDlg" role="dialog" aria-modal="true" aria-labelledby="cvT"><div class="in"><small id="cvK">EYE CAVE · OLD RECORD</small><h1 id="cvT">선대의 기록</h1><p id="cvP"></p><div class="decode" id="cvDecode"><div class="tiles" id="cvTiles"></div><div class="map" id="cvMap"></div><div class="sent" id="cvSent"></div></div><div class="test" id="cvTest" hidden><div class="sets"><div class="set"><b>선대의 장치</b><div class="opts" data-set="dev"><button type="button" data-v="on">켜 둠</button><button type="button" data-v="off">끔</button></div></div><div class="set"><b>환원 순서</b><div class="opts ord" data-set="ord"><button type="button" data-v="forest"><i></i>안쪽 숲</button><button type="button" data-v="valley"><i></i>계곡</button><button type="button" data-v="shore"><i></i>바닷가</button></div></div><div class="set"><b>한 번에 환원하는 양</b><div class="opts" data-set="amt"><button type="button" data-v="small">조금</button><button type="button" data-v="big">많이</button></div></div></div><div class="run"><canvas id="cvIsl" width="320" height="200" aria-label="가상의 섬"></canvas><div class="warn" id="cvWarn" hidden></div><ol class="log" id="cvLog"></ol></div><div class="row"><button type="button" class="go" id="cvGo" disabled>시험</button><button type="button" class="later" id="cvReset">순서 다시</button></div></div><div class="row"><button type="button" class="go" id="cvNext" hidden>시험으로</button></div></div></div>
+<div id="caveDlg" role="dialog" aria-modal="true" aria-labelledby="cvT"><div class="in"><small id="cvK">코덱스의 동굴</small><h1 id="cvT">선대의 기록</h1><p id="cvP"></p><div class="decode" id="cvDecode"><div class="tiles" id="cvTiles"></div><div class="map" id="cvMap"></div><div class="sent" id="cvSent"></div></div><div class="test" id="cvTest" hidden><div class="sets"><div class="set"><b>선대의 장치</b><div class="opts" data-set="dev"><button type="button" data-v="on">켜 둠</button><button type="button" data-v="off">끔</button></div></div><div class="set"><b>환원 순서</b><div class="opts ord" data-set="ord"><button type="button" data-v="forest"><i></i>안쪽 숲</button><button type="button" data-v="valley"><i></i>계곡</button><button type="button" data-v="shore"><i></i>바닷가</button></div></div><div class="set"><b>한 번에 환원하는 양</b><div class="opts" data-set="amt"><button type="button" data-v="small">조금</button><button type="button" data-v="big">많이</button></div></div></div><div class="run"><canvas id="cvIsl" width="320" height="200" aria-label="가상의 섬"></canvas><div class="warn" id="cvWarn" hidden></div><ol class="log" id="cvLog"></ol></div><div class="row"><button type="button" class="go" id="cvGo" disabled>시험</button><button type="button" class="later" id="cvReset">순서 다시</button></div></div><div class="row"><button type="button" class="go" id="cvNext" hidden>시험으로</button></div></div></div>
 <div id="callDlg" role="dialog" aria-modal="true"><div class="in"><small>CALL</small><div id="callLines"></div><div class="row"><button type="button" class="go" id="callGo">섬으로 가기</button><button type="button" class="later" id="callLater">조금 뒤에</button></div></div></div>
 <button id="sndBtn" type="button" aria-pressed="true" aria-label="소리 켬" title="소리 켬/끔"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="w"/><path d="M16 7l6 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" class="x"/></svg></button><button id="adminBtn" type="button">관리자</button><button id="admSkip" type="button" hidden aria-label="관리자 건너뛰기"><small>관리자</small><b id="admSkipT">건너뛰기</b> ›</button><div id="recDone" role="dialog" aria-modal="true"><div class="band"><i class="sweep"></i><div class="in"><small id="rdK">MISSION CLEAR</small><h1 id="rdT">기록 1 복구</h1><p id="rdP"></p></div></div><div class="sub"><div class="cells" id="rdCells"></div><span class="next" id="rdNext">Space ▸ 계속</span></div></div><div id="voidVn" aria-live="polite"><button type="button" id="tutSkip" hidden>건너뛰기 ›</button><div class="in"><img id="voidImg" src="img/chars/void.png?v=20261028c" alt=""><div class="box"><b>보이드</b><p id="voidTxt"></p><div id="voidCard"></div><span class="dots" id="tutDots"></span><span class="nav"><button type="button" id="tutPrev" hidden>‹ 이전</button><i id="voidNext"></i></span></div></div></div><div id="tutWipe"></div>
 <section id="questHud" hidden aria-live="polite"><i class="mk"></i><div><small>MISSION <em id="qhStep"></em></small><b id="qhT"></b><span id="qhHint"></span></div><div class="nav" aria-hidden="true"><small>남은 거리</small><b id="qhDist"></b></div><button type="button" id="qTmp" class="tmp">관리자 · 미션 완료</button></section>
@@ -2778,7 +2783,7 @@ add(cave, new THREE.SphereGeometry(17, 16, 10, 0, Math.PI*2, 0, Math.PI/2), flat
 add(cave, ICO(7, 0), flat(C.rock), -14, 1, -14).rotation.set(0.4, 1.1, 0); add(cave, ICO(6, 0), flat(C.rock), 13, 0.5, -15).rotation.set(0.2, 2.3, 0); add(cave, ICO(5, 0), flat(C.rock), 2, 9, -19);
 place(cave, -31, -391, 0.35);
 islAnim.push(t=>{ caveEye.material.opacity = 0.65 + 0.35*Math.sin(t*1.6); caveEye.position.y = 30 + Math.sin(t*0.9)*1.5; });
-pickable(cave, {n:'눈 문양 동굴', c:'place', sub:'챕터 1', cx:-31, cz:-391, h:40, r:24,
+pickable(cave, {n:'코덱스의 동굴', c:'place', sub:'챕터 1', cx:-31, cz:-391, h:40, r:24,
   desc:'섬 북쪽 끝 숲 너머 바닷가에 눈 문양이 새겨진 동굴. 철창 우리와 아래로 내려가는 계단, 손을 대면 초록빛을 내는 덩굴 벽화가 숨어 있습니다.',
   facts:[['등장','챕터 1 · 신비한 초대'],['상징','코덱스 가문의 눈 문양']]});
 
@@ -4500,6 +4505,7 @@ const maze = new THREE.Group(); let MAZE = null;
   while(q.length){ const [i, j] = q.shift(); [[i-1, j, !H[i][j]], [i+1, j, i + 1 < n && !H[i+1][j]], [i, j-1, !V[i][j]], [i, j+1, j + 1 < n && !V[i][j+1]]].forEach(([a, b, open])=>{ if(open && a >= 0 && a < n && b >= 0 && b < n && dist[a][b] < 0){ dist[a][b] = dist[i][j] + 1; q.push([a, b]); } }); }
   const marks = new THREE.InstancedMesh(new THREE.CircleGeometry(1.1, 12).rotateX(-Math.PI/2), glowMat(0x9ff6ff, 0.35), n*n); marks.count = 0; marks.frustumCulled = false; islRoot.add(marks);
   MAZE = {S, n, cell, TH, H, V, ent, dist, cx:MX, cz:MZ, rot:MR, marks, clip, seen:new Set()};
+  islRoot.userData.mazeDeck = {cx:MX, cz:MZ, rot:MR, half:S/2 + 1, top:G + 0.3};
 }
 place(maze, 165/K, 420/K, 0.2);
 pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:165/K, cz:420/K, h:8, r:36, desc:'키 높은 생울타리로 만든 미로 정원. 네이티를 따라 가운데 남아 있는 옛 물길 흔적을 찾아가 보세요.', facts:[['위치','정문 동쪽']]});
@@ -5008,7 +5014,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 
 // ---------- spur paths to every attraction, and a switchback queue at every ride entrance ----------
 {
-  const SKIP = new Set(['하모니아', '메인 스트리트', '도로랜드 퍼레이드', '포시즌스 가든', '스카이 크루즈', '등대', '홀로그램 고목', '분수 광장', '도로랜드 정문', '항구', '눈 문양 동굴', '그랜드 스테이지']);   // no path leads to the eye cave; the stage opens straight onto the plaza (connector below) (a 270-long spur used to cut through the mountain forest to it)
+  const SKIP = new Set(['하모니아', '메인 스트리트', '도로랜드 퍼레이드', '포시즌스 가든', '스카이 크루즈', '등대', '홀로그램 고목', '분수 광장', '도로랜드 정문', '항구', '코덱스의 동굴', '그랜드 스테이지']);   // no path leads to the eye cave; the stage opens straight onto the plaza (connector below) (a 270-long spur used to cut through the mountain forest to it)
   const REACH = {'관람차': 84};                                       // the wheel's queue waits at the foot of its hill
   const NO_SPUR = new Set(['관람차']);
   const nearest = (x, z)=>{ let best = null, bd = Infinity; pathSamples.forEach(([px,pz])=>{ const d = (px-x)*(px-x) + (pz-z)*(pz-z); if(d < bd){ bd = d; best = [px, pz]; } }); return [best, Math.sqrt(bd)]; };
@@ -6566,7 +6572,7 @@ function maybeRestore(delay){
   if(seen) return;
   restoreT = setTimeout(()=>{ if(SIM_LIT !== 5 || simOn || walk || intro) return; openRestore(); }, delay);
 }
-function openRestore(){ $('restoreGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 120); const tested = typeof QUESTS === 'object' && QDONE.has('q3'); $('restoreP').textContent = SCREEN || tested ? '일루아를 환원할 준비가 끝났습니다.' : '코덱스와 눈 문양 동굴로 가서 가상 시험을 통과하세요.'; $('restoreGo').textContent = SCREEN || tested ? '환원하기' : '동굴로 가기'; $('restoreDlg').dataset.on = '1'; try{ sessionStorage.setItem(`void-restore-${progTeam()}`, '1'); }catch(e){} }
+function openRestore(){ $('restoreGlyph').innerHTML = glyphSVG(GLYPH_ZONES.map(z=> z.id), 120); const tested = typeof QUESTS === 'object' && QDONE.has('q3'); $('restoreP').textContent = SCREEN || tested ? '일루아를 환원할 준비가 끝났습니다.' : '코덱스와 코덱스의 동굴로 가서 가상 시험을 통과하세요.'; $('restoreGo').textContent = SCREEN || tested ? '환원하기' : '동굴로 가기'; $('restoreDlg').dataset.on = '1'; try{ sessionStorage.setItem(`void-restore-${progTeam()}`, '1'); }catch(e){} }
 function playRestore(){ const v = $('cinemaV'); $('cinemaEnd').hidden = true; $('cinema').hidden = false; v.src = RESTORE_VIDEO; v.currentTime = 0; v.play().catch(()=>{}); }
 function endRestore(){ $('cinemaV').pause(); const e = $('cinemaEnd'); if(!e.querySelector('.epi')){ e.querySelector('h1').insertAdjacentHTML('beforebegin', `<div class="epig">${glyphSVG(GLYPH_ZONES.map(z=> z.id), 120)}</div>`); e.querySelector('h1').insertAdjacentHTML('afterend', `<div class="epi">${[['zero_hmm', '제로', '……이게 흐름의 모양이야?'], ['rico', '리코', '코덱스의 문양은 이 흐름을 본떠 만든 거였어.'], ['codex', '코덱스', '고맙다. 너희가 아니었으면 끝까지 몰랐을 거다.']].map(([i, w, t])=> `<div class="cl"><span class="pic"><img src="img/chars/${i}.png?v=20261028c" alt=""></span><div><b>${w}</b><p>${t}</p></div></div>`).join('')}</div>`); } e.hidden = false; }
 $('restoreLater').onclick = ()=>{ delete $('restoreDlg').dataset.on; };
@@ -7131,7 +7137,7 @@ function roomShell(sc, w, h, d, wallC, floorC, ceilC){
 function screenTex(draw, w=256, h=160){ const c = document.createElement('canvas'); c.width = w; c.height = h; const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace; return {t, redraw:(k)=>{ draw(c.getContext('2d'), w, h, k); t.needsUpdate = true; }}; }
 
 const INTERIORS = {
-  '눈 문양 동굴': ()=>{
+  '코덱스의 동굴': ()=>{
     const sc = new THREE.Scene(); sc.background = new THREE.Color(0x07080b); sc.fog = new THREE.Fog(0x07080b, 6, 34);
     lightUp(sc, 0x8d8aa0, 0x221a14, 0.55);
     const tg = new THREE.CylinderGeometry(7, 7, 40, 18, 12, true).rotateX(Math.PI/2), p = tg.attributes.position;
@@ -7382,7 +7388,9 @@ const WALKERS = [PAIR, '자일로', '코덱스', '네이티'];
 function walkerOf(label){ return PAIR_NAMES.includes(label) ? PAIR : WALKERS.includes(label) ? label : null; }
 const WALK_IMG = {[PAIR]:['rico', 'zero'], '자일로':['xylo'], '코덱스':['codex'], '네이티':['naty'], '보이드':[]};
 const WALK_KEYS = {}, walkPad = {dx:0, dz:0, id:null, run:false};
-function groundY(x, z){ let y = G; for(const [mx, mz, r, h] of (islRoot.userData.mounds || [])){ const d = Math.hypot(x - mx, z - mz); if(d < r*0.96) y = Math.max(y, G - 1.2 + h*Math.sqrt(1 - (d/r)*(d/r))); } return y; }
+function mazeFloorAt(x, z){ const f = islRoot.userData.mazeDeck; if(!f) return null; const dx = x - f.cx, dz = z - f.cz, lx = dx*Math.cos(f.rot) - dz*Math.sin(f.rot), lz = dx*Math.sin(f.rot) + dz*Math.cos(f.rot); return Math.abs(lx) <= f.half && Math.abs(lz) <= f.half ? {x:lx, z:lz, top:f.top} : null; }
+function groundY(x, z){ let y = G; for(const [mx, mz, r, h] of (islRoot.userData.mounds || [])){ const d = Math.hypot(x - mx, z - mz); if(d < r*0.96) y = Math.max(y, G - 1.2 + h*Math.sqrt(1 - (d/r)*(d/r))); } const floor = mazeFloorAt(x, z); return floor ? Math.max(y, floor.top) : y; }
+function characterGroundY(x, z){ const floor = mazeFloorAt(x, z), y = groundY(x, z); if(!floor) return y; return (Math.abs(floor.x) < 1.65 && Math.abs(floor.z) < 2 ? Math.max(y, G + 0.55) : y) + 0.025; }
 let walkBlocks = null;
 const WALK_BLOCKS = ()=> walkBlocks || (walkBlocks = IB.filter(b=> b.label === '미러 레이크' || b.label === '키즈 라군').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20)*0.9})));   // water only: rides are in the walk grid by their real footprint (2026-11-02)
 function caveBlocked(x, z){   // the eye cave is a rock arch over a dark face: the rock legs stop the walker and nothing walks through the face into the mountain
@@ -7398,7 +7406,7 @@ let WGRID = null; const _wgM = new THREE.Matrix4();
 function buildWalkGrid(){
   try{
     const root = islRoot; root.updateMatrixWorld(true);
-    const SKIP = new Set(); IB.forEach(b=>{ if(['눈 문양 동굴', '미스터리 메이즈'].includes(b.label) && b.mesh) SKIP.add(b.mesh); });
+    const SKIP = new Set(); IB.forEach(b=>{ if(['코덱스의 동굴', '미스터리 메이즈'].includes(b.label) && b.mesh) SKIP.add(b.mesh); });
     const bb = new THREE.Box3().setFromObject(root); const X0 = Math.floor(bb.min.x) - 2, Z0 = Math.floor(bb.min.z) - 2, Wd = Math.ceil(bb.max.x - bb.min.x) + 4, Hd = Math.ceil(bb.max.z - bb.min.z) + 4;
     const a = new Uint8Array(Wd*Hd), inb = (x, z)=> x >= X0 && z >= Z0 && x < X0 + Wd && z < Z0 + Hd, at = (x, z)=> (Math.floor(z) - Z0)*Wd + (Math.floor(x) - X0);
     const mark = (x, z)=>{ for(let dz = -0.5; dz <= 0.5; dz += 0.5) for(let dx = -0.5; dx <= 0.5; dx += 0.5) if(inb(x + dx, z + dz)) a[at(x + dx, z + dz)] = 1; };
@@ -7464,7 +7472,7 @@ function startWalk(name){
   walkSaved = {pos:camera.position.clone(), tgt:controls.target.clone(), near:camera.near, fov:camera.fov};
   fly = null; if(follow) setFollow(false); hovered = -1; renderer.domElement.style.cursor = '';
   camera.near = 0.2; camera.fov = 68; camera.updateProjectionMatrix(); controls.enabled = false;
-  document.body.classList.add('walk'); $('walkName').textContent = `${name} 시점`;
+  document.body.classList.add('walk'); $('walkName').textContent = name; $('walkHud').setAttribute('aria-label', `${name} 시점`);
   $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '패드로 걷기 · 끝까지 밀면 달리기 · 화면 끌어 둘러보기' : '방향키로 걷기 · Shift 달리기 · 화면 끌어 둘러보기';
   $('walkHint').hidden = true; $('walkHelp').setAttribute('aria-expanded', 'false');
   $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none'); placeQuestHud();
@@ -7507,7 +7515,7 @@ function walkTick(now){
   const inMaze = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1); w.mazeCamera = inMaze;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
   w.mates.forEach((m, i)=>{ const k = i - (w.mates.length - 1)/2; let side = k*(inMaze ? 0.9 : 2.4), back = inMaze ? Math.abs(k)*1.6 : 0;
     let px = w.x + cy*side - sy*back, pz = w.z - sy*side - cy*back; if(inMaze && mazeBlocked(px, pz)){ px = w.x; pz = w.z; }
-    m.g.position.set(px, gy + lift, pz); m.g.rotation.y = w.yaw; if(m.g.userData.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
+    m.g.position.set(px, characterGroundY(px, pz) + lift, pz); m.g.rotation.y = w.yaw; if(m.g.userData.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
   const cpi = inMaze ? -0.12 : w.pitch;   // in the maze the camera stays below the hedge tops: you only see the corridor ahead
   const ease = 1 - Math.pow(0.002, dt);
   if(inMaze || w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }
@@ -7740,8 +7748,8 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
     if(st === 'station'){ TRAIN.lit = true; miniWalkTo(3, '스카이 루프 역으로', '선로 아래 계단', STATION.spot, 9, rideBoard); }
     else miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); }
   else if(q.mini === 'maze'){ buildLabDoor();
-    if(st === 'lab'){ mini = {q, kind:'maze', phase:'walk', cellD:null, labDone:cp.lab || []}; NATY.userData.hold = {color:0x7cc8f0, t:performance.now(), keep:true}; miniWalkTo(3, '관람차 아래 연구실로', '관람차 언덕 아래 출입금지 문', LAB_DOOR, 8, labOpen); }
-    else { mini = {q, kind:'maze', phase:'record', cellD:null}; miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '네이티 아래 물길 흔적에서 「기록」 누르기'); } }
+    if(st === 'lab'){ mini = {q, kind:'maze', phase:'walk', cellD:null, labDone:cp.lab || []}; NATY.userData.hold = {color:0x7cc8f0, t:performance.now(), keep:true}; mazeToLab(false); }
+    else { mini = {q, kind:'maze', phase:'record', cellD:null}; miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '물길 흔적에서 「기록」 누르기'); } }
   else if(q.mini === 'cave'){ mini = {q, kind:'cave', decoded:!!cp.decoded}; caveOpen(); }
   else return false;
   qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say'); return true; }
@@ -7755,7 +7763,7 @@ function questOnWalk(name){
   const q = questFor(name); questLive = null; $('questHud').hidden = true; qNavHide();
   if(!q || questDone(q) || !questOpen(q)) return;
   { const cp = miniLoad(); if(cp && cp.q === q.id){ try{ if(miniResume(q, cp)) return; }catch(e){ console.warn('mission resume', e); } } }
-  questLive = q; q.found = false; QUEST_FOUND[q.id](name).forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; }); $('qhT').textContent = q.title; $('qhHint').textContent = q.hint; $('qhStep').textContent = '1 / 3 찾기'; $('questHud').classList.remove('near'); $('qhDist').textContent = ''; $('questHud').hidden = false; placeQuestHud();
+  questLive = q; q.found = false; QUEST_FOUND[q.id](name).forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; }); $('qhT').textContent = q.title; $('qhHint').textContent = q.hint; $('qhStep').textContent = '1 / 3'; $('questHud').classList.remove('near'); $('qhDist').textContent = ''; $('questHud').hidden = false; placeQuestHud();
   const key = `void-vn-${q.id}-${TEAM || 0}`; let seen = false; try{ seen = !!sessionStorage.getItem(key); }catch(e){}
   if(!seen){ try{ sessionStorage.setItem(key, '1'); }catch(e){} setTimeout(()=>{ if(walk && questLive === q && !vn) say(QUEST_INTRO[q.id](name)); }, 700); }
 }
@@ -7805,7 +7813,7 @@ const ACT_CALL = {
 const ACT_STORY = {
   1: [{who:'제로', img:'zero_joy', text:'우와…… 하모니아가 진짜로 돌아왔어!!'}, {who:'리코', img:'rico_hmm', text:'사라진 기록이 하나 줄었어. 남은 건 네 개.'}, {who:'리코', img:'rico_hmm', text:'……근데 자일로는? 분명 여기서 불렀는데.'}, {who:'제로', img:'zero_brave', text:'롤러코스터 소리가 나는 쪽으로 간 것 같아. 찾으러 가자!'}],
   2: [{who:'제로', img:'zero_joy', text:'관람차도 돌아왔어!!'}, {who:'리코', img:'rico_hmm', text:'……근데 네이티가 안 보여요. 아까부터.'}, {who:'자일로', img:'xylo_talk', text:'네이티는 일루아가 한쪽에 몰린 곳에서 빛이 거칠어지고, 그 앞을 막아서요. 미로 정원 쪽으로 가는 걸 봤습니다.'}, {who:'자일로', img:'xylo_point', text:'미로 정원은 옛 물길을 메우고 지은 곳이에요. 뭔가 있는 거예요.'}, {who:'제로', img:'zero_brave', text:'미로라니, 가 보자!'}],
-  3: [{who:'제로', img:'zero_joy', text:'모든 빈 기록을 채웠어!!'}, {who:'리코', img:'rico', text:'이제 흐름을 다 봤으니까, 환원할 방법도 알 수 있는 거죠?'}, {who:'자일로', img:'xylo_talk', text:'네. 섬 아래 응축되어 있는 일루아를, 흐름을 따라 섬 곳곳에 고르게 되돌리는 게 환원이에요.'}, {who:'자일로', img:'xylo_point', text:'하지만 진짜 섬에서 바로 하면 안 됩니다. 잘못되면 되돌릴 수 없으니까요. 먼저 시험해야 해요.'}, {who:'자일로', img:'xylo', text:'코덱스가 먼저 눈 문양 동굴로 갔어요. 선대의 기록이 거기 남아 있다면서요.'}, {who:'제로', img:'zero_brave', text:'북쪽 해안이야. 가자!'}]};
+  3: [{who:'제로', img:'zero_joy', text:'모든 빈 기록을 채웠어!!'}, {who:'리코', img:'rico', text:'이제 흐름을 다 봤으니까, 환원할 방법도 알 수 있는 거죠?'}, {who:'자일로', img:'xylo_talk', text:'네. 섬 아래 응축되어 있는 일루아를, 흐름을 따라 섬 곳곳에 고르게 되돌리는 게 환원이에요.'}, {who:'자일로', img:'xylo_point', text:'하지만 진짜 섬에서 바로 하면 안 됩니다. 잘못되면 되돌릴 수 없으니까요. 먼저 시험해야 해요.'}, {who:'자일로', img:'xylo', text:'코덱스가 먼저 코덱스의 동굴로 갔어요. 선대의 기록이 거기 남아 있다면서요.'}, {who:'제로', img:'zero_brave', text:'북쪽 해안이야. 가자!'}]};
 // after the mission: the restored ride is greeted, the flow is shown once as a hologram swap, then the coordinates are handed over
 const ACT_EXIT = {
   q1: {greet:[{who:'자일로', img:'xylo', text:'롤러코스터의 기록까지 돌아왔군요! 비어 있는 기록은 이제 세 개입니다.'}, {who:'리코', img:'rico_hmm', text:'기록이 돌아올 때마다 흐름이 더 보이는 거지?'}], hud:'롤러코스터의 기록이 돌아오면서 흐름이 더 이어졌어.', give:[{who:'자일로', img:'xylo_point', text:'그리고 기록이 돌아오면서 다음 기록이 잠든 자리가 보였어요. 좌표를 드릴게요.'}], card:{who:'자일로', img:'xylo_talk', text:'그 자리에 뭐가 있는지는 저도 모릅니다. 좌표를 따라가서 찾아 주세요. 저는 여기서 기다리겠습니다.'}},
@@ -8131,7 +8139,7 @@ function miniStart(q){
   if(q.mini === 'loop'){ mini = {q, kind:'loop'}; buildStation(); miniSave('yard');
     miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); return; }
   if(q.mini === 'maze'){ mini = {q, kind:'maze', phase:'record', cellD:null}; buildLabDoor(); miniSave('record');
-    miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '네이티 아래 물길 흔적에서 「기록」 누르기'); return; }
+    miniGo.textContent = '기록'; miniGo.disabled = false; miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; miniHud(2, '옛 물길 터 기록', '물길 흔적에서 「기록」 누르기'); return; }
   if(q.mini === 'cave'){ mini = {q, kind:'cave'}; miniSave('cave'); caveOpen(); }
 }
 function miniTarget(){ if(!mini) return null; if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(mini.phase === 'walk' && mini.target) return mini.target; if(mini.kind === 'maze' && mini.phase === 'record') return NATY_HIDE; return null; }
@@ -8251,8 +8259,24 @@ miniGo.onclick = ()=>{
   if(!mini || !walk || vn || ride) return;
   if(mini.kind === 'maze' && mini.phase === 'record'){ if(!mazeHeart(walk.x, walk.z)) return; flash(); qPop('기록'); miniBox.hidden = true; mini.phase = 'said'; miniSave('lab'); NATY.userData.hold = {color:0x7cc8f0, t:performance.now(), keep:true};
     say([{who:'네이티', img:'naty', nar:true, text:'불꽃이 천천히 하늘색으로 가라앉는다.'}, {who:'리코', img:'rico_hmm', text:'왜 여기서 거칠어졌는지 알아야 해. 자일로 연구실 화면에 환원 기록이 있댔어.'}, {who:'제로', img:'zero_brave', text:'관람차 아래! 이번엔 몰래 안 들어가도 되겠다.'}],
-      ()=> miniWalkTo(3, '관람차 아래 연구실로', '관람차 언덕 아래 출입금지 문', LAB_DOOR, 8, labOpen)); }
+      ()=> mazeToLab(true)); }
 };
+function mazeToLab(withFade){
+  const w = walk, current = mini; if(!w || !current || current.kind !== 'maze') return;
+  buildLabDoor();
+  const go = ()=>{ if(walk !== w || mini !== current) return;
+    if(mazeInside(w.x, w.z, 4)){
+      const M = MAZE, [i, j, side] = M.ent, edge = M.S/2 + 7;
+      let lx = -M.S/2 + (j + 0.5)*M.cell, lz = -M.S/2 + (i + 0.5)*M.cell;
+      if(side === 'W') lx = -edge; else if(side === 'E') lx = edge; else if(side === 'N') lz = -edge; else lz = edge;
+      const [x, z] = freeSpot(M.cx + lx*Math.cos(M.rot) + lz*Math.sin(M.rot), M.cz - lx*Math.sin(M.rot) + lz*Math.cos(M.rot));
+      w.x = x; w.z = z; w.yaw = Math.atan2(LAB_DOOR[0] - x, LAB_DOOR[1] - z); w.pitch = -0.32; w.snap = true; w.mazeCamera = false; w.camYaw = null; MAZE.clip.constant = 1e6;
+      for(const k in WALK_KEYS) delete WALK_KEYS[k]; walkPad.dx = walkPad.dz = 0;
+    }
+    miniWalkTo(3, '관람차 아래 연구실로', '관람차 언덕 아래 출입금지 문', LAB_DOOR, 8, labOpen); miniSave('lab');
+  };
+  if(withFade) fadeThrough('#05070c', go); else go();
+}
 function buildLabDoor(){ if(LAB_DOOR) return; const FX = FERRIS_X*K, FZ = FERRIS_Z*K; let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - FX, pz - FZ); if(d < bd){ bd = d; best = [px, pz]; } }   // the park path that climbs to the wheel: the door sits at the hill's foot on that side
   const ax = best ? best[0] - FX : 0, az = best ? best[1] - FZ : 1, L = Math.hypot(ax, az) || 1, ux = ax/L, uz = az/L, yaw = Math.atan2(ux, uz);
   const g = new THREE.Group(); g.position.set(FX + ux*75, G, FZ + uz*75); g.rotation.y = yaw; islRoot.add(g);
@@ -8323,7 +8347,7 @@ function caveOpen(){ miniBox.hidden = true; $('questHud').hidden = true; qNavHid
   if(mini && mini.decoded){ setTimeout(()=> say([{who:'코덱스', img:'codex_side', text:'벽은 읽었다. 이어서 시험이다. 조건을 정하고 돌려 봐라.'}], null, {dark:true}), 900); return; }
   setTimeout(()=> say([{who:'코덱스', img:'codex', text:'우리 가문이 문양을 처음 새긴 곳이다. 일루아를 알고 그 힘을 쓰던 때의 기록이지.'}, {who:'코덱스', img:'codex_side', text:'그런데 문양 옆의 글은 나도 읽지 못한다. 전해지지 않았어.'}, {who:'리코', img:'rico_hmm', text:'보이드, 노아랑 루나의 옛 섬을 벽에 띄워 줘.'}, {who:'제로', img:'zero_joy', text:'그림 글자가 옛 섬 모양이랑 닮았어! 글자를 옛 섬의 자리에 맞춰 보자.'}], null, {dark:true}), 900); }
 function caveBuild(){ caveS = {phase:'decode', pick:null, done:new Set(), fails:0, dev:null, ord:[], amt:null, runs:0, busy:false};
-  $('cvK').textContent = 'EYE CAVE · OLD RECORD'; $('cvT').textContent = '선대의 기록'; $('cvP').textContent = '그림 글자를 누른 다음, 옛 섬에서 그 자리를 누르세요.'; $('cvDecode').hidden = false; $('cvTest').hidden = true; $('cvSent').innerHTML = ''; $('cvLog').innerHTML = ''; $('cvWarn').hidden = true; $('cvNext').hidden = true;
+  $('cvK').textContent = '코덱스의 동굴'; $('cvT').textContent = '선대의 기록'; $('cvP').textContent = '그림 글자를 누른 다음, 옛 섬에서 그 자리를 누르세요.'; $('cvDecode').hidden = false; $('cvTest').hidden = true; $('cvSent').innerHTML = ''; $('cvLog').innerHTML = ''; $('cvWarn').hidden = true; $('cvNext').hidden = true;
   const order = GLYPHS.map((g, i)=> i).sort(()=> Math.random() - 0.5);
   $('cvTiles').innerHTML = order.map(i=> `<button type="button" data-g="${GLYPHS[i].id}" aria-label="그림 글자"><svg viewBox="0 0 100 100">${GLYPHS[i].svg}</svg></button>`).join('');
   $('cvMap').innerHTML = `<canvas width="320" height="240" id="cvOld"></canvas>` + GLYPHS.map(g=> `<button type="button" class="slot" data-s="${g.id}" style="left:${g.at[0]}%;top:${g.at[1]}%" aria-label="옛 섬의 자리"><span></span><b>${g.name}</b></button>`).join('');
@@ -8344,7 +8368,7 @@ $('cvMap').addEventListener('click', e=>{ const s = e.target.closest('.slot'); i
   else { caveS.fails++; s.classList.remove('no'); void s.offsetWidth; s.classList.add('no'); const left = GLYPHS.filter(x=> !caveS.done.has(x.id)); $('cvP').textContent = caveS.fails >= 2 ? `아니다. 힌트: ${g.name}은 ${g.id === 'forest' ? '섬 안쪽, 나무가 모인 곳' : g.id === 'valley' ? '두 능선 사이, 서쪽' : g.id === 'shore' ? '섬 가장자리의 점선' : g.id === 'cave' ? '북쪽의 어두운 입구' : g.id === 'water' ? '남동쪽으로 흐르는 푸른 줄' : '남쪽의 평평한 터'}.` : '아니다. 글자의 모양을 다시 봐.'; } });
 function caveDecoded(){ miniSave('cave', {decoded:true}); $('cvSent').innerHTML = `<span>힘은</span><b>숲</b><i>·</i><span>에서 깨어나</span><b>계곡</b><i>··</i><span>을 지나</span><b>바닷가</b><i>···</i><span>에 닿는다</span>`; $('cvP').textContent = '글이 읽힌다. 점의 수가 순서다.'; $('cvNext').hidden = true; $('cvNext').textContent = '시험으로';
   setTimeout(()=> say([{who:'코덱스', img:'codex', text:'……순서가 있었군. 숲, 계곡, 바닷가. 우리 가문은 이걸 잊고 문양만 남겼다.'}, {who:'리코', img:'rico_hmm', text:'이제 시험이에요. 연구실에서 본 것, 기억하지?'}, {who:'제로', img:'zero_brave', text:'장치 끄고, 숲부터, 조금씩!'}, {who:'코덱스', img:'codex_side', text:'벽이 시험대다. 조건을 정하고 돌려 봐라. 진짜 섬에서는 한 번도 해볼 수 없는 실패를, 여기서는 몇 번이고 해볼 수 있다.'}], ()=>{ $('cvNext').hidden = false; }, {dark:true}), 500); }
-function caveToTest(){ caveS.phase = 'test'; $('cvK').textContent = 'EYE CAVE · VIRTUAL TEST'; $('cvT').textContent = '가상 시험'; $('cvDecode').hidden = true; $('cvTest').hidden = false; $('cvNext').hidden = true; $('cvP').textContent = '세 가지를 정하고 「시험」. 실패는 벽에 남는다.'; caveIsl(null, 0); }
+function caveToTest(){ caveS.phase = 'test'; $('cvK').textContent = '코덱스의 동굴'; $('cvT').textContent = '가상 시험'; $('cvDecode').hidden = true; $('cvTest').hidden = false; $('cvNext').hidden = true; $('cvP').textContent = '세 가지를 정하고 「시험」. 실패는 벽에 남는다.'; caveIsl(null, 0); }
 $('cvNext').onclick = ()=>{ if(!caveS || vn) return; if(caveS.phase === 'decode'){ caveToTest(); return; }
   if(caveS.phase === 'won'){ fadeThrough('#05070c', ()=>{ delete $('caveDlg').dataset.on; }); setTimeout(()=> say([{who:'코덱스', img:'codex', text:'그게 이 섬의 본래 모습이다. 제대로 환원할수록 섬은 예전의 힘을 되찾는다.'}, {who:'리코', img:'rico', text:'……방법은 찾았어요. 안쪽 숲부터, 고르게.'}, {who:'코덱스', img:'codex_side', text:'좋다. 더는 부수지 않겠다. 그 방법을 끝까지 보지.'}, {who:'네이티', img:'naty', nar:true, text:'네이티의 빛이 하늘색으로 가라앉는다.'}], ()=> questComplete(mini.q), {dark:true}), 700); } };
 $('cvTest').addEventListener('click', e=>{ const b = e.target.closest('.opts button'); if(!b || !caveS || caveS.busy) return; const set = b.parentElement.dataset.set, v = b.dataset.v;
