@@ -41,13 +41,10 @@ async def main():
   await pg.evaluate('__dbg.walkTo(...__dbg.forestSpot())');await pg.wait_for_selector('#miniBox',state='visible')
   assert await pg.locator('#miniGo').inner_text()=='기록 찍기'
   assert await pg.evaluate('__dbg.simState().lit')==1
-  await pg.locator('#miniGo').click();await drain('#qReward');assert '기다리는 중'  in await pg.locator('#qrS').inner_text()
-  assert await pg.locator('#qrMap').is_disabled();assert not await pg.locator('#qrList').is_visible()
-  assert await pg.evaluate('__dbg.simState().lit')==2
-  print('OK separate on-site forest capture completes, records stay 2/5, team wait blocks the next campus coordinate',flush=True)
-  await post('quest',{'team':12,'dev':'secondtablet','done':['q1'],'story':2})
-  await pg.wait_for_function("!document.getElementById('qrMap').disabled",timeout=25000)
-  assert await pg.locator('#qrList').is_visible();assert '기다리는 중' not in await pg.locator('#qrP').inner_text();assert await pg.locator('#qrCount').inner_text()=='채운 기록 2 / 5';print('OK matching second-tablet completion unlocks the next activity',flush=True)
+  await pg.locator('#miniGo').click();await drain('#qReward');assert '기다리는 중' not in await pg.locator('#qrS').inner_text()
+  assert not await pg.locator('#qrMap').is_disabled();assert await pg.locator('#qrList').is_visible()
+  assert await pg.evaluate('__dbg.simState().lit')==2;assert await pg.locator('#qrCount').inner_text()=='채운 기록 2 / 5'
+  print('OK on-site forest capture completes at 2/5 and opens the next activity without waiting for the other tablet (independent tablets, 2026-10-30)',flush=True)
   # Completed teams preserve actual-restoration state when a replacement tablet joins.
   await post('quest',{'team':12,'dev':'firsttablet','done':['q1','q2','q4','q3'],'act':3,'story':3,'restored':True})
   state=await (await post('quest',{'team':12,'dev':'replacement'})).json()
