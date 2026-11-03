@@ -439,7 +439,9 @@ class Handler(BaseHTTPRequestHandler):
                     tq = {}
             else:
                 if not letter and dev:
-                    letter = next((l for l, v in tq.items() if v.get('dev') == dev), None) or next(l for l in 'abcdefghij' if l not in tq)
+                    letter = next((l for l, v in tq.items() if v.get('dev') == dev), None) or next((l for l in 'abcdefghij' if l not in tq), None)
+                    if not letter:
+                        raise ValueError('한 조에는 태블릿을 10대까지 등록할 수 있습니다. 기존 태블릿을 사용하거나 선생님께 조 초기화를 요청하세요.')
                 if not letter:
                     raise ValueError('태블릿 정보가 없습니다.')
                 cur = dict(tq.get(letter, {}))
