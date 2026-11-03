@@ -22,7 +22,6 @@ async def main():
         await ctx.request.post(API+'/api/void/admin/skip', data=json.dumps({'team':2,'mission':'z1'}), headers=H)
         await ctx.request.post(API+'/api/void/admin/skip', data=json.dumps({'team':2,'mission':'z2'}), headers=H)
         # team 3 tablet b: registered, finished mission 1 (its record 1 counts for the team, as tablets share scans)
-        await ctx.request.post(API+'/api/void/quest', data=json.dumps({'team':3,'dev':'tabletb','done':['q1'],'act':1,'tut':True}), headers=J)
         pg=await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); ev=pg.evaluate
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept('0101')))
         await pg.goto(f'{STATIC}/chapter05/{FILE}?team=3', wait_until='domcontentloaded')
@@ -30,6 +29,8 @@ async def main():
             if await ev("typeof window.__dbg !== 'undefined'"): break
             await asyncio.sleep(0.5)
         await asyncio.sleep(4); await ev("__dbg.tutEnd()"); await asyncio.sleep(2.5)
+        # tablet b joins AFTER this tablet registered (a tablet joining later inherits the team's furthest progress by design, set_quests 2026-10-27)
+        await ctx.request.post(API+'/api/void/quest', data=json.dumps({'team':3,'dev':'tabletb','done':['q1'],'act':1,'tut':True}), headers=J); await asyncio.sleep(9)
         ST = """(()=>{ const t = __dbg.tutState(); return {rec:!!document.getElementById('recDone').dataset.on, busy:__dbg.simState().busy, qd:__dbg.qdone(), z2locked:(t.locked.find(x=> x[0] === 'z2') || [])[1], skip:__dbg.skipWhat ? __dbg.skipWhat() : null}; })()"""
         async def server_a():
             j = await (await ctx.request.get(API+'/api/void/state')).json(); q = j['quests'].get('3', {})
