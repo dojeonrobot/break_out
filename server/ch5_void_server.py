@@ -450,7 +450,7 @@ class Handler(BaseHTTPRequestHandler):
                         if not isinstance(v, dict):
                             continue
                         for k, val in v.items():
-                            if QUEST_ID.match(k) or k == 'tut':
+                            if QUEST_ID.match(k) or k in ('tut', 'story', 'restored', 'power'):
                                 cur[k] = cur.get(k) or val
                             elif k == 'act':
                                 cur['act'] = max(int(cur.get('act') or 0), int(val or 0))
@@ -466,6 +466,12 @@ class Handler(BaseHTTPRequestHandler):
                         cur['act'] = max(int(cur.get('act') or 0), min(3, int(b['act'])))
                     except (TypeError, ValueError):
                         pass
+                if b.get('story') in (2, 3):
+                    cur['story'] = max(cur.get('story', 0), b['story'])
+                if b.get('power'):
+                    cur['power'] = cur.get('power') or now_ms()
+                if b.get('restored') and 'q3' in cur:
+                    cur['restored'] = cur.get('restored') or now_ms()
                 if b.get('tut'):
                     cur['tut'] = cur.get('tut') or now_ms()
                 tq[letter] = cur

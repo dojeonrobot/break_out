@@ -17,13 +17,16 @@ JS = r"""async (label) => { const b = __dbg, r = b.renderer; const out = {label}
   return out; }"""
 async def main():
     async with async_playwright() as p:
-        br = await p.chromium.launch(args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+        br = await p.chromium.launch(args=['--enable-gpu'])
         ctx = await br.new_context(viewport={'width':1152,'height':720}, device_scale_factor=1); await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');")
         pg = await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); await pg.route('**/api/void/**', lambda rt: rt.abort())
         await pg.goto('http://127.0.0.1:8097/chapter05/index.html?team=12&world=island', wait_until='load'); await pg.wait_for_timeout(9000)
+        await pg.evaluate('__dbg.tutEnd()');await asyncio.sleep(1)
+        await pg.evaluate("__dbg.quest().set(['q1','q2','q3']);__dbg.setWorld('island',true)");await asyncio.sleep(1)
         print(json.dumps(await pg.evaluate(JS, 'island overview'), ensure_ascii=False))
         # island, first-person near the ground (walk mode) 
-        await pg.evaluate("() => { try{ __dbg.tutEnd && __dbg.tutEnd(); }catch(e){} __dbg.startWalk('리코·제로'); }"); await pg.wait_for_timeout(2500)
+        await pg.evaluate("() => { __dbg.setWorld('island',true);__dbg.startWalk('리코·제로'); }"); await pg.wait_for_timeout(2500)
+        assert await pg.evaluate('!!__dbg.walk()')
         print(json.dumps(await pg.evaluate(JS, 'island walk'), ensure_ascii=False))
         await pg.evaluate("() => { __dbg.stopWalk(); __dbg.setWorld('erica', true); }"); await pg.wait_for_timeout(2500)
         print(json.dumps(await pg.evaluate(JS, 'campus'), ensure_ascii=False))
@@ -32,5 +35,5 @@ async def main():
           const buckets = {}; let n = 0, noUv = 0, multi = 0, kids = 0, dyn = 0, skinned = 0; const dynIn = o => { for(let p = o; p; p = p.parent) if(p.userData && p.userData.dynamic) return true; return false; };
           __dbg.islRoot.traverse(o=>{ if(!o.isMesh || o.isInstancedMesh) return; n++; if(o.isSkinnedMesh){ skinned++; return; } if(Array.isArray(o.material)){ multi++; return; } if(!o.geometry.attributes.uv) noUv++; if(o.children.length) kids++; if(dynIn(o)){ dyn++; return; } const k = sig(o); buckets[k] = (buckets[k] || 0) + 1; });
           const vals = Object.values(buckets).sort((a, b)=> b - a); return {meshes:n, skinned, multiMat:multi, noUv, withChildren:kids, dynamic:dyn, staticBuckets:vals.length, staticMeshes:vals.reduce((a, b)=> a + b, 0), top:vals.slice(0, 12)}; })()"""), ensure_ascii=False))
-        print('errs', errs[:1]); await br.close()
+        print('errs', errs[:1]); assert not errs,errs; await br.close()
 asyncio.run(main())
