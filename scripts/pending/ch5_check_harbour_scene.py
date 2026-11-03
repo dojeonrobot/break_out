@@ -19,6 +19,15 @@ async def main():
   assert not result['parade']['bad'],'parade crosses gate';assert result['parade']['minZ']>180,'parade crosses fountain';print('OK full parade cycle clears fountain and gate',flush=True)
   assert len(result['barriers'])==10 and all(b['xSpan']==b['ySpan']==0 and b['zSpan']>1.4 for b in result['barriers']);print('OK ten barriers pivot vertically at their side hinges',flush=True)
   assert result['labels'].count('항구')==1 and '키즈 라군' not in result['labels'];assert result['blockedWest'] and not result['openGate'];assert all(abs(c['x'])<20 for c in result['crossings']),result['crossings'];print('OK harbour unified, west bypass blocked, all path crossings use main gate',flush=True)
+  west=await pg.evaluate('()=>{const H=__parkPolish.state.harbour,b=new __dbg.THREE.Box3().setFromObject(H.fence);return {minX:b.min.x,closed:__dbg.walkBlocked(-255,450),segments:H.entry.segments}}')
+  assert west['minX']>=-257 and west['closed'],west
+  assert west['segments'][0]==[[-255,560],[-255,390]]
+  print('OK western fence closes at harbour edge without crossing the distant meadow',flush=True)
+  paths=await pg.evaluate('()=>{const d=__dbg,H=__parkPolish.state.harbour,T=d.THREE,trees=[];d.islRoot.traverse(o=>{if(o.userData.palm)trees.push(o.getWorldPosition(new T.Vector3()))});const paths=[25,26].map(i=>{const p=d.PATHS[i],length=p.slice(1).reduce((s,q,j)=>s+Math.hypot(q[0]-p[j][0],q[1]-p[j][1]),0),direct=Math.hypot(p.at(-1)[0]-p[0][0],p.at(-1)[1]-p[0][1]);return {i,length,direct,blocked:p.filter(([x,z])=>[-2.16,0,2.16].every(dx=>d.walkBlocked(x+dx,z))).length}});return {paths,cleared:H.clearedPalms.length,obstructions:trees.filter(p=>(p.x>-255&&p.x<20&&p.z>410&&p.z<550)||[25,26,28].some(i=>d.PATHS[i].some(([x,z])=>Math.hypot(p.x-x,p.z-z)<18))).length}}')
+  print('harbour approaches',paths,flush=True)
+  assert all(p['length']<p['direct']*1.01 and p['blocked']==0 for p in paths['paths']),paths
+  assert paths['cleared']>0 and paths['obstructions']==0,paths
+  print('OK both harbour approaches are direct and palms clear the public apron and paths',flush=True)
   assert result['visitors']['count']==640 and len(result['visitors']['parts'])>=14 and result['visitors']['feet']>=-.01;print('OK articulated crowd includes faces, hair, clothes, arms and grounded feet',flush=True)
   # Exhaustive reachability with the gate temporarily treated as closed: no harbour-to-park bypass.
   reach=await pg.evaluate('''()=>{const d=__dbg,step=3,X0=-630,Z0=-610,W=421,H=440,n=W*H,seen=new Uint8Array(n),idx=(x,z)=>Math.floor((z-Z0)/step)*W+Math.floor((x-X0)/step),start=idx(0,450),stack=[start];seen[start]=1;let crossed=false,count=0;while(stack.length){const k=stack.pop(),i=k%W,j=(k/W)|0,x=X0+i*step+1.5,z=Z0+j*step+1.5;count++;if(z<365){crossed=true;break;}for(const [a,b]of [[i-1,j],[i+1,j],[i,j-1],[i,j+1]]){if(a<0||a>=W||b<0||b>=H)continue;const key=b*W+a;if(seen[key])continue;const px=X0+a*step+1.5,pz=Z0+b*step+1.5;if(Math.abs(px)<24&&Math.abs(pz-390)<3)continue;if(d.walkBlocked(px,pz))continue;seen[key]=1;stack.push(key)}}return {crossed,count}}''')

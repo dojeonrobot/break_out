@@ -13,11 +13,17 @@ async def main():
   await ctx.request.post(API+'/api/void/team_reset',data={'team':12,'confirm':'AGAIN'},headers={'X-Admin-Key':'0101'})
   for mission in ['z1','z2']:await ctx.request.post(API+'/api/void/admin/skip',data={'team':12,'mission':mission},headers={'X-Admin-Key':'0101'})
   await ctx.request.post(API+'/api/void/quest',data={'team':12,'dev':'storytest','done':['q1'],'act':2,'tut':True,'story':2})
+  reject_capture=False
   async def route(r):
-   q=r.request;res=await ctx.request.fetch(q.url.replace(STATIC,API),method=q.method,data=q.post_data_buffer,headers={k:v for k,v in q.headers.items() if k not in ['host','origin','referer']})
+   nonlocal reject_capture
+   q=r.request
+   if reject_capture and q.method=='POST' and q.url.endswith('/quest') and 'records' in (q.post_data or ''):
+    reject_capture=False
+    await r.fulfill(status=503,body=json.dumps({'error':'test unavailable'}),content_type='application/json');return
+   res=await ctx.request.fetch(q.url.replace(STATIC,API),method=q.method,data=q.post_data_buffer,headers={k:v for k,v in q.headers.items() if k not in ['host','origin','referer']})
    await r.fulfill(status=res.status,body=await res.body(),headers={'content-type':res.headers.get('content-type','application/json')})
   await ctx.route(re.compile(r'.*/api/void/.*'),route);await ctx.route('**/chapter05/index.html*',lambda r:r.fulfill(body=source,content_type='text/html'))
-  pg=await ctx.new_page();pg.on('pageerror',lambda e:errors.append(str(e)))
+  pg=await ctx.new_page();pg.on('pageerror',lambda e:(errors.append(str(e)),print('PAGEERROR',str(e),flush=True)))
   await pg.goto(STATIC+'/chapter05/index.html?team=12',wait_until='load');await pg.wait_for_function('!!window.__dbg?.rideState',timeout=60000)
   async def say_done():
    await pg.evaluate('()=>{for(let i=0;i<120&&__dbg.quest().vn();i++)__dbg.quest().next()}')
@@ -37,9 +43,27 @@ async def main():
   await say_done();await pg.evaluate('__dbg.walkTo(165,420)')
   await pg.wait_for_function("__dbg.quest().vn()?.lines[0].text.includes('찾았다')")
   assert not await pg.evaluate("!!__dbg.islRoot.getObjectByName('old-watercourse')");await say_done();await asyncio.sleep(.7)
-  assert await pg.evaluate("__dbg.mini().phase")=='walk';assert not await pg.locator('#miniBox').is_visible()
+  assert await pg.evaluate("__dbg.mini().phase")=='naty-shot';assert await pg.locator('#miniBox').is_visible()
   assert not await pg.evaluate('(()=>{const w=__dbg.walk();return __dbg.mazeInside(w.x,w.z)})()')
-  print('OK maze only finds Naty, no orb, trace or record button; exits maze',flush=True)
+  assert await pg.evaluate('__activity().count')==3
+  assert '기록 찍기' in await pg.evaluate('__activity().help')
+  # Leave and resume before capture: the count must remain 3 and the pair stays outside.
+  await pg.evaluate("__dbg.stopWalk();__dbg.startWalk('리코·제로')");await say_done();await asyncio.sleep(.3)
+  assert await pg.evaluate('__activity().count')==3
+  assert not await pg.evaluate('(()=>{const w=__dbg.walk();return __dbg.mazeInside(w.x,w.z)})()')
+  reject_capture=True
+  await pg.locator('#miniGo').click()
+  await pg.wait_for_function("document.getElementById('qhHint').textContent.includes('저장하지 못했습니다')")
+  assert await pg.evaluate('__activity().count')==3
+  assert not await pg.locator('#miniGo').is_disabled()
+  print('OK failed record save keeps count unchanged and allows retry',flush=True)
+  await pg.locator('#miniGo').click();await say_done();await pg.wait_for_function('__activity().count===4')
+  await say_done();await pg.wait_for_function('__dbg.mini().phase==="walk"')
+  state=await (await ctx.request.get(API+'/api/void/state')).json()
+  assert state['quests']['12']['a']['records'].get('q2')
+  assert 'q2' not in state['quests']['12']['a']
+  assert '연구실' in await pg.evaluate('__activity().help')
+  print('OK maze only finds Naty; separate capture outside persists record 4 before lab completion',flush=True)
   await pg.evaluate('__dbg.walkTo(...__dbg.labDoor())');await drain_until('#labDlg');await asyncio.sleep(1);await say_done()
   assert await pg.locator('#lbMons svg').count()==1
   assert '선대' not in await pg.locator('#lbMons').inner_text()
@@ -47,7 +71,7 @@ async def main():
   await pg.screenshot(path=str(OUT/'analysis.png'))
   await pg.locator('#lbGo').click();await drain_until('#qReward');assert '네이티 발견' in await pg.locator('#qrT').inner_text()
   assert not await pg.locator('#qrList .z').count();assert 'q4' not in await pg.evaluate('__dbg.qdone()')
-  print('OK lab fills fourth record and identifies only an anomaly, no device identity or blueprint',flush=True)
+  print('OK lab uses captured fourth record and identifies only an anomaly, no device identity or blueprint',flush=True)
   await pg.locator('#qrMap').click();await asyncio.sleep(1);await say_done()
   assert await pg.evaluate('__dbg.quest().live.id')=='q4'
   await pg.evaluate('()=>{const q=__dbg.quest();__dbg.walkTo(...q.target(q.live))}');await drain_until('#deviceDlg');await say_done()

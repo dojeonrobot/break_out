@@ -421,9 +421,9 @@ class Handler(BaseHTTPRequestHandler):
         team = clean_team(b.get('team'))
         if not team:
             raise ValueError('조 번호가 없습니다.')
-        self.set_quests(team, b)
+        self.set_quests(team, b, rewind_records=True)
 
-    def set_quests(self, team, b):
+    def set_quests(self, team, b, rewind_records=False):
         # quests[team] = {'a': {'dev': 태블릿 id, 'q1': ts, ..., 'act': 본 막, 'tut': 튜토리얼 끝낸 시각}, 'b': {...}} — 조 안의 태블릿마다 한 칸 (2026-10-27)
         dev = re.sub(r'[^a-z0-9]', '', str(b.get('dev') or ''))[:16]
         letter = str(b.get('letter') or '')
@@ -452,6 +452,8 @@ class Handler(BaseHTTPRequestHandler):
                         for k, val in v.items():
                             if QUEST_ID.match(k) or k in ('tut', 'story', 'restored', 'power'):
                                 cur[k] = cur.get(k) or val
+                            elif k == 'records' and isinstance(val, dict):
+                                cur['records'] = dict(cur.get('records') or {}, **val)
                             elif k == 'act':
                                 cur['act'] = max(int(cur.get('act') or 0), int(val or 0))
                 if dev:
@@ -459,6 +461,8 @@ class Handler(BaseHTTPRequestHandler):
                 cur['seen'] = now_ms()
                 if isinstance(b.get('done'), list):
                     done = [str(x) for x in b['done'] if QUEST_ID.match(str(x))]
+                    if rewind_records:
+                        cur['records'] = {k: v for k, v in (cur.get('records') or {}).items() if k in done}
                     keep = {k: v for k, v in cur.items() if not QUEST_ID.match(k)}
                     cur = dict(keep, **{x: cur.get(x) or now_ms() for x in done})
                 if b.get('act') is not None:
@@ -468,6 +472,12 @@ class Handler(BaseHTTPRequestHandler):
                         pass
                 if b.get('story') in (2, 3):
                     cur['story'] = max(cur.get('story', 0), b['story'])
+                if isinstance(b.get('records'), list):
+                    records = dict(cur.get('records') or {})
+                    for record in b['records']:
+                        if record in ('q1', 'q2'):
+                            records[record] = records.get(record) or now_ms()
+                    cur['records'] = records
                 if b.get('power'):
                     cur['power'] = cur.get('power') or now_ms()
                 if b.get('restored') and 'q3' in cur:

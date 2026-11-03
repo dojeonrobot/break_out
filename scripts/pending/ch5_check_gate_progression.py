@@ -47,12 +47,12 @@ async def main():
   print('OK separate on-site forest capture completes, records stay 2/5, team wait blocks the next campus coordinate',flush=True)
   await post('quest',{'team':12,'dev':'secondtablet','done':['q1'],'story':2})
   await pg.wait_for_function("!document.getElementById('qrMap').disabled",timeout=25000)
-  assert await pg.locator('#qrList').is_visible();print('OK matching second-tablet completion unlocks the next activity',flush=True)
+  assert await pg.locator('#qrList').is_visible();assert '기다리는 중' not in await pg.locator('#qrP').inner_text();assert await pg.locator('#qrCount').inner_text()=='채운 기록 2 / 5';print('OK matching second-tablet completion unlocks the next activity',flush=True)
   # Completed teams preserve actual-restoration state when a replacement tablet joins.
   await post('quest',{'team':12,'dev':'firsttablet','done':['q1','q2','q4','q3'],'act':3,'story':3,'restored':True})
   state=await (await post('quest',{'team':12,'dev':'replacement'})).json()
   entry=next(v for v in state['quests']['12'].values() if v.get('dev')=='replacement')
-  assert entry.get('story')==3 and entry.get('restored') and all(k in entry for k in ['q1','q2','q4','q3'])
+  assert entry.get('records',{}).get('q1');assert entry.get('story')==3 and entry.get('restored') and all(k in entry for k in ['q1','q2','q4','q3'])
   print('OK replacement tablet inherits story revision and actual-restoration status',flush=True)
   # Exercise final modal layouts at desktop and tablet sizes without altering mission progress.
   await pg.evaluate("delete document.getElementById('qReward').dataset.on;__dbg.stopWalk();__dbg.dlg.lab(true)")
