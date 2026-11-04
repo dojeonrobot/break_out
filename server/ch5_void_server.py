@@ -39,6 +39,9 @@ ROOT = os.path.dirname(HERE)
 DATA_DIR = os.path.join(HERE, 'data')
 THUMB_DIR = os.path.join(DATA_DIR, 'thumbs')
 SPLAT_DIR = os.path.join(DATA_DIR, 'splats')
+VIK_DIR = os.path.join(DATA_DIR, 'vikings')   # 2026-11-04: 조별 바이킹 배 모델 <team>.<stl|obj|glb>
+VIK_MAX = 20 * 1024 * 1024
+VIK_TYPES = {'stl': 'model/stl', 'obj': 'text/plain; charset=utf-8', 'glb': 'model/gltf-binary'}
 try:
     from spz2splat import convert as spz_convert
 except Exception:          # numpy 없는 환경: 링크는 받되 변환은 못 한다
@@ -161,7 +164,7 @@ def live_pos():
 
 def state():
     return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)), 'reset': int(DB.get('reset', 0)),
-            'quests': DB.get('quests', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'now': now_ms()}
+            'quests': DB.get('quests', {}), 'vikings': DB.get('vikings', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'now': now_ms()}
 
 
 # ---------- Scaniverse 링크 → 스플랫 자동 변환 ----------
@@ -240,6 +243,28 @@ def scan_meta(scan_id):
         return '', ''
 
 
+def vik_ok(data, ext):
+    """올린 파일이 그 확장자의 3D 모델처럼 생겼는지 (내용까지 검사하지는 않음)."""
+    if ext == 'glb':
+        return data[:4] == b'glTF'
+    if ext == 'stl':
+        if len(data) >= 84 and 84 + 50 * int.from_bytes(data[80:84], 'little') == len(data):
+            return True
+        return data.lstrip()[:5].lower() == b'solid' and b'facet' in data[:4096]
+    if ext == 'obj':
+        head = data[:200000]
+        return bool(re.search(rb'(^|\n)v\s', head)) and bool(re.search(rb'(^|\n)f\s', data))
+    return False
+
+
+def vik_remove(team):
+    for e in VIK_TYPES:
+        try:
+            os.remove(os.path.join(VIK_DIR, f'{team}.{e}'))
+        except OSError:
+            pass
+
+
 def fetch_thumb(scan_id):
     os.makedirs(THUMB_DIR, exist_ok=True)
     fp = os.path.join(THUMB_DIR, scan_id + '.jpg')
@@ -306,6 +331,12 @@ class Handler(BaseHTTPRequestHandler):
             if not fp:
                 return self.fail('미리보기를 가져오지 못했습니다.', 404)
             return self.send_bytes(open(fp, 'rb').read(), 'image/jpeg', cache=True)
+        m = re.fullmatch(r'/api/void/viking/(\d{1,2})\.(stl|obj|glb)', path)
+        if m:
+            fp = os.path.join(VIK_DIR, f'{int(m.group(1))}.{m.group(2)}')
+            if not os.path.isfile(fp):
+                return self.fail('올린 배 모델이 없습니다.', 404)
+            return self.send_bytes(open(fp, 'rb').read(), VIK_TYPES[m.group(2)], cache=True)
         m = re.fullmatch(r'/api/void/splat/([a-z0-9]{6,40})\.txt', path)
         if m:
             fp = os.path.join(SPLAT_DIR, m.group(1) + '.splat.txt')
@@ -339,6 +370,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
+        if path == '/api/void/viking':   # 본문이 JSON이 아니라 파일 그대로
+            try:
+                return self.viking_upload()
+            except ValueError as e:
+                return self.fail(str(e))
         try:
             body = self.read_json()
         except (ValueError, json.JSONDecodeError):
@@ -351,7 +387,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto,
             '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
-            '/api/void/admin/skip': self.admin_skip,
+            '/api/void/admin/skip': self.admin_skip, '/api/void/admin/viking_clear': self.admin_viking_clear,
         }
         fn = routes.get(path)
         if not fn:
@@ -393,6 +429,49 @@ class Handler(BaseHTTPRequestHandler):
         threading.Thread(target=fetch_thumb, args=(scan_id,), daemon=True).start()
         threading.Thread(target=convert_scan, args=(sub_id, scan_id), daemon=True).start()
 
+    # 학생: 바이킹 복구 — 조가 설계한 배 모델(STL/OBJ/GLB)을 올린다. 조마다 하나, 다시 올리면 바뀐다 (2026-11-04)
+    def viking_upload(self):
+        qs = parse_qs(urlparse(self.path).query)
+        team = clean_team((qs.get('team') or [''])[0])
+        ext = (qs.get('ext') or [''])[0].lower()
+        if not team:
+            raise ValueError('우리 조를 먼저 고르세요.')
+        if ext not in VIK_TYPES:
+            raise ValueError('STL, OBJ, GLB 파일만 올릴 수 있습니다.')
+        n = int(self.headers.get('Content-Length') or 0)
+        if n <= 0 or n > VIK_MAX:
+            self.close_connection = True
+            raise ValueError('20MB보다 작은 파일을 올려 주세요.')
+        data = self.rfile.read(n)
+        if len(data) != n or not vik_ok(data, ext):
+            raise ValueError('3D 모델 파일 형식이 맞지 않습니다.')
+        os.makedirs(VIK_DIR, exist_ok=True)
+        fp = os.path.join(VIK_DIR, f'{team}.{ext}')
+        with open(fp + '.tmp', 'wb') as f:
+            f.write(data)
+        with lock:
+            for e in VIK_TYPES:
+                if e != ext:
+                    try:
+                        os.remove(os.path.join(VIK_DIR, f'{team}.{e}'))
+                    except OSError:
+                        pass
+            os.replace(fp + '.tmp', fp)
+            DB.setdefault('vikings', {})[str(team)] = {'ext': ext, 'name': clean_text((qs.get('name') or [''])[0], 60), 'size': n, 't': now_ms()}
+            save()
+            self.send_json(state())
+
+    # 운영자: 한 조의 바이킹 배 모델을 지우고 공사 중으로 되돌린다
+    def admin_viking_clear(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조 번호가 없습니다.')
+        with lock:
+            DB.setdefault('vikings', {}).pop(str(team), None)
+            vik_remove(team)
+            save()
+            self.send_json(state())
+
     # 학생: 우리 조 처음부터 — 이 조의 제출과 미션·막·튜토리얼 진행을 모두 지운다 (2026-10-27).
     # 2026-10-30: 같이 다니는 선생님의 비밀번호(X-Admin-Key)가 있어야 한다 — 아이가 혼자 눌러 조 전체를 날리지 않게.
     def team_reset(self, b):
@@ -406,6 +485,8 @@ class Handler(BaseHTTPRequestHandler):
         with lock:
             DB['subs'] = [s for s in DB['subs'] if s['team'] != team]
             DB.setdefault('quests', {}).pop(str(team), None)
+            DB.setdefault('vikings', {}).pop(str(team), None)
+            vik_remove(team)
             save()
             self.send_json(state())
 
@@ -596,6 +677,9 @@ class Handler(BaseHTTPRequestHandler):
             DB['subs'] = []
             DB['hidden'] = sorted(set(DB['hidden']) | set(hide))
             DB['quests'] = {}
+            for t in list(DB.get('vikings', {})):
+                vik_remove(t)
+            DB['vikings'] = {}
             DB['notice'] = None
             DB['reset'] = now_ms()   # every tablet forgets its team when it sees a newer reset
             save()

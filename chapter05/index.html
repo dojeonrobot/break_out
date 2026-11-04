@@ -6,7 +6,7 @@ body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-colo
 #adminBtn,#sndBtn{height:44px;box-sizing:border-box;display:flex;align-items:center}
 #sndBtn{right:84px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--fg)} #sndBtn .x{display:none} #sndBtn.off .w{display:none} #sndBtn.off .x{display:block} #sndBtn.off{color:var(--muted)}
 body.admin #sndBtn,body.screen #sndBtn{display:none}
-
+.vik{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}.vik small{font-size:12px;opacity:.72}.vik .vikf{margin:0;font-size:13px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.enter.ghost{background:transparent;color:var(--ink,inherit);box-shadow:inset 0 0 0 1px var(--line)}.enter:disabled{opacity:.6}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -676,7 +676,7 @@ body.island #panel,body.sim #panel{display:none}
 <section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-label="조작법" title="조작법" aria-expanded="false" aria-controls="walkHint">?</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkX">나가기</button></section>
 <div id="walkPad" hidden aria-hidden="true"><i></i></div>
 <div id="miniBox" hidden><div class="dots" id="miniDots"></div><button type="button" id="miniGo">찍기</button><button type="button" id="miniDone" class="alt" hidden>완료</button></div><div id="flash"></div>
-<div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전반</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><p id="ydSuccess" role="status" hidden><b>전력 복구 완료</b><span>섬 전체의 놀이기구와 조명에 전원이 들어왔어요</span></p><button type="button" class="go" id="ydContinue" hidden>Space ▸ 계속</button><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이루프에서 네 좌표를 확보해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>열차를 타고 이동하며 남은 촬영 좌표를 확인해요. 열차는 저절로 달려요.</span></li><li><i>2</i><b>노선의 표시 지점 네 곳을 확인해요</b><span>표시 지점에서 좌표 카드를 받아요. 캠퍼스 두 곳과 섬 두 곳의 좌표예요.</span></li><li><i>3</i><b>열차가 고리 안에 있을 때 「좌표 확인」을 꾹</b><span>버튼이 차면 좌표 확보 완료. 놓쳤다면 다음 바퀴에 다시 확인해요. 실제 기록은 내려서 그 자리에서 찍어요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「좌표 확인」을 꾹!</span><span>좌표 확보 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>좌표 확인</b></div></div><p class="sub">네 좌표를 모두 확보하면 역으로 돌아와요. 좌표만 얻었을 때는 기록 수가 늘지 않아요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
+<div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전선</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><p id="ydSuccess" role="status" hidden><b>전력 복구 완료</b><span>섬 전체의 놀이기구와 조명에 전원이 들어왔어요</span></p><button type="button" class="go" id="ydContinue" hidden>Space ▸ 계속</button><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이루프에서 네 좌표를 확보해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>열차를 타고 이동하며 남은 촬영 좌표를 확인해요. 열차는 저절로 달려요.</span></li><li><i>2</i><b>노선의 표시 지점 네 곳을 확인해요</b><span>표시 지점에서 좌표 카드를 받아요. 캠퍼스 두 곳과 섬 두 곳의 좌표예요.</span></li><li><i>3</i><b>열차가 고리 안에 있을 때 「좌표 확인」을 꾹</b><span>버튼이 차면 좌표 확보 완료. 놓쳤다면 다음 바퀴에 다시 확인해요. 실제 기록은 내려서 그 자리에서 찍어요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「좌표 확인」을 꾹!</span><span>좌표 확보 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>좌표 확인</b></div></div><p class="sub">네 좌표를 모두 확보하면 역으로 돌아와요. 좌표만 얻었을 때는 기록 수가 늘지 않아요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
 <div id="labDlg" role="dialog" aria-modal="true" aria-labelledby="lbT"><div class="room"><div class="in"><small>UNDER THE WHEEL · XYLO'S LAB</small><h1 id="lbT">관람차 아래 연구실</h1><p id="lbP"></p><div class="mons" id="lbMons"></div><div class="row"><button type="button" class="go" id="lbGo" hidden>설계도 보기</button></div></div></div></div>
 <div id="deviceDlg" role="dialog" aria-modal="true" aria-labelledby="dvTitle"><div class="in"><header><div><small>FIELD INVESTIGATION</small><h1 id="dvTitle">선대의 잔재를 부숴라</h1></div><b id="dvStatus" aria-live="polite"></b></header><p id="dvHint" role="status"></p><div class="diagram"><svg id="dvArt" viewBox="0 0 560 400" role="img" aria-label="빛을 끌어들이는 낡은 금속 잔재"></svg><div id="dvFittings"></div></div><div class="actions"><button type="button" id="dvContinue" hidden>연구실 앞으로</button></div></div></div>
 <div id="caveDlg" role="dialog" aria-modal="true" aria-labelledby="cvT"><div class="in"><small id="cvK">코덱스의 동굴</small><h1 id="cvT">선대의 기록</h1><p id="cvP"></p><div class="decode" id="cvDecode"><div class="tiles" id="cvTiles"></div><div class="map" id="cvMap"></div><div class="sent" id="cvSent"></div></div><div class="test" id="cvTest" hidden><div class="sets"><p class="device-status">선대의 잔재 제거 완료 · 기록 5 / 5</p><div class="set"><b>환원 순서</b><div class="opts ord" data-set="ord"><button type="button" data-v="forest"><i></i>안쪽 숲</button><button type="button" data-v="valley"><i></i>계곡</button><button type="button" data-v="shore"><i></i>바닷가</button></div></div><div class="set"><b>한 번에 환원하는 양</b><div class="opts" data-set="amt"><button type="button" data-v="small">조금</button><button type="button" data-v="big">많이</button></div></div></div><div class="run"><canvas id="cvIsl" width="320" height="200" aria-label="가상의 섬"></canvas><div class="warn" id="cvWarn" hidden></div><ol class="log" id="cvLog"></ol></div><div class="row"><button type="button" class="go" id="cvGo" disabled>시험</button><button type="button" class="later" id="cvReset">순서 다시</button></div></div><div class="row"><button type="button" class="go" id="cvNext" hidden>시험으로</button></div></div></div>
@@ -756,6 +756,7 @@ const MISSIONS = [{"id":"z1","name":"융합교육관 전시대","building":14715
 const SCANS_ALL = [];
 // Server state is read once before the map is built, so restored records and the admin's hidden list apply without a reload.
 const API = '/api/void';
+let VIK_STATE = {};   /* vikings from the server state, read before the island is built (2026-11-04) */
 let BOOT = null;
 if(location.protocol !== 'file:'){
   try{ const ac = new AbortController(), tm = setTimeout(()=>ac.abort(), 2500);
@@ -1575,6 +1576,7 @@ function applyState(st){
   checkReset(st);
   if(st.version === STATE_VER) return; STATE_VER = st.version;
   SUBS = st.subs || []; if(st.now) SNOW = st.now;
+  if(!LOCAL){ VIK_STATE = st.vikings || {}; if(window.__vikReady){ VIKINGS = VIK_STATE; vikingSync(); } }
   AUTO = st.auto !== false;
   noticeApply(st.notice);
   if(st.pos){ LAST_POS = st.pos; updateTeamDots(LAST_POS, st.now); }
@@ -2613,12 +2615,12 @@ const MI = MISSIONS_I.map(m=>({...m, twin: TWIN[m.id] || null, scans: scansFor(m
 // speed s × dt (dt capped at 1/20 s), so it can stand still and then pick up speed. uLv/uPow drive the bulb shader (bulbMat): lit below uLv.
 const RIDE = {}; MI.forEach(m=>{ RIDE[m.id] = {s:0, tau:0, pow:0, on:false, chain:null, U:{uLv:{value:-1e4}, uPow:{value:0}}}; });
 let RIDE_PROBE = false, RIDE_READY = false;   // batchIsland runs the animations at fixed times: every ride must move then, or its moving parts get baked
-var POWER_TEAM=0,PARK_T=0,PARK_ON=false;
+var POWER_TEAM=0,PARK_T=0,PARK_ON=false,PARK_HOLD=false,PARK_WAKE=null;
 const PARK_U={uLv:{value:-1e4},uPow:{value:0}};
 function poweredGlowMat(c,op=1,add=false){return bulbMat(glowMat(c,op,add),PARK_U);}
-function parkPowerOn(){if(RIDE_PROBE||!TEAM||SCREEN||document.body.classList.contains('admin'))return true;const cp=miniLoad();return POWER_TEAM===TEAM||QDONE.has('q1')||!!myEntry().power||cp?.q==='q1'&&['station','coordinates','forest','forest-shot'].includes(cp.step);}
+function parkPowerOn(){if(PARK_HOLD&&!RIDE_PROBE)return false;if(RIDE_PROBE||!TEAM||SCREEN||document.body.classList.contains('admin'))return true;const cp=miniLoad();return POWER_TEAM===TEAM||QDONE.has('q1')||!!myEntry().power||cp?.q==='q1'&&['station','coordinates','forest','forest-shot'].includes(cp.step);}
 function poweredAnim(f){const wrapped=t=>f(RIDE_PROBE?t:PARK_ON?PARK_T:0);wrapped.powered=true;islAnim.push(wrapped);}
-function restoreParkPower(){POWER_TEAM=TEAM;TRAIN.lit=true;TRAIN.mode='run';rideSync();if(TEAM&&!LOCAL)api('/quest',{team:TEAM,dev:DEV,power:true,story:3}).then(applyState).catch(e=>toast(e.message));}
+function restoreParkPower(hold){POWER_TEAM=TEAM;PARK_HOLD=!!hold;if(!hold){TRAIN.lit=true;TRAIN.mode='run';}rideSync();if(TEAM&&!LOCAL)api('/quest',{team:TEAM,dev:DEV,power:true,story:3}).then(applyState).catch(e=>toast(e.message));}
 function rideClock(id, from){ for(let i = from; i < islAnim.length; i++){ const f = islAnim[i]; islAnim[i] = t=> f(RIDE_PROBE ? t : RIDE[id].tau); } }
 const GATE_SIGNS = {}, SIGNS = {};
 
@@ -3769,7 +3771,7 @@ mission(coaster, 'dl-coaster', {n:'롤러코스터', sub:'챕터 5', cx:-200, cz
   facts:[['챕터','5 · 코덱스의 선택'],['볼거리','78m 리프트 힐 · 첫 낙하 · 에어타임 힐 · 오버뱅크 턴 · 나무 터널 · 2편성 7량']]});
 
 // viking ship on its own lot in the south-west (chapter 5's rebuilt viking) — pivot ≈ 30 m, ship ≈ 36 m
-const viking = new THREE.Group();
+const viking = new THREE.Group(), VK = {on:false};
 {
   // viking ship: A-frames, swing arms, a curved hull with shields, benches, dragon head and tail
   const vik = new THREE.Group(); viking.add(vik);
@@ -3805,20 +3807,140 @@ const viking = new THREE.Group();
   [-0.8, 0.8].forEach(z=>{ add(dragon, SPH(0.4, 8, 6), glowMat(0xffd400), 2.6, 0.7, z*1.4, false); const h = add(dragon, new THREE.ConeGeometry(0.5, 2.6, 6), mat(0xffd400), -0.4, 2, z); h.rotation.z = 0.6; });
   for(let i=0;i<4;i++) add(dragon, new THREE.ConeGeometry(0.25, 0.7, 4), mat(0xffffff), 1 + i*1, -1.1, 0, false).rotation.x = Math.PI;
   add(ship, new THREE.TorusGeometry(3, 0.9, 8, 20, Math.PI*1.4), mat(0x2f9d63), -26.5, 19.5, 0).rotation.z = 0.4;
-  /* collapsed ride (story 2026-11-04: 바이킹이 무너지면서 전선이 끊김) — the ship fell off its arms and lies on the lot; it never swings, even after power returns */
-  vik.add(ship); ship.position.set(9, 4.6, 3); ship.rotation.set(0.42, 0.45, -0.3);
-  swing.rotation.z = 0.38; if(swing.children[1]) swing.children[1].rotation.z = -0.95; if(swing.children[2]) swing.children[2].rotation.z = 0.7;
-  [[-18,0.9,8,0.3],[-14,0.8,-9,1.2],[16,0.8,-8,2.1]].forEach(([x,y,z,r],i)=>{ const d = add(vik, new THREE.CylinderGeometry(1.6, 1.6, 0.4, 14), mat(SH[i%4]), x, y, z, false); d.rotation.set(0.15, r, 0.1); });
-  add(vik, BOX(9, 0.8, 1.2), mat(0x2f62b8), -8, 1, 10, false).rotation.y = 0.5;
+  /* 2026-11-04 rebuild (user): until the team uploads its own ship (STL/OBJ/GLB) the viking is a construction site. The A-frames stand;
+     the swing (arms + the uploaded ship in VK.hold) and the site swap. Both are dynamic, so batchIsland never bakes them. */
+  swing.remove(ship); swing.userData.dynamic = true; swing.visible = false;
+  const hold = new THREE.Group(); hold.position.y = -26.4; swing.add(hold);
+  const site = new THREE.Group(); site.userData.dynamic = true; vik.add(site);
+  const POLE = mat(0xb9bec6), PLANK = mat(0x9a7b4f);
+  [-1, 1].forEach(s=>{ const xs = [s*6, s*24];
+    xs.forEach(x=> [-12, -6, 6, 12].forEach(z=> add(site, CYL(0.22, 0.22, 30, 6), POLE, x, 1.2, z, false)));
+    for(let y = 7; y <= 31; y += 8){ [-12, 12].forEach(z=> add(site, BOX(18.4, 0.22, 0.22), POLE, s*15, y, z, false)); xs.forEach(x=> add(site, BOX(0.22, 0.22, 24.4), POLE, x, y, 0, false));
+      [-11.2, 11.2].forEach(z=> add(site, BOX(18, 0.3, 1.6), PLANK, s*15, y + 0.22, z, false)); } });
+  [[-18,0.9,8,0.3],[-14,0.8,-9,1.2],[16,0.8,-8,2.1]].forEach(([x,y,z,r],i)=>{ const d = add(site, new THREE.CylinderGeometry(1.6, 1.6, 0.4, 14), mat(SH[i%4]), x, y, z, false); d.rotation.set(0.15, r, 0.1); });
+  add(site, BOX(9, 0.8, 1.2), mat(0x2f62b8), -8, 1, 10, false).rotation.y = 0.5;
+  for(let k = 0; k < 4; k++) add(site, BOX(12, 0.6, 1.4), PLANK, 14, 1.2 + k*0.6, 4 + (k%2)*0.4, false).rotation.y = 0.08*k;
+  [-20, -10, 0, 10, 20].forEach(x=>{ add(site, CONE(0.8, 2.2, 10), mat(0xff7a1a), x, 1.2, 14, false); add(site, CYL(0.62, 0.7, 0.35, 10), mat(0xffffff), x, 2.0, 14, false); });
+  { const sg = new THREE.Mesh(new THREE.PlaneGeometry(14, 3.4), new THREE.MeshBasicMaterial({map:signTex('REBUILDING', {bg:'#ffd400', fg:'#22252b', size:72, w:512, h:124}), side:THREE.DoubleSide}));
+    sg.position.set(0, 6.2, 16.6); site.add(sg); [-6.4, 6.4].forEach(x=> add(site, BOX(0.4, 7.9, 0.4), mat(0x3a3f4a), x, 0, 16.6, false)); }
   const TAPE_Y = 0xffd400, TAPE_K = 0x22252b;
   [[-31,-16,31,-16],[31,-16,31,16],[31,16,-31,16],[-31,16,-31,-16]].forEach(([x0,z0,x1,z1])=>{ const L = Math.hypot(x1-x0, z1-z0), n = Math.round(L/2);
-    for(let k=0;k<n;k++){ const u = (k+0.5)/n; add(vik, BOX(L/n, 0.35, 0.12), mat(k%2 ? TAPE_K : TAPE_Y), x0+(x1-x0)*u, 2.4, z0+(z1-z0)*u, false).rotation.y = -Math.atan2(z1-z0, x1-x0); }
-    for(let k=0;k<=Math.round(L/8);k++){ const u = k/Math.round(L/8); add(vik, BOX(0.3, 2.8, 0.3), mat(0xe8e8e8), x0+(x1-x0)*u, 1.4, z0+(z1-z0)*u, false); } });
+    for(let k=0;k<n;k++){ const u = (k+0.5)/n; add(site, BOX(L/n, 0.35, 0.12), mat(k%2 ? TAPE_K : TAPE_Y), x0+(x1-x0)*u, 2.4, z0+(z1-z0)*u, false).rotation.y = -Math.atan2(z1-z0, x1-x0); }
+    for(let k=0;k<=Math.round(L/8);k++){ const u = k/Math.round(L/8); add(site, BOX(0.3, 2.8, 0.3), mat(0xe8e8e8), x0+(x1-x0)*u, 1.4, z0+(z1-z0)*u, false); } });
+  /* the island's main power line ran past the lot; the collapse knocked a pole down and snapped the cable (story 2026-11-04). It stays cut:
+     the children restore the park through the backup line (예비 배전선) at the coaster's service yard. */
+  const line = new THREE.Group(); line.userData.dynamic = true; vik.add(line); VK.line = line;
+  const WOOD = mat(0x6b4f36), CAB = new THREE.MeshLambertMaterial({color:0x1f2328});
+  const pole = (x, z)=>{ const g = new THREE.Group(); g.position.set(x, 1.2, z); line.add(g);
+    add(g, CYL(0.45, 0.6, 20, 8), WOOD); add(g, BOX(6, 0.5, 0.5), WOOD, 0, 18, 0); [-2.4, 0, 2.4].forEach(dx=> add(g, CYL(0.18, 0.25, 0.8, 6), mat(0xe8e8e8), dx, 18.5, 0, false));
+    return g; };
+  const p1 = pole(-27, -14.5); add(p1, BOX(1.8, 2.4, 1.4), mat(0x8c939c), 0.9, 13, 0.4);
+  const p2 = pole(-6, -14.5); p2.rotation.z = -1.38; p2.position.y = 1.6;   /* knocked flat towards the ship */
+  const tipOf = g=>{ g.updateMatrix(); return new THREE.Vector3(0, 18.6, 0).applyMatrix4(g.matrix); };
+  const a = new THREE.Vector3(-27, 19.8, -14.5), b = tipOf(p2), cut = new THREE.Vector3(6, 1.5, -12.4);
+  [-2.4, 0, 2.4].forEach((dz, j)=>{ const off = new THREE.Vector3(0, 0, dz*0.35);
+    const sag = new THREE.CatmullRomCurve3([a.clone().add(new THREE.Vector3(dz, 0, 0)), a.clone().lerp(b, 0.5).add(new THREE.Vector3(0, -7 - j, dz*0.4)), b.clone().add(off)]);
+    add(line, new THREE.TubeGeometry(sag, 24, 0.14, 5), CAB, 0, 0, 0, false);
+    const loose = new THREE.CatmullRomCurve3([b.clone().add(off), b.clone().lerp(cut, 0.5).add(new THREE.Vector3(0, 0.4, dz*0.6)), cut.clone().add(new THREE.Vector3(j*0.8 - 0.8, 0, dz*0.5))]);
+    add(line, new THREE.TubeGeometry(loose, 20, 0.14, 5), CAB, 0, 0, 0, false); });
+  const sparks = []; for(let i = 0; i < 7; i++){ const s = add(line, SPH(0.32, 6, 4), glowMat(i%2 ? 0xfff2a8 : 0x9fe8ff, 1, true), cut.x, cut.y, cut.z, false); s.visible = false; sparks.push({s, d:new THREE.Vector3(Math.random()*2 - 1, Math.random()*1.6 + 0.4, Math.random()*2 - 1).normalize(), ph:Math.random()}); }
+  islAnim.push(t=>{ const burst = (t*0.55) % 1 < 0.12; sparks.forEach(p=>{ const k = ((t*0.55) % 1)/0.12 + p.ph*0.3; p.s.visible = burst && k < 1; if(!p.s.visible) return;
+    p.s.position.copy(cut).addScaledVector(p.d, 0.4 + k*3.2); p.s.position.y -= k*k*1.6; p.s.scale.setScalar(1 - k*0.8); }); });
+  Object.assign(VK, {vik, swing, hold, site});
+  poweredAnim(t=>{ swing.rotation.z = VK.on ? Math.sin(t*0.75)*0.95 : 0; });
 }
 place(viking, 70, 167, 0.5); viking.scale.setScalar(1.275);   // 1.5× (user, 2026-10-15); moved SE so the bigger lot clears the drop-tower path
-pickable(viking, {n:'바이킹', c:'ride', sub:'놀이기구', cx:70, cz:167,
-  desc:'용머리를 단 거대한 배가 하늘 높이 흔들리던 바이킹. 배가 팔에서 떨어져 내려앉아, 지금은 운행을 멈추고 출입을 막아 두었습니다.',
-  facts:[['위치','정문 거리 동쪽'],['상태','운행 중지 · 출입 금지'],['특징','용머리 · 방패 장식']]});
+viking.updateMatrixWorld(true);
+{ const w = VK.line.children[0].getWorldPosition(new THREE.Vector3());
+  window.POWER_LINE = pickable(VK.line, {n:'끊어진 배전선', c:'place', sub:'시설', cx:w.x/K, cz:w.z/K, keepSize:false,
+    desc:'섬으로 전기를 보내던 배전선. 바이킹이 무너질 때 전봇대가 쓰러지면서 끊어졌습니다.',
+    facts:[['위치','바이킹 공사장 옆'],['상태','끊어짐 · 접근 금지']]}); }
+const VIK_B = pickable(viking, {n:'바이킹', c:'ride', sub:'놀이기구', cx:70, cz:167,
+  desc:'용머리를 단 거대한 배가 하늘 높이 흔들리던 바이킹. 배가 팔에서 떨어져 무너진 뒤, 지금은 다시 짓고 있습니다.',
+  facts:[['위치','정문 거리 동쪽'],['상태','공사 중'],['특징','용머리 · 방패 장식']]});
+// ---------- viking rebuild from the team's own ship file (2026-11-04) ----------
+// The team uploads a ship model; it is fitted to the swing (longest side along the swing, at most 42 long, 12 wide, 24 high) and the ride swings
+// once the park has power. The server keeps one file per team (data/vikings/<team>.<ext>); team tablets show their own, the admin's 「모든 조」
+// view and the big screen show the latest upload. Without a server (file:, LOCAL) the ship lives in this tab only.
+const VIK_EXT = ['stl', 'obj', 'glb'], VIK_MAX = 20*1024*1024, VIK_TRIS = 800000;
+let VIKINGS = VIK_STATE, VIK_SHOWN = null, VIK_BUSY = false, VIK_SEQ = 0;
+const VIK_TXT = {site:{d:VIK_B.desc, s:'공사 중'}, on:{d:'용머리를 단 거대한 배가 하늘 높이 흔들리는 바이킹. 신입사원이 설계한 배로 다시 세웠습니다.', s:'운행 중'}};
+const vikMat = ()=> new THREE.MeshLambertMaterial({color:0xc0392b});
+function vikTeam(){ const vt = viewTeam(); if(vt > 0 && VIKINGS[vt]) return String(vt); if(vt > 0 && !LOCAL) return ''; let best = '', bt = -1; for(const [t, v] of Object.entries(VIKINGS)) if(v && v.t > bt){ bt = v.t; best = t; } return best; }
+async function vikLoad(buf, ext){
+  let obj;
+  if(ext === 'glb') obj = (await new GLTFLoader().parseAsync(buf, '')).scene;
+  else if(ext === 'obj'){ const {OBJLoader} = await import('three/addons/loaders/OBJLoader.js'); obj = new OBJLoader().parse(new TextDecoder().decode(buf)); obj.traverse(o=>{ if(o.isMesh) o.material = vikMat(); }); }
+  else { const {STLLoader} = await import('three/addons/loaders/STLLoader.js'); const g = new STLLoader().parse(buf); if(!g.attributes.normal) g.computeVertexNormals();
+    obj = new THREE.Mesh(g, g.hasColors ? new THREE.MeshLambertMaterial({vertexColors:true}) : vikMat()); obj.rotation.x = -Math.PI/2; }   /* STL from CAD tools is Z-up */
+  let tris = 0; obj.traverse(o=>{ if(o.isMesh){ const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count)/3; o.castShadow = o.receiveShadow = true; } });
+  if(!tris) throw new Error('모델에 면이 없습니다');
+  if(tris > VIK_TRIS) throw new Error('면이 너무 많습니다');
+  const turn = new THREE.Group(), fit = new THREE.Group(); turn.add(obj); fit.add(turn); fit.updateMatrixWorld(true);
+  let bb = new THREE.Box3().setFromObject(turn); if(bb.isEmpty()) throw new Error('모델이 비어 있습니다');
+  let sz = bb.getSize(new THREE.Vector3()); if(sz.z > sz.x*1.05){ turn.rotation.y = Math.PI/2; fit.updateMatrixWorld(true); bb = new THREE.Box3().setFromObject(turn); sz = bb.getSize(new THREE.Vector3()); }
+  const k = Math.min(42/Math.max(sz.x, 1e-6), 12/Math.max(sz.z, 1e-6), 24/Math.max(sz.y, 1e-6)), c = bb.getCenter(new THREE.Vector3());
+  fit.scale.setScalar(k); fit.position.set(-c.x*k, -bb.min.y*k, -c.z*k); fit.userData.tris = tris; fit.userData.size = [sz.x*k, sz.y*k, sz.z*k]; return fit;
+}
+function vikDrop(){ while(VK.hold.children.length){ const o = VK.hold.children.pop(); o.traverse(x=>{ if(x.isMesh){ x.geometry.dispose(); (Array.isArray(x.material) ? x.material : [x.material]).forEach(m=>{ if(m.map) m.map.dispose(); m.dispose(); }); } }); } }
+function vikSet(on, model, live){
+  vikDrop(); if(model) VK.hold.add(model);
+  VK.on = !!on; VK.site.visible = !on; VK.swing.visible = !!on;
+  if(on){ if(VK.site.parent) VK.site.parent.remove(VK.site); } else if(!VK.site.parent) VK.vik.add(VK.site);   /* detached while restored: rideSweep draws every mesh whose own flag is visible */
+  const tx = on ? VIK_TXT.on : VIK_TXT.site; VIK_B.desc = tx.d; VIK_B.facts = [['위치','정문 거리 동쪽'],['상태', tx.s],['특징','용머리 · 방패 장식']];
+  if(live && on && W.id === 'island'){ SWEEP_MODE.viking = 'rise'; let sw = null; fxChain('viking', [{n:'draw', start(){ sw = rideSweep({id:'viking', b:VIK_B}, 0.2); }, tick:k=>{ if(sw) sw.tick(k); return k >= (sw ? sw.until : 0.6); }, end(){ if(sw) sw.end(); }}]); sfx('power'); }
+  vikCard();
+}
+async function vikingSync(){
+  const t = vikTeam(), v = t ? VIKINGS[t] : null, key = v ? `${t}:${v.t}` : '';
+  if(key === VIK_SHOWN) return; const live = VIK_SHOWN !== null; VIK_SHOWN = key; const seq = ++VIK_SEQ;
+  if(!v){ vikSet(false); return; }
+  try{ const buf = v.buf || await fetch(`${API}/viking/${t}.${v.ext}?v=${v.t}`).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); });
+    const model = await vikLoad(buf, v.ext); if(seq !== VIK_SEQ) return; vikSet(true, model, live); }
+  catch(e){ console.error(e); if(seq === VIK_SEQ){ vikSet(false); toast('바이킹 배 모델을 불러오지 못했습니다'); } }
+}
+function vikCardHTML(){
+  if(SCREEN) return '';
+  const t = vikTeam(), v = t ? VIKINGS[t] : null, mine = LOCAL || (TEAM > 0 && (!v || +t === TEAM));
+  let hh = '<div class="vik">';
+  if(v) hh += `<p class="vikf">${LOCAL ? '' : `${esc(t)}조 · `}${esc(v.name || '배 모델')}</p>`;
+  if(mine) hh += `<button class="enter" type="button" data-vik="up"${VIK_BUSY ? ' disabled' : ''}>${VIK_BUSY ? '올리는 중' : v ? '다른 배로 바꾸기' : '배 모델 올려 복구하기'}</button><small>STL, OBJ, GLB · 20MB까지</small>`;
+  else if(!v && !TEAM && !ADMIN_KEY) hh += '<small>우리 조를 고르면 배 모델을 올릴 수 있습니다</small>';
+  if(ADMIN_KEY && v && !LOCAL) hh += `<button class="enter ghost" type="button" data-vik="clear">공사 중으로 되돌리기</button>`;
+  return hh + '</div>';
+}
+function vikCard(){ const box = document.querySelector('#iIsl .vik'); if(box) box.outerHTML = vikCardHTML(); }
+const vikFile = Object.assign(document.createElement('input'), {type:'file', accept:'.stl,.obj,.glb', hidden:true}); document.body.appendChild(vikFile);
+vikFile.addEventListener('change', ()=>{ const f = vikFile.files[0]; vikFile.value = ''; if(f) vikUpload(f); });
+async function vikUpload(file){
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if(!VIK_EXT.includes(ext)){ toast('STL, OBJ, GLB 파일만 올릴 수 있습니다'); return; }
+  if(file.size > VIK_MAX){ toast('20MB보다 작은 파일을 올려 주세요'); return; }
+  VIK_BUSY = true; vikCard();
+  try{
+    const buf = await file.arrayBuffer();
+    try{ await vikLoad(buf.slice(0), ext); }catch(e){ throw new Error(e.message === '면이 너무 많습니다' ? '면이 너무 많은 모델입니다. 줄여서 다시 내보내 주세요' : '이 파일은 3D 모델로 열 수 없습니다'); }
+    if(LOCAL){ VIKINGS = {...VIKINGS, local:{ext, name:file.name, t:Date.now(), buf}}; }
+    else {
+      const r = await fetch(`${API}/viking?team=${TEAM}&ext=${ext}&name=${encodeURIComponent(file.name.slice(0, 60))}`, {method:'POST', headers:{'Content-Type':'application/octet-stream'}, body:buf});
+      let j = {}; try{ j = await r.json(); }catch(e){} if(!r.ok) throw new Error(j.error || `서버 오류 (${r.status})`);
+      VIK_BUSY = false; applyState(j);
+    }
+    VIK_BUSY = false; vikingSync(); toast('바이킹을 다시 세웠습니다');
+  }catch(e){ toast(e.message); }
+  finally{ VIK_BUSY = false; vikCard(); }
+}
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-vik]'); if(!b) return;
+  if(b.dataset.vik === 'up'){ if(!VIK_BUSY) vikFile.click(); return; }
+  if(b.dataset.vik === 'clear'){ const t = vikTeam(); if(!t || !confirm(`${t}조의 배 모델을 지우고 공사 중으로 되돌릴까요?`)) return;
+    api('/admin/viking_clear', {team:+t}, true).then(st=>{ applyState(st); vikingSync(); toast('공사 중으로 되돌렸습니다'); }).catch(er=> toast(er.message)); }
+});
+window.__vik = ()=>{ return {on:VK.on, site:!!VK.site.parent, swing:VK.swing.visible, kids:VK.hold.children.length, rot:VK.swing.rotation.z, tris:VK.hold.children[0] ? VK.hold.children[0].userData.tris : 0, size:VK.hold.children[0] ? VK.hold.children[0].userData.size : null, team:vikTeam(), shown:VIK_SHOWN}; };
+window.__parkWake = ()=> PARK_WAKE ? {k:+PARK_WAKE.k.toFixed(2), sp:+PARK_WAKE.sp.toFixed(2)} : null;
+window.__vikOpen = ()=> select(VIK_B.i, true);
+window.__vikReady = true; vikingSync();
+
 
 // ---------- theme-park life: main street, entrance garden, lake, rides, cable car, visitors ----------
 // entrance boulevard between the gate and the fountain: open market stalls (churros, cotton candy, popcorn...) under string lights
@@ -6723,7 +6845,7 @@ buildSim();
 maybeRestore(7000);
 // a record came back or a preview was ticked: recompute every zone's records, then the panels, markers, board and the flow layer
 function rescan(revealIds, arrive){
-  rebuildIndex();
+  rebuildIndex(); if(window.__vikReady) vikingSync();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
   const arriving = false;
@@ -6850,7 +6972,7 @@ function rideSet(id, on){ const R = RIDE[id]; if(!R) return; if(R.chain){ const 
 // the ride powers up the next time the island is free — never "just on"
 function rideSync(){
   if(!RIDE_READY) return;
-  PARK_U.uLv.value=parkPowerOn()?1e4:-1e4;
+  if(!PARK_WAKE) PARK_U.uLv.value=parkPowerOn()?1e4:-1e4;
   MI.forEach(m=>{ const R = RIDE[m.id]; if(!R || !m.b) return; const on = parkPowerOn();
     if(!on){ if(R.on || R.chain) rideSet(m.id, false); return; }
     if(R.on || R.chain) return;
@@ -7463,7 +7585,7 @@ function updateI(now, zoneK){
   const t = now/1000;
   const dtF = Math.min(1/20, Math.max(0, t - FX_T)); FX_T = t;   // effect time: a stalled frame plays on slower, it never jumps ahead
   for(const id in RIDE){ const R = RIDE[id]; R.tau += R.s*dtF; }
-  PARK_ON=parkPowerOn();if(PARK_ON)PARK_T+=dtF;else PARK_T=0;
+  parkWakeTick(dtF);PARK_ON=parkPowerOn();if(PARK_ON)PARK_T+=dtF*(PARK_WAKE?PARK_WAKE.sp:1);else PARK_T=0;
   fxStep(dtF);
   islAnim.forEach(f=> f(t));
   waterU.uTime.value = t; ghostU.uTime.value = t; waterU.uSun.value.copy(sun.position).sub(sun.target.position).normalize();
@@ -7504,6 +7626,7 @@ function infoI(i, move){
   $('iM').innerHTML = back ? `<span class="st ok">돌아온 기록${m.scans.length ? ` ${m.scans.length}건` : ''}</span>${twinLine(m)}${thumbsHTML(m.scans)}` : '';
   $('iDl').hidden = true; $('iNote').hidden = true; $('iIsl').hidden = false;
   $('iIsl').innerHTML = (INTERIORS[b.label] ? `<button class="enter" data-enter="${esc(b.label)}">안으로 들어가기</button>` : '') + (b.c==='char' && walkerOf(b.label) && !walk ? (walkerOpen(walkerOf(b.label)) ? `<button class="enter" data-walk="${esc(walkerOf(b.label))}">${esc(walkerOf(b.label))}의 시점으로 탐험</button>` : `<p class="desc" style="opacity:.7">${esc(walkerOf(b.label))}의 시점은 ${esc(walkerWhy(walkerOf(b.label)))} 열립니다.</p>`) : '') + `<p class="desc">${esc(b.desc||'')}</p>` + (b.facts ? `<dl class="facts">${b.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '');
+  if(b.mesh === viking) $('iIsl').insertAdjacentHTML('beforeend', vikCardHTML());
   if(move){
     const tgt = new THREE.Vector3(b.cx, b.y0 + b.h*0.45, b.cz);
     const dir = camera.position.clone().sub(controls.target).normalize();
@@ -7668,7 +7791,7 @@ function walkTick(now){
   _ct.y = Math.max(_ct.y, groundY(_ct.x, _ct.z) + 0.9);
   camera.position.copy(_ct); w.snap = false;
   _wt.set(w.x + (inMaze ? sy*1.2 : 0), gy + w.eye*(inMaze ? 0.7 : 0.85) + lift, w.z + (inMaze ? cy*1.2 : 0));
-  camera.lookAt(_wt); controls.target.copy(_wt);
+  camera.lookAt(_wt); controls.target.copy(_wt); if(PARK_WAKE) parkWakeCam();
   questNav(); questTick();
 }
 $('qTmp').onclick = ()=>{ const q = questLive; if(!q || !walk) return; if(vn) return; if(mini) miniClear(); questComplete(q); };
@@ -7770,7 +7893,7 @@ $('walkX').onclick = ()=> stopWalk(true);
 // ---------- the mission chain: walk the island as a character, find the target, receive ERICA coordinates ----------
 // 제로·리코 look for 자일로 → his two coordinates; once both zones are restored 네이티 opens and looks for the hidden 코덱스 → one coordinate;
 // once that zone is restored 코덱스 opens and enters the eye cave → the last two. The chain is remembered per team on this device.
-const STORY = {"q1intro":[{"who":"리코","text":"롤러코스터 쪽으로 가 보자. 자일로가 거기 있을 거야."}],"q1found":[{"who":"자일로","text":"오셨군요. 바이킹이 무너지면서 섬으로 가는 전선이 끊겼어요."},{"who":"자일로","text":"섬 전체에 전기가 들어오지 않아 놀이기구가 모두 멈춰 있습니다."},{"who":"제로","text":"정말이네. 아무것도 안 움직여요."},{"who":"자일로","text":"롤러코스터 옆 정비동에 예비 배전반이 있어요. 거기서 전선을 다시 연결하면 섬 전체에 전기를 보낼 수 있습니다."},{"who":"리코","text":"정비동으로 가서 연결해 볼게요."}],"yard":[{"who":"자일로","text":"발전기에서 나오는 선을 모든 칸까지 이어 주세요. 이 배전반이 섬 전체 전기를 맡고 있어요."}],"yardDone":[{"who":"제로","text":"돌아간다! 저쪽 놀이기구도 움직여!"},{"who":"리코","text":"섬 전체에 전기가 들어왔어!"},{"who":"자일로","text":"됐어요. 두 분이 섬의 전원을 되살렸습니다."}],"rideIntro":[{"who":"보이드","text":"이제 남은 기록을 채우러 가야 해. 그러려면 다음 위치의 좌표가 필요해."},{"who":"자일로","text":"스카이루프가 움직이니 타고 이동할 수 있겠어요."},{"who":"보이드","text":"타고 이동하면서 남은 좌표들을 확보하자."},{"who":"제로","text":"좋아. 이번에는 어디로 가면 되는지 알아내는 거네!"}],"rideDone":[{"who":"보이드","text":"남은 네 좌표를 모두 확보했어. 카드에 저장해 뒀어."},{"who":"리코","text":"이제 이 좌표들을 따라가서 기록을 찍으면 되겠네."}],"q1exit":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"q2intro":[{"who":"제로","text":"네이티, 혼자 괜찮을까?"},{"who":"리코","text":"빛이 붉어지고 몸도 흔들렸대. 얼른 찾아보자. 관람차 뒤쪽 길로 갔다고 했어."}],"mazeEntrance":[{"who":"제로","text":"잠깐. 저 울타리 사이로 빛이 보이는데?"},{"who":"리코","text":"네이티가 여기 있는 것 같은데……?"},{"who":"제로","text":"안쪽에서 깜빡이고 있어. 그런데 여긴 미로잖아!"},{"who":"리코","text":"들어가서 찾아보자. 갈림길에서는 빛이 보이는 쪽을 확인해 봐."},{"who":"제로","text":"좋아. 미로 탐험이다! 네이티, 우리가 갈게!"}],"labIntro":[{"who":"자일로","text":"찾았군요! 아직도 빛이 붉고 몸이 불안정하네요."},{"who":"리코","text":"미로 안에 있었어요. 네이티를 데리고 나와 그 자리의 상태를 기록했어요."},{"who":"자일로","text":"가져온 기록으로 일루아의 흐름을 분석해 봅시다."}],"labAnalysis":[{"who":"보이드","text":"여길 봐. 이 지점에서 흐름이 이상하게 꺾이고 있어."},{"who":"리코","text":"원래대로 이어지지 못하고 있어요."},{"who":"자일로","text":"무언가 흐름을 방해하고 있습니다. 여기서도 네이티가 거칠게 반응하네요."},{"who":"제로","text":"뭐가 막고 있는 건데요?"},{"who":"자일로","text":"분석으로는 정체까지 알 수 없어요. 표시된 지점에 가서 직접 확인해야 합니다."},{"who":"자일로","text":"나중에 환원할 때는 이 시험 기록도 확인해야 해요. 지금은 흐름을 방해하는 것부터 알아봅시다."},{"who":"리코","text":"그럼 우리가 가 볼게요. 네이티, 같이 가자."}],"deviceIntro":[{"who":"제로","text":"표시된 곳이 이쪽이야. 무엇이 있는 걸까?"},{"who":"리코","text":"아직 모르지. 직접 보고 확인하자."}],"deviceFound":[{"who":"제로","text":"저기, 뭔가 남아 있어!"},{"who":"리코","text":"빛이 저것 때문에 꺾이고 있어. 연구실에서 보던 바로 그 모습이야."},{"who":"보이드","text":"이 문양…… 선대가 일루아를 모을 때 쓰던 장치에 새겨져 있던 거야."},{"who":"리코","text":"선대가 남긴 잔재였구나."},{"who":"보이드","text":"장치는 대부분 망가졌지만 일루아를 끌어들이는 부분이 아직 남아 있어. 이게 흐름을 가로채고 있었어."},{"who":"제로","text":"이걸 두면 일루아를 돌려줘도 또 끌려오겠네!"},{"who":"리코","text":"부숴서 방해를 없애자."}],"deviceExplain":[{"who":"보이드","text":"빛이 모이는 부분을 봐. 그곳을 맞히면 잔재를 부술 수 있어."}],"deviceDone":[{"who":"제로","text":"네이티! 원래 빛으로 돌아왔어!"},{"who":"리코","text":"기록을 채웠을 때는 그대로였는데…… 방해하던 걸 없애니까 달라졌어."},{"who":"보이드","text":"이제 흐름을 가로채는 힘이 사라졌어."},{"who":"제로","text":"그럼 환원할 수 있는 거야?"},{"who":"보이드","text":"방해는 없어졌지만 기록이 하나 남아 있어. 그 내용까지 채워야 환원을 시험할 수 있어."}],"deviceReturn":[{"who":"자일로","text":"이상이 생기던 지점에서 흐름이 정상으로 돌아왔어요. 무엇이 있었나요?"},{"who":"리코","text":"선대가 쓰던 장치의 잔재였어요. 아직 일루아를 끌어들이고 있어서 부쉈어요."},{"who":"자일로","text":"그래서 분석만으로 정체를 알 수 없었군요. 이제 방해는 없어졌어요."},{"who":"제로","text":"남은 기록 하나를 채우러 가자!"},{"who":"자일로","text":"스카이루프에서 확보한 캠퍼스 좌표가 하나 남았어요. 마지막 기록을 찍으러 가 주세요."}],"q3intro":[{"who":"리코","text":"기록을 모두 채웠어. 이제 환원 순서를 확인하러 가자."},{"who":"제로","text":"코덱스가 선대의 글을 찾으러 갔다고 했지? 북쪽 해안으로 가자."}],"q3found":[{"who":"코덱스","text":"왔군. 선대의 잔재는 부쉈다고 들었다."},{"who":"제로","text":"네. 그대로 두면 일루아를 돌려줘도 다시 끌려가니까요."},{"who":"코덱스","text":"나는 섬을 되돌리려면 도로랜드에 세운 것부터 전부 부숴야 한다고 생각했다."},{"who":"리코","text":"누락된 기록도 모두 채웠어요. 다른 곳을 부수기 전에, 이 기록대로 돌려주면 어떻게 되는지 먼저 확인해 봐요."},{"who":"코덱스","text":"……좋다. 그 방법으로 섬이 돌아오는지 보여 줘라. 안쪽 벽에 선대의 글이 남아 있다."}],"caveIntro":[{"who":"코덱스","text":"우리 가문이 문양을 처음 새긴 곳이다. 일루아가 섬에 흐르던 때의 기록이지."},{"who":"코덱스","text":"하지만 옆의 글은 나도 읽지 못한다. 뜻이 전해지지 않았어."},{"who":"리코","text":"보이드, 노아랑 루나의 옛 섬과 우리가 채운 기록을 같이 띄워 줘."},{"who":"보이드","text":"좋아. 누락된 기록을 다 채웠으니, 이제 이 글자가 옛 섬의 어디를 가리키는지 맞춰 볼 수 있어."},{"who":"제로","text":"이 그림 글자, 지형이랑 닮았어! 하나씩 맞춰 보자."}],"caveDecoded":[{"who":"제로","text":"점이 하나, 둘, 셋이야. 이게 순서구나!"},{"who":"코덱스","text":"숲, 계곡, 바닷가…… 우리 가문은 문양만 남기고 이 뜻을 잊었다."},{"who":"리코","text":"모은 기록에 이 순서를 적용해서 시험해 보면 되겠어요."},{"who":"제로","text":"양은 조금씩! 자일로의 시험 기록에서 한꺼번에 많이 보냈을 때 기구가 제멋대로 움직였잖아."},{"who":"보이드","text":"맞아. 흐름을 가로채던 잔재도 이미 없앴어. 이제 완성한 기록을 시뮬레이터에 넣고 순서와 양을 시험해 보자."},{"who":"코덱스","text":"진짜 섬을 건드리기 전에 확인하자는 거군. 해 봐라."}],"caveWon":[{"who":"보이드","text":"됐어. 전부 원래 자리로 돌아갔어. 아직 가상 시험이지만, 이 방법이라면 환원할 수 있어."},{"who":"리코","text":"우리가 채운 기록대로 일루아가 흐르고 있어. 누락된 곳 없이 전부 이어졌어."},{"who":"코덱스","text":"……보이는군. 시설을 더 부수지 않아도, 일루아가 돌아갈 길을 찾을 수 있었어."},{"who":"코덱스","text":"더는 부수지 않겠다. 너희가 찾아낸 방법대로 섬에 돌려주겠다."},{"who":"제로","text":"그럼 이제 진짜로 해 보자!"}],"ending":[{"who":"보이드","text":"봐. 우리가 찾아낸 일루아의 원래 자리와 길이야. 원천에서 다섯 기록의 자리까지 전부 이어졌어."},{"who":"제로","text":"잠깐…… 이 모양, 코덱스 망토에 있던 거잖아?"},{"who":"리코","text":"코덱스 가문의 눈 문양이야. 일루아가 섬에 흐르던 모습을 본떠 만든 거였어."},{"who":"코덱스","text":"섬을 지키는 뜻도 모르고 문양만 지니고 있었군."},{"who":"보이드","text":"캠퍼스에서 직접 찍은 기록까지 모였으니까 이 모양을 찾을 수 있었어. 한 자리라도 빠져 있었다면 끝까지 이어지지 않았을 거야."}],"actual":[{"who":"코덱스","text":"이제 진짜 일루아를 돌려주겠다. 너희가 찾아낸 자리로, 그 순서대로."}],"act1":[{"who":"보이드","text":"자일로가 롤러코스터 근처에서 우리를 찾고 있어."},{"who":"제로","text":"무슨 일이지? 가 보자!"}],"act2":[{"who":"자일로","text":"돌아오셨군요. 두 분이 기록을 찍으러 간 사이에 네이티에게 이상이 생겼어요."},{"who":"리코","text":"네이티한테요? 무슨 일이에요?"},{"who":"자일로","text":"빛이 갑자기 붉어지고 몸이 불안정하게 흔들렸어요. 그러더니 관람차 뒤쪽 길로 가 버렸습니다."},{"who":"제로","text":"그 상태로 혼자 간 거예요?"},{"who":"자일로","text":"네. 아직 돌아오지 않았어요. 걱정됩니다. 두 분이 찾아봐 주실래요?"},{"who":"제로","text":"우리가 찾으러 갈게요!"},{"who":"자일로","text":"저는 연구실에서 네이티의 반응을 확인하고 있을게요. 찾으면 같이 데려와 주세요."}],"act3":[{"who":"자일로","text":"마지막 기록까지 들어왔군요. 수고했어요."},{"who":"제로","text":"다섯 개를 전부 채웠어요!"},{"who":"리코","text":"이제 기록이 비어서 흐름을 못 보는 곳은 없네요."},{"who":"자일로","text":"네. 흐름을 방해하던 잔재도 없앴고요. 이제 환원 방법을 시험해 봅시다."},{"who":"자일로","text":"코덱스는 동굴로 갔어요. 선대가 남긴 글에 환원 순서가 있을지도 모른다고 합니다."},{"who":"제로","text":"북쪽 해안이지? 가 보자!"}],"q2found":[{"who":"제로","text":"네이티! 찾았다. 괜찮아?"},{"who":"네이티","img":"naty_red","nar":true,"text":"네이티의 불꽃이 붉게 흔들린다. 일행이 다가가도 그 자리를 떠나지 않는다."},{"who":"리코","text":"이 자리에서 뭔가를 알려 주려는 것 같아."},{"who":"보이드","text":"이 미로 정원도 스카이루프에서 확보한 섬 좌표 중 하나야. 네이티를 데리고 밖으로 나가서 미로 정원을 기록하자."}],"forestIntro":[{"who":"보이드","text":"먼저 가까운 섬 좌표로 가자. 서쪽 숲 가장자리야."}],"forestDone":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"리코","text":"이제 두 개야. 다음 기록도 채우자."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"record1":[{"who":"보이드","text":"하모니아 아래의 흐름을 확인했어. 일루아가 광장 둘레를 따라 흐르고 있었구나."},{"who":"제로","text":"우와, 하모니아 주변의 흐름은 이렇게 생겼네!"},{"who":"리코","text":"아직 네 군데가 비어 있어. 얼른 나머지도 채우자!"}],"record2":[{"who":"보이드","text":"이번에는 관람차 언덕 주변의 흐름을 확인했어. 언덕 아래를 지나 해안 쪽으로 이어지고 있었어."},{"who":"리코","text":"세 번째 기록까지 채웠어. 남은 두 개도 마저 찍자."}],"record3":[{"who":"보이드","text":"사파리 주변의 흐름도 확인했어. 원천에서 나온 일루아가 사파리 아래로 이어지고 있었구나."},{"who":"보이드","text":"이걸로 누락됐던 다섯 기록을 모두 채웠어. 이제 전체 흐름으로 환원 시험을 해 볼 수 있어."}],"natyRecord":[{"who":"보이드","text":"미로 정원 아래의 흐름을 확인했어. 이 자리 아래로도 일루아가 이어져 있었구나. 이걸로 네 번째 기록을 채웠어."},{"who":"리코","text":"네이티가 아직도 불안정해. 이 기록을 가지고 연구실에서 원인을 알아보자."},{"who":"제로","text":"자일로가 찾으면 연구실로 오랬지? 네이티, 같이 가자."}]};
+const STORY = {"q1intro":[{"who":"리코","text":"롤러코스터 쪽으로 가 보자. 자일로가 거기 있을 거야."}],"q1found":[{"who":"자일로","text":"오셨군요. 바이킹이 무너지면서 섬으로 가는 전선이 끊겼어요."},{"who":"자일로","text":"섬 전체에 전기가 들어오지 않아 놀이기구가 모두 멈춰 있습니다."},{"who":"제로","text":"정말이네. 아무것도 안 움직여요."},{"who":"자일로","text":"롤러코스터 옆 정비동에 예비 배전선이 있어요. 거기서 전선을 다시 연결하면 섬 전체에 전기를 보낼 수 있습니다."},{"who":"리코","text":"정비동으로 가서 연결해 볼게요."}],"yard":[{"who":"자일로","text":"발전기에서 나오는 선을 모든 칸까지 이어 주세요. 이 예비 배전선이 섬 전체 전기를 맡고 있어요."}],"yardDone":[{"who":"제로","text":"돌아간다! 저쪽 놀이기구도 움직여!"},{"who":"리코","text":"섬 전체에 전기가 들어왔어!"},{"who":"자일로","text":"됐어요. 두 분이 섬의 전원을 되살렸습니다."}],"rideIntro":[{"who":"보이드","text":"이제 남은 기록을 채우러 가야 해. 그러려면 다음 위치의 좌표가 필요해."},{"who":"자일로","text":"스카이루프가 움직이니 타고 이동할 수 있겠어요."},{"who":"보이드","text":"타고 이동하면서 남은 좌표들을 확보하자."},{"who":"제로","text":"좋아. 이번에는 어디로 가면 되는지 알아내는 거네!"}],"rideDone":[{"who":"보이드","text":"남은 네 좌표를 모두 확보했어. 카드에 저장해 뒀어."},{"who":"리코","text":"이제 이 좌표들을 따라가서 기록을 찍으면 되겠네."}],"q1exit":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"q2intro":[{"who":"제로","text":"네이티, 혼자 괜찮을까?"},{"who":"리코","text":"빛이 붉어지고 몸도 흔들렸대. 얼른 찾아보자. 관람차 뒤쪽 길로 갔다고 했어."}],"mazeEntrance":[{"who":"제로","text":"잠깐. 저 울타리 사이로 빛이 보이는데?"},{"who":"리코","text":"네이티가 여기 있는 것 같은데……?"},{"who":"제로","text":"안쪽에서 깜빡이고 있어. 그런데 여긴 미로잖아!"},{"who":"리코","text":"들어가서 찾아보자. 갈림길에서는 빛이 보이는 쪽을 확인해 봐."},{"who":"제로","text":"좋아. 미로 탐험이다! 네이티, 우리가 갈게!"}],"labIntro":[{"who":"자일로","text":"찾았군요! 아직도 빛이 붉고 몸이 불안정하네요."},{"who":"리코","text":"미로 안에 있었어요. 네이티를 데리고 나와 그 자리의 상태를 기록했어요."},{"who":"자일로","text":"가져온 기록으로 일루아의 흐름을 분석해 봅시다."}],"labAnalysis":[{"who":"보이드","text":"여길 봐. 이 지점에서 흐름이 이상하게 꺾이고 있어."},{"who":"리코","text":"원래대로 이어지지 못하고 있어요."},{"who":"자일로","text":"무언가 흐름을 방해하고 있습니다. 여기서도 네이티가 거칠게 반응하네요."},{"who":"제로","text":"뭐가 막고 있는 건데요?"},{"who":"자일로","text":"분석으로는 정체까지 알 수 없어요. 표시된 지점에 가서 직접 확인해야 합니다."},{"who":"자일로","text":"나중에 환원할 때는 이 시험 기록도 확인해야 해요. 지금은 흐름을 방해하는 것부터 알아봅시다."},{"who":"리코","text":"그럼 우리가 가 볼게요. 네이티, 같이 가자."}],"deviceIntro":[{"who":"제로","text":"표시된 곳이 이쪽이야. 무엇이 있는 걸까?"},{"who":"리코","text":"아직 모르지. 직접 보고 확인하자."}],"deviceFound":[{"who":"제로","text":"저기, 뭔가 남아 있어!"},{"who":"리코","text":"빛이 저것 때문에 꺾이고 있어. 연구실에서 보던 바로 그 모습이야."},{"who":"보이드","text":"이 문양…… 선대가 일루아를 모을 때 쓰던 장치에 새겨져 있던 거야."},{"who":"리코","text":"선대가 남긴 잔재였구나."},{"who":"보이드","text":"장치는 대부분 망가졌지만 일루아를 끌어들이는 부분이 아직 남아 있어. 이게 흐름을 가로채고 있었어."},{"who":"제로","text":"이걸 두면 일루아를 돌려줘도 또 끌려오겠네!"},{"who":"리코","text":"부숴서 방해를 없애자."}],"deviceExplain":[{"who":"보이드","text":"빛이 모이는 부분을 봐. 그곳을 맞히면 잔재를 부술 수 있어."}],"deviceDone":[{"who":"제로","text":"네이티! 원래 빛으로 돌아왔어!"},{"who":"리코","text":"기록을 채웠을 때는 그대로였는데…… 방해하던 걸 없애니까 달라졌어."},{"who":"보이드","text":"이제 흐름을 가로채는 힘이 사라졌어."},{"who":"제로","text":"그럼 환원할 수 있는 거야?"},{"who":"보이드","text":"방해는 없어졌지만 기록이 하나 남아 있어. 그 내용까지 채워야 환원을 시험할 수 있어."}],"deviceReturn":[{"who":"자일로","text":"이상이 생기던 지점에서 흐름이 정상으로 돌아왔어요. 무엇이 있었나요?"},{"who":"리코","text":"선대가 쓰던 장치의 잔재였어요. 아직 일루아를 끌어들이고 있어서 부쉈어요."},{"who":"자일로","text":"그래서 분석만으로 정체를 알 수 없었군요. 이제 방해는 없어졌어요."},{"who":"제로","text":"남은 기록 하나를 채우러 가자!"},{"who":"자일로","text":"스카이루프에서 확보한 캠퍼스 좌표가 하나 남았어요. 마지막 기록을 찍으러 가 주세요."}],"q3intro":[{"who":"리코","text":"기록을 모두 채웠어. 이제 환원 순서를 확인하러 가자."},{"who":"제로","text":"코덱스가 선대의 글을 찾으러 갔다고 했지? 북쪽 해안으로 가자."}],"q3found":[{"who":"코덱스","text":"왔군. 선대의 잔재는 부쉈다고 들었다."},{"who":"제로","text":"네. 그대로 두면 일루아를 돌려줘도 다시 끌려가니까요."},{"who":"코덱스","text":"나는 섬을 되돌리려면 도로랜드에 세운 것부터 전부 부숴야 한다고 생각했다."},{"who":"리코","text":"누락된 기록도 모두 채웠어요. 다른 곳을 부수기 전에, 이 기록대로 돌려주면 어떻게 되는지 먼저 확인해 봐요."},{"who":"코덱스","text":"……좋다. 그 방법으로 섬이 돌아오는지 보여 줘라. 안쪽 벽에 선대의 글이 남아 있다."}],"caveIntro":[{"who":"코덱스","text":"우리 가문이 문양을 처음 새긴 곳이다. 일루아가 섬에 흐르던 때의 기록이지."},{"who":"코덱스","text":"하지만 옆의 글은 나도 읽지 못한다. 뜻이 전해지지 않았어."},{"who":"리코","text":"보이드, 노아랑 루나의 옛 섬과 우리가 채운 기록을 같이 띄워 줘."},{"who":"보이드","text":"좋아. 누락된 기록을 다 채웠으니, 이제 이 글자가 옛 섬의 어디를 가리키는지 맞춰 볼 수 있어."},{"who":"제로","text":"이 그림 글자, 지형이랑 닮았어! 하나씩 맞춰 보자."}],"caveDecoded":[{"who":"제로","text":"점이 하나, 둘, 셋이야. 이게 순서구나!"},{"who":"코덱스","text":"숲, 계곡, 바닷가…… 우리 가문은 문양만 남기고 이 뜻을 잊었다."},{"who":"리코","text":"모은 기록에 이 순서를 적용해서 시험해 보면 되겠어요."},{"who":"제로","text":"양은 조금씩! 자일로의 시험 기록에서 한꺼번에 많이 보냈을 때 기구가 제멋대로 움직였잖아."},{"who":"보이드","text":"맞아. 흐름을 가로채던 잔재도 이미 없앴어. 이제 완성한 기록을 시뮬레이터에 넣고 순서와 양을 시험해 보자."},{"who":"코덱스","text":"진짜 섬을 건드리기 전에 확인하자는 거군. 해 봐라."}],"caveWon":[{"who":"보이드","text":"됐어. 전부 원래 자리로 돌아갔어. 아직 가상 시험이지만, 이 방법이라면 환원할 수 있어."},{"who":"리코","text":"우리가 채운 기록대로 일루아가 흐르고 있어. 누락된 곳 없이 전부 이어졌어."},{"who":"코덱스","text":"……보이는군. 시설을 더 부수지 않아도, 일루아가 돌아갈 길을 찾을 수 있었어."},{"who":"코덱스","text":"더는 부수지 않겠다. 너희가 찾아낸 방법대로 섬에 돌려주겠다."},{"who":"제로","text":"그럼 이제 진짜로 해 보자!"}],"ending":[{"who":"보이드","text":"봐. 우리가 찾아낸 일루아의 원래 자리와 길이야. 원천에서 다섯 기록의 자리까지 전부 이어졌어."},{"who":"제로","text":"잠깐…… 이 모양, 코덱스 망토에 있던 거잖아?"},{"who":"리코","text":"코덱스 가문의 눈 문양이야. 일루아가 섬에 흐르던 모습을 본떠 만든 거였어."},{"who":"코덱스","text":"섬을 지키는 뜻도 모르고 문양만 지니고 있었군."},{"who":"보이드","text":"캠퍼스에서 직접 찍은 기록까지 모였으니까 이 모양을 찾을 수 있었어. 한 자리라도 빠져 있었다면 끝까지 이어지지 않았을 거야."}],"actual":[{"who":"코덱스","text":"이제 진짜 일루아를 돌려주겠다. 너희가 찾아낸 자리로, 그 순서대로."}],"act1":[{"who":"보이드","text":"자일로가 롤러코스터 근처에서 우리를 찾고 있어."},{"who":"제로","text":"무슨 일이지? 가 보자!"}],"act2":[{"who":"자일로","text":"돌아오셨군요. 두 분이 기록을 찍으러 간 사이에 네이티에게 이상이 생겼어요."},{"who":"리코","text":"네이티한테요? 무슨 일이에요?"},{"who":"자일로","text":"빛이 갑자기 붉어지고 몸이 불안정하게 흔들렸어요. 그러더니 관람차 뒤쪽 길로 가 버렸습니다."},{"who":"제로","text":"그 상태로 혼자 간 거예요?"},{"who":"자일로","text":"네. 아직 돌아오지 않았어요. 걱정됩니다. 두 분이 찾아봐 주실래요?"},{"who":"제로","text":"우리가 찾으러 갈게요!"},{"who":"자일로","text":"저는 연구실에서 네이티의 반응을 확인하고 있을게요. 찾으면 같이 데려와 주세요."}],"act3":[{"who":"자일로","text":"마지막 기록까지 들어왔군요. 수고했어요."},{"who":"제로","text":"다섯 개를 전부 채웠어요!"},{"who":"리코","text":"이제 기록이 비어서 흐름을 못 보는 곳은 없네요."},{"who":"자일로","text":"네. 흐름을 방해하던 잔재도 없앴고요. 이제 환원 방법을 시험해 봅시다."},{"who":"자일로","text":"코덱스는 동굴로 갔어요. 선대가 남긴 글에 환원 순서가 있을지도 모른다고 합니다."},{"who":"제로","text":"북쪽 해안이지? 가 보자!"}],"q2found":[{"who":"제로","text":"네이티! 찾았다. 괜찮아?"},{"who":"네이티","img":"naty_red","nar":true,"text":"네이티의 불꽃이 붉게 흔들린다. 일행이 다가가도 그 자리를 떠나지 않는다."},{"who":"리코","text":"이 자리에서 뭔가를 알려 주려는 것 같아."},{"who":"보이드","text":"이 미로 정원도 스카이루프에서 확보한 섬 좌표 중 하나야. 네이티를 데리고 밖으로 나가서 미로 정원을 기록하자."}],"forestIntro":[{"who":"보이드","text":"먼저 가까운 섬 좌표로 가자. 서쪽 숲 가장자리야."}],"forestDone":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"리코","text":"이제 두 개야. 다음 기록도 채우자."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"record1":[{"who":"보이드","text":"하모니아 아래의 흐름을 확인했어. 일루아가 광장 둘레를 따라 흐르고 있었구나."},{"who":"제로","text":"우와, 하모니아 주변의 흐름은 이렇게 생겼네!"},{"who":"리코","text":"아직 네 군데가 비어 있어. 얼른 나머지도 채우자!"}],"record2":[{"who":"보이드","text":"이번에는 관람차 언덕 주변의 흐름을 확인했어. 언덕 아래를 지나 해안 쪽으로 이어지고 있었어."},{"who":"리코","text":"세 번째 기록까지 채웠어. 남은 두 개도 마저 찍자."}],"record3":[{"who":"보이드","text":"사파리 주변의 흐름도 확인했어. 원천에서 나온 일루아가 사파리 아래로 이어지고 있었구나."},{"who":"보이드","text":"이걸로 누락됐던 다섯 기록을 모두 채웠어. 이제 전체 흐름으로 환원 시험을 해 볼 수 있어."}],"natyRecord":[{"who":"보이드","text":"미로 정원 아래의 흐름을 확인했어. 이 자리 아래로도 일루아가 이어져 있었구나. 이걸로 네 번째 기록을 채웠어."},{"who":"리코","text":"네이티가 아직도 불안정해. 이 기록을 가지고 연구실에서 원인을 알아보자."},{"who":"제로","text":"자일로가 찾으면 연구실로 오랬지? 네이티, 같이 가자."}]};
 const QUESTS = [
   {id:'q1', act:1, who:[PAIR], short:'스카이 루프', title:'섬의 전원을 되살려라', hint:'롤러코스터가 제일 잘 보이는 자리', needs:['z1'], zones:['z2'], restores:'dl-coaster', mini:'loop', r:7, pop:'자일로 발견!'},
   {id:'q2', act:2, who:[PAIR], short:'미로와 연구실', title:'네이티를 찾아라', hint:'관람차 뒤쪽 산책로부터 살펴보기', needs:['z2'], zones:[], restores:'dl-carousel', mini:'maze', r:6, pop:'네이티 발견!'},
@@ -7857,7 +7980,7 @@ function miniLoad(){ try{ const o = JSON.parse(localStorage.getItem(MINI_KEY()) 
 function miniSave(step, patch){ if(!questLive) return; const cur = miniLoad(), o = Object.assign(cur && cur.q === questLive.id ? cur : {q:questLive.id}, {step}, patch || {}); if(walk && !walk.ride) o.pos = [walk.x, walk.z, walk.yaw]; o.t = Date.now(); try{ localStorage.setItem(MINI_KEY(), JSON.stringify(o)); }catch(e){} }
 function miniSavePos(){ const cur = miniLoad(); if(!cur || !questLive || cur.q !== questLive.id || !walk || walk.ride) return; cur.pos = [walk.x, walk.z, walk.yaw]; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cur)); }catch(e){} }
 function miniForget(){ try{ localStorage.removeItem(MINI_KEY()); }catch(e){} }
-const STEP_LINE = {found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 배전반을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
+const STEP_LINE = {found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 예비 배전선을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
 // put the walker back where the mission was left and jump straight to its step (the intro and the finding are already done)
 function miniResume(q, cp){ const w = walk; if(!w) return false;
   if(cp.pos && !walkBlocked(cp.pos[0], cp.pos[1])){ w.x = cp.pos[0]; w.z = cp.pos[1]; if(cp.pos[2] != null) w.yaw = cp.pos[2]; }
@@ -8102,7 +8225,7 @@ function activityHelp(q){
   if(['forest','forest-shot'].includes(step))return '서쪽 숲 가장자리로 가서 「기록 찍기」를 눌러 줘. 좌표만 얻은 상태라 아직 기록은 1 / 5야.';
   if(m?.phase==='ride')return '스카이루프가 표시 지점을 지날 때 「좌표 확인」을 눌러 줘. 네 좌표를 모두 모으면 역에서 내릴 수 있어.';
   if(step==='station')return '섬 전체의 전원이 돌아왔어. 스카이루프 역에서 탑승해 남은 네 좌표를 확보하자.';
-  if(step==='yard')return '예비 배전반의 칸을 돌려 발전기에서 모든 칸까지 선을 이어 줘.';
+  if(step==='yard')return '예비 배전선의 칸을 돌려 발전기에서 모든 칸까지 선을 이어 줘.';
   return '자일로가 롤러코스터 근처에서 기다리고 있어. 만나서 섬의 전원이 끊긴 이유를 들어 보자.';
  }
  if(q.id==='q2'){
@@ -8314,7 +8437,7 @@ function yardBuild(){
   const leaves = []; con.forEach((row, y)=> row.forEach((c, x)=>{ if(c.size === 1 && !(x === src[0] && y === src[1])) leaves.push([x, y, Math.abs(x - src[0]) + Math.abs(y - src[1])]); })); leaves.sort((a, b)=> b[2] - a[2]);
   yard = {W, H, src, tiles, rot, ROT, D, sol:con, stations:leaves.slice(0, 3).map(l=> l[0] + ',' + l[1]), done:false};
   $('ydBoard').style.gridTemplateColumns = `repeat(${W}, 1fr)`;
-  $('ydBoard').innerHTML = tiles.map((row, y)=> row.map((t, x)=> `<button type="button" data-x="${x}" data-y="${y}" class="${x === src[0] && y === src[1] ? 'src' : ''}${yard.stations.includes(x + ',' + y) ? ' stn' : ''}" aria-label="배전반 ${y + 1}행 ${x + 1}열"></button>`).join('')).join('');
+  $('ydBoard').innerHTML = tiles.map((row, y)=> row.map((t, x)=> `<button type="button" data-x="${x}" data-y="${y}" class="${x === src[0] && y === src[1] ? 'src' : ''}${yard.stations.includes(x + ',' + y) ? ' stn' : ''}" aria-label="예비 배전선 ${y + 1}행 ${x + 1}열"></button>`).join('')).join('');
   yardPaint();
 }
 function yardPower(){ const {W, H, src, tiles, D} = yard, on = Array.from({length:H}, ()=> Array(W).fill(false)), st = [src]; on[src[1]][src[0]] = true;
@@ -8332,7 +8455,7 @@ function yardPaint(){ const {W, H, tiles} = yard, on = yardPower(); let lit = 0;
         if(nx >= 0 && nx < W && ny >= 0 && ny < H && !seen.has(key)){ seen.add(key); queue.push([nx, ny, depth + 1]); } }
     }
     $('ydP').textContent = '전부 이어졌다. 섬 전체에 전기가 들어온다.'; $('ydSuccess').hidden = false; $('ydMix').disabled = true;
-    $('yardDlg').classList.add('win'); sfx('success');restoreParkPower();miniSave('station');
+    $('yardDlg').classList.add('win'); sfx('success');restoreParkPower(true);miniSave('station');
     $('ydContinue').hidden=false;
   } }
 
@@ -8340,8 +8463,35 @@ $('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button')
 $('ydContinue').onclick=()=>{if(yard?.done)yardDone();};
 $('ydMix').onclick = ()=>{ if(yard && !yard.done) yardBuild(); };
 function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true; });
-  setTimeout(()=> say(STORY.yardDone,
-    ()=> miniWalkTo(3, '스카이 루프 역으로', '선로 아래 계단', STATION.spot, 9, rideBoard)), 700); }
+  setTimeout(()=> parkWake(()=> say(STORY.yardDone,
+    ()=> miniWalkTo(3, '스카이 루프 역으로', '선로 아래 계단', STATION.spot, 9, rideBoard))), 700); }
+// ---------- the park wakes up (2026-11-04): seen from above, a ring of light runs out from the service yard, the bulbs come on from the
+// ground up and every ride starts slowly and picks up speed. Its own clock (dt capped at 1/20 s), so a slow tablet plays it slower, never skips it.
+function parkWake(done){
+  const go = ()=>{ PARK_HOLD = false; TRAIN.lit = true; TRAIN.mode = 'run'; rideSync(); };
+  if(!PARK_HOLD || reduce || !walk){ go(); done(); return; }
+  const src = new THREE.Vector3(walk.x, G, walk.z), ctr = new THREE.Vector3(10, G, 30);
+  go();
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.5, 8, 128).rotateX(Math.PI/2), glowMat(0xffe27a, 0.9, true)); ring.material.depthWrite = false; ring.position.set(src.x, G + 1.5, src.z); ring.renderOrder = 9; sceneI.add(ring);
+  PARK_WAKE = {k:0, dur:6.2, sp:0, src, ctr, ring, done, p0:camera.position.clone(), t0:controls.target.clone()};
+  MI.forEach(m=>{ const R = RIDE[m.id]; if(R){ R.s = 0; R.U.uLv.value = G - 6; } }); PARK_U.uLv.value = G - 6; sfx('power');
+}
+const _pwP = new THREE.Vector3(), _pwT = new THREE.Vector3();
+function parkWakeTick(dt){
+  const w = PARK_WAKE; if(!w) return; w.k += Math.min(dt, 1/20); const k = w.k, sm = x=>{ x = Math.min(1, Math.max(0, x)); return x*x*(3 - 2*x); };
+  w.sp = sm((k - 1.4)/3.2);
+  const lv = G - 6 + sm((k - 0.7)/2.6)*160; PARK_U.uLv.value = lv;
+  MI.forEach(m=>{ const R = RIDE[m.id]; if(R && R.on){ R.s = w.sp; R.U.uLv.value = lv; } });
+  const rk = Math.min(1, k/3.4); w.ring.scale.setScalar(1 + rk*720); w.ring.material.opacity = 0.9*(1 - rk)*(1 - rk);
+  if(k >= w.dur){ sceneI.remove(w.ring); w.ring.geometry.dispose(); w.ring.material.dispose(); PARK_WAKE = null;
+    PARK_U.uLv.value = 1e4; MI.forEach(m=>{ const R = RIDE[m.id]; if(R && R.on){ R.s = 1; R.U.uLv.value = 1e4; } }); if(walk) walk.snap = true; w.done(); }
+}
+function parkWakeCam(){   /* after the walk camera each frame: rise to a high view of the island, hold, come back down behind the pair */
+  const w = PARK_WAKE; if(!w) return; const k = w.k, sm = x=>{ x = Math.min(1, Math.max(0, x)); return x*x*(3 - 2*x); };
+  const up = sm(k/1.6)*(1 - sm((k - (w.dur - 1.1))/1.1)), a = 0.6 + k*0.07;
+  _pwT.copy(w.src).lerp(w.ctr, 0.55); _pwP.set(_pwT.x + Math.sin(a)*430, G + 300, _pwT.z + Math.cos(a)*430);
+  camera.position.lerp(_pwP, up); _pwT.lerpVectors(controls.target, _pwT, up); camera.lookAt(_pwT); controls.target.copy(_pwT);
+}
 // ----- q1 · the Sky Loop lap: the marked target along the elevated loop; hold 「기록」 while the train is inside a ring -----
 function buildStation(){ if(STATION) return; const c = TRAIN.curve, N = 360; let bu = 0, bd = 1e9; for(let i=0;i<N;i++){ const p = c.getPointAt(i/N); const d = Math.hypot(p.x - XYLO_HIDE[0], p.z - XYLO_HIDE[1]); if(d < bd){ bd = d; bu = i/N; } }
   TRAIN.stationU = bu; const p = c.getPointAt(bu), q = c.getPointAt((bu + 0.003) % 1), tx = q.x - p.x, tz = q.z - p.z, L = Math.hypot(tx, tz) || 1, ux = tx/L, uz = tz/L, inx = -p.x/Math.hypot(p.x, p.z), inz = -p.z/Math.hypot(p.x, p.z);

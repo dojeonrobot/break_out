@@ -1,0 +1,73 @@
+diff --git a/chapter05/index.html b/chapter05/index.html
+index 0c4ea2e..6bc6aed 100644
+--- a/chapter05/index.html
++++ b/chapter05/index.html
+@@ -3727,7 +3727,7 @@ const coaster = new THREE.Group();
+     add(g, new THREE.PlaneGeometry(6, 1.4), new THREE.MeshBasicMaterial({map:signTex('TUNNEL', {bg:'#1d2f55', fg:'#ffd400', size:70, w:384, h:90}), side:THREE.DoubleSide}), -13.2, q.y + 5.4, 0, false).rotation.y = Math.PI/2; }
+   // LED strips that chase round the track
+   const leds = [];
+-  for(let i=0;i<N;i+=16){ const r = add(coaster, new THREE.TorusGeometry(3, 0.2, 6, 22), glowMat(0x7fd7ff), 0, 0, 0, false); r.position.copy(P[i]).addScaledVector(U[i], 1.3); r.lookAt(P[i].clone().add(T[i]).addScaledVector(U[i], 1.3)); leds.push(r); }
++  for(let i=0;i<N;i+=16){ const r = add(coaster, new THREE.TorusGeometry(3, 0.2, 6, 22), glowMat(0x7fd7ff), 0, 0, 0, false); r.position.copy(P[i]).addScaledVector(U[i], 1.3); r.lookAt(P[i].clone().add(T[i]).addScaledVector(U[i], 1.3)); r.userData.liveColor = true; leds.push(r); }   /* colour set every frame: never baked into vertex colours */
+   // station: a timber lodge over the home straight — pitched shingle roof, lanterns, gates, waiting riders, the big sign
+   { const st = new THREE.Group(); st.position.set(112, 0, -29); coaster.add(st);   // on the east edge; its east gate faces the path
+     add(st, BOX(26, 1.2, 44), mat(0xd9cfba), 0, 0, 0);
+@@ -5706,9 +5706,9 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
+       pool.material.opacity = night*0.5; glow.material.opacity = night*0.3; pool.visible = glow.visible = night > 0.02; });
+     // camera helper for screenshots: window.__islandCam(x, z, distance)
+     window.__dbg = {THREE, renderer, sun, hemi, fill, islAnim, placeLabels:()=> placeLabels(), navCam:(x, z, dir, d)=> navCam(x, z, dir, d), NAV_D, mazeHeart:(x, z)=> mazeHeart(x, z), mazeInside:(x, z)=> mazeInside(x, z), bakedAudit:()=>{ const out = new Map(); const label = o=>{ for(let p = o; p; p = p.parent){ if(p.userData && p.userData.i != null && IB[p.userData.i]) return IB[p.userData.i].label; } return '(섬 바닥)'; };
+-      BAKED.forEach(e=>{ e.p.updateWorldMatrix(true, false); e.node.updateWorldMatrix(true, false); e.m.updateMatrix(); const rel = relativeMatrix(e.p, e.node); let moved = false; for(let i = 0; i < 16; i++) if(Math.abs(rel.elements[i] - e.pw.elements[i]) > 1e-3){ moved = true; break; } const own = !e.m.matrix.equals(e.ml) && !moved, vis = e.m.visible !== e.v;
++      BAKED.forEach(e=>{ e.p.updateWorldMatrix(true, false); e.node.updateWorldMatrix(true, false); e.m.updateMatrix(); const rel = relativeMatrix(e.p, e.node); let moved = false; for(let i = 0; i < 16; i++) if(Math.abs(rel.elements[i] - e.pw.elements[i]) > 1e-3){ moved = true; break; } const own = !e.m.matrix.equals(e.ml) && !moved, vis = e.m.visible !== e.v, recol = e.col != null && e.m.material.color.getHex() !== e.col;
+         let attached = false; for(let q = e.p; q; q = q.parent) if(q.isScene){ attached = true; break; }
+-        if(!(moved || own || vis)) return; const k = label(e.p) + ' | ' + (moved ? '합친 자리와 따로 움직임' : own ? '조각이 움직임' : '보임/숨김 바뀜') + (attached ? '' : ' (분리된 그룹)'); const r = out.get(k) || {n:0, colors:new Set()}; r.n++; const mt = e.m.material; if(mt && mt.color) r.colors.add('#' + mt.color.getHexString()); out.set(k, r); });
++        if(!(moved || own || vis || recol)) return; const k = label(e.p) + ' | ' + (moved ? '합친 자리와 따로 움직임' : own ? '조각이 움직임' : vis ? '보임/숨김 바뀜' : '색이 바뀜(정점 색으로 구움)') + (attached ? '' : ' (분리된 그룹)'); const r = out.get(k) || {n:0, colors:new Set()}; r.n++; const mt = e.m.material; if(mt && mt.color) r.colors.add('#' + mt.color.getHexString()); out.set(k, r); });
+       return [...out].map(([k, r])=> [k, r.n, [...r.colors].slice(0, 4).join(' ')]).sort((a, b)=> b[1] - a[1]); }, zoneMine:(id)=>{ const m = MISSION_E.find(x=> x.id === id) || MI.find(x=> x.id === id); return zoneMine(m); }, walkGrid:()=> WGRID || (WGRID = buildWalkGrid()), onPath:(x, z)=> onPath(x, z), walkBlocked:(x, z)=> walkBlocked(x, z), miniCp:()=> miniLoad(), say:(...a)=> say(...a), walkTo:(x, z)=>{ if(walk){ walk.x = x; walk.z = z; } }, walkState:()=> walk ? {x:walk.x, z:walk.z, name:walk.name} : null, mini:()=> mini ? {kind:mini.kind, phase:mini.phase, target:mini.target || null, arrived:!!mini.arrived} : null, target:()=> questLive ? questTarget(questLive) : null, qdone:()=> [...QDONE], quests:()=> QUESTS.map(q=> ({id:q.id, open:questOpen(q), done:questDone(q)})), act:(n)=> playAct(n), chars:()=> ({ZERO, RICO, XYLO, CODEX, NATY}), rigPose:(...a)=> rigPose(...a), act:(n)=> playAct(n), tutEnd:()=> tutEnd(), simState:()=> ({simOn, lit:SIM_LIT, reveals:REVEALS.length, busy:actBusy, walk:!!walk, vn:!!vn, cinema:!$('cinema').hidden}), tutState:()=> ({step:tutStep, world:W.id, len:TUT.length, LOCAL, locked:MISSION_E.filter(m=> m.lat != null).map(m=> [m.id, zoneLocked(m), zoneDone(m)]), restoreShow:typeof restoreShow, goWorld:typeof goWorld, vnVoid:VN_IMG['보이드']}), islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, NATY_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, qnav:()=> ({route:qNav, count:qTrailMesh ? qTrailMesh.count : -1, mark:$('qMark').className, markT:$('qMark').style.transform, markTxt:$('qMark').textContent, route2:(s, t, r)=> qRoute(...s, ...t, r)}), scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid, ride:()=> ride, caveS:()=> caveS, yard:()=> yard, lab:()=> labGame, train:()=> TRAIN, maze:()=> MAZE, mazeBlocked:(x, z)=> mazeBlocked(x, z), station:()=> STATION, power:()=>({on:parkPowerOn(),clock:PARK_T,poweredAnimations:islAnim.filter(f=>f.powered).length}),forestSpot,device:()=>({model:collectorModel,mini,spot:deviceSpot()}),labDoor:()=> LAB_DOOR, natyHide:()=> NATY_HIDE, yardPaint:()=> yardPaint(), labWin:()=> labGame && labGame.win(), yardDoor:()=> YARD_DOOR, dlg:{yard:(win)=>{ yardBuild(); if(win){ yard.tiles = yard.sol.map(r=> r.map(c=> new Set(c))); yard.done = true; yardPaint(); $('yardDlg').classList.add('win'); } $('yardDlg').dataset.on = '1'; }, lab:(all)=>{ mini = {kind:'maze'}; labBuild(); if(all)$('lbGo').hidden=false; $('labDlg').dataset.on = '1'; }, cave:(test)=>{ caveBuild(); if(test){ $('cvNext').click(); } $('caveDlg').dataset.on = '1'; }}};   // for the overlap audit and screenshot scripts
+     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
+   }
+@@ -7231,6 +7231,12 @@ function batchIsland(){
+   const DYN = new Set(); snaps[0].forEach((v,o)=>{ if(snaps.some(sn=> sn.get(o)!==v)) DYN.add(o); });
+   const sig = m => [m.type, m.color ? m.color.getHex() : '', m.opacity, m.transparent, m.side, m.map ? m.map.uuid : '', m.flatShading, m.vertexColors, m.blending, m.depthWrite, m.polygonOffset ? m.polygonOffsetFactor : ''].join('|');
+   const keep = ['position','normal','uv','color'];
++  /* 2026-11-04 lag pass 2: a plain opaque Lambert or Basic material (no map, no glow, no shader hook, no clipping) differs from its neighbours only by colour, so its colour
++     goes into the vertices and every such mesh under one node shares one draw. Island draws per frame fell from about 4,200 (shadow pass included). */
++  const plainLambert = m => (m.isMeshLambertMaterial || m.isMeshBasicMaterial) && !m.map && !m.vertexColors && !m.transparent && m.opacity === 1 && !m.alphaTest && !m.wireframe && (!m.emissive || m.emissive.getHex() === 0)
++    && !m.clippingPlanes && !m.userData.keep && !m.userData.bulb && !Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile') && m.blending === THREE.NormalBlending && m.depthWrite && m.depthTest && m.colorWrite;
++  const vcKey = m => ['VC', m.type, m.side, m.flatShading, m.fog, m.polygonOffset ? m.polygonOffsetFactor + ',' + m.polygonOffsetUnits : ''].join('|');
++  const VC_MATS = new Map(), PICK = new Set(IB.map(b=> b.mesh));
+   function mergeUnder(node){
+     const buckets = new Map(), inner = [];
+     node.updateMatrixWorld(true);
+@@ -7241,9 +7247,9 @@ function batchIsland(){
+       o.children.slice().forEach(c=>{
+         if(DYN.has(c) || c.userData.dynamic){ inner.push(c); return; }
+         if(c.visible===false) return;
+-        if((c.userData.i !== undefined && c !== node) || c.isInstancedMesh || c.isPoints || c.isLine) return;
++        if(c !== node && (PICK.has(c) || (c.userData.i !== undefined && !(IB[c.userData.i] && IB[c.userData.i].mesh === node))) || c.isInstancedMesh || c.isPoints || c.isLine) return;   /* a former pickable root re-parented into its own group (the harbour's old group inside port) merges with it */
+         if(c.isMesh && !Array.isArray(c.material) && c.geometry.attributes.uv && c.children.length===0){
+-          const k = sig(c.material) + '|' + c.castShadow + '|' + c.receiveShadow + '|' + (c.userData.keepReal ? 1 : 0) + '|' + c.renderOrder + '|' + Object.keys(c.geometry.attributes).filter(n=>keep.includes(n)).sort().join();
++          const k = (plainLambert(c.material) && !c.userData.liveColor ? vcKey(c.material) : sig(c.material)) + '|' + c.castShadow + '|' + c.receiveShadow + '|' + (c.userData.keepReal ? 1 : 0) + '|' + c.renderOrder + '|' + Object.keys(c.geometry.attributes).filter(n=>keep.includes(n)).sort().join();
+           if(!buckets.has(k)) buckets.set(k, []); buckets.get(k).push(c); return;
+         }
+         walk(c);
+@@ -7251,16 +7257,20 @@ function batchIsland(){
+     })(node);
+     buckets.forEach(list=>{
+       if(list.length < 2) return;
++      const vc = plainLambert(list[0].material) && !list[0].userData.liveColor;
+       const geos = list.map(c=>{ const g = c.geometry.index ? c.geometry.toNonIndexed() : c.geometry.clone(); g.clearGroups();
+         Object.keys(g.attributes).forEach(n=>{ if(!keep.includes(n)) g.deleteAttribute(n); });
++        if(vc){ const col = c.material.color, n = g.attributes.position.count, a = new Float32Array(n*3); for(let i = 0; i < n; i++){ a[i*3] = col.r; a[i*3+1] = col.g; a[i*3+2] = col.b; } g.setAttribute('color', new THREE.BufferAttribute(a, 3)); }
+         g.applyMatrix4(rel(c)); return g; });
+       const merged = mergeGeometries(geos, false); if(!merged) return;
+-      const f = list[0], mesh = new THREE.Mesh(merged, f.material);
++      const f = list[0], mesh = new THREE.Mesh(merged, vc ? vcMat(f.material) : f.material);
+       mesh.castShadow = f.castShadow; mesh.receiveShadow = f.receiveShadow; mesh.renderOrder = f.renderOrder; mesh.userData.keepReal = f.userData.keepReal;
+-      list.forEach(c=>{ c.updateMatrix(); c.parent.updateWorldMatrix(true, false); BAKED.push({m:c, p:c.parent, node, pw:relativeMatrix(c.parent, node), v:c.visible, ml:c.matrix.clone()}); c.parent.remove(c); }); node.add(mesh);   // BAKED: an audit record of what was merged away (see __dbg.bakedAudit)
++      list.forEach(c=>{ c.updateMatrix(); c.parent.updateWorldMatrix(true, false); BAKED.push({m:c, p:c.parent, node, pw:relativeMatrix(c.parent, node), v:c.visible, ml:c.matrix.clone(), col:vc ? c.material.color.getHex() : null}); c.parent.remove(c); }); node.add(mesh);   // BAKED: an audit record of what was merged away (see __dbg.bakedAudit)
+     });
+     inner.forEach(mergeUnder);
+   }
++  function vcMat(m){ const k = vcKey(m); if(!VC_MATS.has(k)) VC_MATS.set(k, new (m.isMeshBasicMaterial ? THREE.MeshBasicMaterial : THREE.MeshLambertMaterial)({color:0xffffff, vertexColors:true, side:m.side, fog:m.fog, ...(m.isMeshBasicMaterial ? {} : {flatShading:m.flatShading}),
++    polygonOffset:m.polygonOffset, polygonOffsetFactor:m.polygonOffsetFactor, polygonOffsetUnits:m.polygonOffsetUnits})); return VC_MATS.get(k); }
+   mergeUnder(islRoot);
+   IB.forEach(b=>{ if(b.c==='char') return; mergeUnder(b.mesh); prepGroup(b); });
+ }

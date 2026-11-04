@@ -27,7 +27,7 @@ async def run():
         br = await p.chromium.launch(args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
         ctx = await br.new_context(viewport={'width':1152,'height':720}); await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');")
         pg = await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); await pg.route('**/api/void/**', lambda rt: rt.abort())
-        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?team=12&world=island', wait_until='load'); await pg.wait_for_timeout(8000)
+        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?team=12&world=island', wait_until='load', timeout=120000); await pg.wait_for_timeout(8000)
         await pg.evaluate("() => { try{ __dbg.tutEnd(); }catch(e){} }"); await pg.wait_for_timeout(500)
         await pg.evaluate("() => { __dbg.station && __dbg.station(); }")
         r = await pg.evaluate(JS); print(json.dumps(r, ensure_ascii=False, indent=0)); print('errs', errs[:2]); await br.close()

@@ -12,10 +12,10 @@ STEPS = [
 ]
 async def run():
     async with async_playwright() as p:
-        br = await p.chromium.launch(args=['--enable-gpu'])
+        br = await p.chromium.launch(args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'])
         ctx = await br.new_context(viewport={'width':1152,'height':720}); await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');")
         pg = await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); await pg.route('**/api/void/**', lambda rt: rt.abort())
-        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?team=12&world=island', wait_until='load'); await pg.wait_for_timeout(9000)
+        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?team=12&world=island', wait_until='load', timeout=120000); await pg.wait_for_timeout(9000)
         await pg.evaluate("__dbg.quest().set(['q1','q2','q3']);__dbg.setWorld('island',true)")
         print('baked pieces', await pg.evaluate("__dbg.bakedAudit ? 'ok' : 'none'"))
         seen = set()
