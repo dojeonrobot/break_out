@@ -13,7 +13,7 @@
 - 바이킹 공사장 + 조별 배 모델(STL·OBJ·GLB) 업로드로 바이킹 복구, 끊어진 배전선, 아이들이 고치는 곳 이름 「예비 배전선」
 - 예비 배전선 성공 → 「계속」 → 섬이 깨어나는 연출(카메라 상공·빛 고리·전구 아래부터·놀이기구 서서히 출발)
 
-### A. 네이티 수색·중간 점검·잔재 수색 (코드 작성됨, 배포 안 함)
+### A. [완료 2026-11-05, 배포함] 네이티 수색·중간 점검·잔재 수색 — 점검 6항목·회귀 4종 통과, 기록은 docs/chapter05.md 2026-11-05 항목. 아래는 당시 메모(남은 것: 관리자 건너뛰기 알약 미션 1·3, 소설·노션 반영)
 - 대본: docs/chapter05_script.md 미션 1~3(사용자가 직접 고치는 중, 커밋 안 함. 커밋할 땐 이 파일만 빼거나 사용자 확인)
 - 코드: scripts/pending/ch5_patch_naty_remnant.py (적용: python scripts/pending/ch5_patch_naty_remnant.py, 한 번만). 같은 내용 diff: scripts/pending/ch5_naty_remnant_wip_20261104.diff
   - 지금 chapter05/index.html은 배포본(8d08679) 그대로. 패치는 적용 안 된 상태.

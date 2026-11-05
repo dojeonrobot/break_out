@@ -6,7 +6,7 @@ body.island .lbl.major{font-weight:700;background:var(--panel-solid);border-colo
 #adminBtn,#sndBtn{height:44px;box-sizing:border-box;display:flex;align-items:center}
 #sndBtn{right:84px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--fg)} #sndBtn .x{display:none} #sndBtn.off .w{display:none} #sndBtn.off .x{display:block} #sndBtn.off{color:var(--muted)}
 body.admin #sndBtn,body.screen #sndBtn{display:none}
-.vik{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}.vik small{font-size:12px;opacity:.72}.vik .vikf{margin:0;font-size:13px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.enter.ghost{background:transparent;color:var(--ink,inherit);box-shadow:inset 0 0 0 1px var(--line)}.enter:disabled{opacity:.6}
+.vik{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}.vik small{font-size:12px;opacity:.72}.vik .vikf{margin:0;font-size:13px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}.enter.ghost{background:transparent;color:var(--ink,inherit);box-shadow:inset 0 0 0 1px var(--line)}.enter:disabled{opacity:.6}#remDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:radial-gradient(ellipse at 50% 0%,rgba(255,80,60,.18),transparent 55%),rgba(5,7,12,.9);color:var(--void-fg);text-align:center;-webkit-user-select:none;user-select:none}#remDlg[data-on]{display:grid}#remDlg .in{display:grid;gap:12px;justify-items:center;width:min(560px,94vw)}#remDlg small{font-family:var(--mono);letter-spacing:.3em;font-size:12px;color:#9ff6ff}#remDlg h1{margin:0;font-size:clamp(22px,4vw,32px)}#remDlg p{margin:0;font-size:15px;line-height:1.6;min-height:1.6em;max-width:40ch;word-break:keep-all}#remDlg svg{width:min(300px,64vw,52vh);height:auto;touch-action:manipulation}#remDlg .go{border:0;border-radius:999px;padding:14px 40px;min-height:48px;background:#9ff6ff;color:#06111a;font:700 17px var(--sans)}#remDlg .go:active{transform:scale(.97)}#remDlg.shake svg{animation:remShake .3s}@keyframes remShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}#remPulse{position:fixed;inset:0;pointer-events:none;z-index:20;opacity:0;transition:opacity .3s;box-shadow:inset 0 0 calc(30px + 140px*var(--k,0)) rgba(255,90,78,calc(.8*var(--k,0)))}#remPulse[data-on]{opacity:1;animation:remBeat 1.1s ease-in-out infinite}@keyframes remBeat{50%{opacity:.6}}@media (prefers-reduced-motion:reduce){#remPulse[data-on]{animation:none}#remDlg.shake svg{animation:none}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -7323,10 +7323,12 @@ islAnim.push(t=>{ islT = t;
   if(NATY.userData.hold){ const hd = NATY.userData.hold, age = (performance.now() - hd.t)/1000; if(hd.keep || age < 3){ _c2.set(hd.color); if(!hd.keep) _c2.lerp(_c1, clamp01((age - 2)/1)); } else NATY.userData.hold = null; }
   const following=walk&&(questLive?.id==='q4'||mini?.kind==='maze'&&['walk','naty-shot'].includes(mini.phase));
   if(following){NATY.position.set(walk.x+Math.cos(walk.yaw)*1.8,groundY(walk.x,walk.z)+2.4+Math.sin(t*2)*.14,walk.z-Math.sin(walk.yaw)*1.8);NATY.rotation.y=walk.yaw;}
-  if(TEAM&&!flowFree()){_c2.set(QDONE.has('q4')||(mini?.kind==='device'&&mini.hits>=3)?0x7cc8f0:0xe05a4e);}
+  if(TEAM&&!flowFree()){_c2.set(0xe05a4e);}
   NATY.userData.fm.emissiveIntensity=NATY.userData.guideBright?.8:.55;
   NATY.userData.fm.color.copy(_c2); NATY.userData.fm.emissive.copy(_c2); if(NATY.userData.tm) NATY.userData.tm.emissive.copy(_c2);
   NATY.userData.bits.forEach((b,i)=>{ const q = t*2 + i*2.1; b.position.set(Math.cos(q)*4.5, 4 + Math.sin(q*1.3)*2, Math.sin(q)*4.5); });
+  { const s0 = NATY.userData.s0 ??= NATY.scale.x; if(TEAM && !flowFree()){ const sp = Math.sin(t*1.9)*Math.sin(t*0.71), k = sp > 0.45 ? (sp - 0.45)/0.55 : 0;   /* 2026-11-04: the Illua is unsteady, so its spirit keeps splitting and pulling back together */
+      NATY.scale.set(s0*(1 + k*0.35*Math.sin(t*31)), s0*(1 - k*0.25), s0*(1 + k*0.3*Math.cos(t*27))); if(k > 0) NATY.userData.bits.forEach(b=> b.position.multiplyScalar(1 + k*1.6)); } else if(NATY.scale.x !== s0) NATY.scale.setScalar(s0); }
   // the shadow leans out from behind its tree now and then
   DARK.position.x = -178*K + Math.max(0, Math.sin(t*0.5))*0.6;
   CHAR.forEach(c=>{ c.b.cx = c.g.position.x; c.b.cz = c.g.position.z; });
@@ -7894,10 +7896,12 @@ $('walkX').onclick = ()=> stopWalk(true);
 // 제로·리코 look for 자일로 → his two coordinates; once both zones are restored 네이티 opens and looks for the hidden 코덱스 → one coordinate;
 // once that zone is restored 코덱스 opens and enters the eye cave → the last two. The chain is remembered per team on this device.
 const STORY = {"q1intro":[{"who":"리코","text":"롤러코스터 쪽으로 가 보자. 자일로가 거기 있을 거야."}],"q1found":[{"who":"자일로","text":"오셨군요. 바이킹이 무너지면서 섬으로 가는 전선이 끊겼어요."},{"who":"자일로","text":"섬 전체에 전기가 들어오지 않아 놀이기구가 모두 멈춰 있습니다."},{"who":"제로","text":"정말이네. 아무것도 안 움직여요."},{"who":"자일로","text":"롤러코스터 옆 정비동에 예비 배전선이 있어요. 거기서 전선을 다시 연결하면 섬 전체에 전기를 보낼 수 있습니다."},{"who":"리코","text":"정비동으로 가서 연결해 볼게요."}],"yard":[{"who":"자일로","text":"발전기에서 나오는 선을 모든 칸까지 이어 주세요. 이 예비 배전선이 섬 전체 전기를 맡고 있어요."}],"yardDone":[{"who":"제로","text":"돌아간다! 저쪽 놀이기구도 움직여!"},{"who":"리코","text":"섬 전체에 전기가 들어왔어!"},{"who":"자일로","text":"됐어요. 두 분이 섬의 전원을 되살렸습니다."}],"rideIntro":[{"who":"보이드","text":"이제 남은 기록을 채우러 가야 해. 그러려면 다음 위치의 좌표가 필요해."},{"who":"자일로","text":"스카이루프가 움직이니 타고 이동할 수 있겠어요."},{"who":"보이드","text":"타고 이동하면서 남은 좌표들을 확보하자."},{"who":"제로","text":"좋아. 이번에는 어디로 가면 되는지 알아내는 거네!"}],"rideDone":[{"who":"보이드","text":"남은 네 좌표를 모두 확보했어. 카드에 저장해 뒀어."},{"who":"리코","text":"이제 이 좌표들을 따라가서 기록을 찍으면 되겠네."}],"q1exit":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"q2intro":[{"who":"제로","text":"네이티, 혼자 괜찮을까?"},{"who":"리코","text":"빛이 붉어지고 몸도 흔들렸대. 얼른 찾아보자. 관람차 뒤쪽 길로 갔다고 했어."}],"mazeEntrance":[{"who":"제로","text":"잠깐. 저 울타리 사이로 빛이 보이는데?"},{"who":"리코","text":"네이티가 여기 있는 것 같은데……?"},{"who":"제로","text":"안쪽에서 깜빡이고 있어. 그런데 여긴 미로잖아!"},{"who":"리코","text":"들어가서 찾아보자. 갈림길에서는 빛이 보이는 쪽을 확인해 봐."},{"who":"제로","text":"좋아. 미로 탐험이다! 네이티, 우리가 갈게!"}],"labIntro":[{"who":"자일로","text":"찾았군요! 아직도 빛이 붉고 몸이 불안정하네요."},{"who":"리코","text":"미로 안에 있었어요. 네이티를 데리고 나와 그 자리의 상태를 기록했어요."},{"who":"자일로","text":"가져온 기록으로 일루아의 흐름을 분석해 봅시다."}],"labAnalysis":[{"who":"보이드","text":"여길 봐. 이 지점에서 흐름이 이상하게 꺾이고 있어."},{"who":"리코","text":"원래대로 이어지지 못하고 있어요."},{"who":"자일로","text":"무언가 흐름을 방해하고 있습니다. 여기서도 네이티가 거칠게 반응하네요."},{"who":"제로","text":"뭐가 막고 있는 건데요?"},{"who":"자일로","text":"분석으로는 정체까지 알 수 없어요. 표시된 지점에 가서 직접 확인해야 합니다."},{"who":"자일로","text":"나중에 환원할 때는 이 시험 기록도 확인해야 해요. 지금은 흐름을 방해하는 것부터 알아봅시다."},{"who":"리코","text":"그럼 우리가 가 볼게요. 네이티, 같이 가자."}],"deviceIntro":[{"who":"제로","text":"표시된 곳이 이쪽이야. 무엇이 있는 걸까?"},{"who":"리코","text":"아직 모르지. 직접 보고 확인하자."}],"deviceFound":[{"who":"제로","text":"저기, 뭔가 남아 있어!"},{"who":"리코","text":"빛이 저것 때문에 꺾이고 있어. 연구실에서 보던 바로 그 모습이야."},{"who":"보이드","text":"이 문양…… 선대가 일루아를 모을 때 쓰던 장치에 새겨져 있던 거야."},{"who":"리코","text":"선대가 남긴 잔재였구나."},{"who":"보이드","text":"장치는 대부분 망가졌지만 일루아를 끌어들이는 부분이 아직 남아 있어. 이게 흐름을 가로채고 있었어."},{"who":"제로","text":"이걸 두면 일루아를 돌려줘도 또 끌려오겠네!"},{"who":"리코","text":"부숴서 방해를 없애자."}],"deviceExplain":[{"who":"보이드","text":"빛이 모이는 부분을 봐. 그곳을 맞히면 잔재를 부술 수 있어."}],"deviceDone":[{"who":"제로","text":"네이티! 원래 빛으로 돌아왔어!"},{"who":"리코","text":"기록을 채웠을 때는 그대로였는데…… 방해하던 걸 없애니까 달라졌어."},{"who":"보이드","text":"이제 흐름을 가로채는 힘이 사라졌어."},{"who":"제로","text":"그럼 환원할 수 있는 거야?"},{"who":"보이드","text":"방해는 없어졌지만 기록이 하나 남아 있어. 그 내용까지 채워야 환원을 시험할 수 있어."}],"deviceReturn":[{"who":"자일로","text":"이상이 생기던 지점에서 흐름이 정상으로 돌아왔어요. 무엇이 있었나요?"},{"who":"리코","text":"선대가 쓰던 장치의 잔재였어요. 아직 일루아를 끌어들이고 있어서 부쉈어요."},{"who":"자일로","text":"그래서 분석만으로 정체를 알 수 없었군요. 이제 방해는 없어졌어요."},{"who":"제로","text":"남은 기록 하나를 채우러 가자!"},{"who":"자일로","text":"스카이루프에서 확보한 캠퍼스 좌표가 하나 남았어요. 마지막 기록을 찍으러 가 주세요."}],"q3intro":[{"who":"리코","text":"기록을 모두 채웠어. 이제 환원 순서를 확인하러 가자."},{"who":"제로","text":"코덱스가 선대의 글을 찾으러 갔다고 했지? 북쪽 해안으로 가자."}],"q3found":[{"who":"코덱스","text":"왔군. 선대의 잔재는 부쉈다고 들었다."},{"who":"제로","text":"네. 그대로 두면 일루아를 돌려줘도 다시 끌려가니까요."},{"who":"코덱스","text":"나는 섬을 되돌리려면 도로랜드에 세운 것부터 전부 부숴야 한다고 생각했다."},{"who":"리코","text":"누락된 기록도 모두 채웠어요. 다른 곳을 부수기 전에, 이 기록대로 돌려주면 어떻게 되는지 먼저 확인해 봐요."},{"who":"코덱스","text":"……좋다. 그 방법으로 섬이 돌아오는지 보여 줘라. 안쪽 벽에 선대의 글이 남아 있다."}],"caveIntro":[{"who":"코덱스","text":"우리 가문이 문양을 처음 새긴 곳이다. 일루아가 섬에 흐르던 때의 기록이지."},{"who":"코덱스","text":"하지만 옆의 글은 나도 읽지 못한다. 뜻이 전해지지 않았어."},{"who":"리코","text":"보이드, 노아랑 루나의 옛 섬과 우리가 채운 기록을 같이 띄워 줘."},{"who":"보이드","text":"좋아. 누락된 기록을 다 채웠으니, 이제 이 글자가 옛 섬의 어디를 가리키는지 맞춰 볼 수 있어."},{"who":"제로","text":"이 그림 글자, 지형이랑 닮았어! 하나씩 맞춰 보자."}],"caveDecoded":[{"who":"제로","text":"점이 하나, 둘, 셋이야. 이게 순서구나!"},{"who":"코덱스","text":"숲, 계곡, 바닷가…… 우리 가문은 문양만 남기고 이 뜻을 잊었다."},{"who":"리코","text":"모은 기록에 이 순서를 적용해서 시험해 보면 되겠어요."},{"who":"제로","text":"양은 조금씩! 자일로의 시험 기록에서 한꺼번에 많이 보냈을 때 기구가 제멋대로 움직였잖아."},{"who":"보이드","text":"맞아. 흐름을 가로채던 잔재도 이미 없앴어. 이제 완성한 기록을 시뮬레이터에 넣고 순서와 양을 시험해 보자."},{"who":"코덱스","text":"진짜 섬을 건드리기 전에 확인하자는 거군. 해 봐라."}],"caveWon":[{"who":"보이드","text":"됐어. 전부 원래 자리로 돌아갔어. 아직 가상 시험이지만, 이 방법이라면 환원할 수 있어."},{"who":"리코","text":"우리가 채운 기록대로 일루아가 흐르고 있어. 누락된 곳 없이 전부 이어졌어."},{"who":"코덱스","text":"……보이는군. 시설을 더 부수지 않아도, 일루아가 돌아갈 길을 찾을 수 있었어."},{"who":"코덱스","text":"더는 부수지 않겠다. 너희가 찾아낸 방법대로 섬에 돌려주겠다."},{"who":"제로","text":"그럼 이제 진짜로 해 보자!"}],"ending":[{"who":"보이드","text":"봐. 우리가 찾아낸 일루아의 원래 자리와 길이야. 원천에서 다섯 기록의 자리까지 전부 이어졌어."},{"who":"제로","text":"잠깐…… 이 모양, 코덱스 망토에 있던 거잖아?"},{"who":"리코","text":"코덱스 가문의 눈 문양이야. 일루아가 섬에 흐르던 모습을 본떠 만든 거였어."},{"who":"코덱스","text":"섬을 지키는 뜻도 모르고 문양만 지니고 있었군."},{"who":"보이드","text":"캠퍼스에서 직접 찍은 기록까지 모였으니까 이 모양을 찾을 수 있었어. 한 자리라도 빠져 있었다면 끝까지 이어지지 않았을 거야."}],"actual":[{"who":"코덱스","text":"이제 진짜 일루아를 돌려주겠다. 너희가 찾아낸 자리로, 그 순서대로."}],"act1":[{"who":"보이드","text":"자일로가 롤러코스터 근처에서 우리를 찾고 있어."},{"who":"제로","text":"무슨 일이지? 가 보자!"}],"act2":[{"who":"자일로","text":"돌아오셨군요. 두 분이 기록을 찍으러 간 사이에 네이티에게 이상이 생겼어요."},{"who":"리코","text":"네이티한테요? 무슨 일이에요?"},{"who":"자일로","text":"빛이 갑자기 붉어지고 몸이 불안정하게 흔들렸어요. 그러더니 관람차 뒤쪽 길로 가 버렸습니다."},{"who":"제로","text":"그 상태로 혼자 간 거예요?"},{"who":"자일로","text":"네. 아직 돌아오지 않았어요. 걱정됩니다. 두 분이 찾아봐 주실래요?"},{"who":"제로","text":"우리가 찾으러 갈게요!"},{"who":"자일로","text":"저는 연구실에서 네이티의 반응을 확인하고 있을게요. 찾으면 같이 데려와 주세요."}],"act3":[{"who":"자일로","text":"마지막 기록까지 들어왔군요. 수고했어요."},{"who":"제로","text":"다섯 개를 전부 채웠어요!"},{"who":"리코","text":"이제 기록이 비어서 흐름을 못 보는 곳은 없네요."},{"who":"자일로","text":"네. 흐름을 방해하던 잔재도 없앴고요. 이제 환원 방법을 시험해 봅시다."},{"who":"자일로","text":"코덱스는 동굴로 갔어요. 선대가 남긴 글에 환원 순서가 있을지도 모른다고 합니다."},{"who":"제로","text":"북쪽 해안이지? 가 보자!"}],"q2found":[{"who":"제로","text":"네이티! 찾았다. 괜찮아?"},{"who":"네이티","img":"naty_red","nar":true,"text":"네이티의 불꽃이 붉게 흔들린다. 일행이 다가가도 그 자리를 떠나지 않는다."},{"who":"리코","text":"이 자리에서 뭔가를 알려 주려는 것 같아."},{"who":"보이드","text":"이 미로 정원도 스카이루프에서 확보한 섬 좌표 중 하나야. 네이티를 데리고 밖으로 나가서 미로 정원을 기록하자."}],"forestIntro":[{"who":"보이드","text":"먼저 가까운 섬 좌표로 가자. 서쪽 숲 가장자리야."}],"forestDone":[{"who":"보이드","text":"서쪽 숲 가장자리의 기록을 채웠어. 일루아가 숲의 바깥 둘레를 따라 흐르고 있었구나."},{"who":"리코","text":"이제 두 개야. 다음 기록도 채우자."},{"who":"보이드","text":"다음은 캠퍼스야. 스카이루프에서 확보한 좌표 중 두 번째 캠퍼스 기록으로 가자."}],"record1":[{"who":"보이드","text":"하모니아 아래의 흐름을 확인했어. 일루아가 광장 둘레를 따라 흐르고 있었구나."},{"who":"제로","text":"우와, 하모니아 주변의 흐름은 이렇게 생겼네!"},{"who":"리코","text":"아직 네 군데가 비어 있어. 얼른 나머지도 채우자!"}],"record2":[{"who":"보이드","text":"이번에는 관람차 언덕 주변의 흐름을 확인했어. 언덕 아래를 지나 해안 쪽으로 이어지고 있었어."},{"who":"리코","text":"세 번째 기록까지 채웠어. 남은 두 개도 마저 찍자."}],"record3":[{"who":"보이드","text":"사파리 주변의 흐름도 확인했어. 원천에서 나온 일루아가 사파리 아래로 이어지고 있었구나."},{"who":"보이드","text":"이걸로 누락됐던 다섯 기록을 모두 채웠어. 이제 전체 흐름으로 환원 시험을 해 볼 수 있어."}],"natyRecord":[{"who":"보이드","text":"미로 정원 아래의 흐름을 확인했어. 이 자리 아래로도 일루아가 이어져 있었구나. 이걸로 네 번째 기록을 채웠어."},{"who":"리코","text":"네이티가 아직도 불안정해. 이 기록을 가지고 연구실에서 원인을 알아보자."},{"who":"제로","text":"자일로가 찾으면 연구실로 오랬지? 네이티, 같이 가자."}]};
+Object.assign(STORY, {"yardDone": [{"who": "제로", "text": "돌아간다! 저쪽 놀이기구도 움직여!"}, {"who": "리코", "text": "섬 전체에 전기가 들어왔어!"}, {"who": "자일로", "text": "됐어요. 두 분이 섬의 전원을 되살렸습니다."}], "natyGone": [{"who": "", "text": "자일로가 주위를 둘러본다. 늘 곁을 맴돌던 네이티가 어디에도 보이지 않는다.", "nar": true}, {"who": "자일로", "text": "……네이티가 없어요."}, {"who": "리코", "text": "아까까지 있었잖아요?"}, {"who": "자일로", "text": "네이티는 일루아가 모습을 띤 존재예요. 일루아가 흔들리면 네이티도 흐트러집니다. 전원이 한꺼번에 들어오면서 일루아가 크게 흔들린 것 같아요."}, {"who": "자일로", "text": "빛이 흩어져서 어딘가로 끌려갔을 거예요. 이렇게 흔들리는 건 처음 봅니다. 응축된 일루아가 오래 버티지 못한다는 뜻이에요."}, {"who": "제로", "text": "그럼 환원을 서둘러야 하는 거네요."}, {"who": "자일로", "text": "네. 그러려면 네이티부터 찾아야 해요. 네이티가 끌려간 쪽에 일루아가 흐르던 자리가 있을 겁니다. 관람차 뒤쪽 길부터 찾아봐 주세요."}, {"who": "리코", "text": "알겠어요. 바로 갈게요."}], "q2intro": [{"who": "리코", "text": "네이티가 흐트러지는 게 일루아가 흔들린다는 뜻이면, 지금 섬 전체가 위험한 거야."}, {"who": "제로", "text": "빨리 찾자. 관람차 뒤쪽 길이랬어."}], "mazeEntrance": [{"who": "제로", "text": "저 울타리 안쪽에서 뭔가 깜빡여."}, {"who": "리코", "text": "미로야. 네이티가 이 안으로 끌려 들어간 것 같아."}, {"who": "제로", "text": "들어가 보자!"}], "q2found": [{"who": "네이티", "text": "미로 한가운데. 네이티의 불꽃이 붉게 일그러져 있다. 몸이 몇 갈래로 갈라졌다가 다시 붙기를 되풀이한다.", "img": "naty_red"}, {"who": "제로", "text": "네이티! 찾았다!"}, {"who": "리코", "text": "몸이 계속 갈라져……. 일루아가 이만큼 흔들리고 있다는 거야."}, {"who": "네이티", "text": "불꽃 한 줄기가 길게 늘어나 한쪽을 가리킨다. 몇 번을 다시 모여도 같은 쪽으로 끌려간다.", "img": "naty_red"}, {"who": "보이드", "text": "잠깐. 네이티가 끌려가는 방향을 재 볼게."}, {"who": "보이드", "text": "이 방향은 내 기록이 비어 있는 자리 중 하나야. 트윈으로 이어진 캠퍼스 좌표를 찾았어."}, {"who": "제로", "text": "네이티가 기록이 빈 곳을 알려 준 거야?"}, {"who": "보이드", "text": "일루아가 원래 흐르던 길이 끊긴 곳으로 끌려가는 거야. 그 자리를 채우면 흐름을 하나 더 알 수 있어."}, {"who": "리코", "text": "그럼 바로 가서 찍어 오자."}], "record2": [{"who": "보이드", "text": "이번에는 관람차 언덕 주변의 흐름을 확인했어. 언덕 아래를 지나 해안 쪽으로 이어지고 있었어."}, {"who": "리코", "text": "캠퍼스 두 번째 기록까지 채웠어. 이제 연구실로 가서 지금까지 모은 걸 확인해 보자."}], "act2": [{"who": "자일로", "text": "기록이 또 들어왔군요. 관람차 아래 연구실에서 지금까지 모은 걸로 시뮬레이션을 한번 돌려 보죠."}, {"who": "제로", "text": "지금까지 모은 걸로 뭘 알 수 있는지 보러 가자!"}], "deviceIntro": [{"who": "리코", "text": "연구실 문은 관람차 언덕 아래야. 가 보자."}], "deviceFound": [{"who": "자일로", "text": "왔군요. 기록이 두 개 모였으니 지금까지의 흐름을 시뮬레이션으로 확인해 봅시다."}], "midA": [{"who": "자일로", "text": "이게 지금까지 모은 기록으로 돌린 시뮬레이션이에요."}], "midA2": [{"who": "보이드", "text": "기록이 있는 곳은 흐름이 이어졌어. 그런데……."}], "midB": [{"who": "리코", "text": "왜 저기로 꺾여요? 기록에는 저런 길이 없는데."}, {"who": "자일로", "text": "계산이 틀어지고 있어요. 섬 어딘가에서 무언가가 측정값을 어지럽히고 있습니다. 이대로면 다섯 기록을 다 모아도 시뮬레이션을 믿을 수 없어요."}, {"who": "제로", "text": "뭐가 어지럽히는 건데요?"}, {"who": "자일로", "text": "선대가 일루아를 모을 때 섬 곳곳에 심어 둔 장치가 있었어요. 대부분 치웠는데, 몇 개는 땅이나 건물 밑에 숨어 있어 저도 다 찾지 못했습니다. 아직 켜져 있는 게 있다면 그게 신호를 흐트러뜨리는 거예요."}, {"who": "보이드", "text": "노이즈가 번지는 세 곳이 있어. 정확한 자리는 몰라도, 가까이 가면 내가 찾아낼 수 있어."}, {"who": "네이티", "text": "연구실 구석의 네이티가 다시 한번 크게 흩어졌다가 모인다.", "img": "naty_red"}, {"who": "자일로", "text": "시간이 많지 않아요. 잔재를 찾아서 꺼 주세요. 그래야 남은 기록으로 제대로 된 시뮬레이션을 할 수 있습니다."}], "remFirst": [{"who": "제로", "text": "찾았다! 이게 선대의 장치야?"}, {"who": "보이드", "text": "응. 오래돼서 거의 다 망가졌는데, 신호를 내는 심장 부분만 아직 돌고 있어. 이게 자일로의 측정을 흐트러뜨려."}, {"who": "보이드", "text": "심장에 걸린 고리를 바깥쪽부터 하나씩 빼면 멈출 거야. 고리의 틈이 위쪽 표시에 닿을 때 눌러."}], "remDone": [{"who": "자일로", "text": "노이즈가 사라졌어요. 이제 기록대로 흐름이 이어집니다."}, {"who": "리코", "text": "이제 제대로 나와요. 한 곳만 비었어요."}, {"who": "보이드", "text": "마지막 빈자리와 트윈으로 이어진 캠퍼스 좌표를 찾았어. 카드에 띄워 둘게."}, {"who": "네이티", "text": "네이티의 빛은 여전히 붉게 흔들린다.", "img": "naty_red"}, {"who": "제로", "text": "잔재를 없앴는데도 네이티는 그대로네……."}, {"who": "자일로", "text": "잔재는 계산을 어지럽혔을 뿐이에요. 일루아가 흔들리는 건 아직 환원을 못 했기 때문입니다. 마지막 기록을 서둘러 주세요."}, {"who": "제로", "text": "마지막 기록을 스캔하러 가자!"}]});   /* 2026-11-04 네이티 수색·중간 점검·잔재 수색 */
+STORY.act3 = STORY.act3.map(L=> L.text.indexOf('흐름을 방해하던 잔재도') >= 0 ? {...L, text:'네. 시뮬레이션을 어지럽히던 잔재도 없앴고요. 이제 환원 방법을 시험해 봅시다.'} : L);
 const QUESTS = [
-  {id:'q1', act:1, who:[PAIR], short:'스카이 루프', title:'섬의 전원을 되살려라', hint:'롤러코스터가 제일 잘 보이는 자리', needs:['z1'], zones:['z2'], restores:'dl-coaster', mini:'loop', r:7, pop:'자일로 발견!'},
-  {id:'q2', act:2, who:[PAIR], short:'미로와 연구실', title:'네이티를 찾아라', hint:'관람차 뒤쪽 산책로부터 살펴보기', needs:['z2'], zones:[], restores:'dl-carousel', mini:'maze', r:6, pop:'네이티 발견!'},
-  {id:'q4', act:2, who:[PAIR], short:'흐름의 이상 지점', title:'흐름을 방해하는 원인을 찾아라', hint:'연구실 분석에 표시된 지점', needs:['z2'], zones:['z3'], mini:'device', r:8, pop:'선대의 잔재 발견!'},
+  {id:'q1', act:1, who:[PAIR], short:'예비 배전선', title:'섬의 전원을 되살려라', hint:'롤러코스터가 제일 잘 보이는 자리', needs:['z1'], zones:[], mini:'loop', r:7, pop:'자일로 발견!'},
+  {id:'q2', act:1, who:[PAIR], short:'네이티 수색', title:'네이티를 찾아라', hint:'관람차 뒤쪽 길', needs:['z1'], zones:['z2'], mini:'maze', r:6, pop:'네이티 발견!'},
+  {id:'q4', act:2, who:[PAIR], short:'중간 점검·잔재', title:'숨겨진 잔재를 찾아라', hint:'관람차 언덕 아래 연구실', needs:['z2'], zones:['z3'], mini:'device', r:8, pop:'연구실 도착'},
   {id:'q3', act:3, who:[PAIR], short:'선대의 기록', title:'코덱스를 찾아라', hint:'북쪽 해안, 눈이 빛나는 곳', needs:['z3'], zones:[], mini:'cave', r:9, dark:true, pop:'코덱스 발견!'},
 ];
 // progress: the server keeps each team's done list (quests in every /state); this device unions what it just finished until the server echoes it
@@ -7919,7 +7923,7 @@ const chainOpen = q => { const i = QUESTS.indexOf(q); if(!needsBack(q)) return f
 const questOpen = q => chainOpen(q);   // the chain holds for every device, admin-logged ones too (user, 2026-10-28)
 const questFor = name => QUESTS.find(q=> q.who.includes(name) && !questDone(q)) || QUESTS.find(q=> q.who.includes(name));   // the pair walks every mission: the one that is due
 function walkerOpen(name){ if(flowFree()) return true; const q = questFor(name); return !!q && questOpen(q) && !questDone(q); }   // strict order: only the mission that is due; free roaming after the restoration (user, 2026-10-28)
-const walkerWhy = name => { const q = questFor(name); if(name === PAIR){ if(!q || questDone(q)) return '환원이 끝난 뒤'; return q.id === 'q1' ? '첫 기록을 찾은 뒤' : q.id === 'q2' ? '두 번째 캠퍼스 기록을 찾은 뒤' : q.id==='q4' ? '연구실에서 이상 지점을 확인한 뒤' : '다섯 기록을 찾은 뒤'; } return '환원이 끝난 뒤'; };
+const walkerWhy = name => { const q = questFor(name); if(name === PAIR){ if(!q || questDone(q)) return '환원이 끝난 뒤'; return q.id === 'q1' ? '첫 기록을 찾은 뒤' : q.id === 'q2' ? '섬의 전원을 되살린 뒤' : q.id==='q4' ? '두 번째 캠퍼스 기록을 찾은 뒤' : '다섯 기록을 찾은 뒤'; } return '환원이 끝난 뒤'; };
 const flowFree = ()=> SCREEN || document.body.classList.contains('admin') || RESTORED_LOCAL || !!myEntry().restored || (QDONE.has('q3')&&!QDONE.has('q4')&&!myEntry().story);   // the dashboard and the finished team roam freely
 // which world the next step is in: an open mission → the island; otherwise the next record → the campus; null = no lock
 function stepWorld(){ if(flowFree() || !TEAM || AUX || (tutStep >= 0 && tutStep < TUT.length)) return null; const q = QUESTS.find(q=> chainOpen(q) && !questDone(q)); return q ? 'island' : 'erica'; }
@@ -7928,7 +7932,7 @@ function flowLockUI(){ const sw = stepWorld(); document.querySelectorAll('#world
 // where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
 const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [165, 420];   // Naty waits in the maze (mission 2)
 let XYLO_HIDE = null, NATY_HOME = null;
-function questTarget(q){ if(mini && mini.q === q){ const t = miniTarget(); if(t) return t; } return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? (q.mazeEntered?NATY_HIDE:mazeEntrance()) : q.id==='q4' ? deviceSpot() : CAVE_MOUTH; }
+function questTarget(q){ if(mini && mini.q === q){ const t = miniTarget(); if(t) return t; } return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? (q.mazeEntered?NATY_HIDE:mazeEntrance()) : q.id==='q4' ? (buildLabDoor(), LAB_DOOR) : CAVE_MOUTH; }
 function questApply(){ try{ flowLockUI(); if(collectorModel)collectorSync(); }catch(e){}
   if(typeof actBusy!=='undefined'&&(actBusy||STAGED||vn)){renderWalkPick();return;}
   if(!XYLO_HIDE){ const c = IB.find(b=> b.label === '롤러코스터'); const cx = c ? c.cx : -270, cz = c ? c.cz : 257, rr = (c ? c.r : 128) + 10, a = Math.atan2(200 - cz, -190 - cx); XYLO_HIDE = freeSpot(cx + Math.cos(a)*rr, cz + Math.sin(a)*rr); XYLO_HIDE.push(Math.atan2(cx - XYLO_HIDE[0], cz - XYLO_HIDE[1])); }
@@ -7980,21 +7984,21 @@ function miniLoad(){ try{ const o = JSON.parse(localStorage.getItem(MINI_KEY()) 
 function miniSave(step, patch){ if(!questLive) return; const cur = miniLoad(), o = Object.assign(cur && cur.q === questLive.id ? cur : {q:questLive.id}, {step}, patch || {}); if(walk && !walk.ride) o.pos = [walk.x, walk.z, walk.yaw]; o.t = Date.now(); try{ localStorage.setItem(MINI_KEY(), JSON.stringify(o)); }catch(e){} }
 function miniSavePos(){ const cur = miniLoad(); if(!cur || !questLive || cur.q !== questLive.id || !walk || walk.ride) return; cur.pos = [walk.x, walk.z, walk.yaw]; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cur)); }catch(e){} }
 function miniForget(){ try{ localStorage.removeItem(MINI_KEY()); }catch(e){} }
-const STEP_LINE = {found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 예비 배전선을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
+const STEP_LINE = {hunt:'빨간 원 안으로 가 봐. 내 신호 소리가 빨라지는 쪽에 잔재가 있어.', mid:'연구실에서 시뮬레이션을 다시 보자.', 'device-return':'연구실로 돌아가서 시뮬레이션을 다시 돌려 보자.', found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 예비 배전선을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
 // put the walker back where the mission was left and jump straight to its step (the intro and the finding are already done)
 function miniResume(q, cp){ const w = walk; if(!w) return false;
   if(cp.pos && !walkBlocked(cp.pos[0], cp.pos[1])){ w.x = cp.pos[0]; w.z = cp.pos[1]; if(cp.pos[2] != null) w.yaw = cp.pos[2]; }
   q.found = false; questLive = q; $('questHud').hidden = true; qNavHide();   // found stays false: questNav draws the marker/trail only then, and questTick never re-fires while `mini` is set (user, 2026-11-02 "이어서 하면 네비가 안 떠")
   const st = cp.step || 'found';
   if(q.mini === 'loop'){ mini = {q, kind:'loop'}; buildStation();
-    if(islandRecord('q1')){say(STORY.forestDone,()=>questComplete(q));return true;}if(st==='coordinates'){mini.routes=[0,1,2,3];showRouteCard();return true;}if(['forest','forest-shot','forest-done'].includes(st)){mini.routes=[0,1,2,3];forestWalk(false);return true;}
-    mini.routes=cp.routes||[];if(st === 'station'){ TRAIN.lit = true; miniWalkTo(3, '스카이 루프 역으로', '선로 아래 계단', STATION.spot, 9, rideBoard); }
+    if(st !== 'yard' && st !== 'found'){ TRAIN.lit = true; say(STORY.natyGone, ()=> questComplete(q)); return true; }
+    if(false){}
     else miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); }
   else if(q.mini==='maze'){
-    if(st==='maze'){q.mazeEntered=true;questLive=q;mini=null;miniHud(2,'네이티를 찾아라','미로 안쪽의 붉은 빛을 따라가기');return true;}
-    mini={q,kind:'maze',phase:'walk'};buildLabDoor();mazeToLab(false);
+    if(st==='maze'){q.mazeEntered=true;questLive=q;mini=null;miniHud(2,'네이티를 찾아라','미로 한가운데까지 가기');return true;}
+    say(STORY.q2found.slice(-1), ()=> questComplete(q)); return true;
   }
-  else if(q.mini==='device'){mini={q,kind:'device',phase:st==='device-return'?'walk':'break',hits:cp.hits||0};if(st==='device-return')deviceReturn();else deviceOpen(true);}
+  else if(q.mini==='device'){mini={q,kind:'device',phase:st,got:cp.got||[]};if(st==='device-return'){remBuild();remBack();}else if(st==='hunt')huntStart();else{midCheck(q);return true;}}
   else if(q.mini === 'cave'){ mini = {q, kind:'cave', decoded:!!cp.decoded,trialRows:cp.trialRows||[]}; caveOpen(); }
   else return false;
   qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say'); return true; }
@@ -8008,7 +8012,7 @@ function questOnWalk(name){
   const q = questFor(name); questLive = null; $('questHud').hidden = true; qNavHide();
   if(!q || questDone(q) || !questOpen(q)) return;
   q.mazeEntered=false;delete q.cellD;
-  { const saved=miniLoad(),cp=saved?.q===q.id?saved:islandRecord(q.id)?{q:q.id,step:q.id==='q1'?'forest-done':'lab'}:null;if(cp){try{if(miniResume(q,cp))return;}catch(e){console.warn('mission resume',e);}} }
+  { const saved=miniLoad(),cp=saved?.q===q.id?saved:null;if(cp){try{if(miniResume(q,cp))return;}catch(e){console.warn('mission resume',e);}} }
   questLive = q; q.found = false; QUEST_FOUND[q.id](name).forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; }); $('qhT').textContent = q.title; $('qhHint').textContent = q.hint; $('qhStep').textContent = '1 / 3'; $('questHud').classList.remove('near'); $('qhDist').textContent = ''; $('questHud').hidden = false; placeQuestHud();
   const key = `void-vn-${q.id}-${TEAM || 0}`; let seen = false; try{ seen = !!sessionStorage.getItem(key); }catch(e){}
   if(!seen){ try{ sessionStorage.setItem(key, '1'); }catch(e){} setTimeout(()=>{ if(walk && questLive === q && !vn) say(QUEST_INTRO[q.id](name)); }, 700); }
@@ -8017,7 +8021,7 @@ function questTick(){
   const q = questLive; if(!q || !walk || vn || q.found || mini) return;
   if(q.mini==='maze'&&q.mazeEntered)mazeGuide(walk,performance.now());
   const [tx, tz] = questTarget(q); if(Math.hypot(walk.x - tx, walk.z - tz) > q.r) return;
-  if(q.mini==='maze'&&!q.mazeEntered){q.mazeEntered=true;miniSave('maze');$('questHud').hidden=true;qNavHide();say(STORY.mazeEntrance,()=>{$('qhT').textContent='네이티를 찾아라';$('qhHint').textContent='미로 안쪽의 붉은 빛을 따라가기';$('qhStep').textContent='2 / 3';$('questHud').hidden=false;});return;}
+  if(q.mini==='maze'&&!q.mazeEntered){q.mazeEntered=true;miniSave('maze');$('questHud').hidden=true;qNavHide();say(STORY.mazeEntrance,()=>{$('qhT').textContent='네이티를 찾아라';$('qhHint').textContent='미로 한가운데까지 가기';$('qhStep').textContent='2 / 3';$('questHud').hidden=false;});return;}
   if(q.mini === 'maze' && !mazeHeart(walk.x, walk.z)) return;   // through a hedge from the next corridor does not count (user, 2026-11-02)
   q.found = true; miniSave('found');
   const tg = q.id === 'q1' ? XYLO : q.id === 'q3' ? CODEX : null; if(tg) tg.rotation.y = Math.atan2(walk.x - tg.position.x, walk.z - tg.position.z);   // the one found turns to the walker
@@ -8033,15 +8037,15 @@ function questComplete(q){
 }
 function showReward(q){ sfx('clear');
   const n = QUESTS.indexOf(q) + 1, zs = q.zones.map(id=> MISSION_E.find(m=> m.id === id)).filter(Boolean), isl = MI.find(m=> m.id === q.restores), L = (ACT_EXIT[q.id] || {}).card;
-  $('qrS').textContent = `MISSION ${n} CLEAR`;$('qrCount').hidden=false;$('qrCount').textContent=`채운 기록 ${recordCount()} / 5`; $('qrT').textContent = q.id==='q2'?'네이티 발견 · 누락 기록 수집 완료':q.id==='q4'?'선대의 잔재 파괴':q.id==='q1'?'서쪽 숲 기록 수집 완료':isl?'누락 기록 수집 완료':'미션 완료';
+  $('qrS').textContent = `MISSION ${n} CLEAR`;$('qrCount').hidden=false;$('qrCount').textContent=`채운 기록 ${recordCount()} / 5`; $('qrT').textContent = q.id==='q2'?'네이티 발견 · 두 번째 좌표 확보':q.id==='q4'?'선대의 잔재 해체':q.id==='q1'?'섬 전체 전원 복구':isl?'누락 기록 수집 완료':'미션 완료';
   $('qrP').innerHTML = L ? `<img class="por" src="img/chars/${L.img}.png?v=20261028c" alt=""><b>${esc(L.who)}</b> ${esc(L.text)}` : '';
   $('qrList').innerHTML = zs.map(m=> `<div class="z"><span>기록 ${MISSION_E.indexOf(m) + 1}</span><code>${coordText(m)}</code></div>`).join('');
   qRewardEl.querySelector('.steps').hidden = true; $('qrMap').textContent = zs.length ? '다음 캠퍼스 기록 보기' : '돌아가기'; $('qrStay').hidden = true;
   delete qRewardEl.dataset.route;qRewardEl.dataset.on = '1'; qRewardEl.dataset.quest=q.id;qRewardEl._readyCopy=$('qrP').innerHTML; rewardWaitTick();
 }
-function rewardWaitTick(){if(!qRewardEl.dataset.on)return;const q=QUESTS.find(q=>q.id===qRewardEl.dataset.quest);if(!q)return;const ready=teamReady(q);$('qrMap').disabled=!ready;$('qrList').hidden=!ready;$('qrS').textContent=`MISSION ${QUESTS.indexOf(q)+1} · ${ready?'CLEAR':'기다리는 중'}`;$('qrMap').textContent=ready?(q.id==='q2'?'미션 3 · 이상 지점 조사':'다음 캠퍼스 기록 보기'):'같은 조의 다른 태블릿을 기다리는 중';if(!ready)$('qrP').textContent='같은 조의 다른 태블릿이 이 미션을 마칠 때까지 기다립니다.';else if(qRewardEl._readyCopy&&$('qrP').innerHTML!==qRewardEl._readyCopy)$('qrP').innerHTML=qRewardEl._readyCopy;}
+function rewardWaitTick(){if(!qRewardEl.dataset.on)return;const q=QUESTS.find(q=>q.id===qRewardEl.dataset.quest);if(!q)return;const ready=teamReady(q);$('qrMap').disabled=!ready;$('qrList').hidden=!ready;$('qrS').textContent=`MISSION ${QUESTS.indexOf(q)+1} · ${ready?'CLEAR':'기다리는 중'}`;$('qrMap').textContent=ready?(q.id==='q1'?'미션 2 · 네이티를 찾아라':'다음 캠퍼스 기록 보기'):'같은 조의 다른 태블릿을 기다리는 중';if(!ready)$('qrP').textContent='같은 조의 다른 태블릿이 이 미션을 마칠 때까지 기다립니다.';else if(qRewardEl._readyCopy&&$('qrP').innerHTML!==qRewardEl._readyCopy)$('qrP').innerHTML=qRewardEl._readyCopy;}
 setInterval(rewardWaitTick,1000);
-$('qrMap').onclick=()=>{if(qRewardEl.dataset.route){delete qRewardEl.dataset.on;delete qRewardEl.dataset.route;forestWalk(true);return;}const id=qRewardEl.dataset.quest;delete qRewardEl.dataset.on;stopWalk();if(id==='q2'){if(simOn)setSim(false);buildLabDoor();STAGED=false;startWalk(PAIR);if(walk){walk.x=LAB_DOOR[0];walk.z=LAB_DOOR[1];walk.snap=true;}}else goBack();};
+$('qrMap').onclick=()=>{if(qRewardEl.dataset.route){delete qRewardEl.dataset.on;delete qRewardEl.dataset.route;forestWalk(true);return;}const id=qRewardEl.dataset.quest;delete qRewardEl.dataset.on;stopWalk();if(id==='q1'){if(simOn)setSim(false);STAGED=false;startWalk(PAIR);}else goBack();};
 $('qrStay').onclick = ()=>{ delete qRewardEl.dataset.on; };
 
 // ---------- acts (user, 2026-10-27): a restored campus record calls the team to the island ----------
@@ -8058,13 +8062,13 @@ const ACT_ZONE = {1:'dl-harmonia', 2:'dl-ferris', 3:'dl-safari'};   // where the
 const ACT_CAST = {1:()=> [ZERO, RICO], 2:()=> [XYLO, ZERO, RICO], 3:()=> [XYLO, ZERO, RICO, NATY]};   // the one to find is never in the scene before it: 자일로 (act 1), 네이티 (act 2), 코덱스 (act 3)   // act 1: 자일로 is the one to find, so he is not at 하모니아 (user, 2026-10-28)
 const ACT_CALL={
   1:[{who:'보이드',text:'자일로에게도 기록이 돌아왔다고 알려 줬어.'},{who:'제로',text:'자일로가 우릴 찾는 것 같은데?'},{who:'리코',text:'롤러코스터 근처에서 보자고 했어. 가 보자!'}],
-  2:[{who:'자일로',text:'제로, 리코! 관람차 앞입니다. 두 분에게 부탁할 일이 있어요.'},{who:'제로',text:'무슨 일이지?'},{who:'리코',text:'가서 들어 보자.'}],
+  2:[{who:'자일로',text:'제로, 리코! 관람차 앞입니다. 연구실에서 시뮬레이션을 돌려 봅시다.'},{who:'제로',text:'지금까지 모은 걸 확인하러 가자!'}],
   3:[{who:'자일로',text:'마지막 기록이 들어왔군요. 사파리 앞에서 만납시다.'},{who:'리코',text:'이제 원래 자리를 전부 알 수 있겠어.'},{who:'제로',text:'자일로한테 가자!'}]};
 const ACT_STORY={1:STORY.act1,2:STORY.act2,3:STORY.act3};
 const ACT_EXIT={
- q1:{greet:STORY.q1exit.slice(0,1),hud:'새로 채운 기록으로 확인한 일루아의 흐름이야.',give:STORY.q1exit.slice(1),card:{who:'자일로',img:'xylo_talk',text:'다음에 방문할 캠퍼스 좌표를 다시 띄워 드릴게요.'}},
- q2:{greet:[{who:'보이드',text:'미로에서 확인한 내용까지 기록에 넣었어. 남은 빈 기록은 하나야.'}],hud:'네 번째 기록으로 흐름의 이상 지점을 찾았어. 실제 일루아는 아직 보내지 않을게.',give:[{who:'자일로',text:'마지막 기록을 찍으러 가기 전에, 분석에서 표시된 곳을 확인해 주세요.'}],card:{who:'자일로',img:'xylo_point',text:'분석에 표시된 이상 지점으로 가서 무엇이 흐름을 방해하는지 살펴보세요.'}},
- q4:{card:{who:'자일로',img:'xylo_talk',text:'스카이루프에서 확보한 캠퍼스 좌표가 하나 남았어요. 마지막 기록을 찍으러 가 주세요.'}}};
+ q1:{card:{who:'자일로',img:'xylo_talk',text:'네이티부터 찾아 주세요. 관람차 뒤쪽 길입니다.'}},
+ q2:{card:{who:'보이드',img:'void',text:'네이티의 빛이 가리킨 캠퍼스 좌표야. 그 자리의 기록을 찍어 줘.'}},
+ q4:{card:{who:'자일로',img:'xylo_talk',text:'마지막 캠퍼스 좌표입니다. 서둘러 주세요.'}}};
 const VOICE = {};   // voice lines off (user, 2026-10-28: the trial voice was too young); voice/tut01.mp3 is kept, add 'text':'file' here to turn one on   // text -> voice/<file>.mp3 (Artlist, 2026-10-28)
 // ===== 소리 (2026-10-30, 사용자 요청 "효과음·BGM 전반적으로") =====
 // 파일 없이 WebAudio로 합성한다: 효과음 sfx(이름), 배경음은 bgmTick()이 0.1초마다 지금 장면에 맞는 세트(campus·island·dark·sim)를 고른다.
@@ -8210,6 +8214,7 @@ document.addEventListener('keydown', e=>{
   if(on('rideDlg')){ go('rideGo'); return; }
   if(on('caveDlg')){ if(!go('cvNext')) go('cvGo'); return; }
   if(on('yardDlg')&&yard?.done){go('ydContinue');return;}
+  if(on('remDlg')){ go('rmGo'); return; }
   if(on('deviceDlg')){if(mini?.hits>=3)go('dvContinue');return;}
   if(on('labDlg')){ go('lbGo'); return; }
   if(!$('cinema').hidden && !$('cinemaEnd').hidden){ go('cinemaX'); return; }
@@ -8220,21 +8225,15 @@ $('restoreBtn').onclick = ()=> voidHelp();
 function activityHelp(q){
  const cp=miniLoad(),step=cp?.q===q.id?cp.step:'',m=mini?.q===q?mini:null;
  if(q.id==='q1'){
-  if(islandRecord('q1'))return '서쪽 숲의 기록을 채웠어. 완료 카드를 확인하고 하냥이 벤치의 기록을 찍으러 가자.';
-  if(step==='coordinates')return '남은 네 좌표를 확보했어. 완료 카드에서 서쪽 숲으로 가서 실제 기록을 찍자.';
-  if(['forest','forest-shot'].includes(step))return '서쪽 숲 가장자리로 가서 「기록 찍기」를 눌러 줘. 좌표만 얻은 상태라 아직 기록은 1 / 5야.';
-  if(m?.phase==='ride')return '스카이루프가 표시 지점을 지날 때 「좌표 확인」을 눌러 줘. 네 좌표를 모두 모으면 역에서 내릴 수 있어.';
-  if(step==='station')return '섬 전체의 전원이 돌아왔어. 스카이루프 역에서 탑승해 남은 네 좌표를 확보하자.';
+  if(step==='station')return '섬의 전원이 돌아왔어. 그런데 네이티가 사라졌대. 자일로의 이야기를 들어 보자.';
   if(step==='yard')return '예비 배전선의 칸을 돌려 발전기에서 모든 칸까지 선을 이어 줘.';
   return '자일로가 롤러코스터 근처에서 기다리고 있어. 만나서 섬의 전원이 끊긴 이유를 들어 보자.';
  }
  if(q.id==='q2'){
-  if(islandRecord('q2'))return '네 번째 기록을 찍었지만 네이티는 아직 불안정해. 관람차 아래 연구실로 데려가 원인을 분석하자.';
-  if(step==='naty-shot')return '네이티를 찾았어. 미로 밖에서 「기록 찍기」를 눌러 이 자리의 상태를 남겨 줘.';
-  if(step==='maze')return '미로 안쪽에서 붉게 깜빡이는 빛을 따라 네이티를 찾아보자.';
-  return '네이티가 붉게 빛나고 불안정해진 채 사라졌대. 관람차 뒤쪽 산책로부터 살펴보자.';
+  if(step==='maze')return '미로 한가운데까지 가 보자. 네이티는 미로 안으로 끌려 들어갔어.';
+  return '네이티가 사라졌어. 네이티가 흩어지는 건 일루아가 흔들린다는 뜻이야. 관람차 뒤쪽 길부터 찾아보자.';
  }
- if(q.id==='q4')return step==='device-return'?'흐름을 방해하던 잔재를 없앴어. 연구실의 자일로에게 결과를 알려 주고 마지막 기록을 찍으러 가자.':step==='device'?'이 잔재가 일루아의 흐름을 가로채고 있어. 빛이 모이는 부분을 차례로 눌러 부수자.':'연구실 분석에서 표시된 지점으로 가 봐. 무엇이 흐름을 방해하는지 직접 확인해야 해.';
+ if(q.id==='q4')return step==='device-return'?'잔재 세 개를 모두 없앴어. 연구실로 돌아가서 시뮬레이션을 다시 돌려 보자.':step==='hunt'?`빨간 원 안으로 가면 내 신호 소리가 들려. 빨라지는 쪽으로 가서 「파내기」를 꾹 눌러. 남은 잔재 ${3-((m?.got||cp?.got||[]).length)}개.`:'관람차 아래 연구실로 가자. 지금까지 모은 기록으로 시뮬레이션을 돌려 볼 거야.';
  return m?.decoded||cp?.decoded?'선대의 글에 나온 순서와 연구실에서 확인한 양으로 가상 시험을 해 보자. 실패한 결과는 시험 기록에서 다시 볼 수 있어.':'다섯 기록을 모두 채웠어. 북쪽 해안의 코덱스의 동굴에서 선대의 글을 읽고 환원 순서를 알아보자.';
 }
 async function voidHelp(){ if($('voidVn').dataset.on || actBusy || vn) return;
@@ -8296,7 +8295,7 @@ function stageAt(zoneId, cast, ms=1600){
 }
 // the completion card (user, 2026-10-28: the popup vanished too fast to read): stays until the child presses Space or taps
 let rdWait = null;
-function recDone(n){ const z = campusZone(n), k = 2*n - 1; $('rdK').textContent = `RECORD RESTORED`; $('rdT').textContent = `캠퍼스 기록 ${n} 수집 완료`; $('rdP').textContent = `${z ? z.name : '이 구역'}의 누락된 기록을 채웠습니다.`;
+function recDone(n){ const z = campusZone(n), k = Math.max(1, recordCount()); $('rdK').textContent = `RECORD RESTORED`; $('rdT').textContent = `캠퍼스 기록 ${n} 수집 완료`; $('rdP').textContent = `${z ? z.name : '이 구역'}의 누락된 기록을 채웠습니다.`;
   $('rdCells').innerHTML = Array.from({length:5}, (_, i)=> `<i class="${i < k ? 'ok' : ''}${i === k - 1 ? ' now' : ''}"></i>`).join('') + `<b>채운 기록 ${k} / 5</b>`;
   $('rdNext').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 계속' : 'Space ▸ 계속'; $('recDone').dataset.on = '1'; sfx('clear');
   const p = new Promise(r=>{ rdWait = ()=>{ rdWait = null; delete $('recDone').dataset.on; r(); }; }); if(ffOn()) rdWait(); return p; }
@@ -8349,9 +8348,9 @@ async function actExit(q){
   actBusy = false; showReward(q);
 }
 function goBack(){ STAGED = false; controls.minDistance = 40; setWorld('erica'); const seen = actSeen(), next = campusZone(seen + 1);
-  setTimeout(async ()=>{ if(next){ setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '방해는 없어졌어. 마지막 좌표에서 남은 기록 하나를 채우자.' : '스카이루프에서 확보한 다음 좌표야. 캠퍼스에서 그 자리의 내용을 기록해 줘.');
+  setTimeout(async ()=>{ if(next){ setTab('v'); setPanel(true); await voidAsk(seen === 2 ? '시뮬레이션이 다시 맞기 시작했어. 마지막 좌표에서 남은 기록 하나를 채우자.' : '네이티의 빛이 가리킨 좌표야. 캠퍼스에서 그 자리의 내용을 기록해 줘.');
       $('lMe').classList.add('pulse'); await voidAsk('밖으로 나가서 「내 시점」을 켜. 움직일 때마다 좌표가 바뀔 거야.'); await voidAsk('네 좌표가 바뀌는 걸 보면서 좌표에 해당하는 위치까지 가. 카드의 거리가 줄어들면 맞게 가는 거야.', 'idle'); }
-    else voidSay('기록은 모두 채웠어. 이제 섬으로 돌아가 환원 순서와 양을 확인하자.', 8000, 'idle'); }, 1200); }
+    else voidSay('기록은 모두 채웠어. 이제 섬으로 돌아가 코덱스를 만나자.', 8000, 'idle'); }, 1200); }
 // ---------- void tutorial (#voidGuide): right after the team is picked, once per team ----------
 const TUT = [
   {t:"난 보이드. 도로랜드가 세워지기 전부터 이 섬의 모습을 기록해 온 로봇이야.",pose:'say',world:'erica'},
@@ -8406,13 +8405,14 @@ function miniStart(q){
   const w = walk; if(!w) return; q.found = false; questLive = q;
   if(q.mini === 'loop'){ mini = {q, kind:'loop'}; buildStation(); miniSave('yard');
     miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); return; }
-  if(q.mini === 'maze'){ mini={q,kind:'maze',phase:'walk'};buildLabDoor();miniSave('naty-shot');mazeToLab(true);return;}
-  if(q.mini==='device'){mini={q,kind:'device',phase:'break',hits:0};miniSave('device',{hits:0});deviceOpen();return;}
+  if(q.mini === 'maze'){ questComplete(q); return; }
+  if(q.mini==='device'){mini={q,kind:'device',phase:'mid',got:[]};midCheck(q);return;}
   if(q.mini === 'cave'){ mini = {q, kind:'cave'}; miniSave('cave'); caveOpen(); }
 }
-function miniTarget(){ if(!mini) return null; if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(['walk','naty-shot'].includes(mini.phase) && mini.target) return mini.target; if(mini.kind==='loop'&&mini.phase==='forest-shot')return forestSpot(); return null; }
+function miniTarget(){ if(!mini) return null; if(mini.kind === 'device' && ['hunt','dig','game'].includes(mini.phase)) return remNext();   /* while digging or in the ring game the target stays on that remnant, not the lab door */ if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(['walk','naty-shot'].includes(mini.phase) && mini.target) return mini.target; if(mini.kind==='loop'&&mini.phase==='forest-shot')return forestSpot(); return null; }
 function miniTick(now, moving){
   const w = walk; if(!mini || !w) return;
+  if(mini.kind === 'device' && mini.phase === 'hunt'){ huntTick(now); return; }
   if(mini.phase === 'walk' && mini.target && !mini.arrived){ const d = Math.hypot(w.x - mini.target[0], w.z - mini.target[1]); if(d < mini.r && !vn){ mini.arrived = true; $('questHud').hidden = true; qNavHide(); mini.onArrive(); } return; }
   if(['forest-shot','naty-shot'].includes(mini.phase)){const spot=mini.phase==='forest-shot'?forestSpot():mini.target;miniGo.disabled=!!vn||!!mini.capturing||Math.hypot(w.x-spot[0],w.z-spot[1])>9;}
 }
@@ -8463,8 +8463,7 @@ $('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button')
 $('ydContinue').onclick=()=>{if(yard?.done)yardDone();};
 $('ydMix').onclick = ()=>{ if(yard && !yard.done) yardBuild(); };
 function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true; });
-  setTimeout(()=> parkWake(()=> say(STORY.yardDone,
-    ()=> miniWalkTo(3, '스카이 루프 역으로', '선로 아래 계단', STATION.spot, 9, rideBoard))), 700); }
+  setTimeout(()=> parkWake(()=> say([...STORY.yardDone, ...STORY.natyGone], ()=> questComplete(mini ? mini.q : QUESTS[0]))), 700); }
 // ---------- the park wakes up (2026-11-04): seen from above, a ring of light runs out from the service yard, the bulbs come on from the
 // ground up and every ride starts slowly and picks up speed. Its own clock (dt capped at 1/20 s), so a slow tablet plays it slower, never skips it.
 function parkWake(done){
@@ -8543,14 +8542,13 @@ function rideTick(now, dt){
 function rideEnd(done){ const R = ride; if(!R) return; ride = null; if(walk){ walk.ride = null; walk.snap = true; walk.x = STATION.spot[0]; walk.z = STATION.spot[1]; walk.pitch = -0.2; } miniGo.classList.remove('hot'); TRAIN.mode = done ? 'run' : 'stop'; TRAIN.u = STATION.u; miniBox.hidden = true;
   if(!done) return;
   miniSave('coordinates',{routes:[0,1,2,3]});setTimeout(()=>say(STORY.rideDone,showRouteCard),500); }
-miniGo.addEventListener('pointerdown', e=>{ if(ride){ ride.press = true; miniGo.setPointerCapture(e.pointerId); e.preventDefault(); } });
-['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev=> miniGo.addEventListener(ev, ()=>{ if(ride) ride.press = false; }));
+miniGo.addEventListener('pointerdown', e=>{ const hunt = mini && mini.kind === 'device' && mini.phase === 'hunt'; if(ride || hunt){ if(ride) ride.press = true; else mini.press = true; miniGo.setPointerCapture(e.pointerId); e.preventDefault(); } });
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev=> miniGo.addEventListener(ev, ()=>{ if(ride) ride.press = false; if(mini) mini.press = false; }));
 // ----- q2 · the maze: 네이티's colour guides, the centre is the empty spot; then the lab under the wheel -----
 function mazeCell(x, z){ const M = MAZE, dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); const i = Math.floor((lz + M.S/2)/M.cell), j = Math.floor((lx + M.S/2)/M.cell); return i >= 0 && i < M.n && j >= 0 && j < M.n ? [i, j] : null; }
 function mazeGuide(w, now){ const M = MAZE, c = mazeCell(w.x, w.z); if(!c){ NATY.userData.hold = null; return; } const key = c[0]*M.n + c[1], d = M.dist[c[0]][c[1]];
   if(!M.seen.has(key)){ M.seen.add(key); const lx = -M.S/2 + (c[1] + 0.5)*M.cell, lz = -M.S/2 + (c[0] + 0.5)*M.cell, wx = M.cx + lx*Math.cos(M.rot) + lz*Math.sin(M.rot), wz = M.cz - lx*Math.sin(M.rot) + lz*Math.cos(M.rot); _qm.makeTranslation(wx, G + 0.42, wz); M.marks.setMatrixAt(M.marks.count++, _qm); M.marks.instanceMatrix.needsUpdate = true; }
-  const guide=mini||questLive;if(!guide)return; if(guide.cellD == null){ guide.cellD = d; return; } if(d === guide.cellD) return;
-  NATY.userData.hold = {color:0xe05a4e,t:now,keep:true}; NATY.userData.guideBright=d<guide.cellD; if(d > guide.cellD && now - (guide.farAt || 0) > 4000){ guide.farAt = now; qPop('막다른 길'); } guide.cellD = d; }
+  NATY.userData.guideBright = false; }   /* 2026-11-04: no light guide in the maze (user) */
 function showRouteCard(){mini.phase='coordinates';$('qrCount').hidden=false;$('qrCount').textContent='채운 기록 1 / 5';miniBox.hidden=true;$('questHud').hidden=true;qNavHide();qRewardEl.dataset.on='1';qRewardEl.dataset.route='1';delete qRewardEl.dataset.quest;$('qrS').textContent='MISSION 1 CLEAR';$('qrT').textContent='섬 전체 전원 복구 · 남은 네 좌표 확보';$('qrP').textContent='좌표를 카드에 저장했습니다. 채운 기록은 아직 1 / 5입니다. 이제 현장에서 실제 기록을 찍으세요.';$('qrList').hidden=false;$('qrList').innerHTML=['서쪽 숲 가장자리 · 섬 지도',`하냥이 벤치 · ${coordText(campusZone(2))}`,'미로 정원 · 섬 지도',`카카오데이터센터 · ${coordText(campusZone(3))}`].map(t=>`<div class="z">${esc(t)}</div>`).join('');qRewardEl.querySelector('.steps').hidden=true;$('qrStay').hidden=true;$('qrMap').disabled=false;$('qrMap').textContent='서쪽 숲 기록하러 가기';}
 function forestSpot(){return freeSpot(-418,-88);}
 function forestWalk(explain){miniSave('forest');const go=()=>miniWalkTo(4,'서쪽 숲의 기록 찍기','스카이루프에서 확보한 첫 섬 좌표',forestSpot(),7,()=>{mini.phase='forest-shot';miniSave('forest-shot');miniHud(4,'서쪽 숲의 기록 찍기','이 자리의 기록을 직접 촬영하세요');miniGo.textContent='기록 찍기';miniGo.disabled=false;miniDots.innerHTML='';miniDoneBtn.hidden=true;miniBox.hidden=false;});if(explain)say(STORY.forestIntro,go);else go();}
@@ -8612,6 +8610,93 @@ function deviceOpen(resume=false){buildCollector();if(!mini)return;mini.hits=min
 $('dvFittings').addEventListener('click',e=>{const b=e.target.closest('[data-part]');if(!b||mini?.kind!=='device'||vn||mini.hits>=3)return;const part=Number(b.dataset.part);if(part!==mini.hits){$('dvHint').textContent='빛이 모이는 부분을 확인해 보세요. 다시 시도할 수 있어요.';sfx('tap');return;}mini.hits++;miniSave('device',{hits:mini.hits});sfx('powerdown');deviceDraw();if(mini.hits===3){$('dvHint').textContent='잔재가 무너졌습니다. 흐름을 끌어들이던 힘이 사라졌습니다.';sfx('success');say(STORY.deviceDone,()=>$('dvContinue').focus());}else{$('dvHint').textContent='균열을 따라 조각이 떨어졌습니다. 다음으로 빛나는 부분을 누르세요.';$('dvFittings').querySelector('.lit')?.focus();}});
 $('dvContinue').onclick=()=>{if(vn||mini?.hits<3)return;delete $('deviceDlg').dataset.on;deviceReturn();};
 function deviceReturn(){buildLabDoor();mini.hits=3;miniSave('device-return',{hits:3});collectorSync();miniWalkTo(3,'자일로에게 돌아가기','관람차 아래 연구실 앞',LAB_DOOR,8,()=>{XYLO.position.set(LAB_DOOR[0]+2,groundY(...LAB_DOOR),LAB_DOOR[1]);say(STORY.deviceReturn,()=>questComplete(mini.q));});}
+// ---------- mission 3 (user, 2026-11-04): the lab's mid-check, then three hidden remnants found by the void's detector and dismantled ----------
+// The remnants are not ruining the Illua: they scramble Xylo's simulation. They are hidden (under ground, under a building, at the water's edge) and never
+// visible by just walking past: only the red circles from the mid-check, the void's beeps and a held 「파내기」 reveal one. Dismantling = take the three
+// rings off the core, outermost first, each when its gap meets the mark on top.
+const REM_R = 46, REM = {spots:null, models:[], rings:[], game:null};
+function remSpots(){ if(REM.spots) return REM.spots;
+  const car = MI.find(m=> m.id === 'dl-carousel'), cb = car && car.b, lake = IB.find(b=> /레이크|호수|LAKE/i.test(b.label || ''));
+  const out = (b, d)=>{ const L = Math.hypot(b.cx, b.cz) || 1; return [b.cx + b.cx/L*((b.r || 30) + d), b.cz + b.cz/L*((b.r || 30) + d)]; };
+  const seeds = [[-418, -88, '땅 밑'], cb ? [...out(cb, 16), '건물 아래'] : [120, -60, '건물 아래'], lake ? [...out(lake, 6), '물가'] : [-120, 120, '물가']];
+  REM.spots = seeds.map(([x, z, kind], i)=>{ const s = freeSpot(x, z), a = i*2.1 + 0.7, off = 14 + i*4; return {x:s[0], z:s[1], kind, cx:s[0] + Math.cos(a)*off, cz:s[1] + Math.sin(a)*off}; });
+  return REM.spots; }
+function remBuild(){ if(REM.models.length) return; remSpots().forEach((s, i)=>{
+  const g = new THREE.Group(); g.name = 'remnant-' + i; g.userData.dynamic = true; const y0 = groundY(s.x, s.z) - 0.2; g.position.set(s.x, y0 - 7, s.z); g.visible = false; islRoot.add(g);
+  add(g, CYL(3.2, 3.8, 0.8, 10), mat(0x5d5f5a));
+  const parts = [[-1.6, 0.8, -0.6, 0.25], [1.5, 0.9, 0.4, -0.3], [0, 1.1, 1.4, 0.1]].map(([x, y, z, r], k)=>{ const p = add(g, BOX(2.2, 2, 1.6), mat(k%2 ? 0x6e7570 : 0x7b7264), x, y, z); p.rotation.z = r; return p; });
+  const core = add(g, new THREE.IcosahedronGeometry(0.9, 0), glowMat(0xff6a4e, 0.9), 0, 3.6, 0, false);
+  const rings = [2.4, 1.9, 1.4].map((r, k)=>{ const m = add(g, new THREE.TorusGeometry(r, 0.13, 6, 28), mat(0x9aa0a6), 0, 3.6, 0, false); m.rotation.x = Math.PI/2 + k*0.5; return m; });
+  REM.models.push({g, parts, core, rings, s, y0, state:0}); });
+  islAnim.push(t=> REM.models.forEach((m, i)=>{ if(m.state !== 1) return; m.core.rotation.y = t*2; m.rings.forEach((r, k)=>{ if(r.visible) r.rotation.z = t*(0.8 + k*0.5)*(k%2 ? -1 : 1); }); m.core.material.opacity = 0.55 + 0.4*Math.abs(Math.sin(t*6 + i)); })); }
+function remTween(ms, f){ if(reduce){ f(1); return; } const t0 = performance.now(); const step = ()=>{ const k = Math.min(1, (performance.now() - t0)/ms); f(k); if(k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+function remCollapse(m, instant){ m.state = 2; m.g.visible = true; m.core.visible = false; m.rings.forEach(r=> r.visible = false);
+  const from = m.parts.map(p=> [p.position.y, p.rotation.z]); const end = (p, k, i)=>{ p.position.y = from[i][0]*(1 - k) + 0.5*k; p.rotation.z = from[i][1] + k*(i%2 ? -1.2 : 1.1); };
+  if(instant){ m.g.position.y = m.y0; m.parts.forEach((p, i)=> end(p, 1, i)); return; } remTween(900, k=> m.parts.forEach((p, i)=> end(p, k, i))); }
+function remNext(){ const w = walk, got = mini ? mini.got || [] : []; let best = null, bd = 1e9; remSpots().forEach((s, i)=>{ if(got.includes(i)) return; const d = w ? Math.hypot(w.x - s.cx, w.z - s.cz) : i; if(d < bd){ bd = d; best = [s.cx, s.cz]; } }); return best; }
+function remPulseEl(){ let el = $('remPulse'); if(!el){ el = document.createElement('div'); el.id = 'remPulse'; el.setAttribute('aria-hidden', 'true'); document.body.appendChild(el); } return el; }
+function remPulse(k){ const el = remPulseEl(); el.style.setProperty('--k', k.toFixed(2)); if(k > 0.02) el.dataset.on = '1'; else delete el.dataset.on; }
+function remHud(){ const left = 3 - (mini.got || []).length; miniHud(2, '숨겨진 잔재를 찾아라', `빨간 원 안에서 보이드의 신호 따라가기 · 남은 잔재 ${left}`); }
+function huntStart(){ remBuild(); const got = mini.got = mini.got || [];
+  REM.models.forEach((m, i)=>{ if(got.includes(i)) remCollapse(m, true); });
+  REM.rings = remSpots().map((s, i)=>{ if(got.includes(i)) return null; const r = add(miniRoot, new THREE.RingGeometry(REM_R - 1.4, REM_R, 96).rotateX(-Math.PI/2), glowMat(0xff5a4e, 0.5), s.cx, groundY(s.cx, s.cz) + 0.7, s.cz, false); r.material.side = THREE.DoubleSide; r.material.depthWrite = false; return r; });
+  mini.phase = 'hunt'; mini.dig = 0; mini.press = false; miniSave('hunt', {got}); remHud(); miniGo.textContent = '파내기'; miniGo.disabled = false; miniDots.innerHTML = ''; miniDoneBtn.hidden = true; miniBox.hidden = true; }
+function huntTick(now){ const w = walk, got = mini.got; let best = -1, bd = 1e9;
+  remSpots().forEach((s, i)=>{ if(got.includes(i)) return; const d = Math.hypot(w.x - s.x, w.z - s.z); if(d < bd){ bd = d; best = i; } });
+  const s = REM.spots[best], inC = !!s && Math.hypot(w.x - s.cx, w.z - s.cz) < REM_R + 4, k = inC ? Math.max(0, 1 - bd/(REM_R + 20)) : 0;
+  remPulse(vn ? 0 : k);
+  if(inC && !vn){ const gap = Math.max(110, Math.min(1100, bd*26)); if(now - (mini.beepAt || 0) > gap){ mini.beepAt = now; sfx('tap'); } }
+  const near = inC && bd < 4.2, dt = Math.min(0.1, (now - (mini.lastT || now))/1000); mini.lastT = now;
+  miniBox.hidden = !near || !!vn; $('qhHint').textContent = near ? '여기야! 「파내기」를 꾹 눌러' : inC ? `신호가 ${k > 0.66 ? '아주 강해' : k > 0.33 ? '강해지고 있어' : '약하게 잡혀'} · 남은 잔재 ${3 - got.length}` : `빨간 원 안에서 보이드의 신호 따라가기 · 남은 잔재 ${3 - got.length}`;
+  if(near && !vn){ const press = mini.press || WALK_KEYS.Space; mini.dig = press ? Math.min(1, mini.dig + dt/1.2) : Math.max(0, mini.dig - dt); miniGo.style.setProperty('--p', mini.dig.toFixed(2)); miniGo.classList.toggle('hot', true);
+    if(mini.dig >= 1){ mini.dig = 0; mini.press = false; remReveal(best); } }
+  else { mini.dig = 0; miniGo.classList.remove('hot'); } }
+function remReveal(i){ const m = REM.models[i]; mini.phase = 'dig'; miniBox.hidden = true; remPulse(0); m.g.visible = true; m.state = 1; sfx('open'); flash();
+  remTween(1300, k=>{ m.g.position.y = m.y0 - 7*(1 - k)*(1 - k); });
+  const w = walk; if(w){ w.yaw = Math.atan2(m.s.x - w.x, m.s.z - w.z); }
+  setTimeout(()=>{ if(!mini || mini.kind !== 'device') return; if(!(mini.got || []).length && !mini.firstSaid){ mini.firstSaid = true; say(STORY.remFirst, ()=> remGame(i)); } else remGame(i); }, reduce ? 200 : 1500); }
+function remDlg(){ let d = $('remDlg'); if(d) return d; d = document.createElement('div'); d.id = 'remDlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'rmT');
+  d.innerHTML = '<div class="in"><small>ANCESTOR DEVICE</small><h1 id="rmT">잔재 해체</h1><p id="rmP"></p><svg id="rmSvg" viewBox="0 0 300 300" aria-hidden="true"></svg><button type="button" class="go" id="rmGo">지금!</button></div>';
+  document.body.appendChild(d); $('rmGo').onclick = remTap; $('rmSvg').addEventListener('pointerdown', e=>{ e.preventDefault(); remTap(); }); return d; }
+const REM_GAP = 0.98, REM_HIT = 0.3;   /* gap width and the hit window, radians */
+function remArc(r, a, gap){ const a0 = a + gap/2, a1 = a + Math.PI*2 - gap/2, p = t=> `${(150 + Math.cos(t)*r).toFixed(1)} ${(150 + Math.sin(t)*r).toFixed(1)}`; return `M${p(a0)} A${r} ${r} 0 1 1 ${p(a1)}`; }
+function remDraw(){ const G2 = REM.game; if(!G2) return; const R = [118, 88, 58];
+  $('rmSvg').innerHTML = `<circle cx="150" cy="150" r="26" fill="#ff6a4e" opacity="${(0.55 + 0.4*Math.abs(Math.sin(performance.now()/160))).toFixed(2)}"/><circle cx="150" cy="150" r="36" fill="none" stroke="#ff6a4e" stroke-opacity=".35" stroke-width="2"/>`
+    + R.map((r, k)=> k < G2.ring ? '' : `<path d="${remArc(r, G2.a[k], REM_GAP)}" fill="none" stroke="${k === G2.ring ? '#ffd84a' : '#5d6670'}" stroke-width="${k === G2.ring ? 14 : 10}" stroke-linecap="round"/>`).join('')
+    + `<path d="M150 6 L140 -10 L160 -10 Z" transform="translate(0 16)" fill="#9ff6ff"/><line x1="150" y1="22" x2="150" y2="${150 - R[G2.ring < 3 ? G2.ring : 2] + 12}" stroke="#9ff6ff" stroke-opacity=".35" stroke-dasharray="4 5"/>`; }
+function remGame(i){ const d = remDlg(); mini.phase = 'game';
+  REM.game = {i, ring:0, a:[Math.random()*6.28, Math.random()*6.28, Math.random()*6.28], sp:reduce ? [0.9, -1.2, 1.5] : [1.4, -2.0, 2.6], boost:0, last:performance.now(), done:false};
+  $('rmP').textContent = '노란 고리의 틈이 위쪽 표시에 닿을 때 「지금!」'; d.dataset.on = '1'; sfx('open');
+  const loop = ()=>{ const G2 = REM.game; if(!G2 || G2.done) return; const now = performance.now(), dt = Math.min(0.05, (now - G2.last)/1000); G2.last = now;
+    for(let k = G2.ring; k < 3; k++) G2.a[k] = (G2.a[k] + G2.sp[k]*dt*(G2.boost > now ? 1.8 : 1) + Math.PI*2) % (Math.PI*2); remDraw(); G2.raf = requestAnimationFrame(loop); };
+  loop(); setTimeout(()=> $('rmGo').focus(), 50); }
+function remTap(){ const G2 = REM.game; if(!G2 || G2.done || vn) return; const k = G2.ring, top = -Math.PI/2, diff = Math.atan2(Math.sin(G2.a[k] - top), Math.cos(G2.a[k] - top));
+  if(Math.abs(diff) < REM_HIT){ G2.ring++; sfx('powerdown'); const m = REM.models[G2.i]; if(m.rings[k]) m.rings[k].visible = false;
+    if(G2.ring >= 3){ G2.done = true; cancelAnimationFrame(G2.raf); remDraw(); $('rmP').textContent = '심장이 멈췄다.'; sfx('success'); setTimeout(()=> remFinish(G2.i), reduce ? 200 : 900); }
+    else $('rmP').textContent = `고리 하나가 빠졌다. 남은 고리 ${3 - G2.ring}`; }
+  else { G2.boost = performance.now() + 900; sfx('tap'); $('rmP').textContent = '빗나갔어. 틈이 표시에 닿을 때까지 기다려.'; const d = $('remDlg'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); } }
+function remFinish(i){ delete $('remDlg').dataset.on; REM.game = null; const m = REM.models[i]; remCollapse(m, false); const got = mini.got = [...new Set([...(mini.got || []), i])]; miniSave('hunt', {got});
+  if(REM.rings[i]){ miniRoot.remove(REM.rings[i]); REM.rings[i] = null; } const left = 3 - got.length;
+  say([{who:'보이드', text: left ? `신호 하나가 꺼졌어. 남은 건 ${left}개야.` : '마지막 신호까지 꺼졌어. 연구실로 돌아가서 다시 돌려 보자.'}], ()=>{ if(!mini) return; if(left){ mini.phase = 'hunt'; remHud(); } else remBack(); }); }
+function remBack(){ buildLabDoor(); remPulse(0); const got = mini.got || [0, 1, 2]; REM.models.forEach((m, i)=>{ if(got.includes(i) && m.state !== 2) remCollapse(m, true); }); miniSave('device-return', {got});
+  miniWalkTo(3, '연구실로 돌아가기', '관람차 언덕 아래 연구실 문', LAB_DOOR, 8, remRerun); }
+async function remRerun(){ const q = mini.q; actBusy = true; stopWalk(); await wait(300); setSim(true); await wait(reduce ? 400 : 3400);
+  await new Promise(r=> say(STORY.remDone, r)); setSim(false); actBusy = false; questComplete(q); }
+// the mid-check: the simulator over the island shows the records so far, then the stretches that bend off into red noise at the three remnant areas
+let SIM_NOISE = null;
+function simNoise(on){ if(SIM_NOISE){ simRoot.remove(SIM_NOISE.g); SIM_NOISE.g.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); }); SIM_NOISE = null; } if(!on) return;
+  const g = new THREE.Group(); simRoot.add(g); const Y = FLOW_Y, items = [];
+  remSpots().forEach((s, i)=>{ const disk = add(g, new THREE.CircleGeometry(REM_R*0.6, 48).rotateX(-Math.PI/2), glowMat(0xff4a3a, 0.35, true), s.cx, Y + 0.5, s.cz, false); disk.material.depthTest = false; disk.renderOrder = 9; items.push({m:disk, ph:i, jit:false});
+    for(let k = 0; k < 5; k++){ const a0 = k*1.26 + i, pts = []; for(let j = 0; j <= 9; j++){ const r = j*7, a = a0 + Math.sin(j*1.7 + k)*0.7; pts.push(new THREE.Vector3(s.cx + Math.cos(a)*r, Y + 1 + Math.sin(j + k)*2, s.cz + Math.sin(a)*r)); }
+      const m = add(g, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 30, 1.3, 5), glowMat(0xff5a4e, 0.8, true), 0, 0, 0, false); m.material.depthTest = false; m.renderOrder = 10; items.push({m, ph:i*3 + k, jit:true}); } });
+  SIM_NOISE = {g, items}; simAnim.push(t=>{ if(!SIM_NOISE) return; SIM_NOISE.items.forEach(it=>{ const f = Math.sin(t*23 + it.ph*7) > 0.15 ? 1 : 0.12; it.m.material.opacity = (0.25 + 0.6*Math.abs(Math.sin(t*5 + it.ph)))*f; if(it.jit){ it.m.position.x = (Math.random() - 0.5)*2; it.m.position.z = (Math.random() - 0.5)*2; } }); }); }
+async function midCheck(q){ miniSave('mid'); actBusy = true; stopWalk(); await wait(300); setSim(true); await wait(reduce ? 400 : 3000);
+  await new Promise(r=> say(STORY.midA, r)); await new Promise(r=> say(STORY.midA2, r)); simNoise(true); sfx('powerdown'); await wait(reduce ? 400 : 3200);
+  await new Promise(r=> say(STORY.midB, r)); simNoise(false); setSim(false); await wait(500);
+  const cp = miniLoad() || {q:q.id}; cp.q = q.id; cp.step = 'hunt'; cp.got = cp.got || []; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cp)); }catch(e){}
+  actBusy = false; startWalk(PAIR); }
+window.__rem = ()=> ({spots:REM.spots, models:REM.models.map(m=> m.state), mini:mini && mini.kind === 'device' ? {phase:mini.phase, got:mini.got, dig:mini.dig} : null, game:REM.game ? {ring:REM.game.ring, a:REM.game.a, done:REM.game.done} : null, noise:!!SIM_NOISE});
+window.__remAim = ()=>{ const G2 = REM.game; if(G2) G2.a[G2.ring] = -Math.PI/2; };
 // Keep keyboard navigation within the active analysis/game without intercepting dialogue controls.
 document.addEventListener('keydown',e=>{if(e.key!=='Tab'||vn)return;const host=['deviceDlg','labDlg'].map($).find(el=>el.dataset.on);if(!host)return;const buttons=[...host.querySelectorAll('button:not([disabled]):not([hidden])')].filter(b=>b.getClientRects().length);if(!buttons.length)return;const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&(!host.contains(document.activeElement)||document.activeElement===first)){last.focus();e.preventDefault();}else if(!e.shiftKey&&(!host.contains(document.activeElement)||document.activeElement===last)){first.focus();e.preventDefault();}});
 // ----- q3 · the eye cave: decode the glyph wall with the old island, then the virtual test -----

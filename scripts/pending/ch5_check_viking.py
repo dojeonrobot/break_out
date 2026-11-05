@@ -26,7 +26,7 @@ async def page_for(br, team, dev):
     pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     await pg.goto(f'{STATIC}/chapter05/index.html?team={team}&world=island', wait_until='load', timeout=120000)
     await ready(pg)
-    await pg.evaluate("()=>{ document.querySelectorAll('#teamPick').forEach(e=> e.dataset.on=''); }")
+    await pg.evaluate("()=>{ document.querySelectorAll('#teamPick').forEach(e=> delete e.dataset.on); }")
     return ctx, pg, errs
 
 async def wait_vik(pg, cond, t=20):

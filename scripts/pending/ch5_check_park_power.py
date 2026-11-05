@@ -27,7 +27,18 @@ async def main():
   assert await pg.evaluate('__dbg.train().mode')=='stop'
   print('OK all five main attractions and additional powered animations are stopped before breaker repair',flush=True)
   await pg.evaluate("__dbg.startWalk('리코·제로')");await asyncio.sleep(1)
-  await pg.evaluate('()=>{for(let i=0;i<40&&__dbg.quest().vn();i++)__dbg.quest().next();__dbg.walkTo(...__dbg.target())}')
+  for _try in range(8):   # late intro dialogue can swallow the arrival: clear until quiet, walk, check, retry
+    idle=0
+    while idle<6:
+      if await pg.evaluate('!!__dbg.quest().vn()'):await pg.evaluate('__dbg.quest().next()');idle=0
+      else:idle+=1
+      await asyncio.sleep(.25)
+    await pg.evaluate('__dbg.walkTo(...__dbg.target())')
+    ok=False
+    for _ in range(40):
+      if await pg.evaluate("__dbg.quest().vn()?.lines[0].who==='자일로'"):ok=True;break
+      await asyncio.sleep(.25)
+    if ok:break
   await wf(pg,"__dbg.quest().vn()?.lines[0].who==='자일로'")
   await pg.evaluate('()=>{for(let i=0;i<40&&__dbg.quest().vn();i++)__dbg.quest().next();__dbg.walkTo(...__dbg.yardDoor())}')
   await pg.wait_for_selector('#yardDlg',state='visible');await asyncio.sleep(1)
@@ -51,6 +62,6 @@ async def main():
   await pg.reload(wait_until='load',timeout=120000);await wf(pg,'!!window.__dbg?.rideState')
   await pg.evaluate("__dbg.setWorld('island',true)");await asyncio.sleep(.5)
   assert await pg.evaluate('__dbg.power().on') and all(x['on'] for x in (await pg.evaluate('__dbg.rideState()')).values())
-  assert 'q1' not in await pg.evaluate('__dbg.qdone()');print('OK power persists before mission completion and survives page reload',flush=True)
+  assert 'q1' in await pg.evaluate('__dbg.qdone()');print('OK power persists and survives page reload; mission 1 is complete (2026-11-04 flow: power on → Naty is gone → mission 1 clear)',flush=True)
   assert not errors,errors;await br.close();print('OK no runtime errors',flush=True)
 asyncio.run(main())

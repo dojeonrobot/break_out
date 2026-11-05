@@ -13,17 +13,46 @@ async def wf(pg, expr, timeout=120):
             if v: return v
         except Exception: pass
         await asyncio.sleep(.25)
-    raise AssertionError('timeout: ' + expr)
+    try: st = await pg.evaluate("({lm:__dbg.quest().live?.mini, ent:__dbg.quest().live?.mazeEntered, found:__dbg.quest().live?.found, r:__dbg.quest().live?.r, mk:JSON.stringify(__dbg.quest().mini?.()||null).slice(0,200), live:__dbg.quest().live?.id, t:__dbg.target(), done:__dbg.quest().done, vn:__dbg.quest().vn()?.lines?.map(l=>l.text.slice(0,30)), mini:__dbg.quest().mini?.()?.kind, pos:__dbg.walkState?.()})")
+    except Exception as e: st = str(e)
+    raise AssertionError('timeout: ' + expr + ' state=' + repr(st))
 
 async def drain(pg, n=60):
     for _ in range(n):
         if not await pg.evaluate('!!__dbg.quest().vn()'): return
         await pg.evaluate('__dbg.quest().next()'); await asyncio.sleep(.08)
 
+async def settle(pg, quiet=2.0, limit=60):
+    # drain dialogue until none has been open for `quiet` seconds (headless is slow: dialogue can open late)
+    idle = 0.0; t = 0.0
+    while idle < quiet and t < limit:
+        if await pg.evaluate('!!__dbg.quest().vn()'):
+            await pg.evaluate('__dbg.quest().next()'); idle = 0.0
+        else: idle += .25
+        await asyncio.sleep(.25); t += .25
+
+async def arrive(pg, cond, tries=6):
+    # clear any late dialogue, walk to the quest target, wait for the arrival dialogue; retry if a late line swallowed it
+    for _ in range(tries):
+        await settle(pg, 1.5)
+        await pg.evaluate('__dbg.walkTo(...__dbg.target())')
+        for _ in range(40):
+            if await pg.evaluate(cond): return
+            await asyncio.sleep(.25)
+    await wf(pg, cond, 1)
+
+async def drain_until(pg, cond, limit=120, step=.4):
+    t = 0.0
+    while t < limit:
+        if await pg.evaluate(cond): return
+        if await pg.evaluate('!!__dbg.quest().vn()'): await pg.evaluate('__dbg.quest().next()')
+        await asyncio.sleep(step); t += step
+    await wf(pg, cond, 1)
+
 async def shot(pg, name):
     if not SHOT: return
-    await pg.evaluate('window.__raf0 = window.__raf0 || requestAnimationFrame; requestAnimationFrame = ()=>0'); await asyncio.sleep(.3)
-    await pg.screenshot(path=os.path.join(SHOT, name)); await pg.evaluate('requestAnimationFrame = window.__raf0')
+    await pg.evaluate('()=>{ window.__raf0 = window.__raf0 || requestAnimationFrame; window.__rafQ = []; requestAnimationFrame = f=>{ window.__rafQ.push(f); return 0; }; }'); await asyncio.sleep(.3)
+    await pg.screenshot(path=os.path.join(SHOT, name)); await pg.evaluate('()=>{ requestAnimationFrame = window.__raf0; (window.__rafQ||[]).splice(0).forEach(f=> requestAnimationFrame(f)); }')
 
 async def main():
     async with async_playwright() as p:
@@ -44,12 +73,12 @@ async def main():
         await pg.evaluate("__dbg.setWorld('island',true)"); await asyncio.sleep(1)
 
         # ---- mission 1 ----
-        await pg.evaluate("__dbg.startWalk('리코·제로')"); await asyncio.sleep(1); await drain(pg)
+        await pg.evaluate("__dbg.startWalk('리코·제로')"); await settle(pg)
         print('dbg', await pg.evaluate("({live:__dbg.quest().live?.id, t:__dbg.target(), done:__dbg.quest().done, walk:!!__dbg.walkState?.(), mini:__dbg.quest().mini()?.kind, cp:localStorage.getItem('void-mini-12')})"), flush=True)
-        await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "__dbg.quest().vn()?.lines[0].who==='자일로'", 40); await drain(pg)
+        await arrive(pg, "__dbg.quest().vn()?.lines[0].who==='자일로'"); await drain(pg)
         await pg.evaluate('__dbg.walkTo(...__dbg.yardDoor())'); await wf(pg, "!!document.querySelector('#yardDlg[data-on]')"); await asyncio.sleep(1); await drain(pg)
         await pg.evaluate('()=>{const y=__dbg.yard();y.tiles=y.sol.map(r=>r.map(c=>new Set(c)));__dbg.yardPaint()}'); await asyncio.sleep(.5)
-        await pg.locator('#ydContinue').click()
+        await wf(pg, "(()=>{const b=document.getElementById('ydContinue'); return b && b.offsetParent && !b.disabled})()", 60); await pg.locator('#ydContinue').click()
         await wf(pg, "!window.__parkWake() && !!__dbg.quest().vn()", 300)
         lines = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')")
         assert '네이티가 없어요' in lines and '스카이' not in lines, lines
@@ -58,11 +87,11 @@ async def main():
         assert t[0] == '섬 전체 전원 복구', t
         print('OK mission 1: backup line → park wakes → Naty is gone → MISSION 1 CLEAR, no Sky Loop ride or forest shot', t, flush=True)
         await shot(pg, 'n1_reward.png')
-        await asyncio.sleep(1.2); await pg.locator('#qrMap').click(); await asyncio.sleep(1.5); await drain(pg)
+        await asyncio.sleep(1.2); await pg.locator('#qrMap').click(); await wf(pg, "__dbg.quest().vn()?.lines[0].text.includes('흐트러지는')", 60); await drain(pg); await asyncio.sleep(.5)
 
         # ---- mission 2 ----
         q = await pg.evaluate("__dbg.quest().done"); assert 'q1' in q, q
-        await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "__dbg.quest().vn()?.lines[0].text.includes('깜빡여')")
+        await arrive(pg, "__dbg.quest().vn()?.lines[0].text.includes('깜빡여')")
         ml = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')"); assert '빛이 보이는 쪽' not in ml, ml; await drain(pg)
         await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "!!__dbg.quest().vn()")
         fl = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')"); assert '캠퍼스 좌표를 찾았어' in fl and '미로 정원' not in fl, fl
@@ -77,12 +106,12 @@ async def main():
         await rq.post(API + '/api/void/admin/skip', data={'team': T, 'mission': 'z2'}, headers=ADM)
         await rq.post(API + '/api/void/quest', data={'team': T, 'dev': 'natycheck', 'act': 2})
         await pg.reload(wait_until='load', timeout=120000); await wf(pg, '!!window.__dbg?.rideState && !!window.__rem')
-        await pg.evaluate("()=>{ const tp=document.getElementById('teamPick'); if(tp) tp.dataset.on=''; }")
+        await pg.evaluate("()=>{ const tp=document.getElementById('teamPick'); if(tp) delete tp.dataset.on; }")
         await pg.evaluate("__dbg.setWorld('island',true)"); await asyncio.sleep(1)
         await wf(pg, "__dbg.quest().done.includes('q2')")
-        await pg.evaluate("__dbg.startWalk('리코·제로')"); await asyncio.sleep(1); await drain(pg)
-        await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "!!__dbg.quest().vn()"); await drain(pg)
-        await wf(pg, "__rem().noise", 120); await shot(pg, 'n3_midcheck_noise.png')
+        await pg.evaluate("__dbg.startWalk('리코·제로')"); await settle(pg)
+        await arrive(pg, "!!__dbg.quest().vn()")
+        await drain_until(pg, "__rem().noise", 120); await shot(pg, 'n3_midcheck_noise.png')
         print('OK mission 3: lab mid-check shows the simulator with red noise at the remnant areas', flush=True)
         for _ in range(40):
             await drain(pg)
@@ -98,6 +127,8 @@ async def main():
             await wf(pg, "['dig','game'].includes(__rem().mini?.phase)", 60)
             await pg.evaluate("()=>{ const b=document.getElementById('miniGo'); b.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1})); }")
             if i == 0: await shot(pg, 'n4_dug.png')
+            hd = await pg.evaluate("[document.getElementById('qhDist').textContent, Math.round(Math.hypot(__dbg.target()[0]-__dbg.walkState().x, __dbg.target()[1]-__dbg.walkState().z))]")
+            assert hd[1] < 40, ('HUD target left the remnant while digging', hd)
             for _ in range(60):
                 await drain(pg)
                 if await pg.evaluate("!!document.querySelector('#remDlg[data-on]')"): break
@@ -105,7 +136,7 @@ async def main():
             await pg.locator('#rmGo').click(); await asyncio.sleep(.2)
             miss = await pg.evaluate('__rem().game.ring')
             for k in range(3):
-                await pg.evaluate('__remAim()'); await pg.locator('#rmGo').click(); await asyncio.sleep(.15)
+                await pg.evaluate("()=>{ __remAim(); document.getElementById('rmGo').click(); }"); await asyncio.sleep(.3)
                 if i == 0 and k == 0: await shot(pg, 'n5_rings.png')
             await wf(pg, "!document.querySelector('#remDlg[data-on]')", 30); await asyncio.sleep(.5); await drain(pg)
             r = await pg.evaluate('__rem()'); print(f'  remnant {i+1}: models {r["models"]} got {r["mini"]["got"] if r["mini"] else None} (miss tap kept ring {miss})', flush=True)
@@ -119,7 +150,6 @@ async def main():
         assert t[0] == '선대의 잔재 해체' and '37.' in t[1], t
         print('OK three remnants dismantled, lab re-run, last campus coordinate given', t, flush=True)
         await shot(pg, 'n6_reward.png')
-        nc = await pg.evaluate("NATY_COLOR = null");
         assert not errs, errs; print('OK no runtime errors', flush=True)
         await br.close()
 asyncio.run(main())
