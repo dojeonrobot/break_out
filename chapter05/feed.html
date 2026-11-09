@@ -87,61 +87,51 @@
     @media (prefers-color-scheme: dark) { .read-hint { background: #0b2a42; color: #cfe8ff; } }
 
     /* ---------- 스토리 줄 ---------- */
-    .rounds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 8px 16px 0; max-width: 980px; }
-    @media (min-width: 1024px) { .rounds { padding: 8px 0 0; } }
-    @media (max-width: 640px) { .rounds { grid-template-columns: 1fr; } }
-    .rounds { max-width: 1180px; gap: 20px; }
-    .home-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; max-width: 1180px; margin: 0 16px 20px; padding: 4px 0 0; }
-    @media (min-width: 1024px) { .home-head { margin: 0 0 20px; } }
+    /* 라운드 선택: 사진 카드 3장 (2026-11-09 재디자인) */
+    #tab-feed:has(#rounds:not([hidden])) { min-height: calc(100dvh - 32px); display: grid; align-content: center; }
+    .rounds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 0 16px; max-width: 1180px; align-items: end; }
+    @media (min-width: 1024px) { .rounds { padding: 0; } }
+    @media (max-width: 760px) { .rounds { grid-template-columns: 1fr; align-items: stretch; } }
+    .round-tile { position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; max-height: min(560px, calc(100dvh - 250px)); padding: 0; border: 0; border-radius: 24px; overflow: hidden; background: #262626; color: #fff; font: inherit; text-align: left; cursor: pointer; box-shadow: rgba(0,0,0,.02) 0 0 0 1px, rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.1) 0 4px 8px; transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s; }
+    .round-tile:not(:disabled):hover { transform: translateY(-6px); box-shadow: rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.18) 0 24px 48px; }
+    .round-tile:not(:disabled):active { transform: translateY(-2px) scale(.99); }
+    .round-tile:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+    .round-tile:disabled { cursor: not-allowed; }
+    .round-tile.now { transform: scale(1.03); box-shadow: 0 0 0 4px var(--surface), 0 0 0 7px #d62976, rgba(214,41,118,.25) 0 24px 48px; }
+    .round-tile.now::before { content: ""; position: absolute; inset: -7px; border-radius: 30px; background: var(--ig-grad); z-index: -1; }
+    .round-tile.now:not(:disabled):hover { transform: scale(1.03) translateY(-6px); }
+    .rt-photo { position: absolute; inset: 0; display: grid; gap: 3px; background: #1c1c1c; }
+    .rt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rt-photo.news { grid-template-columns: 1fr 1fr; grid-template-rows: 1.25fr 1fr; } .rt-photo.news img:first-child { grid-column: 1 / -1; }
+    .rt-photo.shorts { grid-template-columns: 1fr 1fr 1fr; }
+    .rt-photo.story { display: block; } .rt-photo.story img { filter: blur(14px) brightness(.8); transform: scale(1.15); }
+    .rt-rings { position: absolute; left: 0; right: 0; top: 24%; display: flex; justify-content: center; align-items: center; gap: 14px; }
+    .rt-rings span { width: 22%; aspect-ratio: 1; border-radius: 50%; padding: 4px; background: var(--ig-grad); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+    .rt-rings span:nth-child(2) { width: 30%; } .rt-rings span img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff; object-fit: cover; filter: none; transform: none; }
+    .rt-play { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.92); color: #111; display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); } .rt-play .icon { width: 28px; height: 28px; margin-left: 3px; }
+    .rt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 45%, rgba(0,0,0,.82) 100%); }
+    .rt-num { position: absolute; top: 16px; left: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.94); color: #262626; }
+    .rt-num .icon { width: 14px; height: 14px; }
+    .rt-state { position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(6px); }
+    .rt-state .dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .round-tile.now .rt-state { background: #d62976; } .round-tile.now .rt-state .dot { animation: rtPulse 1.5s ease-out infinite; box-shadow: 0 0 0 0 rgba(255,255,255,.7); }
+    .round-tile.past .rt-state { background: var(--real); } .round-tile.past .rt-state .icon { width: 14px; height: 14px; }
+    @keyframes rtPulse { to { box-shadow: 0 0 0 8px transparent; } }
+    .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 0 22px 22px; }
+    .rt-body b { font-size: clamp(30px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+    .rt-body small { font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); word-break: keep-all; }
+    .rt-cta { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; width: fit-content; padding: 10px 16px; border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 800; } .rt-cta .icon { width: 16px; height: 16px; }
+    .round-tile.now .rt-cta { background: var(--blue); color: #fff; }
+    .round-tile:disabled .rt-photo { filter: grayscale(1) brightness(.55); } .round-tile:disabled .rt-play { display: none; } .round-tile:disabled .rt-rings { top: 14%; opacity: .7; } .round-tile:has(.rt-photo.story):disabled .rt-lock { top: 56%; }
+    .round-tile:disabled .rt-body small, .round-tile:disabled .rt-body b { color: rgba(255,255,255,.75); }
+    .rt-lock { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 2; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; backdrop-filter: blur(6px); } .rt-lock .icon { width: 30px; height: 30px; }
+    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active, .round-tile.now { transform: none; } .round-tile.now .rt-state .dot { animation: none; } }
+    .home-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; max-width: 1180px; margin: 0 16px 26px; }
+    @media (min-width: 1024px) { .home-head { margin: 0 0 26px; } }
     .home-head small { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
     .home-head h1 { margin: 0; font-size: clamp(26px, 3.2vw, 36px); line-height: 1.15; letter-spacing: -0.01em; font-weight: 900; word-break: keep-all; }
     .home-head p { margin: 8px 0 0; font-size: 15px; color: var(--muted); word-break: keep-all; max-width: 44em; }
     .home-head .btn { min-height: 48px; padding: 0 22px; font-size: 16px; border-radius: 12px; }
-    .art-news { padding-top: 14%; } .art-news .ph { height: 38%; min-height: 84px; }
-    .art-shorts .phone { width: 36%; min-width: 104px; max-width: 220px; margin-top: 12%; }
-    .art-story { padding-top: 8%; } .art-story .ring { width: 26%; max-width: 110px; height: auto; aspect-ratio: 1; } .art-story .ring:nth-child(2) { width: 32%; max-width: 134px; }
-    .round-tile { position: relative; display: grid; grid-template-rows: clamp(190px, calc(100dvh - 430px), 520px) auto; text-align: left; padding: 0; border-radius: 22px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; overflow: hidden; box-shadow: 0 1px 2px color-mix(in srgb, #262626 6%, transparent); transition: transform .22s cubic-bezier(.16,1,.3,1), box-shadow .22s; }
-    .round-tile:not(:disabled):hover { transform: translateY(-4px); box-shadow: 0 16px 36px color-mix(in srgb, #262626 14%, transparent); }
-    .round-tile:not(:disabled):active { transform: translateY(0) scale(.99); }
-    .round-tile:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
-    .round-tile:disabled { cursor: not-allowed; }
-    .round-tile:disabled .rt-art { filter: grayscale(1); opacity: .45; }
-    .round-tile:disabled .rt-body b, .round-tile:disabled .rt-body small { color: var(--muted); }
-    .round-tile.now { border-color: transparent; box-shadow: 0 0 0 2px var(--blue), 0 14px 34px color-mix(in srgb, var(--blue) 22%, transparent); }
-    .rt-num { position: absolute; top: 14px; left: 14px; z-index: 2; font-size: 12px; font-weight: 800; letter-spacing: .02em; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #262626; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
-    .rt-lock { position: absolute; inset: 0 0 auto; height: clamp(190px, calc(100dvh - 430px), 520px); z-index: 2; display: grid; place-items: center; color: #fff; }
-    .rt-lock span { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: rgba(38,38,38,.75); backdrop-filter: blur(4px); }
-    .rt-lock .icon { width: 24px; height: 24px; }
-    .rt-art { position: relative; overflow: hidden; }
-    .rt-body { display: grid; gap: 4px; padding: 16px 18px 18px; }
-    .rt-body b { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
-    .rt-body small { font-size: 13px; font-weight: 700; color: var(--muted); }
-    .rt-st { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
-    .rt-st .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex: none; }
-    .round-tile.now .rt-st { color: var(--blue); } .round-tile.now .rt-st .dot { background: var(--blue); box-shadow: 0 0 0 0 color-mix(in srgb, var(--blue) 50%, transparent); animation: rtPulse 1.6s ease-out infinite; }
-    .round-tile.past .rt-st { color: var(--real); } .round-tile.past .rt-st .dot { background: var(--real); }
-    @keyframes rtPulse { to { box-shadow: 0 0 0 9px transparent; } }
-    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active { transform: none; } .round-tile.now .rt-st .dot { animation: none; } }
-    /* 기사 지면 */
-    .art-news { background: linear-gradient(180deg, #fff 0, #f3f4f6 100%); padding: 44px 22px 0; display: grid; gap: 9px; align-content: start; }
-    .art-news .mh { height: 10px; width: 34%; border-radius: 3px; background: #d62976; }
-    .art-news .hl { height: 15px; border-radius: 4px; background: #262626; } .art-news .hl.s { width: 72%; }
-    .art-news .ph { margin-top: 4px; height: 84px; border-radius: 10px; background: linear-gradient(135deg, #0f766e, #134e4a 60%, #1e293b); position: relative; }
-    .art-news .ph::after { content: ""; position: absolute; left: 10px; bottom: 10px; width: 46%; height: 8px; border-radius: 3px; background: rgba(255,255,255,.75); }
-    .art-news .ln { height: 7px; border-radius: 3px; background: #c9ced6; } .art-news .ln.s { width: 60%; }
-    /* 세로 쇼츠 */
-    .art-shorts { background: #0f0f0f; display: grid; place-items: center; }
-    .art-shorts .phone { width: 104px; height: 100%; margin-top: 30px; border-radius: 16px 16px 0 0; background: linear-gradient(160deg, #4f5bd5, #962fbf 45%, #d62976 80%, #fa7e1e); position: relative; box-shadow: 0 0 0 5px #262626, 0 18px 40px rgba(0,0,0,.6); }
-    .art-shorts .phone::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.65)); border-radius: inherit; }
-    .art-shorts .play { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.92); display: grid; place-items: center; color: #111; } .art-shorts .play .icon { width: 18px; height: 18px; margin-left: 2px; }
-    .art-shorts .cap { position: absolute; left: 12px; right: 36px; bottom: 26px; height: 8px; border-radius: 3px; background: rgba(255,255,255,.9); } .art-shorts .cap.s { bottom: 12px; right: 56px; opacity: .6; }
-    .art-shorts .acts { position: absolute; right: 8px; bottom: 10px; display: grid; gap: 7px; } .art-shorts .acts i { display: block; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.85); }
-    /* 스토리 링 */
-    .art-story { background: linear-gradient(180deg, #fff, #fafafa); display: flex; align-items: center; justify-content: center; gap: 14px; padding-top: 22px; }
-    .art-story .ring { width: 62px; height: 62px; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
-    .art-story .ring span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 3px solid #fff; background: var(--c, #0f766e); }
-    .art-story .ring:nth-child(2) { width: 78px; height: 78px; } .art-story .ring.seen { background: #dbdbdb; }
-    @media (prefers-color-scheme: dark) { .art-news { background: linear-gradient(180deg, #1a1a1a, #111); } .art-news .hl { background: #f5f5f5; } .art-news .ln { background: #3a3a3a; } .art-story { background: #111; } .art-story .ring span { border-color: #111; } .rt-num { background: rgba(38,38,38,.9); color: #f5f5f5; } }
     .round-head { display: flex; align-items: center; gap: 12px; margin: 0 16px 14px; flex-wrap: wrap; }
     @media (min-width: 1024px) { .round-head { margin: 0 0 14px; } }
     .round-head h2 { margin: 0; font-size: 22px; }
@@ -1168,13 +1158,18 @@ function renderRounds() {
     const n = all.filter(p => !p.seed).length;
     const st = adm ? (now ? STEP_LABEL[S.data.phase] + ' 중 · ' : '') + `예시 ${all.length - n} · 조 게시물 ${n}`
       : now ? `지금 진행 중 · ${STEP_LABEL[S.data.phase]}` : past ? `끝난 라운드 · 게시물 ${n}개` : `${i}라운드가 끝나면 열려요`;
-    const art = f === 'news' ? `<div class="rt-art art-news"><i class="mh"></i><i class="hl"></i><i class="hl s"></i><i class="ph"></i><i class="ln"></i><i class="ln s"></i></div>`
-      : f === 'shorts' ? `<div class="rt-art art-shorts"><div class="phone"><span class="play">${ic('play')}</span><i class="cap"></i><i class="cap s"></i><span class="acts"><i></i><i></i><i></i></span></div></div>`
-      : `<div class="rt-art art-story"><span class="ring" style="--c:#0f766e"><span></span></span><span class="ring" style="--c:#d62976"><span></span></span><span class="ring seen" style="--c:#4b5563"><span></span></span></div>`;
-    const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장 + 한 줄' }[f];
+    const cv = ((S.data.covers || {})[f] || []).map(id => `<img src="${imgSrc(id)}" alt="" loading="lazy">`);
+    const art = f === 'news' ? `<span class="rt-photo news">${cv.slice(0, 3).join('')}</span>`
+      : f === 'shorts' ? `<span class="rt-photo shorts">${cv.slice(0, 3).join('')}</span><span class="rt-play">${ic('play')}</span>`
+      : `<span class="rt-photo story">${cv[0] || ''}</span><span class="rt-rings">${cv.slice(1, 4).map(x => `<span>${x}</span>`).join('')}</span>`;
+    const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장과 한 줄' }[f];
+    const cta = adm ? '전체 보기' : now ? { read: '예시 보기', make: '우리 조 만들기', judge: '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : '';
+    const state = adm ? st : now ? `<i class="dot"></i>${STEP_LABEL[S.data.phase]} 중` : past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
     return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : ''}" data-round="${f}" ${open ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
-      <span class="rt-num">${i + 1}라운드</span>${art}${open ? '' : `<span class="rt-lock"><span>${ic('lock')}</span></span>`}
-      <span class="rt-body"><b>${ROUND_LABEL[f]}</b><small>${sub}</small><span class="rt-st"><i class="dot"></i>${st}</span></span></button>`;
+      ${art}<span class="rt-shade"></span>
+      <span class="rt-num">${ic(ROUND_ICON[f])}${i + 1}라운드</span>${state ? `<span class="rt-state">${state}</span>` : ''}
+      ${open ? '' : `<span class="rt-lock">${ic('lock')}</span>`}
+      <span class="rt-body"><b>${ROUND_LABEL[f]}</b><small>${open ? sub : `${i}라운드가 끝나면 열려요`}</small>${cta ? `<span class="rt-cta">${cta}${ic('arrow-right')}</span>` : ''}</span></button>`;
   }).join('');
 }
 /* 진행 막대: 관리자(다음 단계 버튼 포함)과 진행 화면에만. 이번 라운드에 올린 조·판별 끝낸 조를 번호로 보여 줌 */
@@ -1229,7 +1224,7 @@ function renderHomeHead() {
     judge: [`${i}라운드 ${L} · 판별`, `다른 조가 올린 ${L}를 하나씩 눌러 진짜인지 가짜인지 판정해요.`, `${L} 판별하러 가기`],
     reveal: [`${i}라운드 ${L} · 정답 공개`, `정답과 각 조가 숨긴 단서, 지금까지 점수를 확인해요.`, `정답 보기`] }[d.phase];
   box.hidden = false;
-  box.innerHTML = `<div><small>지금 할 일</small><h1>${esc(txt[0])}</h1><p>${esc(txt[1])}</p></div><button type="button" class="btn btn-primary" data-round="${f}">${esc(txt[2])}${ic('chevron-right')}</button>`;
+  box.innerHTML = `<div><small>지금 할 일</small><h1>${esc(txt[0])}</h1><p>${esc(txt[1])}</p></div>`;
 }
 function renderFeed() {
   const d = S.data, home = !S.fmt;

@@ -185,6 +185,15 @@ def any_revealed():
     return round_idx(DB.get('round')) > 0 or DB['phase'] == 'reveal'
 
 
+def round_covers():
+    """라운드 타일용 예시 사진 4장씩(형식별). 사진 id만 보내며 글 내용·정답은 없다."""
+    out = {}
+    for f in ROUNDS:
+        ids = [p.get('thumbImageId') or p.get('imageId') for p in DB['posts'] if p.get('seed') and p.get('format') == f and (p.get('imageId') or p.get('thumbImageId'))]
+        out[f] = ids[:4]
+    return out
+
+
 def round_progress():
     """이번 라운드 현황(내용 없이 숫자만): 올린 조, 조마다 판별한 수, 조 게시물 수. 진행 화면·운영자 막대용."""
     rd = DB.get('round')
@@ -295,6 +304,7 @@ def state_for(team, admin=False):
            'aiQuota': AI_QUOTA, 'aiUsed': DB['aiUsed'].get(str(team), 0) if team else 0,
            'aiEnabled': bool(GEMINI_KEY), 'maxPosts': POSTS_PER_ROUND, 'minPosts': MIN_POSTS_PER_ROUND}
     res['progress'] = round_progress()
+    res['covers'] = round_covers()
     if admin or any_revealed():
         res['scores'] = compute_scores()
     if admin:
