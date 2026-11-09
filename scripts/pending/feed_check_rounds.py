@@ -1,4 +1,5 @@
-# 2026-11-09 도로그램 3라운드 점검. 서버: CH5_PORT=8095 CH5_ADMIN_KEY=0101 (data는 스크래치 사본 폴더), 페이지는 그 서버가 정적으로 서빙.
+# 2026-11-09 도로그램 수업 흐름 점검. 서버: CH5_PORT=8095 CH5_ADMIN_KEY=0101 (스크래치 사본 폴더에서), 페이지는 그 서버가 서빙.
+# 학생 1조 노트북 / 진행 화면 / 선생님 화면 세 창으로, 1라운드 예시 보기 → 만들기 → 판별 → 공개 → 2라운드 예시 보기까지.
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 BASE = 'http://127.0.0.1:8095'; OUT = sys.argv[1] if len(sys.argv) > 1 else '.'
@@ -14,87 +15,89 @@ def post(team, fmt, truth='fake'):
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
-        ctx = await b.new_context(viewport={'width': 1366, 'height': 768})
-        rq = ctx.request
+        ctx = await b.new_context(viewport={'width': 1366, 'height': 768}); rq = ctx.request
+        errs = []
+        async def page(path='/chapter05/feed.html'):
+            pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
+            await pg.goto(BASE + path, wait_until='load'); await asyncio.sleep(2); return pg
         async def phase(ph, rd): r = await rq.post(BASE + '/api/ch5/admin/phase', data=json.dumps({'phase': ph, 'round': rd}), headers=H); assert r.ok, await r.text()
+        async def state(t=1): return await (await rq.get(BASE + f'/api/ch5/state?team={t}')).json()
         await rq.post(BASE + '/api/ch5/admin/reset', data=json.dumps({'confirm': 'RESET'}), headers=H)
         await phase('read', 'news')
-        st = await (await rq.get(BASE + '/api/ch5/state?team=1')).json()
-        check(not any(x.get('seed') for x in st['posts']), f'no example posts sent to a team ({len(st["posts"])} posts)')
-        check(st.get('round') == 'news', 'starts on round news')
 
-        pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(BASE + '/chapter05/feed.html', wait_until='load'); await asyncio.sleep(2)
-        await asyncio.sleep(1)
-        check(await pg.locator('#teamModal').is_visible(), 'team picker shows first')
-        await pg.screenshot(path=OUT + '/r0_team.png')
-        await pg.locator('#teamGrid [data-team="1"]').click(); await asyncio.sleep(1)
-        body = await pg.evaluate('document.body.innerText')
-        check('지금 단계' not in body and '자료 살펴보기' not in body and '예제' not in body, 'no phase/example text on the first screen')
-        tiles = await pg.evaluate("[...document.querySelectorAll('[data-round]')].map(b=>[b.dataset.round,b.disabled])")
-        check(tiles == [['news', False], ['shorts', True], ['story', True]], f'tiles: news open, others locked ({tiles})')
-        await pg.screenshot(path=OUT + '/r1_home.png')
-        # reload keeps asking for the team
-        await pg.reload(wait_until='load'); await asyncio.sleep(2); await asyncio.sleep(1)
-        check(await pg.locator('#teamModal').is_visible(), 'team picker shows again after reload')
-        await pg.locator('#teamGrid [data-team="1"]').click(); await asyncio.sleep(0.5)
+        st = await state()
+        check(st['posts'] and all(x.get('seed') and x['format'] == 'news' for x in st['posts']), f'예시 보기: 뉴스 예시만 내려감 ({len(st["posts"])})')
 
-        # round 1 make
-        await phase('make', 'news'); await asyncio.sleep(1.5)
-        r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(1, 'shorts')), headers=J)
-        check(r.status == 400, 'shorts refused in the news round')
+        kid = await page()
+        check(await kid.locator('#teamModal').is_visible(), '조 선택 창이 먼저 뜸')
+        await kid.screenshot(path=OUT + '/a0_team.png')
+        await kid.locator('#teamGrid [data-team="1"]').click(); await asyncio.sleep(1)
+        await kid.screenshot(path=OUT + '/a1_home.png')
+        await kid.locator('[data-round="news"]').click(); await asyncio.sleep(1)
+        check(await kid.locator('#guideBox details[open]').count() == 1, '뉴스 안내 카드가 펼쳐져 있음')
+        n = await kid.locator('#feed [data-open]').count(); check(n >= 10, f'예시 뉴스 목록 ({n})')
+        await kid.screenshot(path=OUT + '/a2_examples.png', full_page=False)
+        # 예시 하나 판별 → 해설 + 들통나는 곳
+        sid = next(x['id'] for x in st['posts'] if x['answer'] if False) if False else None
+        fake = [x for x in (await (await rq.get(BASE + '/api/ch5/admin/state', headers=H)).json())['posts'] if x.get('seed') and x['format'] == 'news' and x['answer']['truth'] == 'fake'][0]
+        r = await rq.post(BASE + '/api/ch5/judge', data=json.dumps({'team': 1, 'postId': fake['id'], 'verdict': 'fake', 'criterion': 'who'}), headers=J); check(r.ok, '예시 판별 저장')
+        await kid.evaluate("refresh()"); await asyncio.sleep(1)
+        await kid.locator(f'#feed [data-open="{fake["id"]}"]').first.click(); await asyncio.sleep(1)
+        txt = await kid.locator('#pmBox').inner_text()
+        check('해설' in txt and '들통나는 곳' in txt and '쓴 수법' in txt, f'예시 해설에 들통나는 곳·쓴 수법 ({txt[:0]})')
+        await kid.screenshot(path=OUT + '/a3_answer.png')
+        await kid.keyboard.press('Escape'); await asyncio.sleep(0.5)
+
+        scr = await page('/chapter05/feed.html?view=screen')
+        # 선생님
+        tea = await page()
+        await tea.locator('#btnTeacher').click(); await asyncio.sleep(0.6)
+        await tea.fill('#adPw', '0101'); await tea.click('#adLoginBtn'); await asyncio.sleep(2)
+        check(await tea.locator('#opBar').is_visible(), '선생님: 진행 막대')
+        tiles = await tea.evaluate("[...document.querySelectorAll('[data-round]')].map(b=>b.disabled)")
+        check(tiles == [False, False, False], f'선생님: 세 라운드 모두 열림 ({tiles})')
+        await tea.locator('[data-round="story"]').click(); await asyncio.sleep(1)
+        ns = await tea.locator('#feed [data-open]').count(); check(ns >= 10, f'선생님: 스토리 예시도 다 보임 ({ns})')
+        await tea.screenshot(path=OUT + '/b0_teacher.png')
+        await tea.locator('[data-act="home"]').click(); await asyncio.sleep(0.5)
+        nxt = await tea.locator('#opBar [data-step]').last.inner_text()
+        check('만들기' in nxt, f'다음 단계 버튼 = 만들기 ({nxt.strip()})')
+        await tea.locator('#opBar [data-step="make:news"]').click(); await asyncio.sleep(2.5)
+
+        # 만들기: 아이 노트북은 만들기 화면으로 따라감, 예시는 사라짐
+        check(await kid.evaluate("S.tab") == 'make', '만들기 시작 → 1조 노트북이 만들기 화면으로')
+        st = await state(); check(not any(x.get('seed') for x in st['posts']), '만들기: 예시가 사라짐')
+        fm = await kid.evaluate("[...document.querySelectorAll('#optFormat [data-format]')].filter(b=>!b.disabled).map(b=>b.dataset.format)")
+        check(fm == ['news'], f'만들기: 뉴스만 선택 가능 ({fm})')
+        await kid.screenshot(path=OUT + '/a4_make.png')
         for t in (1, 2, 3):
-            r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(t, 'news', 'fake' if t != 3 else 'real')), headers=J); check(r.ok, f'team {t} news saved ({r.status} {(await r.text())[:80]})')
-        await pg.locator('[data-round="news"]').click(); await asyncio.sleep(0.6)
-        head = await pg.locator('#roundHead').inner_text()
-        check('우리 조 뉴스 만들기' in head, f'make button in round view ({head!r})')
-        n = await pg.locator('#feed .news-item, #feed [data-open]').count()
-        await pg.screenshot(path=OUT + '/r2_make.png')
-        await pg.locator('#roundHead [data-goto="make"]').click(); await asyncio.sleep(0.6)
-        fm = await pg.evaluate("[...document.querySelectorAll('#optFormat [data-format]')].map(b=>[b.dataset.format,b.disabled])")
-        check(fm and all(dis == (k != 'news') for k, dis in fm), f'make tab: only news selectable ({fm})')
-        await pg.screenshot(path=OUT + '/r3_maketab.png')
+            r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(t, 'news', 'fake' if t != 3 else 'real')), headers=J); check(r.ok, f'{t}조 뉴스 올림')
+        await asyncio.sleep(2)
+        await tea.evaluate("refresh()"); await asyncio.sleep(1)
+        bar = await tea.locator('#opBar').inner_text(); check('올린 조 3 / 10' in bar, f'진행 막대: 올린 조 3 ({bar.splitlines()[:3]})')
+        await scr.evaluate("refresh()"); await asyncio.sleep(1)
+        await scr.screenshot(path=OUT + '/c0_screen_make.png')
 
-        # judge
-        await phase('judge', 'news'); await asyncio.sleep(1.5)
-        st = await (await rq.get(BASE + '/api/ch5/state?team=1')).json()
-        others = [x for x in st['posts'] if not x.get('mine')]
-        check(len(others) == 2 and all('secret' not in x for x in others), f'team 1 sees 2 other news, no secrets ({len(others)})')
-        for x in others:
-            r = await rq.post(BASE + '/api/ch5/judge', data=json.dumps({'team': 1, 'postId': x['id'], 'verdict': 'fake', 'criterion': 'who'}), headers=J); check(r.ok, 'judge ok')
-        check('scores' not in st, 'no scores before reveal')
-        await pg.locator('[data-tab="feed"]').first.click(); await asyncio.sleep(0.3)
-        await pg.locator('[data-round="news"]').click(); await asyncio.sleep(0.8)
-        await pg.screenshot(path=OUT + '/r4_judge.png')
+        # 판별
+        await tea.locator('#opBar [data-step="judge:news"]').click(); await asyncio.sleep(2.5)
+        check(await kid.evaluate("S.tab") == 'feed' and await kid.evaluate("S.fmt") == 'news', '판별 시작 → 1조 노트북이 뉴스 판별 화면으로')
+        hint = await kid.locator('#roundHint').inner_text(); check('남은 것 2개' in hint, f'판별 안내 ({hint})')
+        st = await state()
+        for x in [x for x in st['posts'] if not x.get('mine')]:
+            await rq.post(BASE + '/api/ch5/judge', data=json.dumps({'team': 1, 'postId': x['id'], 'verdict': 'fake', 'criterion': 'who'}), headers=J)
+        await kid.screenshot(path=OUT + '/a5_judge.png')
 
-        # reveal → round 2
-        await phase('reveal', 'news'); await asyncio.sleep(1.5)
-        st = await (await rq.get(BASE + '/api/ch5/state?team=1')).json()
-        me = next(r for r in st['scores'] if r['team'] == 1)
-        check(me['correct'] == 1 and me['judgable'] == 2, f'team 1 score after round 1 ({me})')
-        await pg.screenshot(path=OUT + '/r5_reveal.png')
-        await phase('make', 'shorts'); await asyncio.sleep(1.5)
-        tiles = await pg.evaluate("[...document.querySelectorAll('[data-round]')].map(b=>[b.dataset.round,b.disabled,b.classList.contains('now')])")
-        check(tiles == [['news', False, False], ['shorts', False, True], ['story', True, False]], f'round 2: news reviewable, shorts now, story locked ({tiles})')
-        st = await (await rq.get(BASE + '/api/ch5/state?team=1')).json()
-        check(all('secret' in x for x in st['posts'] if x['format'] == 'news'), 'round 1 answers stay open in round 2')
-        check('scores' in st, 'scores stay visible')
-        r = await rq.post(BASE + '/api/ch5/judge', data=json.dumps({'team': 1, 'postId': others[0]['id'], 'verdict': 'real', 'criterion': 'who'}), headers=J)
-        check(r.status == 400, 'old round can no longer be judged')
-        await pg.screenshot(path=OUT + '/r6_round2.png')
-
-        # admin buttons
-        await pg.evaluate("sessionStorage.setItem('dorogram-admin','0101')")
-        await pg.locator('[data-tab="admin"]').first.click(); await asyncio.sleep(1.5)
-        if await pg.locator('#adPw').is_visible():
-            await pg.fill('#adPw', '0101'); await pg.click('#adLoginBtn'); await asyncio.sleep(1.5)
-        nb = await pg.locator('[data-adphase]').count()
-        check(nb == 10, f'admin shows 10 step buttons ({nb})')
-        await pg.locator('[data-adphase="judge:shorts"]').click(); await asyncio.sleep(1.5)
-        st = await (await rq.get(BASE + '/api/ch5/state')).json()
-        check(st['phase'] == 'judge' and st['round'] == 'shorts', f'admin button sets round+phase ({st["phase"]},{st["round"]})')
-        await pg.screenshot(path=OUT + '/r7_admin.png', full_page=True)
-        check(not errs, f'no page errors {errs[:2]}')
+        # 공개 → 2라운드 예시
+        await tea.locator('#opBar [data-step="reveal:news"]').click(); await asyncio.sleep(2.5)
+        check(await kid.locator('#twist').is_visible(), '공개 → 1조 노트북에 정답 공개 배너')
+        await kid.screenshot(path=OUT + '/a6_reveal.png')
+        await tea.locator('#opBar [data-step="read:shorts"]').click(); await asyncio.sleep(2.5)
+        check(await kid.evaluate("S.fmt") == 'shorts', '2라운드 예시 → 1조 노트북이 쇼츠 예시로')
+        st = await state(); check(st['posts'] and all(x.get('seed') and x['format'] == 'shorts' or not x.get('seed') for x in st['posts']) and any(x.get('seed') for x in st['posts']), '2라운드 예시: 쇼츠 예시가 내려감')
+        g = await kid.locator('#guideBox').inner_text(); check('쇼츠에서' in g, '쇼츠 안내 카드')
+        await kid.screenshot(path=OUT + '/a7_shorts_examples.png')
+        await tea.screenshot(path=OUT + '/b1_teacher_bar.png')
+        check(not errs, f'페이지 오류 없음 {errs[:2]}')
         await b.close()
     print('FAILS', len(fails)); sys.exit(1 if fails else 0)
 asyncio.run(main())

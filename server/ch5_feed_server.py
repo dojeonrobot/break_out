@@ -183,6 +183,20 @@ def any_revealed():
     return round_idx(DB.get('round')) > 0 or DB['phase'] == 'reveal'
 
 
+def round_progress():
+    """이번 라운드 현황(내용 없이 숫자만): 올린 조, 조마다 판별한 수, 조 게시물 수. 진행 화면·운영자 막대용."""
+    rd = DB.get('round')
+    posts = [p for p in DB['posts'] if not p.get('seed') and p['status'] == 'approved' and p.get('format') == rd]
+    ids = {p['id'] for p in posts}
+    judged = {}
+    for k in DB['judgments']:
+        pid, t = k.rsplit(':', 1)
+        if pid in ids:
+            judged[t] = judged.get(t, 0) + 1
+    return {'submitted': sorted({p['team'] for p in posts}), 'judged': judged, 'posts': len(posts),
+            'seeds': sum(1 for p in DB['posts'] if p.get('seed') and p['status'] == 'approved' and p.get('format') == rd)}
+
+
 def compute_scores():
     """공개 단계 점수: 맞힌 판별 1점(근거 기준을 고른 경우만), 우리 조 가짜를 진짜라고 한 조마다 1점."""
     n = DB['teamCount']
@@ -239,7 +253,8 @@ def public_post(p, team, admin=False):
     if p.get('seed'):
         out['seed'] = True
         if admin or reveal or (team and judgment_key(p['id'], team) in DB['judgments']):
-            out['answer'] = p.get('answer')   # 연습: 판정하자마자 해설이 열림
+            sec = p.get('secret') or {}   # 연습: 판정하자마자 해설 + 어디서 들통나는지(기준)·쓴 수법까지 열림
+            out['answer'] = dict(p.get('answer') or {}, tactic=sec.get('tactic') or '', criterion=sec.get('clueCriterion') or '')
     if admin or reveal:
         out.update(seed=bool(p.get('seed')), team=p['team'], secret=p.get('secret'), answer=p.get('answer'),
                    aiGenerated=p.get('aiGenerated'), aiPrompt=p.get('aiPrompt'), counts=verdict_counts(p['id']))
@@ -251,8 +266,10 @@ def public_post(p, team, admin=False):
 def visible_to(p, team, admin):
     if admin:
         return True
-    if p['status'] != 'approved' or p.get('seed'):   # 예제는 학생 화면에 보내지 않음 (2026-11-09)
+    if p['status'] != 'approved':
         return False
+    if p.get('seed'):   # 예시는 그 라운드의 「예시 보기」 때만 (2026-11-09)
+        return DB['phase'] == 'read' and p.get('format') == DB.get('round')
     if team and p['team'] == team:
         return True
     # 다른 조 게시물은 그 라운드의 판별 시간부터 보인다 (만드는 동안 새 글이 뜨면 조 게시물인 게 티 남)
@@ -270,6 +287,7 @@ def state_for(team, admin=False):
     res = {'version': DB['version'], 'phase': DB['phase'], 'round': DB.get('round', ROUNDS[0]), 'rounds': ROUNDS, 'teamCount': DB['teamCount'], 'posts': posts, 'myJudgments': mine,
            'aiQuota': AI_QUOTA, 'aiUsed': DB['aiUsed'].get(str(team), 0) if team else 0,
            'aiEnabled': bool(GEMINI_KEY), 'maxPosts': MAX_POSTS_PER_TEAM}
+    res['progress'] = round_progress()
     if admin or any_revealed():
         res['scores'] = compute_scores()
     if admin:
@@ -632,8 +650,8 @@ class Handler(BaseHTTPRequestHandler):
             if p['team'] == team:
                 raise ValueError('우리 조 게시글은 판별하지 않습니다.')
             if p.get('seed'):
-                if DB['phase'] == 'reveal':
-                    raise ValueError('정답 공개 중에는 판정을 바꿀 수 없습니다.')
+                if DB['phase'] != 'read' or p.get('format') != DB.get('round'):
+                    raise ValueError('예시는 예시 보기 시간에만 골라 볼 수 있습니다.')
             elif DB['phase'] != 'judge' or p.get('format') != DB.get('round'):
                 raise ValueError('이번 라운드 게시물만 판별 시간에 판별할 수 있습니다.')
             DB['judgments'][judgment_key(p['id'], team)] = {

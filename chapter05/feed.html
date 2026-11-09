@@ -528,6 +528,63 @@
 
     /* ---------- 조 고르기·토스트·스켈레톤 ---------- */
     .modal { position: fixed; inset: 0; z-index: 50; background: rgba(14, 20, 34, .72); display: grid; place-items: center; padding: 16px; }
+    /* 조 선택 (2026-11-09 새 디자인) */
+    .tp { position: fixed; inset: 0; z-index: 60; overflow: auto; background: var(--bg); display: grid; place-items: center; padding: 32px 16px; }
+    .tp[hidden] { display: none; }
+    .tp::before { content: ""; position: fixed; inset: -20% -10% auto; height: 60vh; background: radial-gradient(60% 60% at 30% 40%, color-mix(in srgb, #d62976 16%, transparent), transparent 70%), radial-gradient(50% 60% at 75% 30%, color-mix(in srgb, #fa7e1e 14%, transparent), transparent 70%); pointer-events: none; }
+    .tp-box { position: relative; width: min(820px, 100%); display: grid; gap: 28px; }
+    .tp-head { text-align: center; display: grid; gap: 10px; justify-items: center; }
+    .tp-logo { font-family: "Grand Hotel", cursive; font-size: 54px; line-height: 1; color: var(--ink); }
+    .tp-head h2 { margin: 0; font-size: clamp(22px, 3vw, 30px); font-weight: 900; letter-spacing: -0.01em; word-break: keep-all; }
+    .tp-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    @media (max-width: 760px) { .tp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .tp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } }
+    .tp-team { position: relative; display: grid; justify-items: center; gap: 10px; padding: 20px 8px 16px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; box-shadow: 0 1px 2px color-mix(in srgb, #262626 6%, transparent); transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s, border-color .18s; }
+    .tp-team .ring { width: clamp(64px, 9vw, 88px); aspect-ratio: 1; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
+    .tp-team .ring span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); border: 3px solid var(--surface); font-size: clamp(26px, 3.4vw, 34px); font-weight: 900; font-variant-numeric: tabular-nums; }
+    .tp-team b { font-size: 15px; }
+    .tp-team em { position: absolute; top: 8px; right: 8px; font-style: normal; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+    .tp-team:hover { transform: translateY(-3px); border-color: transparent; box-shadow: 0 10px 28px color-mix(in srgb, #d62976 18%, transparent); }
+    .tp-team:active { transform: translateY(0) scale(.98); }
+    .tp-team:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .tp-foot { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .tp-foot button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .tp-foot button:hover { color: var(--ink); }
+    @media (prefers-reduced-motion: no-preference) {
+      .tp:not([hidden]) .tp-team { animation: tpIn .45s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--i) * 28ms); }
+      @keyframes tpIn { from { opacity: 0; transform: translateY(10px); } }
+    }
+    /* 진행 막대: 운영자·진행 화면 */
+    .opbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 16px 18px; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+    @media (min-width: 1024px) { .opbar { margin: 0 0 18px; } }
+    .opbar .now { display: grid; gap: 2px; min-width: 0; }
+    .opbar .now small { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .opbar .now b { font-size: 18px; }
+    .opbar .prog { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; min-width: 220px; }
+    .opbar .prog > span { font-size: 13px; font-weight: 700; margin-right: 4px; }
+    .opbar .tm { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; font-size: 12px; font-weight: 800; font-style: normal; background: var(--surface-2); color: var(--muted); }
+    .opbar .tm.on { background: var(--real); color: #fff; }
+    .opbar .tm.part { background: color-mix(in srgb, var(--real) 25%, var(--surface-2)); color: var(--ink); }
+    .opbar .acts { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+    .opbar .acts .btn { min-height: 40px; }
+    body.screen .opbar .now b { font-size: 26px; } body.screen .opbar .tm { min-width: 40px; height: 40px; font-size: 15px; }
+    .guide { margin: 0 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    @media (min-width: 1024px) { .guide { margin: 0 0 18px; } }
+    .guide > summary { display: flex; align-items: center; gap: 8px; padding: 14px 16px; cursor: pointer; font-weight: 800; font-size: 16px; list-style: none; }
+    .guide > summary::-webkit-details-marker { display: none; }
+    .guide > summary .chev { margin-left: auto; transition: transform .2s; } .guide[open] > summary .chev { transform: rotate(180deg); }
+    .guide-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0 16px 16px; }
+    @media (max-width: 900px) { .guide-cols { grid-template-columns: 1fr; } }
+    .guide-col { border-radius: 10px; padding: 12px 14px; background: var(--surface-2); }
+    .guide-col.fake { background: var(--fake-bg); } .guide-col.real { background: var(--real-bg); }
+    .guide-col h4 { margin: 0 0 8px; font-size: 14px; } .guide-col.fake h4 { color: var(--fake); } .guide-col.real h4 { color: var(--real); }
+    .guide-col ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; line-height: 1.55; word-break: keep-all; }
+    .ans-meta { display: grid; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, currentColor 30%, transparent); font-size: 13.5px; line-height: 1.5; }
+    .round-hint { margin: -4px 16px 14px; font-size: 14px; color: var(--muted); }
+    @media (min-width: 1024px) { .round-hint { margin: -4px 0 14px; } }
+    .make-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .make-head h2 { margin: 0; font-size: 20px; }
+    .make-head .back { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
     .modal-box { background: var(--surface); border-radius: 20px; padding: 24px; width: min(460px, 100%); } .modal-box h2 { margin: 0 0 4px; }
     .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 12px; }
     .team-grid button { aspect-ratio: 1; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 2px #d62976; background: var(--surface-2); font-weight: 800; font-size: 20px; }
@@ -571,15 +628,13 @@
     <!-- 홈: 스토리 줄 / 쇼츠 / 뉴스 -->
     <section id="tab-feed">
       <div id="twist" hidden></div>
+      <div class="opbar" id="opBar" hidden></div>
       <div class="rounds" id="rounds" role="group" aria-label="라운드"></div>
       <div id="roundView" hidden>
       <div class="round-head" id="roundHead"></div>
-      <div class="filters" role="group" aria-label="게시물 거르기">
-        <button class="chip" data-filter="all" aria-pressed="true">전체</button>
-        <button class="chip" data-filter="todo" aria-pressed="false">아직 판별 안 함</button>
-        <button class="chip" data-filter="mine" aria-pressed="false" hidden>우리 조가 만든 것</button>
-        <span class="cnt" id="feedCnt"></span>
-      </div>
+      <p class="round-hint" id="roundHint" hidden></p>
+      <div id="guideBox"></div>
+      <div class="filters" id="filters" role="group" aria-label="게시물 거르기"></div>
       <div class="round-list" id="feed"><div class="skeleton"></div></div>
       </div>
     </section>
@@ -589,6 +644,8 @@
 
     <!-- 만들기 -->
     <section id="tab-make" hidden>
+      <div class="make-head" id="makeHead"></div>
+      <div id="makeGuide"></div>
       <div class="mk-top">
         <div class="mission" id="missionCard"></div>
         <div class="make-notice" id="makeNotice" hidden></div>
@@ -747,12 +804,14 @@
     <button class="pm-nav next" id="pmNext" aria-label="다음 게시물"><i data-lucide="chevron-right" class="icon"></i></button>
   </div>
   <div class="prof" id="prof" hidden role="dialog" aria-modal="true" aria-label="계정 정보"><div class="prof-box" id="profBox"></div></div>
-  <div class="modal" id="teamModal" hidden>
-    <div class="modal-box">
-      <h2>우리 조를 골라 주세요</h2>
-      <p class="muted small">이 노트북에서 판별하고 게시물을 올릴 조입니다.</p>
-      <div class="team-grid" id="teamGrid"></div>
-      <button class="btn btn-ghost" id="btnScreen" type="button"><i data-lucide="monitor" class="icon"></i>진행 화면으로 보기 (판별 안 함)</button>
+  <div class="tp" id="teamModal" hidden role="dialog" aria-modal="true" aria-labelledby="tpTitle">
+    <div class="tp-box">
+      <div class="tp-head"><div class="tp-logo">Dorogram</div><h2 id="tpTitle">우리 조를 골라 주세요</h2></div>
+      <div class="tp-grid" id="teamGrid"></div>
+      <div class="tp-foot">
+        <button id="btnScreen" type="button"><i data-lucide="monitor" class="icon"></i>진행 화면</button>
+        <button id="btnTeacher" type="button"><i data-lucide="key-round" class="icon"></i>선생님</button>
+      </div>
     </div>
   </div>
   <div class="toast" id="toast" hidden></div>
@@ -776,7 +835,11 @@ const ROUND_ORDER = ['news', 'shorts', 'story'], ROUND_LABEL = { news: '뉴스',
 const roundIdx = f => Math.max(0, ROUND_ORDER.indexOf(f));
 const curRound = () => (S.data && S.data.round) || 'news';
 /* 그 형식 라운드가 정답 공개까지 갔는지 (서버 post_revealed와 같은 규칙) */
-const revealed = p => !!S.data && (roundIdx(p.format) < roundIdx(curRound()) || (p.format === curRound() && S.data.phase === 'reveal'));
+const isAdmin = () => !!(typeof AD !== 'undefined' && AD.key);
+const STEP_ORDER = ROUND_ORDER.flatMap(f => ['read', 'make', 'judge', 'reveal'].map(k => [k, f]));
+const STEP_LABEL = { read: '예시 보기', make: '만들기', judge: '판별', reveal: '정답 공개' };
+const stepName = (k, f) => `${roundIdx(f) + 1}라운드 ${ROUND_LABEL[f]} · ${STEP_LABEL[k]}`;
+const revealed = p => isAdmin() || !!S.data && (roundIdx(p.format) < roundIdx(curRound()) || (p.format === curRound() && S.data.phase === 'reveal'));
 const truthOf = p => p.seed ? p.answer?.truth : (p.secret?.truth || 'fake');
 const ic = (n, cls = '') => `<i data-lucide="${n}"${cls ? ` class="${cls}"` : ''}></i>`;
 const vbadge = (a, lg) => a && a.verified ? `<span class="vb${lg ? ' lg' : ''}" title="도로그램 인증 계정">${ic('check')}</span>` : '';
@@ -806,15 +869,31 @@ async function api(path, body) {
 
 // ---------- 조 선택 ----------
 function renderTeamGrid(n) {
-  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => `<button type="button" aria-label="${i + 1}조" data-team="${i + 1}">${i + 1}</button>`).join('');
+  const last = +load('dorogram-team') || 0;
+  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => i + 1).map(t => `<button type="button" class="tp-team" style="--i:${t}" aria-label="${t}조" data-team="${t}">${t === last ? '<em>최근</em>' : ''}<span class="ring"><span>${t}</span></span><b>${t}조</b></button>`).join('');
+}
+/* 선생님(운영자): 조 없이 모든 라운드·게시물·정답을 본다 */
+function enterAdmin(silent) {
+  S.team = null; S.screen = false; document.body.classList.remove('screen'); document.body.classList.add('admin');
+  $('#teamChipTxt').textContent = 'T'; $('#sbTeamAv').textContent = 'T'; $('#sbTeamTxt').textContent = '선생님';
+  $('#teamModal').hidden = true; S.fmt = null; S.filter = 'all';
+  showTab('feed'); refresh();
+  if (!silent) toast('선생님 화면입니다. 모든 게시물과 정답이 보입니다.');
+}
+function leaveAdmin() {
+  AD.key = null; AD.data = null; try { sessionStorage.removeItem('dorogram-admin'); } catch (e) {}
+  document.body.classList.remove('admin'); S.fmt = null; showTab('feed'); $('#teamModal').hidden = false;
 }
 async function initTeam() {
   $('#btnScreen').onclick = () => setTeam(0);
+  $('#btnTeacher').onclick = () => { $('#teamModal').hidden = true; showTab('admin'); };
+  try { AD.key = sessionStorage.getItem('dorogram-admin'); } catch (e) {}
   $('#teamChip').onclick = $('#sbTeam').onclick = () => $('#teamModal').hidden = false;
   $('#teamGrid').addEventListener('click', e => { const b = e.target.closest('[data-team]'); if (b) setTeam(+b.dataset.team); });
   const q = new URLSearchParams(location.search);
   const fixed = q.get('view') === 'screen' ? '0' : q.get('team');   /* 주소에 조가 박혀 있을 때만 건너뜀 */
   renderTeamGrid(10);
+  if (AD.key) { renderTeamGrid(10); enterAdmin(true); return; }   /* 선생님 로그인이 남아 있으면 바로 선생님 화면 */
   if (fixed === null || fixed === '') $('#teamModal').hidden = false;   /* 들어오면 먼저 조부터 고름 (2026-11-09 사용자) */
   let n = 10;
   try { const d = await api('/state'); n = d.teamCount || 10; } catch (e) {}
@@ -823,7 +902,7 @@ async function initTeam() {
   else { $('#teamModal').hidden = false; refresh(); }
 }
 function setTeam(t, silent) {
-  S.team = t || null; S.screen = t === 0;
+  S.team = t || null; S.screen = t === 0; document.body.classList.remove('admin');
   store('dorogram-team', String(t));
   document.body.classList.toggle('screen', S.screen);
   $('#teamChipTxt').textContent = S.screen ? '화면' : t;
@@ -844,15 +923,20 @@ setInterval(() => { if (!es || es.readyState === 2) connect(); }, 10000);
 
 async function refresh() {
   try {
-    const d = await api('/state' + (S.team ? '?team=' + S.team : ''));
+    const d = isAdmin() ? await adApi('/admin/state') : await api('/state' + (S.team ? '?team=' + S.team : ''));
     const phaseChanged = S.data && S.data.phase !== d.phase;
     const roundChanged = S.data && S.data.round !== d.round;
     const teamsChanged = !S.data || S.data.teamCount !== d.teamCount;
     S.data = d; S.version = d.version;
     if (teamsChanged) renderTeamGrid(d.teamCount);
     if (S.team && S.team > d.teamCount) { S.team = null; $('#teamModal').hidden = false; }
-    if (roundChanged && S.fmt && S.fmt !== d.round) S.fmt = null;   /* 라운드가 넘어가면 첫 화면(타일)으로 */
     if (!S.form || (roundChanged && !S.editing)) resetForm();
+    if ((phaseChanged || roundChanged) && !isAdmin() && (S.team || S.screen) && ['feed', 'make'].includes(S.tab) && $('#teamModal').hidden) {
+      /* 선생님이 단계를 넘기면 아이들 노트북·진행 화면이 지금 할 화면으로 따라감 */
+      const say = { read: `${ROUND_LABEL[d.round]} 예시가 열렸어요`, make: `우리 조 ${ROUND_LABEL[d.round]}를 만들 시간이에요`, judge: `다른 조 ${ROUND_LABEL[d.round]}를 판별할 시간이에요`, reveal: '정답 공개!' }[d.phase];
+      if (d.phase === 'make' && S.team) { S.fmt = d.round; showTab('make'); } else { showTab('feed'); S.fmt = d.round; S.filter = 'all'; }
+      if (say) toast(say);
+    }
     render();
 
   } catch (e) {
@@ -864,10 +948,9 @@ async function refresh() {
 function render() {
   const d = S.data;
   $$('[data-tab="score"]').forEach(b => b.hidden = !d.scores);
-  $$('[data-tab="make"]').forEach(b => b.hidden = S.screen);
-  $('[data-filter="mine"]').hidden = S.screen || !(d.posts || []).some(p => p.mine);
-  if ((S.tab === 'score' && !d.scores) || (S.tab === 'make' && S.screen)) showTab('feed');
+  if ((S.tab === 'score' && !d.scores) || (S.tab === 'make' && (S.screen || isAdmin() || !S.team || d.phase !== 'make'))) { showTab('feed'); S.fmt = d.round; }
   if (S.tab === 'admin' && AD.key) adRefresh();
+  $$('[data-tab="make"]').forEach(b => b.hidden = true);   /* 만들기는 라운드 타일에서 들어감 */
   renderTwist(); renderFeed(); renderMake(); renderScores(); icons();
 }
 function showTab(t) {
@@ -885,8 +968,10 @@ function showTab(t) {
 // 어떤 게시물을 보여 줄지: 예제는 살펴보기·만들기 단계에, 조 게시물은 판별·공개 단계에. 칩으로 바꿀 수 있음.
 function feedPosts() {
   const d = S.data;
-  let posts = d.posts.filter(p => p.status === 'approved' && !p.seed && (!S.fmt || p.format === S.fmt));   /* 예제는 학생 화면에 띄우지 않음 (2026-11-09 사용자) */
-  if (S.filter === 'mine') posts = posts.filter(p => p.mine);
+  let posts = d.posts.filter(p => p.status === 'approved' && (!S.fmt || p.format === S.fmt));   /* 예시는 서버가 그 라운드 예시 보기 때만 보냄, 선생님은 전부 */
+  if (S.filter === 'seed') posts = posts.filter(p => p.seed);
+  else if (S.filter === 'team') posts = posts.filter(p => !p.seed);
+  else if (S.filter === 'mine') posts = posts.filter(p => p.mine);
   else {
     if (S.filter === 'todo') posts = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]);
   }
@@ -895,10 +980,12 @@ function feedPosts() {
 function canJudge(p) {
   if (!S.team || p.mine) return false;
   const ph = S.data.phase;
-  return !p.seed && ph === 'judge' && p.format === curRound();
+  if (isAdmin() || p.format !== curRound()) return false;
+  return p.seed ? ph === 'read' : ph === 'judge';
 }
 function stateBadge(p, cls) {
   const mine = S.data.myJudgments[p.id], reveal = revealed(p);
+  if (isAdmin()) { const t = truthOf(p); return `<span class="${cls} ts-${t}">${p.seed ? '예시' : (p.team || '?') + '조'} · ${t === 'real' ? '진짜' : '가짜'}</span>`; }
   if (p.seed && p.answer) { const t = p.answer.truth; return `<span class="${cls} ts-${t}">${t === 'real' ? '진짜' : '가짜'}${mine ? (mine.verdict === t ? ' · 맞힘' : ' · 틀림') : ''}</span>`; }
   if (reveal) { const t = truthOf(p); return `<span class="${cls} ts-${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
   if (mine) return `<span class="${cls} ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
@@ -974,23 +1061,73 @@ function newsItemHTML(p) {
 
 /* 첫 화면: 라운드 타일 3개(뉴스 → 쇼츠 → 스토리). 지금 라운드만 열리고, 끝난 라운드는 다시 볼 수 있고, 다음 라운드는 잠김 (2026-11-09 사용자) */
 function renderRounds() {
-  const cur = roundIdx(curRound());
+  const cur = roundIdx(curRound()), adm = isAdmin();
   $('#rounds').innerHTML = ROUND_ORDER.map((f, i) => {
-    const now = i === cur, past = i < cur, n = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved' && !p.seed).length;
-    const st = now ? '지금 라운드' : past ? `끝난 라운드 · 게시물 ${n}개` : '앞 라운드가 끝나면 열립니다';
-    return `<button type="button" class="round-tile${now ? ' now' : ''}" data-round="${f}" ${now || past ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${now || past ? '' : ' (잠김)'}">
-      <span class="rt-ic">${ic(now || past ? ROUND_ICON[f] : 'lock')}</span><span><small>${i + 1}라운드</small><b>${ROUND_LABEL[f]}</b></span><span class="rt-st">${st}</span></button>`;
+    const now = i === cur, past = i < cur, open = now || past || adm, all = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved');
+    const n = all.filter(p => !p.seed).length;
+    const st = adm ? (now ? STEP_LABEL[S.data.phase] + ' 중' : '') + `${now ? ' · ' : ''}예시 ${all.length - n} · 조 게시물 ${n}`
+      : now ? '지금 라운드' : past ? `끝난 라운드 · 게시물 ${n}개` : '앞 라운드가 끝나면 열립니다';
+    return `<button type="button" class="round-tile${now ? ' now' : ''}" data-round="${f}" ${open ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
+      <span class="rt-ic">${ic(open ? ROUND_ICON[f] : 'lock')}</span><span><small>${i + 1}라운드</small><b>${ROUND_LABEL[f]}</b></span><span class="rt-st">${st}</span></button>`;
   }).join('');
+}
+/* 진행 막대: 선생님(다음 단계 버튼 포함)과 진행 화면에만. 이번 라운드에 올린 조·판별 끝낸 조를 번호로 보여 줌 */
+function renderOpBar() {
+  const box = $('#opBar'), d = S.data, adm = isAdmin();
+  if (!adm && !S.screen) { box.hidden = true; return; }
+  const pr = d.progress || { submitted: [], judged: {}, posts: 0, seeds: 0 }, n = d.teamCount, teams = Array.from({ length: n }, (_, i) => i + 1);
+  let prog = '';
+  if (d.phase === 'read') prog = `<span>예시 ${pr.seeds}개</span>`;
+  else if (d.phase === 'make') prog = `<span>올린 조 ${pr.submitted.length} / ${n}</span>` + teams.map(t => `<i class="tm${pr.submitted.includes(t) ? ' on' : ''}">${t}</i>`).join('');
+  else if (d.phase === 'judge') { const need = t => pr.posts - (pr.submitted.includes(t) ? 1 : 0), done = t => (pr.judged[t] || 0) >= need(t) && need(t) > 0;
+    prog = `<span>판별 끝낸 조 ${teams.filter(done).length} / ${n}</span>` + teams.map(t => `<i class="tm${done(t) ? ' on' : (pr.judged[t] ? ' part' : '')}" title="${t}조 ${pr.judged[t] || 0} / ${need(t)}">${t}</i>`).join(''); }
+  else if (d.scores) prog = `<span>순위</span>` + d.scores.slice(0, 3).map((r, i) => `<i class="tm on">${i + 1}위 ${r.team}조</i>`).join('');
+  const k = STEP_ORDER.findIndex(([ph, f]) => ph === d.phase && f === d.round), next = STEP_ORDER[k + 1], prev = STEP_ORDER[k - 1];
+  box.hidden = false;
+  box.innerHTML = `<div class="now"><small>${adm ? '선생님 화면' : '진행 화면'}</small><b>${stepName(d.phase, d.round)}</b></div><div class="prog">${prog}</div>
+    ${adm ? `<div class="acts">${prev ? `<button type="button" class="btn btn-ghost" data-step="${prev.join(':')}">${ic('chevron-left')}이전</button>` : ''}
+      ${next ? `<button type="button" class="btn btn-primary" data-step="${next.join(':')}">다음: ${esc(stepName(...next))}${ic('chevron-right')}</button>` : ''}
+      <button type="button" class="btn btn-ghost" data-act="leave-admin">선생님 화면 끝내기</button></div>` : ''}`;
+}
+async function goStep(spec) {
+  const [phase, round] = spec.split(':');
+  if (!confirm(`모든 노트북이 「${stepName(phase, round)}」 화면으로 바뀝니다. 넘길까요?`)) return;
+  try { await adApi('/admin/phase', { phase, round }); await refresh(); toast(stepName(phase, round)); } catch (e) { toast(e.message); }
+}
+/* 형식별 안내: 확인할 곳 / 가짜가 숨는 곳 / 진짜의 특징 (예시 보기 때 펼침, 만들기 때 접힘) */
+function guideHTML(f, open) {
+  const g = (C.FORMAT_GUIDE || {})[f]; if (!g) return '';
+  const col = (cls, t, list) => `<div class="guide-col ${cls}"><h4>${t}</h4><ul>${list.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+  return `<details class="guide"${open ? ' open' : ''}><summary>${ic('lightbulb')}${ROUND_LABEL[f]}에서 진짜·가짜 가려내기${ic('chevron-down', 'chev')}</summary>
+    <div class="guide-cols">${col('', '확인할 곳', g.look)}${col('fake', '가짜가 숨는 곳', g.fake)}${col('real', '진짜의 특징', g.real)}</div></details>`;
+}
+function renderFilters(posts) {
+  const d = S.data, adm = isAdmin(), now = S.fmt === curRound(), chips = [['all', '전체']];
+  if (adm) chips.push(['seed', '예시'], ['team', '조 게시물']);
+  else {
+    if (now && d.phase === 'judge') chips.push(['todo', '아직 판별 안 함']);
+    if (d.posts.some(p => p.mine && p.format === S.fmt)) chips.push(['mine', '우리 조가 만든 것']);
+  }
+  if (!chips.some(c => c[0] === S.filter)) S.filter = 'all';
+  $('#filters').innerHTML = (chips.length > 1 ? chips.map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`).join('') : '')
+    + `<span class="cnt">${posts.length}개</span>`;
 }
 function renderFeed() {
   const d = S.data, home = !S.fmt;
+  renderOpBar();
   $('#rounds').hidden = !home; $('#roundView').hidden = home;
   if (home) { renderRounds(); renderModal(); return; }
-  const f = S.fmt, now = f === curRound(), posts = feedPosts(), judging = now && d.phase === 'judge';
+  const f = S.fmt, now = f === curRound(), posts = feedPosts(), adm = isAdmin(), L = ROUND_LABEL[f];
   const canMakeNow = now && d.phase === 'make' && !S.screen && S.team;
-  $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${ROUND_LABEL[f]}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${ROUND_LABEL[f]} 만들기</button>` : ''}`;
-  const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase !== 'judge' && d.phase !== 'reveal' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
-  $('#feedCnt').textContent = `${judging ? '판별할 게시물' : '게시물'} ${posts.length}개`;
+  $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${L}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${L} 만들기</button>` : ''}`;
+  const left = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]).length;
+  const hint = adm || !now ? '' : d.phase === 'read' ? `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`
+    : d.phase === 'make' ? (S.team ? `우리 조 ${L}를 만들 시간이에요.` : `조마다 ${L}를 만들고 있어요.`)
+    : d.phase === 'judge' ? (S.team ? `다른 조 ${L}를 눌러 판별하세요. 남은 것 ${left}개` : `다른 조 ${L}를 판별하는 시간이에요.`) : '';
+  $('#roundHint').hidden = !hint; $('#roundHint').textContent = hint;
+  $('#guideBox').innerHTML = (now && d.phase === 'read') || adm ? guideHTML(f, now && d.phase === 'read') : '';
+  renderFilters(posts);
+  const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase === 'make' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
   $('#feed').innerHTML = !posts.length ? `<div class="panel-empty">${empty}</div>`
     : f === 'story' ? `<div class="tray">${posts.map(trayHTML).join('')}</div>`
     : f === 'shorts' ? `<div class="shorts-grid">${posts.map(tileHTML).join('')}</div>`
@@ -1158,14 +1295,16 @@ function judgeHTML(p) {
 function answerHTML(p) {
   const mine = S.data.myJudgments[p.id];
   const result = t => mine ? `<div class="big">${mine.verdict === t ? '맞혔습니다!' : mine.verdict === 'unsure' ? '모르겠음으로 넘겼습니다' : '틀렸습니다'}</div>` : '';
-  if (p.seed && p.answer) return `<div class="answer ${p.answer.truth}">${result(p.answer.truth)}<div>${verdictBadge(p.answer.truth)} <b>해설</b></div><div>${esc(p.answer.explain)}</div>${p.counts ? countsHTML(p.counts) : ''}</div>`;
+  if (p.seed && p.answer) { const a = p.answer, cr = C.CRITERIA[a.criterion], tc = C.TACTICS.find(x => x.id === a.tactic);
+    const meta = (cr ? `<div><b>${a.truth === 'fake' ? '들통나는 곳' : '진짜인 근거'}</b> ${esc(cr.label)}: ${esc(cr.hint)}</div>` : '') + (tc ? `<div><b>쓴 수법</b> ${esc(tc.id)}: ${esc(tc.desc)}</div>` : '');
+    return `<div class="answer ${a.truth}">${result(a.truth)}<div>${verdictBadge(a.truth)} <b>해설</b></div><div>${esc(a.explain)}</div>${meta ? `<div class="ans-meta">${meta}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
   if (revealed(p) && p.secret) { const s = p.secret; return `<div class="answer ${s.truth}">${result(s.truth)}<div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}</b></div>
       ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 자료실 내용' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
   return '';
 }
 const countsHTML = c => `<div class="counts"><span>진짜라고 한 조 ${c.real}</span><span>가짜라고 한 조 ${c.fake}</span><span>모르겠음 ${c.unsure}</span></div>`;
 function statusHTML(p) {
-  if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예제 자료 · 연습용 (점수 없음)</div>`;
+  if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예시 · 연습 (점수 없음)</div>`;
   if (!p.mine || revealed(p)) return '';
   const s = p.secret || {};
   return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
@@ -1225,9 +1364,15 @@ function openProfile(id) {
 }
 
 document.addEventListener('click', async e => {
+  const st = e.target.closest('[data-step]'); if (st) { goStep(st.dataset.step); return; }
+  if (e.target.closest('[data-act="leave-admin"]')) { leaveAdmin(); return; }
+  const fc = e.target.closest('#filters [data-filter]'); if (fc) { S.filter = fc.dataset.filter; renderFeed(); icons(); return; }
+  const rt0 = e.target.closest('[data-round]');
+  if (rt0 && !rt0.disabled && !isAdmin() && S.team && rt0.dataset.round === curRound() && S.data.phase === 'make') { S.fmt = curRound(); showTab('make'); return; }
   const rt = e.target.closest('[data-round]'); if (rt && !rt.disabled) { S.fmt = rt.dataset.round; S.filter = 'all'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'all')); renderTwist(); renderFeed(); icons(); window.scrollTo({ top: 0 }); return; }
+  if (e.target.closest('[data-act="home-make"]')) { showTab('feed'); return; }
   if (e.target.closest('[data-act="home"]')) { S.fmt = null; renderTwist(); renderFeed(); icons(); return; }
-  const g = e.target.closest('[data-goto]'); if (g) { showTab(g.dataset.goto); return; }
+  const g = e.target.closest('[data-goto]'); if (g) { const keep = S.fmt; showTab(g.dataset.goto); if (g.dataset.goto === 'make') S.fmt = keep; return; }
   const pr = e.target.closest('[data-profile]'); if (pr) { openProfile(pr.dataset.profile); return; }
   if (e.target === $('#prof') || e.target.closest('[data-act="prof-close"]')) { $('#prof').hidden = true; return; }
   const vote = e.target.closest('[data-vote]'); if (vote) { const poll = vote.closest('.stk-poll'); if (poll && !poll.classList.contains('voted')) { const pa = +poll.dataset.pa; poll.classList.add('voted'); const [ba, bb] = poll.querySelectorAll('button'); ba.querySelector('i').style.width = pa + '%'; bb.querySelector('i').style.width = (100 - pa) + '%'; ba.querySelector('span').textContent += ` ${pa}%`; bb.querySelector('span').textContent += ` ${100 - pa}%`; } return; }
@@ -1306,8 +1451,9 @@ function renderMake() {
   const canMake = S.editing || !mine.some(p => p.format === curRound());
   $('#makeWrap').hidden = !canMake; $('#makeClosed').hidden = canMake;
   $('#makeClosed').innerHTML = `<b>이번 라운드 ${ROUND_LABEL[curRound()]}를 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 판별 시간이 되면 다른 조 ${ROUND_LABEL[curRound()]}가 열립니다.</p>`;
-  $('#makeNotice').hidden = d.phase === 'make';
-  $('#makeNotice').innerHTML = `미리 써 볼 수는 있고, <b>공유하기</b>는 선생님이 만들기 시간을 열면 됩니다.`;
+  $('#makeNotice').hidden = true;
+  $('#makeGuide').innerHTML = guideHTML(curRound(), false);
+  $('#makeHead').innerHTML = `<button type="button" class="back" data-act="home-make">${ic('chevron-left')}처음으로</button><h2>${roundIdx(curRound()) + 1}라운드 · 우리 조 ${ROUND_LABEL[curRound()]} 만들기</h2>`;
   if (canMake) fillForm();
 }
 const TPL_OPTS = [['auto', '자동', 'shuffle'], ['frame', '프레임', 'panel-top'], ['full', '큰 제목', 'heading-1'], ['cam', '카메라', 'camera'], ['pola', '폴라로이드', 'image'], ['collage', '콜라주', 'layout-grid'], ['black', '자막형', 'captions'], ['text', '글만', 'quote']];
@@ -1471,7 +1617,7 @@ function adShow() {
 }
 async function adLogin() {
   AD.key = $('#adPw').value;
-  try { AD.data = await adApi('/admin/state'); try { sessionStorage.setItem('dorogram-admin', AD.key); } catch (e) {} $('#adPwErr').textContent = ''; adShow(); }
+  try { AD.data = await adApi('/admin/state'); try { sessionStorage.setItem('dorogram-admin', AD.key); } catch (e) {} $('#adPwErr').textContent = ''; $('#adPw').value = ''; enterAdmin(); }
   catch (e) { AD.key = null; $('#adPwErr').textContent = e.message; }
 }
 async function adRefresh() {
@@ -1480,9 +1626,8 @@ async function adRefresh() {
 }
 function adRender() {
   const d = AD.data; if (!d) return;
-  const RSTEP = { make: '만들기', judge: '판별', reveal: '정답 공개' };
-  $('#adPhases').innerHTML = `<button class="ad-phase" data-adphase="read:news" aria-pressed="${d.phase === 'read'}"><b>시작 전</b><span>조를 고르고 자료실을 읽는 시간</span></button>`
-    + ROUND_ORDER.map((f, i) => ['make', 'judge', 'reveal'].map(k => `<button class="ad-phase" data-adphase="${k}:${f}" aria-pressed="${d.phase === k && d.round === f}"><b>${i + 1}라운드 ${ROUND_LABEL[f]} · ${RSTEP[k]}</b><span>${k === 'make' ? `조마다 ${ROUND_LABEL[f]} 1개` : k === 'judge' ? `다른 조 ${ROUND_LABEL[f]} 판별` : '정답·점수 공개 (점수는 누적)'}</span></button>`).join('')).join('');
+  const SDESC = { read: f => `예시 ${ROUND_LABEL[f]}로 연습 (바로 해설)`, make: f => `조마다 ${ROUND_LABEL[f]} 1개`, judge: f => `다른 조 ${ROUND_LABEL[f]} 판별`, reveal: () => '정답·점수 공개 (점수는 누적)' };
+  $('#adPhases').innerHTML = STEP_ORDER.map(([k, f]) => `<button class="ad-phase" data-adphase="${k}:${f}" aria-pressed="${d.phase === k && d.round === f}"><b>${stepName(k, f)}</b><span>${SDESC[k](f)}</span></button>`).join('');
   $('#adTeams').innerHTML = Array.from({ length: 11 }, (_, i) => i + 2).map(n => `<button class="opt" data-adteams="${n}" aria-pressed="${d.teamCount === n}">${n}조</button>`).join('');
   const judgedBy = {}; Object.keys(d.judgments).forEach(k => { const [pid, t] = k.split(':'); if (!d.posts.find(p => p.id === pid)?.seed) judgedBy[t] = (judgedBy[t] || 0) + 1; });
   const teamPosts = d.posts.filter(p => !p.seed);
@@ -1593,7 +1738,7 @@ function renderHelp() {
 // ---------- 시작 ----------
 $$('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
-$$('[data-filter]').forEach(b => b.onclick = () => { S.filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderFeed(); icons(); });
+
 icons();
 initTeam();
 connect();
