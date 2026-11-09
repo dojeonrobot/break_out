@@ -90,6 +90,7 @@
     /* 라운드 선택: 사진 카드 3장 (2026-11-09 재디자인) */
     #tab-feed:has(#rounds:not([hidden])) { min-height: calc(100dvh - 32px); display: grid; align-content: center; }
     #tab-feed:has(#meProf:not([hidden])) .round-tile { max-height: min(560px, calc(100dvh - 370px)); min-height: 300px; }
+    #tab-feed:has(#meProf:not([hidden])):has(#opBar:not([hidden])) .round-tile { max-height: min(560px, calc(100dvh - 460px)); min-height: 260px; }
     @media (max-height: 820px) { .rt-body { padding: 12px 18px 16px; gap: 3px; } .rt-body b { font-size: 28px; } .rt-body small { font-size: 13px; } .rt-cta { margin-top: 6px; padding: 8px 14px; font-size: 13px; } .rt-rings { top: 18%; } .round-tile:has(.rt-photo.story):disabled .rt-lock { top: 50%; } }
     .rounds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; padding: 0 16px; max-width: 1180px; align-items: end; }
     @media (min-width: 1024px) { .rounds { padding: 0; } }
@@ -159,8 +160,19 @@
     .me-prof .stats { display: flex; gap: 20px; grid-row: 1 / 3; grid-column: 2; } .me-prof .stats span { display: grid; line-height: 1.15; } .me-prof .stats b { font-size: 18px; font-weight: 900; font-variant-numeric: tabular-nums; } .me-prof .stats small { font-size: 12.5px; color: var(--muted); }
     .me-prof .acts { display: flex; gap: 8px; grid-column: 1 / -1; } @media (min-width: 1024px) { .me-prof .acts { grid-column: auto; } }
     .me-prof .acts button { min-height: 42px; padding: 0 22px; border-radius: 999px; border: 0; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
-    .me-prof .acts .follow { background: #ff2d55; color: #fff; } .me-prof .acts .msg { background: var(--surface-2); color: var(--ink); } .me-prof .acts .ico { width: 42px; padding: 0; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); }
+    .me-prof .acts .follow { background: #ff2d55; color: #fff; display: inline-flex; align-items: center; gap: 6px; } .me-prof .acts .follow .icon { width: 16px; height: 16px; }
+    .me-prof .acts .follow.on { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); } .me-prof .acts .msg { background: var(--surface-2); color: var(--ink); } .me-prof .acts .ico { width: 42px; padding: 0; display: grid; place-items: center; background: var(--surface-2); color: var(--ink); }
     .me-prof .bio { display: none; }
+    .friend-box { width: min(420px, 100%); padding: 0; max-height: 80dvh; display: flex; flex-direction: column; }
+    .fr-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 10px; border-bottom: 1px solid var(--line); } .fr-head h2 { margin: 0; font-size: 17px; }
+    .fr-head .pm-x { position: static; color: var(--ink); padding: 4px; } .fr-head .pm-x .icon { width: 22px; height: 22px; }
+    .fr-list { overflow: auto; padding: 6px 10px 12px; }
+    .fr-row { display: grid; grid-template-columns: 48px 1fr auto; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; } .fr-row:hover { background: var(--surface-2); }
+    .fr-row .av { width: 48px; height: 48px; border-radius: 50%; padding: 2px; background: var(--ig-grad); } .fr-row .av span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); border: 2px solid var(--surface); font-weight: 900; font-size: 15px; }
+    .fr-row .av.adm { background: var(--blue); }
+    .fr-row b { display: flex; align-items: center; gap: 4px; font-size: 15px; } .fr-row small { display: block; font-size: 12.5px; color: var(--muted); }
+    .fr-row button { min-height: 36px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--blue); color: #fff; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; }
+    .fr-row button.on { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); } .fr-row .me { font-size: 12.5px; color: var(--muted); font-weight: 700; padding: 0 6px; }
     .home-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; max-width: 1180px; margin: 0 16px 26px; }
     @media (min-width: 1024px) { .home-head { margin: 0 0 26px; } }
     .home-head small { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
@@ -945,6 +957,7 @@
       </div>
     </div>
   </div>
+  <div class="modal" id="friendDlg" hidden role="dialog" aria-modal="true" aria-labelledby="friendTitle"><div class="modal-box friend-box"><div class="fr-head"><h2 id="friendTitle">친구 추가</h2><button type="button" class="pm-x fr-x" data-act="friend-close" aria-label="닫기"><i data-lucide="x" class="icon"></i></button></div><div class="fr-list" id="friendList"></div></div></div>
   <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -1218,14 +1231,14 @@ function renderOpBar() {
   if (!adm && !S.screen) { box.hidden = true; return; }
   const pr = d.progress || { submitted: [], judged: {}, posts: 0, seeds: 0 }, n = d.teamCount, teams = Array.from({ length: n }, (_, i) => i + 1);
   let prog = '';
-  if (d.phase === 'read') prog = `<span>예시 ${pr.seeds}개</span>`;
+  if (d.phase === 'read') prog = '';
   else if (d.phase === 'make') { const ret = pr.returned || [], cnt = pr.counts || {}; prog = `<span>${d.minPosts || 2}개 이상 올린 조 ${pr.submitted.length} / ${n}${ret.length ? ` · 돌려보냄 ${ret.length}` : ''}</span>` + teams.map(t => { const k = cnt[t] || 0; return `<i class="tm${ret.includes(t) ? ' ret' : pr.submitted.includes(t) ? ' on' : k ? ' part' : ''}" title="${t}조 ${k}개${ret.includes(t) ? ' · 돌려보냄' : ''}">${t}${k ? `<small>${k}</small>` : ''}</i>`; }).join(''); }
   else if (d.phase === 'judge') { const need = t => pr.posts - (pr.submitted.includes(t) ? 1 : 0), done = t => (pr.judged[t] || 0) >= need(t) && need(t) > 0;
     prog = `<span>판별 끝낸 조 ${teams.filter(done).length} / ${n}</span>` + teams.map(t => `<i class="tm${done(t) ? ' on' : (pr.judged[t] ? ' part' : '')}" title="${t}조 ${pr.judged[t] || 0} / ${need(t)}">${t}</i>`).join(''); }
   else if (d.scores) prog = `<span>순위</span>` + d.scores.slice(0, 3).map((r, i) => `<i class="tm on">${i + 1}위 ${r.team}조</i>`).join('');
   const k = STEP_ORDER.findIndex(([ph, f]) => ph === d.phase && f === d.round), next = STEP_ORDER[k + 1], prev = STEP_ORDER[k - 1];
   box.hidden = false;
-  box.innerHTML = `<div class="now"><small>${adm ? '관리자 화면' : '진행 화면'}</small><b>${stepName(d.phase, d.round)}</b></div><div class="prog">${prog}</div>
+  box.innerHTML = `<div class="now"><small>${adm ? '관리자' : '진행 화면'}</small>${adm ? '' : `<b>${stepName(d.phase, d.round)}</b>`}</div><div class="prog">${prog}</div>
     ${adm ? `<div class="acts"><select class="input" data-stepsel aria-label="단계 바로 가기" style="width:auto;min-height:40px">${STEP_ORDER.map(([ph, f]) => `<option value="${ph}:${f}" ${ph === d.phase && f === d.round ? 'selected' : ''}>${esc(stepName(ph, f))}</option>`).join('')}</select>${prev ? `<button type="button" class="btn btn-ghost" data-step="${prev.join(':')}">${ic('chevron-left')}이전</button>` : ''}
       ${next ? `<button type="button" class="btn btn-primary" data-step="${next.join(':')}">다음: ${esc(stepName(...next))}${ic('chevron-right')}</button>` : ''}
       <button type="button" class="btn btn-ghost" data-act="leave-admin">관리자 화면 끝내기</button></div>` : ''}`;
@@ -1255,18 +1268,26 @@ function renderFilters(posts) {
     + `<span class="cnt">${posts.length}개</span>`;
 }
 /* 조의 SNS 프로필 (장식: 팔로워·좋아요는 조 번호로 정해지는 숫자, 게시물 수는 실제) */
+const meFollowKey = () => 'dorogram-follow-' + (isAdmin() ? 'admin' : S.team || 0);
+const meFollowed = () => load(meFollowKey()) === '1';
+function renderFriends() {
+  const d = S.data, n = d.teamCount || 10, adm = isAdmin(), me = adm ? 'admin' : String(S.team || 0);
+  const rows = [['admin', '도로그램 관리자', '@dorogram_admin', true], ...Array.from({ length: n }, (_, i) => [String(i + 1), `${i + 1}조`, `@doro_team_${i + 1}`, false])];
+  $('#friendList').innerHTML = rows.map(([id, name, handle, isAdm]) => { const on = load('dorogram-friend-' + id) === '1';
+    return `<div class="fr-row"><span class="av${isAdm ? ' adm' : ''}"><span>${isAdm ? 'T' : id}</span></span><div><b>${esc(name)}${isAdm ? vbadge({ verified: true }) : ''}</b><small>${esc(handle)}</small></div>${id === me ? '<span class="me">나</span>' : `<button type="button" class="${on ? 'on' : ''}" data-friend="${id}" aria-pressed="${on}">${on ? '팔로우 중' : '팔로우'}</button>`}</div>`; }).join('');
+}
 function renderMeProf() {
   const d = S.data, box = $('#meProf'), adm = isAdmin();
   if (S.screen || (!S.team && !adm)) { box.hidden = true; return; }
   const t = S.team || 0, posts = adm ? (d.posts || []).filter(p => !p.seed).length : (d.posts || []).filter(p => p.mine).length;
-  const fol = adm ? 153000 : 1200 + ((t * 7919) % 2300), likes = adm ? 2840000 : fol * (4 + (t % 3)) + ((t * 613) % 900);
-  const k = n => n >= 10000 ? (n / 10000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + '만' : n.toLocaleString();
+  const fol = (adm ? 1530000 : 12000 + ((t * 7919) % 23000)) + (meFollowed() ? 1 : 0), likes = adm ? 28400000 : fol * (4 + (t % 3)) + ((t * 613) % 9000);
+  const k = n => n >= 100000000 ? (n / 100000000).toFixed(1).replace(/\.0$/, '') + '억' : n >= 10000 ? (n / 10000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + '만' : n.toLocaleString();
   box.hidden = false;
   box.innerHTML = `<span class="av"><span>${adm ? 'T' : t}</span></span>
     <div class="who"><b>${adm ? '도로그램 관리자' : t + '조'}${adm ? vbadge({ verified: true }, true) : ''}</b><small>@${adm ? 'dorogram_admin' : 'doro_team_' + t}</small>
       <div class="stats"><span><b>${posts}</b><small>게시물</small></span><span><b>${k(fol)}</b><small>팔로워</small></span><span><b>${k(likes)}</b><small>좋아요</small></span></div>
       <div class="bio">${adm ? '모든 조의 게시물과 정답을 봅니다' : `도로랜드 ${t}조 · 진짜와 가짜를 가려내는 중`}</div></div>
-    <div class="acts"><button type="button" class="follow" data-act="me-follow">팔로우</button><button type="button" class="msg" data-act="me-msg">메시지</button><button type="button" class="ico" data-act="me-msg" aria-label="친구 추가">${ic('user-round-plus')}</button></div>`;
+    <div class="acts"><button type="button" class="follow${meFollowed() ? ' on' : ''}" data-act="me-follow" aria-pressed="${meFollowed()}">${meFollowed() ? ic('check') + '팔로우 중' : '팔로우'}</button><button type="button" class="msg" data-act="me-msg">메시지</button><button type="button" class="ico" data-act="friend-open" aria-label="친구 추가">${ic('user-round-plus')}</button></div>`;
 }
 function renderHomeHead() {
   renderMeProf();
@@ -1549,7 +1570,10 @@ document.addEventListener('click', async e => {
   if (rt0 && !rt0.disabled && !isAdmin() && S.team && rt0.dataset.round === curRound() && S.data.phase === 'make') { S.fmt = curRound(); showTab('make'); return; }
   const rt = e.target.closest('[data-round]'); if (rt && !rt.disabled) { S.fmt = rt.dataset.round; S.filter = 'all'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'all')); renderTwist(); renderFeed(); icons(); window.scrollTo({ top: 0 }); return; }
   if (e.target.closest('[data-act="home-make"]')) { showTab('feed'); return; }
-  if (e.target.closest('[data-act="me-follow"]')) { toast(S.team ? `${S.team}조 계정이에요. 우리 조는 팔로우할 수 없어요.` : '우리 계정이에요.'); return; }
+  if (e.target.closest('[data-act="me-follow"]')) { const on = !meFollowed(); store(meFollowKey(), on ? '1' : undefined); renderMeProf(); icons(); toast(on ? '팔로우했어요' : '팔로우를 취소했어요'); return; }
+  const fb = e.target.closest('[data-friend]'); if (fb) { const id = fb.dataset.friend, on = load('dorogram-friend-' + id) !== '1'; store('dorogram-friend-' + id, on ? '1' : undefined); renderFriends(); icons(); return; }
+  if (e.target.closest('[data-act="friend-open"]')) { renderFriends(); $('#friendDlg').hidden = false; icons(); return; }
+  if (e.target.closest('[data-act="friend-close"]') || (e.target.id === 'friendDlg')) { $('#friendDlg').hidden = true; return; }
   if (e.target.closest('[data-act="me-msg"]')) { toast('이 활동에서는 쓰지 않는 기능이에요.'); return; }
   if (e.target.closest('[data-act="home"]')) { S.fmt = null; renderTwist(); renderFeed(); icons(); return; }
   const g = e.target.closest('[data-goto]'); if (g) { const keep = S.fmt; showTab(g.dataset.goto); if (g.dataset.goto === 'make') S.fmt = keep; return; }
@@ -1576,6 +1600,7 @@ document.addEventListener('input', e => { if (e.target.dataset.act === 'reason')
 $('#pmX').onclick = closePost; $('#pmPrev').onclick = () => stepPost(-1); $('#pmNext').onclick = () => stepPost(1);
 document.addEventListener('keydown', e => {
   if (!$('#prof').hidden && e.key === 'Escape') { $('#prof').hidden = true; return; }
+  if (!$('#friendDlg').hidden && e.key === 'Escape') { $('#friendDlg').hidden = true; return; }
   if ($('#pm').hidden || e.target.matches('input, textarea')) return;
   const p = S.data?.posts.find(x => x.id === S.modal), vert = p && p.format !== 'news';
   if (e.key === 'Escape') closePost();
