@@ -109,7 +109,7 @@
     .rt-rings span { width: 22%; aspect-ratio: 1; border-radius: 50%; padding: 4px; background: var(--ig-grad); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
     .rt-rings span:nth-child(2) { width: 30%; } .rt-rings span img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff; object-fit: cover; filter: none; transform: none; }
     .rt-play { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.92); color: #111; display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); } .rt-play .icon { width: 28px; height: 28px; margin-left: 3px; }
-    .rt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 45%, rgba(0,0,0,.82) 100%); }
+    .rt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 50%, rgba(0,0,0,.55) 100%); }
     .rt-num { position: absolute; top: 16px; left: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.94); color: #262626; }
     .rt-num .icon { width: 14px; height: 14px; }
     .rt-state { position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(6px); }
@@ -117,7 +117,7 @@
     .round-tile.now .rt-state { background: #d62976; } .round-tile.now .rt-state .dot { animation: rtPulse 1.5s ease-out infinite; box-shadow: 0 0 0 0 rgba(255,255,255,.7); }
     .round-tile.past .rt-state { background: var(--real); } .round-tile.past .rt-state .icon { width: 14px; height: 14px; }
     @keyframes rtPulse { to { box-shadow: 0 0 0 8px transparent; } }
-    .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 0 22px 22px; }
+    .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 20px 22px 22px; background: rgba(0,0,0,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,.1); }
     .rt-body b { font-size: clamp(30px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
     .rt-body small { font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); word-break: keep-all; }
     .rt-cta { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; width: fit-content; padding: 10px 16px; border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 800; } .rt-cta .icon { width: 16px; height: 16px; }
@@ -643,7 +643,11 @@
       @keyframes tpIn { from { opacity: 0; transform: translateY(10px); } }
     }
     /* 진행 막대: 관리자·진행 화면 */
-    .opbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 16px 18px; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+    .opbar { position: sticky; top: 8px; z-index: 30; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 16px 18px; padding: 14px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: rgba(0,0,0,.04) 0 2px 6px, rgba(0,0,0,.08) 0 6px 16px; }
+    @media (max-width: 1023px) { .opbar { top: 58px; } }
+    #tab-feed:has(#rounds:not([hidden])) .opbar { align-self: start; }
+    .round-tile.adm-peek { cursor: pointer; } .round-tile.adm-peek .rt-photo { filter: grayscale(1) brightness(.55); }
+    .round-tile.adm-peek .rt-cta { background: rgba(255,255,255,.18); color: #fff; border: 1px solid rgba(255,255,255,.35); }
     @media (min-width: 1024px) { .opbar { margin: 0 0 18px; } }
     .opbar .now { display: grid; gap: 2px; min-width: 0; }
     .opbar .now small { font-size: 12px; font-weight: 700; color: var(--muted); }
@@ -1154,18 +1158,16 @@ function newsItemHTML(p) {
 function renderRounds() {
   const cur = roundIdx(curRound()), adm = isAdmin();
   $('#rounds').innerHTML = ROUND_ORDER.map((f, i) => {
-    const now = i === cur, past = i < cur, open = now || past || adm, all = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved');
+    const now = i === cur, past = i < cur, open = now || past, peek = adm && !open, all = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved');
     const n = all.filter(p => !p.seed).length;
-    const st = adm ? (now ? STEP_LABEL[S.data.phase] + ' 중 · ' : '') + `예시 ${all.length - n} · 조 게시물 ${n}`
-      : now ? `지금 진행 중 · ${STEP_LABEL[S.data.phase]}` : past ? `끝난 라운드 · 게시물 ${n}개` : `${i}라운드가 끝나면 열려요`;
     const cv = ((S.data.covers || {})[f] || []).map(id => `<img src="${imgSrc(id)}" alt="" loading="lazy">`);
     const art = f === 'news' ? `<span class="rt-photo news">${cv.slice(0, 3).join('')}</span>`
       : f === 'shorts' ? `<span class="rt-photo shorts">${cv.slice(0, 3).join('')}</span><span class="rt-play">${ic('play')}</span>`
       : `<span class="rt-photo story">${cv[0] || ''}</span><span class="rt-rings">${cv.slice(1, 4).map(x => `<span>${x}</span>`).join('')}</span>`;
     const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장과 한 줄' }[f];
-    const cta = adm ? '전체 보기' : now ? { read: '예시 보기', make: '우리 조 만들기', judge: '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : '';
-    const state = adm ? st : now ? `<i class="dot"></i>${STEP_LABEL[S.data.phase]} 중` : past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
-    return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : ''}" data-round="${f}" ${open ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
+    const cta = now ? { read: '예시 보기', make: adm ? '조 게시물 보기' : '우리 조 만들기', judge: adm ? '게시물 보기' : '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : peek ? '관리자 미리 보기' : '';
+    const state = now ? `<i class="dot"></i>${STEP_LABEL[S.data.phase]} 중` : past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
+    return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : peek ? ' adm-peek' : ''}" data-round="${f}" ${open || peek ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
       ${art}<span class="rt-shade"></span>
       <span class="rt-num">${ic(ROUND_ICON[f])}${i + 1}라운드</span>${state ? `<span class="rt-state">${state}</span>` : ''}
       ${open ? '' : `<span class="rt-lock">${ic('lock')}</span>`}
@@ -1207,18 +1209,16 @@ function guideHTML(f, open) {
 }
 function renderFilters(posts) {
   const d = S.data, adm = isAdmin(), now = S.fmt === curRound(), chips = [['all', '전체']];
+  if (!adm && now && d.phase === 'judge') chips.push(['todo', '아직 판별 안 함']);
+  if (d.posts.some(p => p.mine && p.format === S.fmt)) chips.push(['mine', '우리 조가 만든 것']);
   if (adm) chips.push(['seed', '예시'], ['team', '조 게시물']);
-  else {
-    if (now && d.phase === 'judge') chips.push(['todo', '아직 판별 안 함']);
-    if (d.posts.some(p => p.mine && p.format === S.fmt)) chips.push(['mine', '우리 조가 만든 것']);
-  }
   if (!chips.some(c => c[0] === S.filter)) S.filter = 'all';
   $('#filters').innerHTML = (chips.length > 1 ? chips.map(([k, l]) => `<button type="button" class="chip" data-filter="${k}" aria-pressed="${S.filter === k}">${l}</button>`).join('') : '')
     + `<span class="cnt">${posts.length}개</span>`;
 }
 function renderHomeHead() {
   const d = S.data, box = $('#homeHead'), f = curRound(), L = ROUND_LABEL[f], i = roundIdx(f) + 1;
-  if (isAdmin() || S.screen) { box.hidden = true; return; }
+  if (S.screen) { box.hidden = true; return; }
   const txt = { read: [`${i}라운드 ${L} · 예시 보기`, `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`, `${L} 예시 보기`],
     make: [`${i}라운드 ${L} · 만들기`, `우리 조 ${L}를 ${d.minPosts || 2}~${d.maxPosts}개 만드는 시간이에요. 진짜로 할지 가짜로 할지 글마다 정해요.`, `우리 조 ${L} 만들기`],
     judge: [`${i}라운드 ${L} · 판별`, `다른 조가 올린 ${L}를 하나씩 눌러 진짜인지 가짜인지 판정해요.`, `${L} 판별하러 가기`],
@@ -1236,7 +1236,7 @@ function renderFeed() {
   const canMakeNow = now && d.phase === 'make' && !S.screen && S.team;
   $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${L}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${L} 만들기</button>` : ''}`;
   const left = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]).length;
-  const hint = adm || !now ? '' : d.phase === 'read' ? `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`
+  const hint = !now ? '' : d.phase === 'read' ? `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`
     : d.phase === 'make' ? (S.team ? `우리 조 ${L}를 만들 시간이에요.` : `조마다 ${L}를 만들고 있어요.`)
     : d.phase === 'judge' ? (S.team ? `다른 조 ${L}를 눌러 판별하세요. 남은 것 ${left}개` : `다른 조 ${L}를 판별하는 시간이에요.`) : '';
   $('#roundHint').hidden = !hint; $('#roundHint').textContent = hint;

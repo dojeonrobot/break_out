@@ -69,7 +69,7 @@ B[0] = B[0][:a] + """    /* 라운드 선택: 사진 카드 3장 (2026-11-09 재
     .rt-rings span { width: 22%; aspect-ratio: 1; border-radius: 50%; padding: 4px; background: var(--ig-grad); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
     .rt-rings span:nth-child(2) { width: 30%; } .rt-rings span img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fff; object-fit: cover; filter: none; transform: none; }
     .rt-play { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.92); color: #111; display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); } .rt-play .icon { width: 28px; height: 28px; margin-left: 3px; }
-    .rt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 45%, rgba(0,0,0,.82) 100%); }
+    .rt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 50%, rgba(0,0,0,.55) 100%); }
     .rt-num { position: absolute; top: 16px; left: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.94); color: #262626; }
     .rt-num .icon { width: 14px; height: 14px; }
     .rt-state { position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(6px); }
@@ -77,7 +77,7 @@ B[0] = B[0][:a] + """    /* 라운드 선택: 사진 카드 3장 (2026-11-09 재
     .round-tile.now .rt-state { background: #d62976; } .round-tile.now .rt-state .dot { animation: rtPulse 1.5s ease-out infinite; box-shadow: 0 0 0 0 rgba(255,255,255,.7); }
     .round-tile.past .rt-state { background: var(--real); } .round-tile.past .rt-state .icon { width: 14px; height: 14px; }
     @keyframes rtPulse { to { box-shadow: 0 0 0 8px transparent; } }
-    .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 0 22px 22px; }
+    .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 20px 22px 22px; background: rgba(0,0,0,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,.1); }
     .rt-body b { font-size: clamp(30px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
     .rt-body small { font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); word-break: keep-all; }
     .rt-cta { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; width: fit-content; padding: 10px 16px; border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 800; } .rt-cta .icon { width: 16px; height: 16px; }
