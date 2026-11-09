@@ -34,9 +34,9 @@ async def main():
         await kid.screenshot(path=OUT + '/a0_team.png')
         await kid.locator('#teamGrid [data-team="1"]').click(); await asyncio.sleep(1)
         await kid.screenshot(path=OUT + '/a1_home.png')
-        await kid.locator('[data-round="news"]').click(); await asyncio.sleep(1)
+        await kid.locator('.round-tile[data-round="news"]').click(); await asyncio.sleep(1)
         check(await kid.locator('#guideBox details[open]').count() == 1, '뉴스 안내 카드가 펼쳐져 있음')
-        n = await kid.locator('#feed [data-open]').count(); check(n >= 10, f'예시 뉴스 목록 ({n})')
+        n = await kid.locator('#feed [data-open]').count(); check(n >= 15, f'예시 뉴스 목록 ({n})')
         await kid.screenshot(path=OUT + '/a2_examples.png', full_page=False)
         # 예시 하나 판별 → 해설 + 들통나는 곳
         sid = next(x['id'] for x in st['posts'] if x['answer'] if False) if False else None
@@ -55,9 +55,9 @@ async def main():
         await tea.locator('#btnTeacher').click(); await asyncio.sleep(0.6)
         await tea.fill('#adPw', '0101'); await tea.click('#adLoginBtn'); await asyncio.sleep(2)
         check(await tea.locator('#opBar').is_visible(), '선생님: 진행 막대')
-        tiles = await tea.evaluate("[...document.querySelectorAll('[data-round]')].map(b=>b.disabled)")
+        tiles = await tea.evaluate("[...document.querySelectorAll('.round-tile[data-round]')].map(b=>b.disabled)")
         check(tiles == [False, False, False], f'선생님: 세 라운드 모두 열림 ({tiles})')
-        await tea.locator('[data-round="story"]').click(); await asyncio.sleep(1)
+        await tea.locator('.round-tile[data-round="story"]').click(); await asyncio.sleep(1)
         ns = await tea.locator('#feed [data-open]').count(); check(ns >= 10, f'선생님: 스토리 예시도 다 보임 ({ns})')
         await tea.screenshot(path=OUT + '/b0_teacher.png')
         await tea.locator('[data-act="home"]').click(); await asyncio.sleep(0.5)
