@@ -988,7 +988,7 @@ const SCREEN = QS.get('view') === 'screen';
 // team's devices (so the "every tablet finished" rule ignores it), never runs the tutorial or an act, and has no mission button.
 const AUX = PHONE && !SCREEN;
 if(AUX) document.documentElement.classList.add('aux');
-let TEAM = 0; try{ TEAM = +(QS.get('team') || localStorage.getItem('dorogram-team') || localStorage.getItem('void-team')) || 0; }catch(e){}
+let TEAM = 0; try{ TEAM = +(QS.get('team') || localStorage.getItem('void-team')) || 0; }catch(e){}
 if(TEAM < 1 || TEAM > 12) TEAM = 0;
 // Who sees which records (user, 2026-10-15): a team's tablet shows only its own team's records, so teams cannot see each other's work.
 // The admin (logged in on this device) and the big screen see every team's, and the admin can pick one team to view as. Team GPS dots stay visible to all.
@@ -1573,7 +1573,7 @@ function checkReset(st){
   try{ localStorage.setItem('void-reset', String(rs)); }catch(e){}
   clearLocalDemo();
   if(!TEAM) return;
-  TEAM = 0; try{ localStorage.removeItem('void-team'); localStorage.removeItem('dorogram-team'); }catch(e){}
+  TEAM = 0; try{ localStorage.removeItem('void-team'); }catch(e){}
   const sel = $('teamSel'); if(sel) sel.value = '';
   if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
   toast('초기화됐습니다. 조를 다시 고르세요');
@@ -1960,7 +1960,7 @@ $('adminX').onclick = closeAdmin;
 // team picker (remembered on this device) and the admin entry (password checked by the server)
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
 function helloTeam(){ if(LOCAL || !TEAM || SCREEN || ADMIN_KEY || AUX) return; api('/quest', {team:TEAM, dev:DEV}).then(applyState).catch(()=>{}); }
-teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; $('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); if(TEAM) localStorage.setItem('dorogram-team', String(TEAM)); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
+teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; $('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
 // first open: pick a team (after the map's entrance), then ask for the position
 var ASK_TEAM = false;
 { const tp = $('teamPick');

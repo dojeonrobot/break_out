@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """챕터 5 「보이드의 기록」 스캔 링크 제출 서버 (표준 라이브러리만 사용, 추가 설치 없음).
 
-chapter05/index.html(보이드의 기록)과 chapter05/feed.html(도로그램 사이드바 현황)이 쓰는 API.
+chapter05/index.html(보이드의 기록)이 쓰는 API.
 조별로 어느 구역에 어떤 Scaniverse 링크를 냈는지 저장하고, 운영자(비밀번호)가 전체 목록 확인·삭제·초기화를 한다.
-도로그램 서버(ch5_feed_server.py)와는 완전히 별개다.
 - 제출 기록: data/ch5_void.json (gitignore)
 - 짝 목록: ch5_void_pairs.json (erica-twin build.py가 dist/void-pairs.json으로 만든 것. 캠퍼스 지점 ↔ 섬 구역, 이미 3D에 들어간 스캔 id)
 - 초기화: 제출 기록을 지우고, 페이지에 이미 3D로 들어가 있는 스캔은 "숨김" 목록에 넣어 구역을 다시 "복구 필요"로 되돌린다.

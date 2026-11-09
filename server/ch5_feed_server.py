@@ -48,9 +48,10 @@ AI_QUOTA = int(os.environ.get('CH5_AI_QUOTA', '8'))
 SERVE_STATIC = os.environ.get('CH5_STATIC', '1') == '1'
 
 DEFAULT_TEAM_COUNT = 10   # 실제 조 수는 DB['teamCount'] (운영자 화면에서 바꿈)
-MAX_POSTS_PER_TEAM = 3    # 조마다 스토리·기사·쇼츠 1개씩
+MAX_POSTS_PER_TEAM = 3    # 조마다 라운드당 1개 (뉴스·쇼츠·스토리)
 MAX_UPLOAD = 6 * 1024 * 1024
 PHASES = ['read', 'make', 'judge', 'reveal']
+ROUNDS = ['news', 'shorts', 'story']   # 2026-11-09: 라운드마다 한 형식 (뉴스 → 쇼츠 → 스토리), 라운드 안에서 만들기 → 판별 → 정답 공개
 FORMATS = {'news', 'story', 'shorts'}
 FORMAT_ALIAS = {'sns': 'shorts', 'witness': 'shorts', 'notice': 'news'}   # 예전 자료 형식 변환
 VERDICTS = {'real', 'fake', 'unsure'}
@@ -104,7 +105,7 @@ def load_seed_posts():
 
 
 def fresh_db():
-    return {'version': 1, 'phase': 'read', 'teamCount': DEFAULT_TEAM_COUNT, 'posts': load_seed_posts(), 'judgments': {},
+    return {'version': 1, 'phase': 'read', 'round': ROUNDS[0], 'teamCount': DEFAULT_TEAM_COUNT, 'posts': load_seed_posts(), 'judgments': {},
             'aiUsed': {}, 'updatedAt': now_ms()}
 
 
@@ -114,6 +115,7 @@ def read_db():
     with open(DB_PATH, encoding='utf-8') as f:
         db = json.load(f)
     db.setdefault('teamCount', DEFAULT_TEAM_COUNT)
+    db.setdefault('round', ROUNDS[0])
     return db
 
 
@@ -161,12 +163,32 @@ def judgment_key(pid, team):
     return f'{pid}:{team}'
 
 
+def round_idx(fmt):
+    return ROUNDS.index(fmt) if fmt in ROUNDS else 0
+
+
+def post_revealed(p):
+    """그 형식의 라운드가 정답 공개까지 갔으면 공개된 것."""
+    i, cur = round_idx(p.get('format')), round_idx(DB.get('round'))
+    return i < cur or (i == cur and DB['phase'] == 'reveal')
+
+
+def post_open(p):
+    """다른 조 게시물은 그 라운드의 판별 시간부터 보인다."""
+    i, cur = round_idx(p.get('format')), round_idx(DB.get('round'))
+    return i < cur or (i == cur and DB['phase'] in ('judge', 'reveal'))
+
+
+def any_revealed():
+    return round_idx(DB.get('round')) > 0 or DB['phase'] == 'reveal'
+
+
 def compute_scores():
     """공개 단계 점수: 맞힌 판별 1점(근거 기준을 고른 경우만), 우리 조 가짜를 진짜라고 한 조마다 1점."""
     n = DB['teamCount']
     scores = {t: {'team': t, 'correct': 0, 'fooled': 0, 'judged': 0, 'total': 0} for t in range(1, n + 1)}
     for p in DB['posts']:
-        if p['status'] != 'approved' or p.get('seed'):   # 예제(운영실 자료)는 연습이라 점수에 안 넣음
+        if p['status'] != 'approved' or p.get('seed') or not post_revealed(p):   # 예제는 점수 제외, 공개된 라운드만 합산
             continue
         truth = p['secret'].get('truth', 'fake')
         for t in range(1, n + 1):
@@ -181,7 +203,7 @@ def compute_scores():
     rows = list(scores.values())
     for r in rows:
         r['total'] = r['correct'] + r['fooled']
-        r['judgable'] = sum(1 for p in DB['posts'] if p['status'] == 'approved' and not p.get('seed') and p['team'] != r['team'])
+        r['judgable'] = sum(1 for p in DB['posts'] if p['status'] == 'approved' and not p.get('seed') and p['team'] != r['team'] and post_revealed(p))
     rows.sort(key=lambda r: (-r['total'], r['team']))
     return rows
 
@@ -206,7 +228,7 @@ def order_key(pid):
 def public_post(p, team, admin=False):
     """보는 사람(조)에 맞게 게시글을 잘라서 보낸다.
     공개 전에는 어느 조가 언제 만들었는지, 운영실 자료인지를 숨긴다. 그래야 "조 게시물은 다 가짜"가 티 나지 않는다."""
-    reveal = DB['phase'] == 'reveal'
+    reveal = post_revealed(p) if not p.get('seed') else DB['phase'] == 'reveal'
     own = bool(team) and p['team'] == team
     out = {k: p.get(k) for k in PUBLIC_FIELDS}
     out['order'] = order_key(p['id'])
@@ -229,12 +251,12 @@ def public_post(p, team, admin=False):
 def visible_to(p, team, admin):
     if admin:
         return True
-    if p['status'] != 'approved':
+    if p['status'] != 'approved' or p.get('seed'):   # 예제는 학생 화면에 보내지 않음 (2026-11-09)
         return False
-    if p.get('seed') or (team and p['team'] == team):
+    if team and p['team'] == team:
         return True
-    # 다른 조 게시물은 판별 시간부터 보인다 (만드는 동안 새 글이 뜨면 조 게시물인 게 티 남)
-    return DB['phase'] in ('judge', 'reveal')
+    # 다른 조 게시물은 그 라운드의 판별 시간부터 보인다 (만드는 동안 새 글이 뜨면 조 게시물인 게 티 남)
+    return post_open(p)
 
 
 def state_for(team, admin=False):
@@ -245,10 +267,10 @@ def state_for(team, admin=False):
             pid, t = k.rsplit(':', 1)
             if int(t) == team:
                 mine[pid] = j
-    res = {'version': DB['version'], 'phase': DB['phase'], 'teamCount': DB['teamCount'], 'posts': posts, 'myJudgments': mine,
+    res = {'version': DB['version'], 'phase': DB['phase'], 'round': DB.get('round', ROUNDS[0]), 'rounds': ROUNDS, 'teamCount': DB['teamCount'], 'posts': posts, 'myJudgments': mine,
            'aiQuota': AI_QUOTA, 'aiUsed': DB['aiUsed'].get(str(team), 0) if team else 0,
            'aiEnabled': bool(GEMINI_KEY), 'maxPosts': MAX_POSTS_PER_TEAM}
-    if admin or DB['phase'] == 'reveal':
+    if admin or any_revealed():
         res['scores'] = compute_scores()
     if admin:
         res['judgments'] = DB['judgments']
@@ -564,6 +586,8 @@ class Handler(BaseHTTPRequestHandler):
         with lock:
             if DB['phase'] != 'make':
                 raise ValueError('지금은 게시글을 만드는 시간이 아닙니다.')
+            if fmt != DB.get('round'):
+                raise ValueError('이번 라운드는 ' + {'news': '뉴스', 'story': '스토리', 'shorts': '쇼츠'}[DB.get('round', 'news')] + '만 만들 수 있습니다.')
             pid = b.get('id')
             if pid:
                 old = find_post(pid)
@@ -610,8 +634,8 @@ class Handler(BaseHTTPRequestHandler):
             if p.get('seed'):
                 if DB['phase'] == 'reveal':
                     raise ValueError('정답 공개 중에는 판정을 바꿀 수 없습니다.')
-            elif DB['phase'] != 'judge':
-                raise ValueError('다른 조 게시물은 판별 시간에만 판별할 수 있습니다.')
+            elif DB['phase'] != 'judge' or p.get('format') != DB.get('round'):
+                raise ValueError('이번 라운드 게시물만 판별 시간에 판별할 수 있습니다.')
             DB['judgments'][judgment_key(p['id'], team)] = {
                 'verdict': verdict, 'criterion': criterion if criterion in CRITERIA else None,
                 'reason': clean_text(b.get('reason'), 120), 'at': now_ms()}
@@ -660,10 +684,14 @@ class Handler(BaseHTTPRequestHandler):
     def admin_phase(self, b):
         if b.get('phase') not in PHASES:
             raise ValueError('없는 단계입니다.')
+        if b.get('round') is not None and b.get('round') not in ROUNDS:
+            raise ValueError('없는 라운드입니다.')
         with lock:
             DB['phase'] = b['phase']
+            if b.get('round'):
+                DB['round'] = b['round']
             save_and_broadcast()
-            self.send_json({'phase': DB['phase']})
+            self.send_json({'phase': DB['phase'], 'round': DB['round']})
 
     def admin_moderate(self, b):
         action = b.get('action')
@@ -687,7 +715,7 @@ class Handler(BaseHTTPRequestHandler):
             if DB['phase'] != 'make':
                 raise ValueError('게시물은 만들기 시간에만 지울 수 있습니다.')
             p = find_post(b.get('postId'))
-            if not p or p.get('seed') or p['team'] != team:
+            if not p or p.get('seed') or p['team'] != team or p.get('format') != DB.get('round'):
                 raise ValueError('지울 수 없는 게시물입니다.')
             remove_posts([p])
             save_and_broadcast()

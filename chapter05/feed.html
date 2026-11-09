@@ -67,13 +67,6 @@
       .sb-btn:hover { background: var(--surface-2); }
       .sb-btn[aria-selected="true"] { font-weight: 800; } .sb-btn[aria-selected="true"] .icon { stroke-width: 2.6; }
       .sb-phase { margin-top: auto; padding: 12px; border-radius: 8px; background: var(--surface-2); font-size: 12.5px; }
-      .sb-void { display: grid; gap: 5px; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--line); text-decoration: none; color: inherit; font-size: 12px; }
-      .sb-void:hover { background: var(--surface-2); }
-      .sb-void span { color: var(--muted); font-weight: 700; }
-      .sb-void b { font-size: 20px; font-weight: 800; line-height: 1; }
-      .sb-void i { display: block; height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
-      .sb-void i u { display: block; height: 100%; width: 0; background: #12b35a; border-radius: 2px; transition: width .6s; }
-      .sb-void small { color: var(--muted); min-height: 1.2em; }
       .sb-phase span { display: block; color: var(--muted); } .sb-phase b { display: block; font-size: 15px; margin: 2px 0 4px; } .sb-phase p { margin: 0; color: var(--muted); line-height: 1.5; }
       .sb-team { margin-top: 6px; border: 0; background: none; display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
       .sb-team:hover { background: var(--surface-2); }
@@ -94,6 +87,32 @@
     @media (prefers-color-scheme: dark) { .read-hint { background: #0b2a42; color: #cfe8ff; } }
 
     /* ---------- 스토리 줄 ---------- */
+    .rounds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 8px 16px 0; max-width: 980px; }
+    @media (min-width: 1024px) { .rounds { padding: 8px 0 0; } }
+    @media (max-width: 640px) { .rounds { grid-template-columns: 1fr; } }
+    .round-tile { display: grid; gap: 14px; justify-items: start; text-align: left; padding: 22px 20px; min-height: 196px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+    .round-tile .rt-ic { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--surface-2); }
+    .round-tile .rt-ic .icon { width: 26px; height: 26px; }
+    .round-tile small { font-size: 13px; font-weight: 700; color: var(--muted); }
+    .round-tile b { display: block; font-size: 26px; line-height: 1.2; margin-top: 2px; }
+    .round-tile .rt-st { font-size: 13px; color: var(--muted); }
+    .round-tile.now { border: 2px solid var(--blue); box-shadow: 0 6px 20px color-mix(in srgb, var(--blue) 18%, transparent); }
+    .round-tile.now .rt-ic { background: var(--blue); color: var(--blue-ink); }
+    .round-tile.now small, .round-tile.now .rt-st { color: var(--blue); }
+    .round-tile:not(:disabled):hover { transform: translateY(-2px); }
+    .round-tile:not(:disabled):active { transform: translateY(1px); }
+    .round-tile:disabled { cursor: not-allowed; opacity: .45; background: var(--surface-2); }
+    .round-tile:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active { transform: none; } }
+    .round-head { display: flex; align-items: center; gap: 12px; margin: 0 16px 14px; flex-wrap: wrap; }
+    @media (min-width: 1024px) { .round-head { margin: 0 0 14px; } }
+    .round-head h2 { margin: 0; font-size: 22px; }
+    .round-head .back { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+    .round-head .btn { margin-left: auto; }
+    .round-list { padding: 0 16px; }
+    @media (min-width: 1024px) { .round-list { padding: 0; } }
+    .round-list .tray { flex-wrap: wrap; }
+    .round-list .news-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px 16px; overflow: visible; max-height: none; }
     .tray-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 6px; margin: 0 16px 16px; }
     @media (min-width: 1024px) { .tray-wrap { margin: 0 0 16px; } }
     .tray-head { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
@@ -529,8 +548,6 @@
       <button class="sb-btn" role="tab" data-tab="score" aria-selected="false" hidden><i data-lucide="trophy" class="icon"></i>점수</button>
       <button class="sb-btn" role="tab" data-tab="help" aria-selected="false"><i data-lucide="circle-help" class="icon"></i>도움말</button>
     </nav>
-    <div class="sb-phase"><span>지금 단계</span><b id="sbPhase">연결 중</b><p id="sbPhaseDesc"></p></div>
-    <a class="sb-void" id="sbVoid" href="index.html" hidden><span>보이드의 기록 · 도로랜드 복구</span><b id="sbVoidN">0 / 0</b><i><u id="sbVoidBar"></u></i><small id="sbVoidTxt"></small></a>
     <button class="sb-team" id="sbTeam" type="button"><span class="team-av" id="sbTeamAv">?</span><span id="sbTeamTxt">조 선택</span></button>
     <button class="sb-small" role="tab" data-tab="admin" aria-selected="false"><i data-lucide="settings" class="icon"></i>운영자</button>
   </aside>
@@ -538,7 +555,6 @@
   <header class="top">
     <div class="top-in">
       <div class="brand">Dorogram<small>도로랜드 공식 도로그램</small></div>
-      <span class="phase-pill" id="phasePill">연결 중</span>
       <nav class="nav" role="tablist" aria-label="화면 선택">
         <button class="nav-btn" role="tab" data-tab="feed" aria-selected="true" aria-label="홈"><i data-lucide="house" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="archive" aria-selected="false" aria-label="자료실"><i data-lucide="library-big" class="icon"></i></button>
@@ -552,21 +568,20 @@
   </header>
 
   <main>
-    <div class="phase-line"><b id="phaseTitle">불러오는 중</b><span class="muted small" id="phaseDesc"></span></div>
-
     <!-- 홈: 스토리 줄 / 쇼츠 / 뉴스 -->
     <section id="tab-feed">
       <div id="twist" hidden></div>
-      <div class="read-hint" id="readHint" hidden><i data-lucide="library-big" class="icon"></i><span>도로랜드를 잘 모르면 판별할 수 없습니다. 먼저 <b>자료실</b>(도로랜드 정리본)을 읽고 오세요.</span><button class="btn btn-primary" type="button" data-goto="archive">자료실 열기</button></div>
-      <div class="tray-wrap"><div class="tray-head"><i data-lucide="circle-dashed" class="icon"></i>스토리<span class="cnt" id="trayCnt"></span></div><div class="tray" id="tray"></div></div>
+      <div class="rounds" id="rounds" role="group" aria-label="라운드"></div>
+      <div id="roundView" hidden>
+      <div class="round-head" id="roundHead"></div>
       <div class="filters" role="group" aria-label="게시물 거르기">
         <button class="chip" data-filter="all" aria-pressed="true">전체</button>
         <button class="chip" data-filter="todo" aria-pressed="false">아직 판별 안 함</button>
         <button class="chip" data-filter="mine" aria-pressed="false" hidden>우리 조가 만든 것</button>
-        <button class="chip" data-filter="seed" aria-pressed="false" hidden>예제 자료</button>
         <span class="cnt" id="feedCnt"></span>
       </div>
-      <div class="feed-split" id="feed"><div class="skeleton"></div><div class="skeleton"></div></div>
+      <div class="round-list" id="feed"><div class="skeleton"></div></div>
+      </div>
     </section>
 
     <!-- 자료실 -->
@@ -746,7 +761,7 @@
 const C = window.DOROGRAM, API = C.API, A = C.ARCHIVE;
 const SWATCHES = ['#1d4ed8', '#0f766e', '#db2777', '#7c3aed', '#ea580c', '#4b5563', '#0891b2', '#b91c1c'];
 const HEARSAY = /(들었는데|들었어|들음|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|지인이|누가 그러는데|라고 함|라고 합니다|라고 해요|제보)/g;
-const S = { team: null, screen: false, data: null, version: 0, tab: 'feed', filter: 'all', modal: null, modalRendered: null, mstep: 'thumb', open: {}, draft: {}, form: null, editing: null, busy: false };
+const S = { team: null, screen: false, data: null, version: 0, tab: 'feed', fmt: null, filter: 'all', modal: null, modalRendered: null, mstep: 'thumb', open: {}, draft: {}, form: null, editing: null, busy: false };
 
 const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -757,6 +772,11 @@ function load(k) { try { return localStorage.getItem(k); } catch (e) { return nu
 const imgSrc = id => id ? API + '/img/' + id : '';
 const initials = name => esc((name || '?').trim().slice(0, 1));
 const teamTactic = t => C.TEAM_TACTICS[((t || 1) - 1) % C.TEAM_TACTICS.length];
+const ROUND_ORDER = ['news', 'shorts', 'story'], ROUND_LABEL = { news: '뉴스', shorts: '쇼츠', story: '스토리' }, ROUND_ICON = { news: 'newspaper', shorts: 'play', story: 'circle-dashed' };
+const roundIdx = f => Math.max(0, ROUND_ORDER.indexOf(f));
+const curRound = () => (S.data && S.data.round) || 'news';
+/* 그 형식 라운드가 정답 공개까지 갔는지 (서버 post_revealed와 같은 규칙) */
+const revealed = p => !!S.data && (roundIdx(p.format) < roundIdx(curRound()) || (p.format === curRound() && S.data.phase === 'reveal'));
 const truthOf = p => p.seed ? p.answer?.truth : (p.secret?.truth || 'fake');
 const ic = (n, cls = '') => `<i data-lucide="${n}"${cls ? ` class="${cls}"` : ''}></i>`;
 const vbadge = (a, lg) => a && a.verified ? `<span class="vb${lg ? ' lg' : ''}" title="도로그램 인증 계정">${ic('check')}</span>` : '';
@@ -792,12 +812,14 @@ async function initTeam() {
   $('#btnScreen').onclick = () => setTeam(0);
   $('#teamChip').onclick = $('#sbTeam').onclick = () => $('#teamModal').hidden = false;
   $('#teamGrid').addEventListener('click', e => { const b = e.target.closest('[data-team]'); if (b) setTeam(+b.dataset.team); });
+  const q = new URLSearchParams(location.search);
+  const fixed = q.get('view') === 'screen' ? '0' : q.get('team');   /* 주소에 조가 박혀 있을 때만 건너뜀 */
+  renderTeamGrid(10);
+  if (fixed === null || fixed === '') $('#teamModal').hidden = false;   /* 들어오면 먼저 조부터 고름 (2026-11-09 사용자) */
   let n = 10;
   try { const d = await api('/state'); n = d.teamCount || 10; } catch (e) {}
   renderTeamGrid(n);
-  const q = new URLSearchParams(location.search);
-  const saved = q.get('view') === 'screen' ? '0' : (q.get('team') || load('dorogram-team'));
-  if (saved !== null && saved !== '' && +saved >= 0 && +saved <= n) setTeam(+saved, true);
+  if (fixed !== null && fixed !== '' && +fixed >= 0 && +fixed <= n) setTeam(+fixed, true);
   else { $('#teamModal').hidden = false; refresh(); }
 }
 function setTeam(t, silent) {
@@ -817,7 +839,6 @@ let es;
 function connect() {
   es = new EventSource(API + '/stream');
   es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.v !== S.version) refresh(); } catch (x) {} };
-  es.onerror = () => { $('#phasePill').textContent = '다시 연결 중'; };
 }
 setInterval(() => { if (!es || es.readyState === 2) connect(); }, 10000);
 
@@ -825,30 +846,27 @@ async function refresh() {
   try {
     const d = await api('/state' + (S.team ? '?team=' + S.team : ''));
     const phaseChanged = S.data && S.data.phase !== d.phase;
+    const roundChanged = S.data && S.data.round !== d.round;
     const teamsChanged = !S.data || S.data.teamCount !== d.teamCount;
     S.data = d; S.version = d.version;
     if (teamsChanged) renderTeamGrid(d.teamCount);
     if (S.team && S.team > d.teamCount) { S.team = null; $('#teamModal').hidden = false; }
-    if (!S.form) resetForm();
+    if (roundChanged && S.fmt && S.fmt !== d.round) S.fmt = null;   /* 라운드가 넘어가면 첫 화면(타일)으로 */
+    if (!S.form || (roundChanged && !S.editing)) resetForm();
     render();
-    if (phaseChanged) { toast(C.PHASES[d.phase].label + ' 단계가 시작됐습니다.'); if (d.phase === 'judge' && S.tab !== 'admin') showTab('feed'); }
+
   } catch (e) {
-    $('#phasePill').textContent = '서버 연결 안 됨';
     $('#feed').innerHTML = `<div class="empty" style="grid-column:1/-1"><b>서버에 연결하지 못했습니다.</b><p class="muted small">${esc(e.message)}<br>주강사에게 알려 주세요.</p></div>`;
   }
 }
 
 // ---------- 렌더 ----------
 function render() {
-  const d = S.data, ph = C.PHASES[d.phase];
-  $('#phasePill').textContent = ph.label; $('#phaseTitle').textContent = ph.label; $('#phaseDesc').textContent = ph.desc;
-  $('#sbPhase').textContent = ph.label; $('#sbPhaseDesc').textContent = ph.desc;
-  $$('[data-tab="score"]').forEach(b => b.hidden = d.phase !== 'reveal');
+  const d = S.data;
+  $$('[data-tab="score"]').forEach(b => b.hidden = !d.scores);
   $$('[data-tab="make"]').forEach(b => b.hidden = S.screen);
   $('[data-filter="mine"]').hidden = S.screen || !(d.posts || []).some(p => p.mine);
-  $('[data-filter="seed"]').hidden = !['judge', 'reveal'].includes(d.phase);
-  $('#readHint').hidden = d.phase !== 'read' || load('dorogram-archive-seen') === '1';
-  if ((S.tab === 'score' && d.phase !== 'reveal') || (S.tab === 'make' && S.screen)) showTab('feed');
+  if ((S.tab === 'score' && !d.scores) || (S.tab === 'make' && S.screen)) showTab('feed');
   if (S.tab === 'admin' && AD.key) adRefresh();
   renderTwist(); renderFeed(); renderMake(); renderScores(); icons();
 }
@@ -859,18 +877,17 @@ function showTab(t) {
   $('main').classList.toggle('wide', t === 'make');
   if (t === 'admin') adShow();
   if (t === 'help') renderHelp();
-  if (t === 'archive') { renderArchive(); store('dorogram-archive-seen', '1'); $('#readHint').hidden = true; }
+  if (t === 'archive') renderArchive();
+  if (t === 'feed') { S.fmt = null; renderFeed(); icons(); }
   window.scrollTo({ top: 0 });
 }
 
 // 어떤 게시물을 보여 줄지: 예제는 살펴보기·만들기 단계에, 조 게시물은 판별·공개 단계에. 칩으로 바꿀 수 있음.
 function feedPosts() {
-  const d = S.data, late = ['judge', 'reveal'].includes(d.phase);
-  let posts = d.posts.filter(p => p.status === 'approved');
-  if (S.filter === 'seed') posts = posts.filter(p => p.seed);
-  else if (S.filter === 'mine') posts = posts.filter(p => p.mine);
+  const d = S.data;
+  let posts = d.posts.filter(p => p.status === 'approved' && !p.seed && (!S.fmt || p.format === S.fmt));   /* 예제는 학생 화면에 띄우지 않음 (2026-11-09 사용자) */
+  if (S.filter === 'mine') posts = posts.filter(p => p.mine);
   else {
-    posts = posts.filter(p => late ? (!p.seed || p.mine) : true);
     if (S.filter === 'todo') posts = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]);
   }
   return posts.sort((a, b) => a.order - b.order);
@@ -878,10 +895,10 @@ function feedPosts() {
 function canJudge(p) {
   if (!S.team || p.mine) return false;
   const ph = S.data.phase;
-  return p.seed ? ph !== 'reveal' : ph === 'judge';
+  return !p.seed && ph === 'judge' && p.format === curRound();
 }
 function stateBadge(p, cls) {
-  const mine = S.data.myJudgments[p.id], reveal = S.data.phase === 'reveal';
+  const mine = S.data.myJudgments[p.id], reveal = revealed(p);
   if (p.seed && p.answer) { const t = p.answer.truth; return `<span class="${cls} ts-${t}">${t === 'real' ? '진짜' : '가짜'}${mine ? (mine.verdict === t ? ' · 맞힘' : ' · 틀림') : ''}</span>`; }
   if (reveal) { const t = truthOf(p); return `<span class="${cls} ts-${t}">정답 ${t === 'real' ? '진짜' : '가짜'}</span>`; }
   if (mine) return `<span class="${cls} ts-${mine.verdict}">${{ real: '진짜', fake: '가짜', unsure: '모르겠음' }[mine.verdict]}로 판정</span>`;
@@ -955,30 +972,40 @@ function newsItemHTML(p) {
     <div class="ni-meta"><span>${esc(a.name || '')}</span>${a.reporter ? `<span>· ${esc(a.reporter)} 기자</span>` : ''}${p.postedAt ? `<span>· ${esc(p.postedAt)}</span>` : ''}${p.views ? `<span>· 조회 ${esc(p.views)}</span>` : ''}${state ? `<span>· ${state}</span>` : ''}</div></button>`;
 }
 
+/* 첫 화면: 라운드 타일 3개(뉴스 → 쇼츠 → 스토리). 지금 라운드만 열리고, 끝난 라운드는 다시 볼 수 있고, 다음 라운드는 잠김 (2026-11-09 사용자) */
+function renderRounds() {
+  const cur = roundIdx(curRound());
+  $('#rounds').innerHTML = ROUND_ORDER.map((f, i) => {
+    const now = i === cur, past = i < cur, n = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved' && !p.seed).length;
+    const st = now ? '지금 라운드' : past ? `끝난 라운드 · 게시물 ${n}개` : '앞 라운드가 끝나면 열립니다';
+    return `<button type="button" class="round-tile${now ? ' now' : ''}" data-round="${f}" ${now || past ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${now || past ? '' : ' (잠김)'}">
+      <span class="rt-ic">${ic(now || past ? ROUND_ICON[f] : 'lock')}</span><span><small>${i + 1}라운드</small><b>${ROUND_LABEL[f]}</b></span><span class="rt-st">${st}</span></button>`;
+  }).join('');
+}
 function renderFeed() {
-  const d = S.data, posts = feedPosts();
-  const stories = posts.filter(p => p.format === 'story'), shorts = posts.filter(p => p.format === 'shorts'), news = posts.filter(p => p.format === 'news');
-  const late = ['judge', 'reveal'].includes(d.phase);
-  const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : late ? '아직 다른 조 게시물이 없습니다.' : '아직 게시물이 없습니다.';
-  $('#trayCnt').textContent = stories.length ? stories.length : '';
-  $('#tray').innerHTML = stories.length ? stories.map(trayHTML).join('') : `<div class="tray-empty">${empty}</div>`;
-  $('#feedCnt').textContent = `${d.phase === 'read' ? '예제' : late ? '판별할 게시물' : '게시물'} ${posts.length}개`;
-  $('#feed').innerHTML = `
-    <section class="shorts-panel" aria-label="쇼츠"><div class="sp-head"><span class="sp-logo">${ic('play')}</span>쇼츠<span class="cnt">${shorts.length}</span></div>
-      ${shorts.length ? `<div class="shorts-grid">${shorts.map(tileHTML).join('')}</div>` : `<div class="panel-empty">${empty}</div>`}</section>
-    <section class="news-panel" aria-label="뉴스"><div class="np-head">${ic('newspaper')}도로랜드 뉴스<span class="cnt">${news.length}</span></div>
-      <div class="news-list">${news.length ? news.map(newsItemHTML).join('') : `<div class="panel-empty">${empty}</div>`}</div></section>`;
+  const d = S.data, home = !S.fmt;
+  $('#rounds').hidden = !home; $('#roundView').hidden = home;
+  if (home) { renderRounds(); renderModal(); return; }
+  const f = S.fmt, now = f === curRound(), posts = feedPosts(), judging = now && d.phase === 'judge';
+  const canMakeNow = now && d.phase === 'make' && !S.screen && S.team;
+  $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${ROUND_LABEL[f]}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${ROUND_LABEL[f]} 만들기</button>` : ''}`;
+  const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase !== 'judge' && d.phase !== 'reveal' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
+  $('#feedCnt').textContent = `${judging ? '판별할 게시물' : '게시물'} ${posts.length}개`;
+  $('#feed').innerHTML = !posts.length ? `<div class="panel-empty">${empty}</div>`
+    : f === 'story' ? `<div class="tray">${posts.map(trayHTML).join('')}</div>`
+    : f === 'shorts' ? `<div class="shorts-grid">${posts.map(tileHTML).join('')}</div>`
+    : `<div class="news-list">${posts.map(newsItemHTML).join('')}</div>`;
   renderModal();
 }
 function renderTwist() {
   const box = $('#twist'), d = S.data;
-  if (d.phase !== 'reveal') { box.hidden = true; return; }
+  if (d.phase !== 'reveal' || S.fmt !== curRound()) { box.hidden = true; return; }
   box.hidden = false;
   const me = (d.scores || []).find(r => r.team === S.team);
   const rank = me ? (d.scores.findIndex(r => r.team === S.team) + 1) : null;
-  box.innerHTML = `<div class="twist"><h2>정답 공개</h2>
-    ${me ? `<div class="twist-grid"><div><b>${me.correct} / ${me.judgable}</b>다른 조 게시물 중 맞힌 수</div><div><b>${me.fooled}</b>우리 가짜를 믿은 조</div><div><b>${rank}위</b>합계 ${me.total}점</div></div>` : ''}
-    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다. "섬이 사라졌다" 기사 3개는 모두 진짜였습니다. 3년마다 같은 시기에 같은 일이 일어났고, 원인은 아직 아무도 모릅니다. 드론쇼·팝업·아기 기린 같은 평범한 소식이 진짜였고, 자극적인 속보일수록 가짜가 많았습니다.</p></div>`;
+  box.innerHTML = `<div class="twist"><h2>${roundIdx(curRound()) + 1}라운드 정답 공개</h2>
+    ${me ? `<div class="twist-grid"><div><b>${me.correct} / ${me.judgable}</b>다른 조 게시물 중 맞힌 수</div><div><b>${me.fooled}</b>우리 가짜를 믿은 조</div><div><b>${rank}위</b>지금까지 합계 ${me.total}점</div></div>` : ''}
+    <p style="margin:12px 0 0;font-size:14px">게시물을 누르면 정답과 각 조가 숨긴 단서가 보입니다.</p></div>`;
 }
 function renderScores() {
   const rows = S.data.scores;
@@ -1132,14 +1159,14 @@ function answerHTML(p) {
   const mine = S.data.myJudgments[p.id];
   const result = t => mine ? `<div class="big">${mine.verdict === t ? '맞혔습니다!' : mine.verdict === 'unsure' ? '모르겠음으로 넘겼습니다' : '틀렸습니다'}</div>` : '';
   if (p.seed && p.answer) return `<div class="answer ${p.answer.truth}">${result(p.answer.truth)}<div>${verdictBadge(p.answer.truth)} <b>해설</b></div><div>${esc(p.answer.explain)}</div>${p.counts ? countsHTML(p.counts) : ''}</div>`;
-  if (S.data.phase === 'reveal' && p.secret) { const s = p.secret; return `<div class="answer ${s.truth}">${result(s.truth)}<div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}</b></div>
+  if (revealed(p) && p.secret) { const s = p.secret; return `<div class="answer ${s.truth}">${result(s.truth)}<div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}</b></div>
       ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 자료실 내용' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
   return '';
 }
 const countsHTML = c => `<div class="counts"><span>진짜라고 한 조 ${c.real}</span><span>가짜라고 한 조 ${c.fake}</span><span>모르겠음 ${c.unsure}</span></div>`;
 function statusHTML(p) {
   if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예제 자료 · 연습용 (점수 없음)</div>`;
-  if (!p.mine || S.data.phase === 'reveal') return '';
+  if (!p.mine || revealed(p)) return '';
   const s = p.secret || {};
   return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
 }
@@ -1150,7 +1177,7 @@ function sideHTML(p) {
       <div class="side-who">${whoBtn(p, `<span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span>`)}<div style="min-width:0"><div class="nm">${whoBtn(p, esc(a.name || '이름 없음') + vbadge(a))}</div><div class="meta">${esc(f.label || '')} · ${esc(a.handle || '')} · ${kindChip(a)}${a.followers ? ` · ${followLabel(p, a)} ${esc(a.followers)}` : ''}</div></div></div>
       <div class="side-h">${ic('search-check')}확인하기</div><div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
       ${canJudge(p) ? judgeHTML(p) : ''}${answerHTML(p)}
-      ${own || S.data.phase === 'reveal' ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}">${ic('image-down')}이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}">${ic('pencil')}고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)">${ic('trash-2')}지우기</button>` : ''}</div>` : ''}`;
+      ${own || revealed(p) ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}">${ic('image-down')}이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}">${ic('pencil')}고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)">${ic('trash-2')}지우기</button>` : ''}</div>` : ''}`;
 }
 function postShell(p) {
   const vert = p.format !== 'news';
@@ -1198,6 +1225,8 @@ function openProfile(id) {
 }
 
 document.addEventListener('click', async e => {
+  const rt = e.target.closest('[data-round]'); if (rt && !rt.disabled) { S.fmt = rt.dataset.round; S.filter = 'all'; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === 'all')); renderTwist(); renderFeed(); icons(); window.scrollTo({ top: 0 }); return; }
+  if (e.target.closest('[data-act="home"]')) { S.fmt = null; renderTwist(); renderFeed(); icons(); return; }
   const g = e.target.closest('[data-goto]'); if (g) { showTab(g.dataset.goto); return; }
   const pr = e.target.closest('[data-profile]'); if (pr) { openProfile(pr.dataset.profile); return; }
   if (e.target === $('#prof') || e.target.closest('[data-act="prof-close"]')) { $('#prof').hidden = true; return; }
@@ -1262,7 +1291,7 @@ async function savePng(id) {
 const myPosts = () => (S.data?.posts || []).filter(p => p.mine);
 const FIELD_MAP = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fPostsCount: 'posts', fBio: 'bio', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fCommentCount: 'commentCount', fThumbTitle: 'thumbTitle', fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fTags: 'tags', fPlace: 'place', fPoll: 'poll', fMusic: 'music', fPosted: 'postedAt', fTaken: 'photoTakenAt', fQuoteText: 'quoteText', fQuoteWho: 'quoteWho', fStat1L: 'stat1L', fStat1V: 'stat1V', fStat2L: 'stat2L', fStat2V: 'stat2V' };
 function resetForm() {
-  const done = new Set(myPosts().map(p => p.format)), first = ['story', 'shorts', 'news'].find(f => !done.has(f)) || 'story';
+  const first = curRound();   /* 이번 라운드 형식만 만든다 */
   S.form = { format: first, tactic: teamTactic(S.team), clueCriterion: null, clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
     truth: 'fake', basis: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
     quoteText: '', quoteWho: '', stat1L: '', stat1V: '', stat2L: '', stat2V: '' };
@@ -1271,21 +1300,21 @@ function resetForm() {
 function renderMake() {
   if (S.screen || !S.team) return;
   const d = S.data, tac = C.TACTICS.find(x => x.id === teamTactic(S.team)) || C.TACTICS[0], mine = myPosts();
-  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>스토리·쇼츠·기사 <b>1개씩</b> (각각 진짜/가짜 선택)</dd><dt>가짜 수법</dt><dd><b>${esc(tac.id)}</b> (${esc(tac.desc)})</dd><dt>규칙</dt><dd>실존 인물 금지 · 진짜는 자료실대로 · 가짜는 단서 하나 · 형식의 성격에 맞게</dd></dl>`;
+  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>${roundIdx(curRound()) + 1}라운드 <b>${ROUND_LABEL[curRound()]} 1개</b> (진짜/가짜 선택)</dd><dt>가짜 수법</dt><dd><b>${esc(tac.id)}</b> (${esc(tac.desc)})</dd><dt>규칙</dt><dd>실존 인물 금지 · 진짜는 자료실대로 · 가짜는 단서 하나 · 형식의 성격에 맞게</dd></dl>`;
   $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 ${mine.length} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
-    <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
-  const canMake = S.editing || mine.length < d.maxPosts;
+    <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' && p.format === curRound() ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
+  const canMake = S.editing || !mine.some(p => p.format === curRound());
   $('#makeWrap').hidden = !canMake; $('#makeClosed').hidden = canMake;
-  $('#makeClosed').innerHTML = `<b>스토리·쇼츠·기사를 모두 올렸습니다.</b><p class="muted small">홈의 "우리 조가 만든 것"에서 보기, 고치기, 지우기를 할 수 있습니다.</p>`;
+  $('#makeClosed').innerHTML = `<b>이번 라운드 ${ROUND_LABEL[curRound()]}를 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 판별 시간이 되면 다른 조 ${ROUND_LABEL[curRound()]}가 열립니다.</p>`;
   $('#makeNotice').hidden = d.phase === 'make';
-  $('#makeNotice').innerHTML = `<b>지금은 「${esc(C.PHASES[d.phase].label)}」 단계입니다.</b> 미리 써 볼 수는 있고, <b>공유하기</b>는 주강사가 「게시물 만들기」를 시작하면 열립니다.`;
+  $('#makeNotice').innerHTML = `미리 써 볼 수는 있고, <b>공유하기</b>는 선생님이 만들기 시간을 열면 됩니다.`;
   if (canMake) fillForm();
 }
 const TPL_OPTS = [['auto', '자동', 'shuffle'], ['frame', '프레임', 'panel-top'], ['full', '큰 제목', 'heading-1'], ['cam', '카메라', 'camera'], ['pola', '폴라로이드', 'image'], ['collage', '콜라주', 'layout-grid'], ['black', '자막형', 'captions'], ['text', '글만', 'quote']];
 function fillForm() {
-  const f = S.form, fmt = C.FORMATS[f.format], d = S.data, done = new Set(myPosts().filter(p => p.id !== S.editing).map(p => p.format));
+  const f = S.form, fmt = C.FORMATS[f.format], d = S.data, done = new Set(ROUND_ORDER.filter(k => k !== curRound()));   /* 이번 라운드 형식만 고를 수 있음 */
   const isNews = f.format === 'news', isShorts = f.format === 'shorts', isStory = f.format === 'story';
-  $('#optFormat').innerHTML = Object.entries(C.FORMATS).map(([k, v]) => `<button type="button" class="opt" data-format="${k}" aria-pressed="${f.format === k}" ${done.has(k) ? 'disabled title="이미 올렸습니다"' : ''}>${ic(v.icon)}${v.label}${done.has(k) ? ' ✓' : ''}</button>`).join('');
+  $('#optFormat').innerHTML = Object.entries(C.FORMATS).map(([k, v]) => `<button type="button" class="opt" data-format="${k}" aria-pressed="${f.format === k}" ${done.has(k) ? 'disabled title="이번 라운드 형식이 아닙니다"' : ''}>${ic(v.icon)}${v.label}</button>`).join('');
   $('#fmtNature').textContent = `${fmt.label}는 ${fmt.where}에 올라갑니다. ${fmt.nature}`;
   $('#optKind').innerHTML = Object.entries(C.AUTHOR_KINDS).map(([k, v]) => `<button type="button" class="opt" data-kind="${k}" aria-pressed="${f.kind === k}">${ic(v.icon)}${v.label}</button>`).join('');
   $('#kindDesc').textContent = C.AUTHOR_KINDS[f.kind].desc + (f.kind === 'official' || f.kind === 'press' ? ' 조가 만든 글에는 인증 배지가 붙지 않습니다.' : '');
@@ -1451,7 +1480,9 @@ async function adRefresh() {
 }
 function adRender() {
   const d = AD.data; if (!d) return;
-  $('#adPhases').innerHTML = Object.entries(C.PHASES).map(([k, ph]) => `<button class="ad-phase" data-adphase="${k}" aria-pressed="${d.phase === k}"><b>${ph.label}</b><span>${esc(ph.desc)}</span></button>`).join('');
+  const RSTEP = { make: '만들기', judge: '판별', reveal: '정답 공개' };
+  $('#adPhases').innerHTML = `<button class="ad-phase" data-adphase="read:news" aria-pressed="${d.phase === 'read'}"><b>시작 전</b><span>조를 고르고 자료실을 읽는 시간</span></button>`
+    + ROUND_ORDER.map((f, i) => ['make', 'judge', 'reveal'].map(k => `<button class="ad-phase" data-adphase="${k}:${f}" aria-pressed="${d.phase === k && d.round === f}"><b>${i + 1}라운드 ${ROUND_LABEL[f]} · ${RSTEP[k]}</b><span>${k === 'make' ? `조마다 ${ROUND_LABEL[f]} 1개` : k === 'judge' ? `다른 조 ${ROUND_LABEL[f]} 판별` : '정답·점수 공개 (점수는 누적)'}</span></button>`).join('')).join('');
   $('#adTeams').innerHTML = Array.from({ length: 11 }, (_, i) => i + 2).map(n => `<button class="opt" data-adteams="${n}" aria-pressed="${d.teamCount === n}">${n}조</button>`).join('');
   const judgedBy = {}; Object.keys(d.judgments).forEach(k => { const [pid, t] = k.split(':'); if (!d.posts.find(p => p.id === pid)?.seed) judgedBy[t] = (judgedBy[t] || 0) + 1; });
   const teamPosts = d.posts.filter(p => !p.seed);
@@ -1473,7 +1504,7 @@ $('#adLoginBtn').onclick = adLogin; $('#adPw').addEventListener('keyup', e => { 
 document.addEventListener('click', async e => {
   const ph = e.target.closest('[data-adphase]'), tg = e.target.closest('[data-adtoggle]'), tc = e.target.closest('[data-adteams]'), dl = e.target.closest('[data-addel]');
   try {
-    if (ph) await adApi('/admin/phase', { phase: ph.dataset.adphase });
+    if (ph) { const [phase, round] = ph.dataset.adphase.split(':'); await adApi('/admin/phase', { phase, round }); }
     if (tc) await adApi('/admin/settings', { teamCount: +tc.dataset.adteams });
     if (tg) await adApi('/admin/moderate', { postId: tg.dataset.adtoggle, action: tg.dataset.hidden === 'true' ? 'show' : 'hide' });
     if (dl && confirm('이 게시물을 완전히 지울까요? 사진과 판별 기록도 함께 지워지고 되돌릴 수 없습니다.')) await adApi('/admin/delete', { postId: dl.dataset.addel });
@@ -1562,19 +1593,6 @@ function renderHelp() {
 // ---------- 시작 ----------
 $$('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
 
-// ---------- 보이드의 기록(미션 4 Scan Break) 복구 현황 — 다른 서버(/api/void)라 응답할 때만 보여 준다 ----------
-async function voidStatus() {
-  try {
-    const r = await fetch('/api/void/state', { cache: 'no-store' }); if (!r.ok) throw 0;
-    const d = await r.json(), ps = d.pairs || []; if (!ps.length) throw 0;
-    const ok = ps.filter(p => p.status === 'ok').length, pend = ps.filter(p => p.status === 'pend');
-    $('#sbVoidN').textContent = `${ok} / ${ps.length}`; $('#sbVoidBar').style.width = `${ok / ps.length * 100}%`;
-    $('#sbVoidTxt').textContent = pend.length ? pend.map(p => `${p.teams.join('·')}조 ${p.island.name} 복구 중`).join(' · ')
-      : ok === ps.length ? '모든 구역이 돌아왔습니다' : `복구 필요 ${ps.length - ok}곳`;
-    $('#sbVoid').hidden = false;
-  } catch (e) { $('#sbVoid').hidden = true; }
-}
-voidStatus(); setInterval(voidStatus, 30000);
 $$('[data-filter]').forEach(b => b.onclick = () => { S.filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b)); renderFeed(); icons(); });
 icons();
 initTeam();
