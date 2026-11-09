@@ -48,7 +48,9 @@ AI_QUOTA = int(os.environ.get('CH5_AI_QUOTA', '8'))
 SERVE_STATIC = os.environ.get('CH5_STATIC', '1') == '1'
 
 DEFAULT_TEAM_COUNT = 10   # 실제 조 수는 DB['teamCount'] (운영자 화면에서 바꿈)
-MAX_POSTS_PER_TEAM = 3    # 조마다 라운드당 1개 (뉴스·쇼츠·스토리)
+POSTS_PER_ROUND = 3       # 조마다 라운드(형식)당 최대 3개, 2개 이상 올리면 끝낸 것으로 봄 (2026-11-09: 조 4명·노트북 2대)
+MIN_POSTS_PER_ROUND = 2
+MAX_POSTS_PER_TEAM = POSTS_PER_ROUND * 3
 MAX_UPLOAD = 6 * 1024 * 1024
 PHASES = ['read', 'make', 'judge', 'reveal']
 ROUNDS = ['news', 'shorts', 'story']   # 2026-11-09: 라운드마다 한 형식 (뉴스 → 쇼츠 → 스토리), 라운드 안에서 만들기 → 판별 → 정답 공개
@@ -193,7 +195,11 @@ def round_progress():
         pid, t = k.rsplit(':', 1)
         if pid in ids:
             judged[t] = judged.get(t, 0) + 1
-    return {'submitted': sorted({p['team'] for p in posts}), 'judged': judged, 'posts': len(posts),
+    returned = sorted({p['team'] for p in DB['posts'] if not p.get('seed') and p['status'] == 'returned' and p.get('format') == rd})
+    counts = {}
+    for p in posts:
+        counts[str(p['team'])] = counts.get(str(p['team']), 0) + 1
+    return {'submitted': sorted({p['team'] for p in posts if counts[str(p['team'])] >= MIN_POSTS_PER_ROUND}), 'counts': counts, 'judged': judged, 'posts': len(posts), 'returned': returned,
             'seeds': sum(1 for p in DB['posts'] if p.get('seed') and p['status'] == 'approved' and p.get('format') == rd)}
 
 
@@ -249,6 +255,7 @@ def public_post(p, team, admin=False):
     if own:
         out['mine'] = True
         out['secret'] = p.get('secret')
+        out['note'] = p.get('note') or ''
         out['aiGenerated'] = p.get('aiGenerated')
     if p.get('seed'):
         out['seed'] = True
@@ -259,19 +266,19 @@ def public_post(p, team, admin=False):
         out.update(seed=bool(p.get('seed')), team=p['team'], secret=p.get('secret'), answer=p.get('answer'),
                    aiGenerated=p.get('aiGenerated'), aiPrompt=p.get('aiPrompt'), counts=verdict_counts(p['id']))
     if admin:
-        out.update(createdAt=p.get('createdAt'), seedKey=p.get('seedKey'))
+        out.update(createdAt=p.get('createdAt'), seedKey=p.get('seedKey'), note=p.get('note') or '')
     return out
 
 
 def visible_to(p, team, admin):
     if admin:
         return True
+    if team and not p.get('seed') and p['team'] == team:
+        return True   # 우리 조 글은 돌려보낸 것도 보인다 (고쳐서 다시 올리려고)
     if p['status'] != 'approved':
         return False
     if p.get('seed'):   # 예시는 그 라운드의 「예시 보기」 때만 (2026-11-09)
         return DB['phase'] == 'read' and p.get('format') == DB.get('round')
-    if team and p['team'] == team:
-        return True
     # 다른 조 게시물은 그 라운드의 판별 시간부터 보인다 (만드는 동안 새 글이 뜨면 조 게시물인 게 티 남)
     return post_open(p)
 
@@ -286,7 +293,7 @@ def state_for(team, admin=False):
                 mine[pid] = j
     res = {'version': DB['version'], 'phase': DB['phase'], 'round': DB.get('round', ROUNDS[0]), 'rounds': ROUNDS, 'teamCount': DB['teamCount'], 'posts': posts, 'myJudgments': mine,
            'aiQuota': AI_QUOTA, 'aiUsed': DB['aiUsed'].get(str(team), 0) if team else 0,
-           'aiEnabled': bool(GEMINI_KEY), 'maxPosts': MAX_POSTS_PER_TEAM}
+           'aiEnabled': bool(GEMINI_KEY), 'maxPosts': POSTS_PER_ROUND, 'minPosts': MIN_POSTS_PER_ROUND}
     res['progress'] = round_progress()
     if admin or any_revealed():
         res['scores'] = compute_scores()
@@ -595,8 +602,11 @@ class Handler(BaseHTTPRequestHandler):
             'imageId': clean_image_id(b.get('imageId')),
             'secret': {'truth': 'real' if secret.get('truth') == 'real' else 'fake', 'tactic': clean_text(secret.get('tactic'), 30),
                        'clue': clean_text(secret.get('clue'), 200), 'clueCriterion': secret.get('clueCriterion')
-                       if secret.get('clueCriterion') in CRITERIA else None},
+                       if secret.get('clueCriterion') in CRITERIA else None,
+                       'clueKind': clean_text(secret.get('clueKind'), 40), 'fact': clean_text(secret.get('fact'), 300)},   # 2026-11-09: 확인 가능한 단서 종류와 어긋나게 쓴 자료실 사실
         }
+        if post['secret']['truth'] == 'fake' and post['secret']['clueKind'] in ('cross', 'when-archive') and not post['secret']['fact']:
+            raise ValueError('어긋나게 쓴 자료실 내용을 골라 주세요.')
         if not post['body'] and not post['title']:
             raise ValueError('제목이나 본문을 써 주세요.')
         if not post['secret']['clue']:  # 가짜면 숨긴 단서, 진짜면 근거가 된 사실 카드
@@ -611,19 +621,15 @@ class Handler(BaseHTTPRequestHandler):
                 old = find_post(pid)
                 if not old or old['team'] != team:
                     raise ValueError('고칠 수 없는 게시글입니다.')
-                if any(p['format'] == fmt and p['id'] != pid for p in DB['posts'] if p['team'] == team):
-                    raise ValueError('그 형식은 이미 다른 글로 올렸습니다.')
                 ai_meta = {k: old.get(k) for k in ('aiGenerated', 'aiPrompt')}
                 if post['imageId'] != old.get('imageId'):
                     ai_meta = self.image_meta(post['imageId'])
-                old.update(post, **ai_meta, updatedAt=now_ms())
+                old.update(post, **ai_meta, updatedAt=now_ms(), status='approved' if old.get('status') == 'returned' else old.get('status', 'approved'), note='')   # 돌려보낸 글을 고쳐 올리면 다시 올라감
                 saved = old
             else:
-                active = [p for p in DB['posts'] if p['team'] == team]
-                if len(active) >= MAX_POSTS_PER_TEAM:
-                    raise ValueError(f'게시글은 조마다 {MAX_POSTS_PER_TEAM}개까지 올릴 수 있습니다.')
-                if any(p['format'] == fmt for p in active):
-                    raise ValueError({'news': '기사', 'story': '스토리', 'shorts': '쇼츠'}[fmt] + '는 이미 올렸습니다. 다른 형식을 만들거나 올린 글을 고쳐 주세요.')
+                active = [p for p in DB['posts'] if p['team'] == team and p['format'] == fmt]
+                if len(active) >= POSTS_PER_ROUND:
+                    raise ValueError(f'이번 라운드 게시글은 조마다 {POSTS_PER_ROUND}개까지 올릴 수 있습니다. 올린 글을 고치거나 지우고 다시 올려 주세요.')
                 saved = dict(post, id='p' + uuid.uuid4().hex[:10], team=team, status='approved', note='',
                              createdAt=now_ms(), **self.image_meta(post['imageId']))
                 DB['posts'].append(saved)
@@ -713,13 +719,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def admin_moderate(self, b):
         action = b.get('action')
-        if action not in ('hide', 'show'):
+        if action not in ('hide', 'show', 'return'):
             raise ValueError('없는 동작입니다.')
         with lock:
             p = find_post(b.get('postId'))
             if not p:
                 raise ValueError('없는 게시글입니다.')
-            p['status'] = 'hidden' if action == 'hide' else 'approved'
+            if p.get('seed') and action == 'return':
+                raise ValueError('예시는 돌려보낼 수 없습니다.')
+            p['status'] = {'hide': 'hidden', 'show': 'approved', 'return': 'returned'}[action]
             p['note'] = clean_text(b.get('note'), 120)
             save_and_broadcast()
             self.send_json({'ok': True})

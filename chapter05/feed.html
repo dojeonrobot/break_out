@@ -618,8 +618,10 @@
     .opbar .now b { font-size: 18px; }
     .opbar .prog { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; min-width: 220px; }
     .opbar .prog > span { font-size: 13px; font-weight: 700; margin-right: 4px; }
-    .opbar .tm { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; font-size: 12px; font-weight: 800; font-style: normal; background: var(--surface-2); color: var(--muted); }
+    .opbar .tm small { font-size: 9px; font-weight: 800; line-height: 1; opacity: .85; }
+    .opbar .tm { display: grid; grid-auto-flow: column; gap: 2px; align-items: center; justify-content: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; font-size: 12px; font-weight: 800; font-style: normal; background: var(--surface-2); color: var(--muted); }
     .opbar .tm.on { background: var(--real); color: #fff; }
+    .opbar .tm.ret { background: var(--fake); color: #fff; }
     .opbar .tm.part { background: color-mix(in srgb, var(--real) 25%, var(--surface-2)); color: var(--ink); }
     .opbar .acts { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
     .opbar .acts .btn { min-height: 40px; }
@@ -638,6 +640,10 @@
     .ans-meta { display: grid; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed color-mix(in srgb, currentColor 30%, transparent); font-size: 13.5px; line-height: 1.5; }
     .round-hint { margin: -4px 16px 14px; font-size: 14px; color: var(--muted); }
     @media (min-width: 1024px) { .round-hint { margin: -4px 0 14px; } }
+    .returned-note { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: var(--fake-bg); color: var(--fake); font-size: 14px; font-weight: 700; margin-bottom: 12px; word-break: keep-all; }
+    .returned-note .icon { flex: none; margin-top: 2px; } .returned-note span { color: var(--ink); font-weight: 500; }
+    .ad-post .clue { margin-top: 4px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); font-size: 12.5px; line-height: 1.5; word-break: keep-all; }
+    .ad-post .clue b { color: var(--fake); } .ad-post.returned { outline: 2px solid var(--fake); }
     .make-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .make-head h2 { margin: 0; font-size: 20px; }
     .make-head .back { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
@@ -793,9 +799,10 @@
                 </div>
                 <p class="small muted" id="truthHelp" style="margin:0"></p></div>
               <div id="fakeFields" class="mk-stack">
-                <div class="field"><label for="fTactic">쓴 수법</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
-                <div class="field"><div class="flabel">단서를 찾는 기준</div><div class="opt-row" id="optClueCrit"></div></div>
-                <div class="field"><label for="fClue">숨긴 단서</label><textarea id="fClue" rows="3" placeholder="예: 공식 계정은 @doroland 인데 @dorolandd 로 썼다 / 매출을 386억이 아니라 193억이라고 썼다"></textarea></div>
+                <div class="field"><label for="fClueKind">들킬 단서 (다른 조가 확인할 수 있는 것 하나)</label><select id="fClueKind"></select><p class="small muted" id="clueKindHint" style="margin:0"></p></div>
+                <div class="field" id="factField" hidden><label for="fFact">어긋나게 쓴 자료실 내용</label><select id="fFact"></select></div>
+                <div class="field"><label for="fClue">어떻게 다르게 썼나요?</label><textarea id="fClue" rows="2" placeholder="예: 매출 386억을 193억이라고 썼다 / 막배가 7시 30분인데 밤 9시 불꽃놀이라고 썼다"></textarea></div>
+                <div class="field"><label for="fTactic">포장 방식 (선택)</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
               </div>
               <div id="realFields" class="mk-stack" hidden>
                 <div class="field"><label for="fBasis">근거가 된 자료실 내용</label><select id="fBasis"></select>
@@ -834,7 +841,7 @@
         <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조 수 <span class="small muted" style="font-weight:400">몇 조로 운영할지. 조마다 스토리·쇼츠·기사 1개씩 만듭니다.</span></h2><div class="ad-teams" id="adTeams"></div></div>
         <div class="ad-grid">
           <div class="ad-card"><h2><i data-lucide="list-checks" class="icon"></i>조별 현황</h2>
-            <table class="ad-table"><thead><tr><th>조</th><th>가짜 수법</th><th class="num">스토리</th><th class="num">쇼츠</th><th class="num">기사</th><th class="num">판별</th></tr></thead><tbody id="adTeamRows"></tbody></table></div>
+            <table class="ad-table"><thead><tr><th>조</th><th>이번 라운드</th><th class="num">스토리</th><th class="num">쇼츠</th><th class="num">기사</th><th class="num">판별</th></tr></thead><tbody id="adTeamRows"></tbody></table></div>
           <div class="ad-card"><h2><i data-lucide="trophy" class="icon"></i>점수 <span class="small muted" style="font-weight:400">아이들에게는 정답 공개 때만 보임</span></h2>
             <table class="ad-table"><thead><tr><th>순위</th><th>조</th><th class="num">합계</th><th class="num">맞힌 판별</th><th class="num">속인 조</th></tr></thead><tbody id="adScores"></tbody></table></div>
         </div>
@@ -859,7 +866,6 @@
       <div class="tp-head"><div class="tp-logo">Dorogram</div><h2 id="tpTitle">우리 조를 골라 주세요</h2></div>
       <div class="tp-grid" id="teamGrid"></div>
       <div class="tp-foot">
-        <button id="btnScreen" type="button"><i data-lucide="monitor" class="icon"></i>진행 화면</button>
         <button id="btnTeacher" type="button"><i data-lucide="key-round" class="icon"></i>선생님</button>
       </div>
     </div>
@@ -880,7 +886,7 @@ function store(k, v) { try { v === undefined ? localStorage.removeItem(k) : loca
 function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 const imgSrc = id => id ? API + '/img/' + id : '';
 const initials = name => esc((name || '?').trim().slice(0, 1));
-const teamTactic = t => C.TEAM_TACTICS[((t || 1) - 1) % C.TEAM_TACTICS.length];
+const clueKind = id => (C.CLUE_KINDS || []).find(k => k.id === id) || null;
 const ROUND_ORDER = ['news', 'shorts', 'story'], ROUND_LABEL = { news: '뉴스', shorts: '쇼츠', story: '스토리' }, ROUND_ICON = { news: 'newspaper', shorts: 'play', story: 'circle-dashed' };
 const roundIdx = f => Math.max(0, ROUND_ORDER.indexOf(f));
 const curRound = () => (S.data && S.data.round) || 'news';
@@ -935,7 +941,6 @@ function leaveAdmin() {
   document.body.classList.remove('admin'); S.fmt = null; showTab('feed'); $('#teamModal').hidden = false;
 }
 async function initTeam() {
-  $('#btnScreen').onclick = () => setTeam(0);
   $('#btnTeacher').onclick = () => { $('#teamModal').hidden = true; showTab('admin'); };
   try { AD.key = sessionStorage.getItem('dorogram-admin'); } catch (e) {}
   $('#teamChip').onclick = $('#sbTeam').onclick = () => $('#teamModal').hidden = false;
@@ -1133,7 +1138,7 @@ function renderOpBar() {
   const pr = d.progress || { submitted: [], judged: {}, posts: 0, seeds: 0 }, n = d.teamCount, teams = Array.from({ length: n }, (_, i) => i + 1);
   let prog = '';
   if (d.phase === 'read') prog = `<span>예시 ${pr.seeds}개</span>`;
-  else if (d.phase === 'make') prog = `<span>올린 조 ${pr.submitted.length} / ${n}</span>` + teams.map(t => `<i class="tm${pr.submitted.includes(t) ? ' on' : ''}">${t}</i>`).join('');
+  else if (d.phase === 'make') { const ret = pr.returned || [], cnt = pr.counts || {}; prog = `<span>${d.minPosts || 2}개 이상 올린 조 ${pr.submitted.length} / ${n}${ret.length ? ` · 돌려보냄 ${ret.length}` : ''}</span>` + teams.map(t => { const k = cnt[t] || 0; return `<i class="tm${ret.includes(t) ? ' ret' : pr.submitted.includes(t) ? ' on' : k ? ' part' : ''}" title="${t}조 ${k}개${ret.includes(t) ? ' · 돌려보냄' : ''}">${t}${k ? `<small>${k}</small>` : ''}</i>`; }).join(''); }
   else if (d.phase === 'judge') { const need = t => pr.posts - (pr.submitted.includes(t) ? 1 : 0), done = t => (pr.judged[t] || 0) >= need(t) && need(t) > 0;
     prog = `<span>판별 끝낸 조 ${teams.filter(done).length} / ${n}</span>` + teams.map(t => `<i class="tm${done(t) ? ' on' : (pr.judged[t] ? ' part' : '')}" title="${t}조 ${pr.judged[t] || 0} / ${need(t)}">${t}</i>`).join(''); }
   else if (d.scores) prog = `<span>순위</span>` + d.scores.slice(0, 3).map((r, i) => `<i class="tm on">${i + 1}위 ${r.team}조</i>`).join('');
@@ -1146,7 +1151,10 @@ function renderOpBar() {
 }
 async function goStep(spec) {
   const [phase, round] = spec.split(':');
-  if (!confirm(`모든 노트북이 「${stepName(phase, round)}」 화면으로 바뀝니다. 넘길까요?`)) return;
+  let warn = '';
+  if (phase === 'judge' && S.data && S.data.progress) { const pr = S.data.progress, n = S.data.teamCount, miss = n - pr.submitted.length, ret = (pr.returned || []).length;
+    if (miss || ret) warn = `\n\n${S.data.minPosts || 2}개를 못 채운 조 ${miss}${ret ? `, 돌려보낸 글 ${ret}` : ''}. 지금 넘기면 그 조는 올린 글만으로 판별에 들어갑니다.`; }
+  if (!confirm(`모든 노트북이 「${stepName(phase, round)}」 화면으로 바뀝니다.${warn}\n넘길까요?`)) return;
   try { await adApi('/admin/phase', { phase, round }); await refresh(); toast(stepName(phase, round)); } catch (e) { toast(e.message); }
 }
 /* 형식별 안내: 확인할 곳 / 가짜가 숨는 곳 / 진짜의 특징 (예시 보기 때 펼침, 만들기 때 접힘) */
@@ -1371,10 +1379,11 @@ function statusHTML(p) {
   if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예시 · 연습 (점수 없음)</div>`;
   if (!p.mine || revealed(p)) return '';
   const s = p.secret || {};
+  if (p.status === 'returned') return `<div class="status-line st-pending">${ic('undo-2')}선생님이 돌려보냄${p.note ? ' · ' + esc(p.note) : ''}</div>`;
   return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
 }
 function sideHTML(p) {
-  const open = S.open[p.id], own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
+  const open = S.open[p.id] === undefined && canJudge(p) && !S.data.myJudgments[p.id] ? 'cross' : S.open[p.id], own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
   const vbar = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="vbtn" data-act="verify" data-id="${p.id}" data-c="${k}" aria-expanded="${open === k}">${ic(c.icon)}${c.label}</button>`).join('');
   return `${statusHTML(p)}
       <div class="side-who">${whoBtn(p, `<span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span>`)}<div style="min-width:0"><div class="nm">${whoBtn(p, esc(a.name || '이름 없음') + vbadge(a))}</div><div class="meta">${esc(f.label || '')} · ${esc(a.handle || '')} · ${kindChip(a)}${a.followers ? ` · ${followLabel(p, a)} ${esc(a.followers)}` : ''}</div></div></div>
@@ -1501,20 +1510,24 @@ const myPosts = () => (S.data?.posts || []).filter(p => p.mine);
 const FIELD_MAP = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fPostsCount: 'posts', fBio: 'bio', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fCommentCount: 'commentCount', fThumbTitle: 'thumbTitle', fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fTags: 'tags', fPlace: 'place', fPoll: 'poll', fMusic: 'music', fPosted: 'postedAt', fTaken: 'photoTakenAt', fQuoteText: 'quoteText', fQuoteWho: 'quoteWho', fStat1L: 'stat1L', fStat1V: 'stat1V', fStat2L: 'stat2L', fStat2V: 'stat2V' };
 function resetForm() {
   const first = curRound();   /* 이번 라운드 형식만 만든다 */
-  S.form = { format: first, tactic: teamTactic(S.team), clueCriterion: null, clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
+  S.form = { format: first, tactic: '', clueCriterion: null, clueKind: '', fact: '', clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
     truth: 'fake', basis: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
     quoteText: '', quoteWho: '', stat1L: '', stat1V: '', stat2L: '', stat2V: '' };
   S.editing = null;
 }
 function renderMake() {
   if (S.screen || !S.team) return;
-  const d = S.data, tac = C.TACTICS.find(x => x.id === teamTactic(S.team)) || C.TACTICS[0], mine = myPosts();
-  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>${roundIdx(curRound()) + 1}라운드 <b>${ROUND_LABEL[curRound()]} 1개</b> (진짜/가짜 선택)</dd><dt>가짜 수법</dt><dd><b>${esc(tac.id)}</b> (${esc(tac.desc)})</dd><dt>규칙</dt><dd>실존 인물 금지 · 진짜는 자료실대로 · 가짜는 단서 하나 · 형식의 성격에 맞게</dd></dl>`;
-  $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 ${mine.length} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
-    <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' && p.format === curRound() ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
-  const canMake = S.editing || !mine.some(p => p.format === curRound());
+  const d = S.data, mine = myPosts(), ret = mine.find(p => p.status === 'returned' && p.format === curRound());
+  const cur = mine.filter(p => p.format === curRound() && p.status !== 'returned').length;
+  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>${roundIdx(curRound()) + 1}라운드 <b>${ROUND_LABEL[curRound()]} ${d.minPosts || 2}~${d.maxPosts}개</b> (글마다 진짜/가짜 선택) · 지금 <b>${cur}개</b></dd><dt>규칙</dt><dd>진짜는 자료실대로 · 가짜는 자료실로 확인되는 단서 하나 · 실존 인물 금지 · 형식의 성격에 맞게</dd></dl>`;
+  $('#makeHead').insertAdjacentHTML('afterend', '');
+  const rn = $('#returnedNote'); if (rn) rn.remove();
+  if (ret && S.editing !== ret.id) $('#makeHead').insertAdjacentHTML('afterend', `<div class="returned-note" id="returnedNote">${ic('undo-2')}<div>선생님이 돌려보냈어요. 단서를 고쳐서 다시 올려 주세요.${ret.note ? `<br><span>${esc(ret.note)}</span>` : ''}</div><button type="button" class="btn btn-primary" data-act="edit" data-id="${ret.id}" style="margin-left:auto">고치기</button></div>`);
+  $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 · 이번 라운드 ${cur} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
+    <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}${p.status === 'returned' ? ' · <b style="color:var(--fake)">돌려보냄</b>' : ''}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' && p.format === curRound() ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
+  const canMake = S.editing || cur < d.maxPosts;
   $('#makeWrap').hidden = !canMake; $('#makeClosed').hidden = canMake;
-  $('#makeClosed').innerHTML = `<b>이번 라운드 ${ROUND_LABEL[curRound()]}를 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 판별 시간이 되면 다른 조 ${ROUND_LABEL[curRound()]}가 열립니다.</p>`;
+  $('#makeClosed').innerHTML = `<b>이번 라운드 ${ROUND_LABEL[curRound()]} ${d.maxPosts}개를 다 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 판별 시간이 되면 다른 조 ${ROUND_LABEL[curRound()]}가 열립니다.</p>`;
   $('#makeNotice').hidden = true;
   $('#makeGuide').innerHTML = guideHTML(curRound(), false);
   $('#makeHead').innerHTML = `<button type="button" class="back" data-act="home-make">${ic('chevron-left')}처음으로</button><h2>${roundIdx(curRound()) + 1}라운드 · 우리 조 ${ROUND_LABEL[curRound()]} 만들기</h2>`;
@@ -1532,9 +1545,13 @@ function fillForm() {
   $('#truthHelp').textContent = f.truth === 'real' ? '진짜를 고르면 점수는 못 얻지만, 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못하게 합니다.' : '가짜를 진짜라고 믿은 조마다 1점을 얻습니다. 들킬 단서를 하나 꼭 남기세요.';
   $('#fakeFields').hidden = f.truth === 'real'; $('#realFields').hidden = f.truth !== 'real';
   $('#fBasis').innerHTML = '<option value="">자료실 내용을 고르세요</option>' + C.FACTS.map(x => `<option ${f.basis === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
-  $('#fTactic').innerHTML = C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
+  $('#fTactic').innerHTML = `<option value="" ${f.tactic ? '' : 'selected'}>고르지 않음</option>` + C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
   $('#tacticDesc').textContent = (C.TACTICS.find(t => t.id === f.tactic) || {}).desc || '';
-  $('#optClueCrit').innerHTML = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="opt" data-cluecrit="${k}" aria-pressed="${f.clueCriterion === k}">${c.label}</button>`).join('');
+  const ck = clueKind(f.clueKind);
+  $('#fClueKind').innerHTML = `<option value="" ${ck ? '' : 'selected'}>단서 종류를 고르세요</option>` + C.CLUE_KINDS.map(k => `<option value="${k.id}" ${f.clueKind === k.id ? 'selected' : ''}>[${esc(C.CRITERIA[k.crit].label)}] ${esc(k.label)}</option>`).join('');
+  $('#clueKindHint').textContent = ck ? ck.hint : '다른 조가 자료실·계정 정보·본문에서 확인할 수 있는 단서만 됩니다. 자료실에 없는 시간이나 숫자를 바꾸는 건 아무도 못 맞춥니다.';
+  $('#factField').hidden = !(ck && ck.fact);
+  $('#fFact').innerHTML = '<option value="">자료실 내용을 고르세요</option>' + C.FACTS.map(x => `<option ${f.fact === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
   $('#swatches').innerHTML = SWATCHES.map(c => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="프로필 색 ${c}" aria-pressed="${f.color === c}"></button>`).join('');
   $('#fNameLabel').textContent = fmt.authorLabel; $('#fName').placeholder = isNews ? '예: 도로일보' : isShorts ? '예: 놀이기구정복러' : '예: 여행하는 다은';
   $('#fFollowersLabel').textContent = isShorts ? '구독자 수' : '팔로워 수';
@@ -1589,7 +1606,6 @@ $('#postForm').addEventListener('click', e => {
   if (b.dataset.truth) S.form.truth = b.dataset.truth;
   else if (b.dataset.format && !b.disabled) S.form.format = b.dataset.format;
   else if (b.dataset.kind) S.form.kind = b.dataset.kind;
-  else if (b.dataset.cluecrit) S.form.clueCriterion = b.dataset.cluecrit;
   else if (b.dataset.color) S.form.color = b.dataset.color;
   else if (b.dataset.tpl && !b.disabled) S.form.thumbTpl = b.dataset.tpl;
   else if (b.dataset.mstep) S.mstep = b.dataset.mstep;
@@ -1601,6 +1617,8 @@ $('#postForm').addEventListener('click', e => {
 $('#postForm').addEventListener('input', e => {
   if (FIELD_MAP[e.target.id]) { S.form[FIELD_MAP[e.target.id]] = e.target.value; renderPreview(); }
 });
+$('#fClueKind').addEventListener('change', e => { S.form.clueKind = e.target.value; const k = clueKind(e.target.value); S.form.clueCriterion = k ? k.crit : null; if (!(k && k.fact)) S.form.fact = ''; fillForm(); });
+$('#fFact').addEventListener('change', e => { S.form.fact = e.target.value; });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
 $('#fBasis').addEventListener('change', e => { S.form.basis = e.target.value; });
 function shrink(file) {
@@ -1636,7 +1654,7 @@ $('#btnPolish').onclick = async e => {
 function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {}, st = p.stats || [];
-  S.form = { format: p.format, tactic: s.tactic || teamTactic(S.team), clueCriterion: s.clueCriterion, clue: s.truth === 'real' ? '' : (s.clue || ''), truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.clue || '') : '',
+  S.form = { format: p.format, tactic: s.tactic || '', clueCriterion: s.clueCriterion, clueKind: s.clueKind || '', fact: s.fact || '', clue: s.truth === 'real' ? '' : (s.clue || ''), truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.clue || '') : '',
     kind: kindOf(a), name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, posts: a.posts || '', bio: a.bio || '', color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', commentCount: p.commentCount || '',
     thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null, title: p.title || '', subhead: p.subhead || '', body: p.body, tags: p.tags, place: p.place, poll: p.poll ? `${p.poll.q} | ${p.poll.a} | ${p.poll.b}` : '', music: p.music || '', postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId, extraImages: [...(p.extraImages || [])],
     quoteText: p.quote?.text || '', quoteWho: p.quote?.who || '', stat1L: st[0]?.label || '', stat1V: st[0]?.value || '', stat2L: st[1]?.label || '', stat2V: st[1]?.value || '' };
@@ -1651,7 +1669,14 @@ $('#postForm').addEventListener('submit', async e => {
   if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return; }
   if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요. 진짜 기사처럼 보여야 합니다.'; return; }
   if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 자료실 내용을 골라 주세요.'; return; }
-  if (f.truth !== 'real' && (!f.clue.trim() || !f.clueCriterion)) { err.textContent = '가짜 게시물은 숨긴 단서와 그 단서를 찾는 기준을 꼭 적어 주세요.'; return; }
+  if (f.truth !== 'real') { const k = clueKind(f.clueKind), allText = [f.title, f.subhead, f.body, f.quoteText].join('\n');
+    if (!k) { err.textContent = '가짜 게시물은 들킬 단서 종류를 골라 주세요.'; return; }
+    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 내용을 골라 주세요.'; return; }
+    if (!f.clue.trim()) { err.textContent = '어떻게 다르게 썼는지 한 줄 적어 주세요.'; return; }
+    if (k.check === 'hear' && !new RegExp(HEARSAY.source).test(allText)) { err.textContent = '들은 이야기 단서는 본문에 "들었는데", "~래요", "친구가" 같은 말이 있어야 합니다.'; return; }
+    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '이 단서는 계정 종류를 공식 계정이나 언론사로 두어야 합니다.'; return; }
+    if (k.check === 'unreg' && f.handle && A.accounts.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록된 계정 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return; }
+    if (k.check === 'photo' && !(f.postedAt && f.photoTakenAt)) { err.textContent = '올린 때와 찍은 때를 둘 다 적어 주세요.'; return; } }
   const btn = $('#btnSubmit'); btn.disabled = true;
   const pv = previewPost();
   try {
@@ -1659,8 +1684,8 @@ $('#postForm').addEventListener('submit', async e => {
       likes: f.format === 'news' ? '' : f.likes, views: f.views || '', commentCount: f.format === 'story' ? '' : f.commentCount, thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
       title: f.format === 'story' ? '' : f.title, subhead: pv.subhead, body: f.body, tags: f.format === 'news' ? '' : f.tags, place: f.place, poll: f.format === 'story' ? pv.poll : null, music: f.format === 'news' ? '' : f.music,
       postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId, extraImages: f.format === 'news' ? [] : f.extraImages, quote: f.format === 'news' ? pv.quote : null, stats: f.format === 'news' ? pv.stats : [],
-      secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basis, clueCriterion: 'cross' } : { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion } });
-    toast(S.editing ? '고친 내용을 올렸습니다.' : '올렸습니다. 다른 조에게는 판별 시간부터 보입니다.');
+      secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basis, clueCriterion: 'cross', clueKind: '', fact: f.basis } : { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion, clueKind: f.clueKind, fact: f.fact } });
+    toast(S.editing ? '고친 내용을 올렸습니다. 선생님이 다시 봅니다.' : '올렸습니다. 선생님 확인을 거쳐 판별 시간에 다른 조에게 보입니다.');
     resetForm(); await refresh();
   } catch (x) { err.textContent = x.message; }
   btn.disabled = false;
@@ -1684,6 +1709,13 @@ async function adLogin() {
   try { AD.data = await adApi('/admin/state'); try { sessionStorage.setItem('dorogram-admin', AD.key); } catch (e) {} $('#adPwErr').textContent = ''; $('#adPw').value = ''; enterAdmin(); }
   catch (e) { AD.key = null; $('#adPwErr').textContent = e.message; }
 }
+/* 선생님 검토용: 이 글이 어디서 들통나는지 한눈에 */
+function clueBox(p) {
+  const s = p.secret || {}; if (p.seed) return '';
+  if (s.truth === 'real') return `<div class="clue">진짜 · 근거: ${esc(s.clue || s.fact || '-')}</div>`;
+  const k = clueKind(s.clueKind), cr = s.clueCriterion ? C.CRITERIA[s.clueCriterion] : null;
+  return `<div class="clue"><b>${cr ? esc(cr.label) : '기준 없음'}</b>${k ? ' · ' + esc(k.label) : ''}${s.fact ? `<br>어긋난 자료실 내용: ${esc(s.fact)}` : ''}<br>설명: ${esc(s.clue || '-')}${s.tactic ? ` · 포장: ${esc(s.tactic)}` : ''}${!k && s.truth === 'fake' ? '<br><b>확인할 수 없는 단서일 수 있음. 내용을 보고 돌려보낼지 정하세요.</b>' : ''}</div>`;
+}
 async function adRefresh() {
   try { AD.data = await adApi('/admin/state'); adRender(); }
   catch (e) { AD.key = null; try { sessionStorage.removeItem('dorogram-admin'); } catch (x) {} adShow(); $('#adPwErr').textContent = e.message; }
@@ -1696,20 +1728,24 @@ function adRender() {
   const judgedBy = {}; Object.keys(d.judgments).forEach(k => { const [pid, t] = k.split(':'); if (!d.posts.find(p => p.id === pid)?.seed) judgedBy[t] = (judgedBy[t] || 0) + 1; });
   const teamPosts = d.posts.filter(p => !p.seed);
   $('#adTeamRows').innerHTML = Array.from({ length: d.teamCount }, (_, i) => i + 1).map(t => { const has = f => teamPosts.some(p => p.team === t && p.format === f) ? '✓' : '·';
-    return `<tr><td><b>${t}조</b></td><td>${esc(teamTactic(t))}</td><td class="num">${has('story')}</td><td class="num">${has('shorts')}</td><td class="num">${has('news')}</td><td class="num">${judgedBy[t] || 0}</td></tr>`; }).join('');
+    const cur = teamPosts.find(p => p.team === t && p.format === d.round), curSt = !cur ? '<span class="muted">아직</span>' : cur.status === 'returned' ? '<b style="color:var(--fake)">돌려보냄</b>' : `<span class="ad-b ${truthOf(cur)}">${truthOf(cur) === 'real' ? '진짜' : '가짜'}</span>`;
+    return `<tr><td><b>${t}조</b></td><td>${curSt}</td><td class="num">${has('story')}</td><td class="num">${has('shorts')}</td><td class="num">${has('news')}</td><td class="num">${judgedBy[t] || 0}</td></tr>`; }).join('');
   $('#adScores').innerHTML = (d.scores || []).map((r, i) => `<tr><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="num"><b>${r.total}</b></td><td class="num">${r.correct} / ${r.judgable}</td><td class="num">${r.fooled}</td></tr>`).join('');
   const posts = [...d.posts].sort((a, b) => (a.seed === b.seed ? (b.createdAt || 0) - (a.createdAt || 0) : a.seed ? 1 : -1)), teamN = posts.filter(p => !p.seed).length;
   $('#adTeamCount').textContent = teamN;
   const row = p => { const truth = truthOf(p), c = p.counts || { real: 0, fake: 0, unsure: 0 };
-    return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
+    return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}${p.status === 'returned' ? ' returned' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
       <div><div>${p.seed ? '<span class="ad-b seed">예제</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')} · ${esc((p.author || {}).name || '')}</span></div>
-        <div class="t">${esc(p.title || p.body || '')}</div><div class="m">${p.secret?.clue ? '단서: ' + esc(p.secret.clue) + ' · ' : ''}판별 진짜 ${c.real} · 가짜 ${c.fake}</div></div>
-      <div><button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button></div></div>`; };
+        <div class="t">${esc(p.title || p.body || '')}</div>${clueBox(p)}<div class="m">판별 진짜 ${c.real} · 가짜 ${c.fake}${p.status === 'returned' ? ` · <b style="color:var(--fake)">돌려보냄</b>${p.note ? ': ' + esc(p.note) : ''}` : ''}</div></div>
+      <div style="display:grid;gap:6px">${p.seed || p.status === 'returned' ? '' : `<button class="btn btn-ghost" data-adreturn="${p.id}">돌려보내기</button>`}<button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button></div></div>`; };
   $('#adPosts').innerHTML = posts.filter(p => !p.seed).map(row).join('') || '<div class="panel-empty">아직 조가 올린 게시물이 없습니다.</div>';
   icons();
 }
 $('#adLoginBtn').onclick = adLogin; $('#adPw').addEventListener('keyup', e => { if (e.key === 'Enter') adLogin(); });
 document.addEventListener('click', async e => {
+  const rb = e.target.closest('[data-adreturn]');
+  if (rb) { const note = prompt('그 조에 보일 한 줄 (예: 바꾼 시간이 자료실에 없어요. 막배 시간처럼 자료실에 있는 걸로 바꿔 주세요)', ''); if (note === null) return;
+    try { await adApi('/admin/moderate', { postId: rb.dataset.adreturn, action: 'return', note }); toast('돌려보냈습니다.'); await adRefresh(); } catch (x) { toast(x.message); } return; }
   const ph = e.target.closest('[data-adphase]'), tg = e.target.closest('[data-adtoggle]'), tc = e.target.closest('[data-adteams]'), dl = e.target.closest('[data-addel]');
   try {
     if (ph) { const [phase, round] = ph.dataset.adphase.split(':'); await adApi('/admin/phase', { phase, round }); }

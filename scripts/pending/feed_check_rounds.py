@@ -30,6 +30,7 @@ async def main():
 
         kid = await page()
         check(await kid.locator('#teamModal').is_visible(), '조 선택 창이 먼저 뜸')
+        check(await kid.locator('#btnScreen').count() == 0, '진행 화면 버튼 없음')
         await kid.screenshot(path=OUT + '/a0_team.png')
         await kid.locator('#teamGrid [data-team="1"]').click(); await asyncio.sleep(1)
         await kid.screenshot(path=OUT + '/a1_home.png')
@@ -69,12 +70,37 @@ async def main():
         st = await state(); check(not any(x.get('seed') for x in st['posts']), '만들기: 예시가 사라짐')
         fm = await kid.evaluate("[...document.querySelectorAll('#optFormat [data-format]')].filter(b=>!b.disabled).map(b=>b.dataset.format)")
         check(fm == ['news'], f'만들기: 뉴스만 선택 가능 ({fm})')
+        nk = await kid.locator('#fClueKind option').count(); check(nk == 7, f'단서 종류 선택지 7개 ({nk})')
+        await kid.select_option('#fClueKind', 'cross'); await asyncio.sleep(0.3)
+        check(not await kid.evaluate("document.getElementById('factField').hidden"), '자료실 내용 고르기 칸이 열림')
         await kid.screenshot(path=OUT + '/a4_make.png')
+        bad = post(9, 'news'); bad['secret']['clueKind'] = 'cross'; bad['secret']['fact'] = ''
+        r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(bad), headers=J); check(r.status == 400, '자료실 사실 없는 가짜는 거부')
         for t in (1, 2, 3):
             r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(t, 'news', 'fake' if t != 3 else 'real')), headers=J); check(r.ok, f'{t}조 뉴스 올림')
+        for i in range(2):
+            r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(1, 'news')), headers=J); check(r.ok, f'1조 뉴스 {i + 2}번째 올림')
+        r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(post(1, 'news')), headers=J); check(r.status == 400, '1조 4번째는 거부')
         await asyncio.sleep(2)
+        # 선생님 검토: 2조 글 돌려보내기 → 2조만 보임, 1조에는 안 보임 → 2조가 고쳐 올리면 다시 올라감
+        adm = await (await rq.get(BASE + '/api/ch5/admin/state', headers=H)).json()
+        p2 = next(x for x in adm['posts'] if x.get('team') == 2)
+        r = await rq.post(BASE + '/api/ch5/admin/moderate', data=json.dumps({'postId': p2['id'], 'action': 'return', 'note': '시간이 자료실에 없어요'}), headers=H); check(r.ok, '돌려보내기')
+        s2 = await state(2); mine2 = next(x for x in s2['posts'] if x.get('mine'))
+        check(mine2['status'] == 'returned' and '자료실' in mine2.get('note', ''), f'2조에 돌려보냄+메모 보임 ({mine2["status"]}, {mine2.get("note")})')
+        s1 = await state(1); check(not any(x.get('team') == 2 for x in s1['posts']) and len([x for x in s1['posts'] if not x.get('mine')]) == 0, '돌려보낸 글은 다른 조에 안 보임(만들기 중)')
         await tea.evaluate("refresh()"); await asyncio.sleep(1)
-        bar = await tea.locator('#opBar').inner_text(); check('올린 조 3 / 10' in bar, f'진행 막대: 올린 조 3 ({bar.splitlines()[:3]})')
+        bar = await tea.locator('#opBar').inner_text(); check('돌려보냄 1' in bar, f'진행 막대: 돌려보냄 1 ({bar.splitlines()[2] if len(bar.splitlines())>2 else bar})')
+        kid2 = await page(); await kid2.locator('#teamGrid [data-team="2"]').click(); await asyncio.sleep(1.5)
+        check(await kid2.locator('#returnedNote').count() == 1, '2조 만들기 화면에 돌려보냄 안내')
+        await kid2.screenshot(path=OUT + '/a4b_returned.png')
+        fix = post(2, 'news'); fix['id'] = p2['id']; fix['secret']['clueKind'] = 'cross'; fix['secret']['fact'] = '지난해 매출 386억 원'
+        r = await rq.post(BASE + '/api/ch5/posts', data=json.dumps(fix), headers=J); check(r.ok, f'2조가 고쳐 올림 ({r.status})')
+        adm = await (await rq.get(BASE + '/api/ch5/admin/state', headers=H)).json()
+        check(next(x for x in adm['posts'] if x['id'] == p2['id'])['status'] == 'approved', '고쳐 올리면 다시 올라감')
+        await kid2.close()
+        await tea.evaluate("refresh()"); await asyncio.sleep(1)
+        bar = await tea.locator('#opBar').inner_text(); check('2개 이상 올린 조 1 / 10' in bar, f'진행 막대: 2개 이상 올린 조 1 ({bar.splitlines()[:3]})')
         await scr.evaluate("refresh()"); await asyncio.sleep(1)
         await scr.screenshot(path=OUT + '/c0_screen_make.png')
 
