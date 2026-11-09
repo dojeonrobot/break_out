@@ -102,8 +102,29 @@
     .round-tile.now:not(:disabled):hover { transform: scale(1.03) translateY(-6px); }
     .rt-photo { position: absolute; inset: 0; display: grid; gap: 3px; background: #1c1c1c; }
     .rt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .rt-photo.news { grid-template-columns: 1fr 1fr; grid-template-rows: 1.25fr 1fr; } .rt-photo.news img:first-child { grid-column: 1 / -1; }
-    .rt-photo.shorts { grid-template-columns: 1fr 1fr 1fr; }
+    /* 뉴스: 신문 1면 */
+    .rt-paper-bg { position: absolute; inset: 0; background: radial-gradient(120% 80% at 50% 0%, #3b4252 0%, #1f2430 60%, #15181f 100%); }
+    .rt-paper { position: absolute; left: 50%; top: 52px; width: 82%; transform: translateX(-50%) rotate(-3deg); background: #fbfaf6; color: #111; border-radius: 6px; padding: 12px 14px 14px; box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 2px 0 #e7e3d8; display: grid; gap: 8px; font-family: "Noto Serif KR", serif; }
+    .rt-paper .mast { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 3px double #333; padding-bottom: 6px; }
+    .rt-paper .mast b { font-size: 20px; font-weight: 900; letter-spacing: -.03em; } .rt-paper .mast span { font-family: var(--sans); font-size: 9px; color: #777; }
+    .rt-paper .tabs { display: flex; gap: 8px; font-family: var(--sans); font-size: 9px; color: #888; border-bottom: 1px solid #ddd; padding-bottom: 5px; } .rt-paper .tabs b { color: #c8102e; }
+    .rt-paper .hl { font-size: 15px; line-height: 1.35; font-weight: 800; letter-spacing: -.02em; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rt-paper img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 2px; }
+    .rt-paper .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .rt-paper .cols i { display: block; height: 5px; border-radius: 2px; background: #cfcbc1; margin-bottom: 4px; } .rt-paper .cols i:last-child { width: 60%; }
+    .round-tile:disabled .rt-paper { filter: grayscale(1) brightness(.75); }
+    /* 쇼츠: 세로 폰 화면 */
+    .rt-shorts-bg { position: absolute; inset: 0; background: #0f0f0f; }
+    .rt-phone { position: absolute; top: 46px; width: 54%; aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: #222; box-shadow: 0 0 0 4px #2a2a2a, 0 24px 50px rgba(0,0,0,.6); }
+    .rt-phone.main { left: 50%; transform: translateX(-32%); z-index: 1; } .rt-phone.back { left: 50%; transform: translateX(-108%) scale(.86); top: 70px; opacity: .55; filter: brightness(.7); }
+    .rt-phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rt-phone .ov { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35), transparent 25%, transparent 55%, rgba(0,0,0,.75)); }
+    .rt-phone .logo { position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 4px; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: -.01em; } .rt-phone .logo i { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; background: #ff0033; } .rt-phone .logo .icon { width: 10px; height: 10px; color: #fff; }
+    .rt-phone .acts { position: absolute; right: 8px; bottom: 54px; display: grid; gap: 10px; justify-items: center; color: #fff; font-size: 8px; font-weight: 700; } .rt-phone .acts .icon { width: 20px; height: 20px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+    .rt-phone .cap { position: absolute; left: 10px; right: 40px; bottom: 12px; color: #fff; display: grid; gap: 5px; }
+    .rt-phone .cap .ch { display: flex; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 700; } .rt-phone .cap .ch i { width: 16px; height: 16px; border-radius: 50%; background: var(--ig-grad); display: inline-block; }
+    .rt-phone .cap .tx { font-size: 10px; line-height: 1.3; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-weight: 600; }
+    .rt-phone .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.3); } .rt-phone .bar::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 42%; background: #ff0033; }
+    .round-tile:disabled .rt-phone { filter: grayscale(1) brightness(.6); }
     .rt-photo.story { display: block; } .rt-photo.story img { filter: blur(14px) brightness(.8); transform: scale(1.15); }
     .rt-rings { position: absolute; left: 0; right: 0; top: 24%; display: flex; justify-content: center; align-items: center; gap: 14px; }
     .rt-rings span { width: 22%; aspect-ratio: 1; border-radius: 50%; padding: 4px; background: var(--ig-grad); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
@@ -122,7 +143,7 @@
     .rt-body small { font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); word-break: keep-all; }
     .rt-cta { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; width: fit-content; padding: 10px 16px; border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 800; } .rt-cta .icon { width: 16px; height: 16px; }
     .round-tile.now .rt-cta { background: var(--blue); color: #fff; }
-    .round-tile:disabled .rt-photo { filter: grayscale(1) brightness(.55); } .round-tile:disabled .rt-play { display: none; } .round-tile:disabled .rt-rings { top: 14%; opacity: .7; } .round-tile:has(.rt-photo.story):disabled .rt-lock { top: 56%; }
+    .round-tile:disabled .rt-photo { filter: grayscale(1) brightness(.55); } .round-tile:disabled .rt-rings { top: 14%; opacity: .7; } .round-tile:has(.rt-photo.story):disabled .rt-lock { top: 56%; }
     .round-tile:disabled .rt-body small, .round-tile:disabled .rt-body b { color: rgba(255,255,255,.75); }
     .rt-lock { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 2; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; backdrop-filter: blur(6px); } .rt-lock .icon { width: 30px; height: 30px; }
     @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active, .round-tile.now { transform: none; } .round-tile.now .rt-state .dot { animation: none; } }
@@ -1161,9 +1182,11 @@ function renderRounds() {
     const now = i === cur, past = i < cur, open = now || past, peek = adm && !open, all = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved');
     const n = all.filter(p => !p.seed).length;
     const cv = ((S.data.covers || {})[f] || []).map(id => `<img src="${imgSrc(id)}" alt="" loading="lazy">`);
-    const art = f === 'news' ? `<span class="rt-photo news">${cv.slice(0, 3).join('')}</span>`
-      : f === 'shorts' ? `<span class="rt-photo shorts">${cv.slice(0, 3).join('')}</span><span class="rt-play">${ic('play')}</span>`
-      : `<span class="rt-photo story">${cv[0] || ''}</span><span class="rt-rings">${cv.slice(1, 4).map(x => `<span>${x}</span>`).join('')}</span>`;
+    const cvo = ((S.data.covers || {})[f] || []).map(x => typeof x === 'string' ? { img: x, title: '', name: '' } : x);
+    const im = o => o && o.img ? `<img src="${imgSrc(o.img)}" alt="" loading="lazy">` : '';
+    const art = f === 'news' ? `<span class="rt-paper-bg"></span><span class="rt-paper"><span class="mast"><b>${esc(cvo[0]?.name || '도로일보')}</b><span>${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}</span></span><span class="tabs"><span>정치</span><span>경제</span><b>사회</b><span>문화</span><span>지역</span></span><span class="hl">${esc(cvo[0]?.title || '')}</span>${im(cvo[0])}<span class="cols"><span><i></i><i></i><i></i></span><span><i></i><i></i><i></i></span></span></span>`
+      : f === 'shorts' ? `<span class="rt-shorts-bg"></span><span class="rt-phone back">${im(cvo[1])}<span class="ov"></span></span><span class="rt-phone main">${im(cvo[0])}<span class="ov"></span><span class="logo"><i>${ic('play')}</i>Shorts</span><span class="acts">${ic('heart')}<span>12만</span>${ic('message-circle')}<span>1.2천</span>${ic('send')}<span>공유</span></span><span class="cap"><span class="ch"><i></i>${esc(cvo[0]?.name || '')}</span><span class="tx">${esc(cvo[0]?.title || '')}</span></span><span class="bar"></span></span>`
+      : `<span class="rt-photo story">${im(cvo[0])}</span><span class="rt-rings">${cvo.slice(1, 4).map(x => `<span>${im(x)}</span>`).join('')}</span>`;
     const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장과 한 줄' }[f];
     const cta = now ? { read: '예시 보기', make: adm ? '조 게시물 보기' : '우리 조 만들기', judge: adm ? '게시물 보기' : '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : peek ? '관리자 미리 보기' : '';
     const state = now ? `<i class="dot"></i>${STEP_LABEL[S.data.phase]} 중` : past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';

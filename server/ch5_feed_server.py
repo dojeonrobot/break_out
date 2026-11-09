@@ -189,8 +189,10 @@ def round_covers():
     """라운드 타일용 예시 사진 4장씩(형식별). 사진 id만 보내며 글 내용·정답은 없다."""
     out = {}
     for f in ROUNDS:
-        ids = [p.get('thumbImageId') or p.get('imageId') for p in DB['posts'] if p.get('seed') and p.get('format') == f and (p.get('imageId') or p.get('thumbImageId'))]
-        out[f] = ids[:4]
+        items = [{'img': p.get('thumbImageId') or p.get('imageId'), 'title': (p.get('thumbTitle') or p.get('title') or (p.get('body') or '').split('\n')[0])[:60],
+                  'name': (p.get('author') or {}).get('name', '')}
+                 for p in DB['posts'] if p.get('seed') and p.get('format') == f and (p.get('imageId') or p.get('thumbImageId'))]
+        out[f] = items[:4]
     return out
 
 
