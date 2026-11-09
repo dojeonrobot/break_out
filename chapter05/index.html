@@ -308,7 +308,7 @@ input[type=range]{accent-color:var(--accent);width:150px}
 #notice{position:fixed;left:12px;right:12px;margin-inline:auto;width:fit-content;max-width:min(680px,calc(100% - 24px));top:calc(74px + env(safe-area-inset-top,0px));z-index:39;display:flex;align-items:center;gap:12px;padding:12px 18px;border-radius:14px;background:#1d2f55;color:#fff;border:0;font:inherit;text-align:left;box-shadow:0 10px 30px -12px rgba(0,0,0,.5);animation:rise .4s both;cursor:pointer}
 #notice[hidden]{display:none} #notice small{font:700 12px var(--mono);letter-spacing:.14em;color:#9ff6ff;white-space:nowrap} #notice b{font-size:15px;line-height:1.4} #notice span{font-size:12px;opacity:.7;white-space:nowrap}
 body.screen #notice{top:24px;padding:18px 28px;max-width:min(1100px,calc(100% - 48px))} body.screen #notice b{font-size:26px}
-#noticeIn{flex:1;min-width:0;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);color:var(--fg);font:inherit;font-size:13px} .adm .nnow{margin:0 0 8px;font-size:13px;line-height:1.5} .adm [data-npre]{white-space:normal;line-height:1.35;text-align:left!important} .adm .nrow{display:flex;gap:6px;min-width:0} .adm .nrow .mini{white-space:nowrap;flex:none}
+#noticeIn{flex:1;min-width:0;box-sizing:border-box;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);color:var(--fg);font:inherit;font-size:13px} .adm .nnow{margin:0 0 8px;font-size:13px;line-height:1.5} .adm [data-npre]{white-space:normal;line-height:1.35;text-align:left!important} .adm .nrow{display:flex;gap:6px;min-width:0} .adm .nrow .mini{white-space:nowrap;flex:none} .adm .crow{display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--line)} .adm .crow:first-of-type{border-top:0;padding-top:2px} .adm .crow .cn{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px} .adm .crow .cin{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:end} .adm .crow label{display:grid;gap:3px;min-width:0} .adm .crow label small{font-size:11px;color:var(--muted)} .adm .crow input{box-sizing:border-box;width:100%;min-width:0;padding:8px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel-solid);color:var(--fg);font:13px var(--mono);font-variant-numeric:tabular-nums} .adm .crow input:focus-visible{outline:2px solid var(--accent);outline-offset:1px} .adm .crow .cin .mini{min-height:36px;white-space:nowrap} .adm .crow .cdef{font:11px var(--mono);color:var(--muted)} @media (pointer:coarse){.adm .crow input,.adm .crow .cin .mini{min-height:44px}}
 #loading{position:fixed;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
 #loading[hidden]{display:none}
 #toast{position:fixed;left:0;right:0;margin-inline:auto;width:fit-content;bottom:calc(84px + env(safe-area-inset-bottom,0px));padding:8px 14px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -753,6 +753,8 @@ const DATA = {"origin":[37.29632795411764,126.8371384682353],"campus":[[-901.4,-
 const KX = Math.cos(DATA.origin[0]*Math.PI/180)*111320, KZ = 110540;
 const toLocal = (lat, lng) => [(lng - DATA.origin[1])*KX, -(lat - DATA.origin[0])*KZ];
 const MISSIONS = [{"id":"z1","name":"융합교육관 전시대","building":1471504923,"radius":80,"indoor":true,"brief":"가져간 인형이나 3D 출력물을 한 바퀴 돌며 스캔해 기록을 채우세요. 층·위치는 확정 전입니다.","twin":"dl-harmonia","lat":37.295655,"lng":126.838475},{"id":"z2","name":"하냥이 벤치","building":367646452,"radius":50,"brief":"라이언스홀 앞 벤치의 하냥이를 옆에 앉아 스캔해 기록을 채우세요.","twin":"dl-ferris","lat":37.295565,"lng":126.840878},{"id":"z3","name":"카카오데이터센터","building":1524278252,"radius":60,"brief":"데이터센터 앞 라이언·어피치 피규어를 스캔해 기록을 채우세요.","twin":"dl-safari","lat":37.293614,"lng":126.831854}];
+/* record coordinates the admin can change on the dashboard (user, 2026-11-09): the values written above are the defaults; the server keeps only the changed ones */
+const COORD_DEF = Object.fromEntries(MISSIONS.filter(m=> m.lat != null).map(m=> [m.id, {lat:m.lat, lng:m.lng}])); let COORDS = {};
 const SCANS_ALL = [];
 // Server state is read once before the map is built, so restored records and the admin's hidden list apply without a reload.
 const API = '/api/void';
@@ -1003,6 +1005,10 @@ const pairIds = id => TWIN[id] ? [id, TWIN[id]] : [id];
 const scansFor = id => pairIds(id).flatMap(k=> byMission[k] || []);
 let M = MISSIONS.filter(m=> m.campus !== false).map(m=>({...m, scans: scansFor(m.id)}));   // 2026-10-27: three campus zones; the other two island zones come back through the island missions
 const MISSION_E = M;
+function coordsApply(c){ c = (c && typeof c === 'object') ? c : {}; const j = JSON.stringify(c); if(j === coordsApply.j) return false; coordsApply.j = j; COORDS = c;
+  [MISSIONS, M].forEach(list=> list.forEach(m=>{ const d = COORD_DEF[m.id]; if(!d) return; const v = c[m.id], ok = v && isFinite(+v.lat) && isFinite(+v.lng); m.lat = ok ? +v.lat : d.lat; m.lng = ok ? +v.lng : d.lng; }));
+  return true; }
+try{ coordsApply(JSON.parse(localStorage.getItem('void-coords') || '{}')); }catch(e){}   /* last coordinates this device saw, until the server answers */
 const missionOfBuilding = {}; M.forEach(m=> missionOfBuilding[m.building] = m);
 // A zone is restored by one record: a Scaniverse link the server converts (or a built-in splat; a preview record counts too). 2026-10-27
 const zoneParts = m => ({scan: !!(m && m.scans.length)});
@@ -1579,6 +1585,7 @@ function applyState(st){
   if(!LOCAL){ VIK_STATE = st.vikings || {}; if(window.__vikReady){ VIKINGS = VIK_STATE; vikingSync(); } }
   AUTO = st.auto !== false;
   noticeApply(st.notice);
+  if(coordsApply(st.coords)){ try{ localStorage.setItem('void-coords', JSON.stringify(COORDS)); }catch(e){} if(typeof myPos !== 'undefined' && myPos) try{ showMeCoord(); }catch(e){} }
   if(st.pos){ LAST_POS = st.pos; updateTeamDots(LAST_POS, st.now); }
   if(lastSig !== null) announceChanges();
   // the hidden list and the restored records are applied live, no reload: the 3D side (markers, monuments, flow) rebuilds through rescan()
@@ -1611,6 +1618,24 @@ function noticeApply(n){
   if(seen < id && (!ADMIN_KEY || TEAM) && !SCREEN){ sfx('notice'); try{ voidSay(n.text, 9000, 'say'); }catch(e){} }
 }
 $('notice').onclick = ()=>{ $('notice').hidden = true; try{ sessionStorage.setItem('void-notice-seen', String(NOTICE ? NOTICE.id : 0)); }catch(e){} };
+/* admin: change one record's coordinates (or put the default back); every tablet picks it up with its next state poll (user, 2026-11-09) */
+document.addEventListener('input', e=>{ const i = e.target; if(!(i instanceof HTMLInputElement) || !i.dataset.keep || !/^cl(at|ng)-/.test(i.dataset.keep)) return; i.dataset.dirty = '1';
+  const two = i.value.match(/(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)/); if(!two) return;   /* "37.29, 126.84" pasted into one box fills both */
+  const id = i.dataset.keep.slice(5), la = document.querySelector(`[data-keep="clat-${id}"]`), ln = document.querySelector(`[data-keep="clng-${id}"]`); if(!la || !ln) return;
+  la.value = two[1]; ln.value = two[2]; la.dataset.dirty = ln.dataset.dirty = '1'; });
+async function saveCoord(id, clear){
+  const m = MISSIONS.find(x=> x.id === id), d = COORD_DEF[id]; if(!m || !d) return;
+  let body = {mission:id, clear:true};
+  if(!clear){ const la = document.querySelector(`[data-keep="clat-${id}"]`), ln = document.querySelector(`[data-keep="clng-${id}"]`);
+    const lat = parseFloat((la && la.value || '').trim()), lng = parseFloat((ln && ln.value || '').trim());
+    if(!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180){ toast('위도·경도를 숫자로 적어 주세요'); return; }
+    const km = Math.hypot((lat - DATA.origin[0])*110.54, (lng - DATA.origin[1])*111.32*Math.cos(lat*Math.PI/180));
+    if(km > 3 && !confirm(`캠퍼스에서 ${km.toFixed(1)}km 떨어진 곳입니다. 위도와 경도가 바뀌지 않았는지 확인해 주세요. 그래도 저장할까요?`)) return;
+    body = {mission:id, lat, lng}; }
+  try{ STATE_VER = -1; const st = await api('/admin/coords', body, true);
+    document.querySelectorAll(`[data-keep="clat-${id}"],[data-keep="clng-${id}"]`).forEach(i=> delete i.dataset.dirty);
+    applyState(st); renderAdmin(); toast(clear ? `${m.name} 좌표를 기본값으로 돌렸습니다` : `${m.name} 좌표를 저장했습니다`); }
+  catch(err){ toast(LOCAL ? '서버에 연결되지 않아 저장할 수 없습니다' : err.message); } }
 async function sendNotice(text){ text = (text || '').trim(); try{ STATE_VER = -1; applyState(await api('/admin/notice', {text}, true)); toast(text ? '공지를 보냈습니다' : '공지를 내렸습니다'); renderAdmin(); }catch(err){ toast(err.message); } }
 const MSG = {};
 const subsFor = m => { const v = viewTeam(); return SUBS.filter(s=> pairIds(m.id).includes(s.mission) && !inMap.has(s.scanId) && (v === 0 || s.team === v)); };
@@ -1745,6 +1770,13 @@ function adminHTML(){
           ${NOTICE ? `<p class="nnow">지금 공지: <b>${esc(NOTICE.text)}</b> <button type="button" class="mini" data-aact="noticeClear">내리기</button></p>` : ''}
           <div class="arow col">${NOTICE_PRESETS.map(t=> `<button type="button" class="mini" data-npre="${esc(t)}">${esc(t)}</button>`).join('')}</div>
           <div class="nrow"><input id="noticeIn" type="text" maxlength="120" placeholder="직접 쓰기" autocomplete="off" aria-label="공지 내용"><button type="button" class="mini on" data-aact="noticeSend">보내기</button></div></section>
+        <section class="card"><h3>기록 좌표</h3>
+          ${MISSIONS.filter(m=> COORD_DEF[m.id]).map(m=>{ const d = COORD_DEF[m.id], ch = !!COORDS[m.id]; return `<div class="crow">
+            <div class="cn"><b>${esc(m.name)}</b>${ch ? `<button type="button" class="mini" data-cdef="${esc(m.id)}">기본값으로</button>` : ''}</div>
+            <div class="cin"><label><small>위도</small><input type="text" inputmode="decimal" autocomplete="off" data-keep="clat-${esc(m.id)}" value="${m.lat.toFixed(6)}" aria-label="${esc(m.name)} 위도"></label>
+              <label><small>경도</small><input type="text" inputmode="decimal" autocomplete="off" data-keep="clng-${esc(m.id)}" value="${m.lng.toFixed(6)}" aria-label="${esc(m.name)} 경도"></label>
+              <button type="button" class="mini on" data-csave="${esc(m.id)}">저장</button></div>
+            ${ch ? `<small class="cdef">기본값 ${d.lat.toFixed(6)}, ${d.lng.toFixed(6)}</small>` : ''}</div>`; }).join('')}</section>
         <section class="card"><h3>보기</h3>
           <label class="autol">이 화면에 보이는 기록 <select data-aview><option value="0" ${VIEW_ADMIN ? '' : 'selected'}>모든 조</option>${Array.from({length:12}, (_,i)=> `<option value="${i+1}" ${VIEW_ADMIN === i+1 ? 'selected' : ''}>${i+1}조가 보는 대로</option>`).join('')}</select></label>
           <label class="autol"><input type="checkbox" id="autoChk" data-aact="auto" ${AUTO ? 'checked' : ''}> 링크가 변환되면 바로 복구됨 <small>(끄면 운영자가 「복구 확정」)</small></label></section>
@@ -1763,7 +1795,11 @@ function adminHTML(){
 // preview ticks apply at once, without a reload: stand-in records go in or out, the zones and the flow layer rebuild (see setDemo)
 function demoTick(ids, on){ setDemo(ids, on); }   // on: the arrival plays in the park, or as a vein sweep if the simulator is on (setDemo → rescan)
 function clearLocalDemo(){ if(DEMO.size) setDemo([...DEMO], false); try{ Object.keys(localStorage).filter(k=> k.startsWith('void-seen-lit')).forEach(k=> localStorage.removeItem(k)); Object.keys(sessionStorage).filter(k=> k.startsWith('void-simdone')).forEach(k=> sessionStorage.removeItem(k)); }catch(e){} }
-function renderAdmin(){ const b = $('adminBody'); if(b && !$('adminDlg').hidden) b.innerHTML = adminHTML(); }
+function renderAdmin(){ const b = $('adminBody'); if(!b || $('adminDlg').hidden) return;
+  const keep = {}, fk = document.activeElement && b.contains(document.activeElement) && document.activeElement.dataset ? document.activeElement.dataset.keep : null;
+  b.querySelectorAll('input[data-keep]').forEach(i=>{ if(i.dataset.dirty) keep[i.dataset.keep] = i.value; });
+  b.innerHTML = adminHTML();
+  b.querySelectorAll('input[data-keep]').forEach(i=>{ if(i.dataset.keep in keep){ i.value = keep[i.dataset.keep]; i.dataset.dirty = '1'; } if(fk && i.dataset.keep === fk) i.focus(); }); }
 function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); rescan(); }
 if(QS.get('admin') === '1'){ try{ sessionStorage.getItem('void-admin') && setTimeout(()=> $('adminBtn').click(), 1500); }catch(e){} }   // ?admin=1 opens the dashboard on a logged-in device
 document.addEventListener('change', e=>{ const v = e.target.closest('[data-aview]'); if(!v) return; VIEW_ADMIN = +v.value || 0; try{ sessionStorage.setItem('void-view', String(VIEW_ADMIN)); }catch(e){} rescan(); });
@@ -1971,6 +2007,8 @@ document.addEventListener('click', e=>{
   if(dm){ e.stopPropagation(); demoTick([dm.dataset.demo], dm.checked); return; }
   const aa = e.target.closest('[data-aact]');
   if(aa){ e.stopPropagation(); adminAct(aa.dataset.aact); return; }
+  const cs = e.target.closest('[data-csave]'); if(cs){ e.stopPropagation(); saveCoord(cs.dataset.csave); return; }
+  const cd = e.target.closest('[data-cdef]'); if(cd){ e.stopPropagation(); saveCoord(cd.dataset.cdef, true); return; }
   const np = e.target.closest('[data-npre]');
   if(np){ e.stopPropagation(); sendNotice(np.dataset.npre); return; }
   const aq = e.target.closest('[data-aq]');

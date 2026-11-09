@@ -76,7 +76,7 @@ def now_ms():
 
 
 def fresh_db():
-    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True, 'reset': 0, 'quests': {}, 'notice': None}
+    return {'version': 0, 'subs': [], 'hidden': [], 'auto': True, 'reset': 0, 'quests': {}, 'notice': None, 'coords': {}}
 
 
 def read_db():
@@ -164,7 +164,7 @@ def live_pos():
 
 def state():
     return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)), 'reset': int(DB.get('reset', 0)),
-            'quests': DB.get('quests', {}), 'vikings': DB.get('vikings', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'now': now_ms()}
+            'quests': DB.get('quests', {}), 'vikings': DB.get('vikings', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'coords': DB.get('coords', {}), 'now': now_ms()}
 
 
 # ---------- Scaniverse 링크 → 스플랫 자동 변환 ----------
@@ -385,7 +385,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/convert': self.admin_convert,
             '/api/void/admin/delete': self.admin_delete, '/api/void/admin/reset': self.admin_reset,
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
-            '/api/void/admin/auto': self.admin_auto,
+            '/api/void/admin/auto': self.admin_auto, '/api/void/admin/coords': self.admin_coords,
             '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
             '/api/void/admin/skip': self.admin_skip, '/api/void/admin/viking_clear': self.admin_viking_clear,
         }
@@ -658,6 +658,26 @@ class Handler(BaseHTTPRequestHandler):
         text = clean_text(b.get('text'), 120)
         with lock:
             DB['notice'] = {'id': now_ms(), 'text': text, 't': now_ms()} if text else None
+            save()
+            self.send_json(state())
+
+    # 운영자: 캠퍼스 기록 좌표 바꾸기 (2026-11-09). clear면 페이지 기본값으로. 바꾼 것만 저장한다.
+    def admin_coords(self, b):
+        mid = str(b.get('mission') or '')
+        if not MISSION_ID.match(mid):
+            raise ValueError('기록 이름이 올바르지 않습니다.')
+        with lock:
+            cs = DB.setdefault('coords', {})
+            if b.get('clear'):
+                cs.pop(mid, None)
+            else:
+                try:
+                    lat, lng = float(b.get('lat')), float(b.get('lng'))
+                except (TypeError, ValueError):
+                    raise ValueError('위도·경도는 숫자로 적어 주세요.')
+                if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+                    raise ValueError('위도는 -90~90, 경도는 -180~180 사이여야 합니다.')
+                cs[mid] = {'lat': round(lat, 7), 'lng': round(lng, 7), 't': now_ms()}
             save()
             self.send_json(state())
 
