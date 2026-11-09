@@ -90,20 +90,49 @@
     .rounds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 8px 16px 0; max-width: 980px; }
     @media (min-width: 1024px) { .rounds { padding: 8px 0 0; } }
     @media (max-width: 640px) { .rounds { grid-template-columns: 1fr; } }
-    .round-tile { display: grid; gap: 14px; justify-items: start; text-align: left; padding: 22px 20px; min-height: 196px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
-    .round-tile .rt-ic { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--surface-2); }
-    .round-tile .rt-ic .icon { width: 26px; height: 26px; }
-    .round-tile small { font-size: 13px; font-weight: 700; color: var(--muted); }
-    .round-tile b { display: block; font-size: 26px; line-height: 1.2; margin-top: 2px; }
-    .round-tile .rt-st { font-size: 13px; color: var(--muted); }
-    .round-tile.now { border: 2px solid var(--blue); box-shadow: 0 6px 20px color-mix(in srgb, var(--blue) 18%, transparent); }
-    .round-tile.now .rt-ic { background: var(--blue); color: var(--blue-ink); }
-    .round-tile.now small, .round-tile.now .rt-st { color: var(--blue); }
-    .round-tile:not(:disabled):hover { transform: translateY(-2px); }
-    .round-tile:not(:disabled):active { transform: translateY(1px); }
-    .round-tile:disabled { cursor: not-allowed; opacity: .45; background: var(--surface-2); }
-    .round-tile:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active { transform: none; } }
+    .rounds { max-width: 1120px; gap: 20px; }
+    .round-tile { position: relative; display: grid; grid-template-rows: 190px auto; text-align: left; padding: 0; border-radius: 22px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; overflow: hidden; box-shadow: 0 1px 2px color-mix(in srgb, #262626 6%, transparent); transition: transform .22s cubic-bezier(.16,1,.3,1), box-shadow .22s; }
+    .round-tile:not(:disabled):hover { transform: translateY(-4px); box-shadow: 0 16px 36px color-mix(in srgb, #262626 14%, transparent); }
+    .round-tile:not(:disabled):active { transform: translateY(0) scale(.99); }
+    .round-tile:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .round-tile:disabled { cursor: not-allowed; }
+    .round-tile:disabled .rt-art { filter: grayscale(1); opacity: .45; }
+    .round-tile:disabled .rt-body b, .round-tile:disabled .rt-body small { color: var(--muted); }
+    .round-tile.now { border-color: transparent; box-shadow: 0 0 0 2px var(--blue), 0 14px 34px color-mix(in srgb, var(--blue) 22%, transparent); }
+    .rt-num { position: absolute; top: 14px; left: 14px; z-index: 2; font-size: 12px; font-weight: 800; letter-spacing: .02em; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #262626; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    .rt-lock { position: absolute; inset: 0 0 auto; height: 190px; z-index: 2; display: grid; place-items: center; color: #fff; }
+    .rt-lock span { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: rgba(38,38,38,.75); backdrop-filter: blur(4px); }
+    .rt-lock .icon { width: 24px; height: 24px; }
+    .rt-art { position: relative; overflow: hidden; }
+    .rt-body { display: grid; gap: 4px; padding: 16px 18px 18px; }
+    .rt-body b { font-size: 24px; line-height: 1.2; letter-spacing: -0.01em; }
+    .rt-body small { font-size: 13px; font-weight: 700; color: var(--muted); }
+    .rt-st { display: inline-flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+    .rt-st .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex: none; }
+    .round-tile.now .rt-st { color: var(--blue); } .round-tile.now .rt-st .dot { background: var(--blue); box-shadow: 0 0 0 0 color-mix(in srgb, var(--blue) 50%, transparent); animation: rtPulse 1.6s ease-out infinite; }
+    .round-tile.past .rt-st { color: var(--real); } .round-tile.past .rt-st .dot { background: var(--real); }
+    @keyframes rtPulse { to { box-shadow: 0 0 0 9px transparent; } }
+    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active { transform: none; } .round-tile.now .rt-st .dot { animation: none; } }
+    /* 기사 지면 */
+    .art-news { background: linear-gradient(180deg, #fff 0, #f3f4f6 100%); padding: 44px 22px 0; display: grid; gap: 9px; align-content: start; }
+    .art-news .mh { height: 10px; width: 34%; border-radius: 3px; background: #d62976; }
+    .art-news .hl { height: 15px; border-radius: 4px; background: #262626; } .art-news .hl.s { width: 72%; }
+    .art-news .ph { margin-top: 4px; height: 84px; border-radius: 10px; background: linear-gradient(135deg, #0f766e, #134e4a 60%, #1e293b); position: relative; }
+    .art-news .ph::after { content: ""; position: absolute; left: 10px; bottom: 10px; width: 46%; height: 8px; border-radius: 3px; background: rgba(255,255,255,.75); }
+    .art-news .ln { height: 7px; border-radius: 3px; background: #c9ced6; } .art-news .ln.s { width: 60%; }
+    /* 세로 쇼츠 */
+    .art-shorts { background: #0f0f0f; display: grid; place-items: center; }
+    .art-shorts .phone { width: 104px; height: 100%; margin-top: 30px; border-radius: 16px 16px 0 0; background: linear-gradient(160deg, #4f5bd5, #962fbf 45%, #d62976 80%, #fa7e1e); position: relative; box-shadow: 0 0 0 5px #262626, 0 18px 40px rgba(0,0,0,.6); }
+    .art-shorts .phone::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.65)); border-radius: inherit; }
+    .art-shorts .play { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.92); display: grid; place-items: center; color: #111; } .art-shorts .play .icon { width: 18px; height: 18px; margin-left: 2px; }
+    .art-shorts .cap { position: absolute; left: 12px; right: 36px; bottom: 26px; height: 8px; border-radius: 3px; background: rgba(255,255,255,.9); } .art-shorts .cap.s { bottom: 12px; right: 56px; opacity: .6; }
+    .art-shorts .acts { position: absolute; right: 8px; bottom: 10px; display: grid; gap: 7px; } .art-shorts .acts i { display: block; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.85); }
+    /* 스토리 링 */
+    .art-story { background: linear-gradient(180deg, #fff, #fafafa); display: flex; align-items: center; justify-content: center; gap: 14px; padding-top: 22px; }
+    .art-story .ring { width: 62px; height: 62px; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
+    .art-story .ring span { display: block; width: 100%; height: 100%; border-radius: 50%; border: 3px solid #fff; background: var(--c, #0f766e); }
+    .art-story .ring:nth-child(2) { width: 78px; height: 78px; } .art-story .ring.seen { background: #dbdbdb; }
+    @media (prefers-color-scheme: dark) { .art-news { background: linear-gradient(180deg, #1a1a1a, #111); } .art-news .hl { background: #f5f5f5; } .art-news .ln { background: #3a3a3a; } .art-story { background: #111; } .art-story .ring span { border-color: #111; } .rt-num { background: rgba(38,38,38,.9); color: #f5f5f5; } }
     .round-head { display: flex; align-items: center; gap: 12px; margin: 0 16px 14px; flex-wrap: wrap; }
     @media (min-width: 1024px) { .round-head { margin: 0 0 14px; } }
     .round-head h2 { margin: 0; font-size: 22px; }
@@ -348,26 +377,36 @@
     .vnav button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; display: grid; place-items: center; } .vnav button:hover { background: rgba(255,255,255,.3); } .vnav button:disabled { opacity: .25; }
     .post-side { overflow: auto; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
     @media (max-width: 860px) { .pm { padding: 0; } .pm-box { width: 100%; height: 100dvh; } .pm-box .post { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; border-radius: 0; } .post-media, .post-side { overflow: visible; } .post-side { border-left: 0; } .pm-nav { top: auto; bottom: 14px; transform: none; } .vnav { display: none; } }
-    .side-h { display: flex; align-items: center; gap: 8px; padding: 14px 14px 4px; font-weight: 800; font-size: 15px; } .side-h .icon { width: 18px; height: 18px; }
-    .side-who { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .post-side { font-size: 15px; line-height: 1.55; }
+    .side-h { display: flex; align-items: center; gap: 8px; padding: 16px 16px 6px; font-weight: 800; font-size: 13px; letter-spacing: .02em; color: var(--muted); text-transform: uppercase; } .side-h .icon { width: 16px; height: 16px; }
+    .side-who { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .side-who .avatar { width: 40px; height: 40px; font-size: 16px; }
     .side-who .nm { font-weight: 800; display: flex; align-items: center; } .side-who .meta { color: var(--muted); font-size: 12px; }
     .kind-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink); } .kind-chip .icon { width: 12px; height: 12px; }
     .kind-chip.official { background: #dbeafe; color: #1e40af; } .kind-chip.press { background: #fde7e9; color: #9f1239; } .kind-chip.creator { background: #fef3c7; color: #92400e; }
     .status-line { padding: 8px 14px; font-size: 13px; font-weight: 700; display: flex; gap: 6px; align-items: center; }
     .st-pending { background: #fff7d6; color: #7a5b00; } .st-approved { background: var(--real-bg); color: var(--real); } .st-seed { background: #dbeafe; color: #1e40af; }
-    .verify { padding: 10px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .vbtn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 7px 6px; font-size: 13px; font-weight: 600; display: flex; gap: 5px; align-items: center; justify-content: center; white-space: nowrap; }
-    .vbtn[aria-expanded="true"] { background: var(--navy); color: var(--navy-ink); border-color: var(--navy); } .vbtn .icon { width: 15px; height: 15px; }
-    .vpanel { margin: 0 12px 12px; padding: 12px 14px; background: var(--surface-2); border-radius: 8px; font-size: 14px; }
+    .verify { padding: 4px 10px 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .vbtn { border: 0; background: transparent; border-radius: 12px; padding: 10px 4px 8px; font-size: 12px; font-weight: 700; display: grid; justify-items: center; gap: 6px; color: var(--ink); min-height: 64px; }
+    .vbtn .icon { width: 24px; height: 24px; stroke-width: 1.75; }
+    .vbtn:hover { background: var(--surface-2); }
+    .vbtn[aria-expanded="true"] { background: var(--ink); color: var(--surface); }
+    .vpanel { margin: 0 12px 12px; padding: 14px 16px; background: var(--surface-2); border-radius: 14px; font-size: 14px; }
     .vpanel dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 6px 0 0; } .vpanel dt { color: var(--muted); } .vpanel dd { margin: 0; font-weight: 700; } .vpanel ul { margin: 6px 0 0; padding-left: 18px; }
     .vpanel .reg { margin-top: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; } .reg.ok { background: var(--real-bg); color: var(--real); } .reg.no { background: var(--fake-bg); color: var(--fake); } .reg.na { background: var(--surface); color: var(--muted); }
     .vpanel details { margin-top: 6px; } .vpanel summary { cursor: pointer; font-weight: 700; font-size: 13px; }
     mark.hear { background: #ffe58a; color: #3d2f00; padding: 0 2px; border-radius: 3px; }
-    .judge { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 10px; }
+    .judge { border-top: 1px solid var(--line); padding: 14px 16px 16px; display: grid; gap: 12px; }
+    .judge-q { font-size: 16px; font-weight: 800; margin: 0; }
     .judge-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .vd { flex: 1; min-width: 88px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; font-weight: 700; }
-    .vd[data-v="real"][aria-pressed="true"] { background: var(--real-bg); border-color: var(--real); color: var(--real); } .vd[data-v="fake"][aria-pressed="true"] { background: var(--fake-bg); border-color: var(--fake); color: var(--fake); } .vd[data-v="unsure"][aria-pressed="true"] { background: var(--unsure-bg); border-color: var(--unsure); }
-    .crit { border: 0; background: var(--surface-2); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 700; } .crit[aria-pressed="true"] { background: var(--navy); color: var(--navy-ink); }
+    .judge-row.seg { gap: 0; padding: 4px; border-radius: 14px; background: var(--surface-2); }
+    .vd { flex: 1; min-width: 0; border: 0; background: transparent; border-radius: 11px; padding: 11px 6px; font-weight: 800; font-size: 15px; display: grid; justify-items: center; gap: 4px; color: var(--muted); }
+    .vd .icon { width: 22px; height: 22px; }
+    .vd[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    .vd[data-v="real"][aria-pressed="true"] { color: var(--real); } .vd[data-v="fake"][aria-pressed="true"] { color: var(--fake); } .vd[data-v="unsure"][aria-pressed="true"] { color: var(--ink); }
+    .crit { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; } .crit .icon { width: 15px; height: 15px; }
+    .crit[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+    .judge .btn-primary { width: 100%; min-height: 44px; font-size: 15px; border-radius: 10px; }
     .flabel { font-weight: 700; font-size: 14px; }
     .field { display: grid; gap: 6px; } .field label { font-weight: 700; font-size: 14px; }
     .input, textarea, select { width: 100%; border: 1px solid #b9c2d0; background: var(--surface); border-radius: var(--r-input); padding: 9px 12px; }
@@ -380,9 +419,26 @@
     .done-judge { font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .badge { display: inline-flex; gap: 4px; align-items: center; padding: 2px 10px; border-radius: 999px; font-weight: 800; font-size: 13px; }
     .b-real { background: var(--real-bg); color: var(--real); } .b-fake { background: var(--fake-bg); color: var(--fake); } .b-unsure { background: var(--unsure-bg); color: var(--unsure); }
-    .answer { border-top: 1px solid var(--line); padding: 12px 16px; display: grid; gap: 6px; font-size: 14px; } .answer.real { background: var(--real-bg); } .answer.fake { background: var(--fake-bg); }
-    .answer .big { font-size: 16px; font-weight: 800; }
-    .counts { display: flex; gap: 12px; font-size: 13px; color: var(--muted); }
+    .answer { border-top: 1px solid var(--line); display: grid; }
+    .ans-head { display: flex; align-items: center; gap: 12px; padding: 16px; color: #fff; }
+    .answer.real .ans-head { background: var(--real); } .answer.fake .ans-head { background: var(--fake); }
+    .ans-head .mark { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.22); flex: none; } .ans-head .mark .icon { width: 24px; height: 24px; stroke-width: 2.5; }
+    .ans-head b { display: block; font-size: 20px; line-height: 1.15; } .ans-head span { font-size: 13px; opacity: .9; }
+    .ans-body { padding: 14px 16px 16px; display: grid; gap: 14px; }
+    .ans-lead { margin: 0; font-size: 15px; font-weight: 800; line-height: 1.5; word-break: keep-all; }
+    .ans-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+    .ans-list li { display: grid; grid-template-columns: 22px 1fr; gap: 9px; font-size: 14.5px; line-height: 1.55; word-break: keep-all; }
+    .ans-list li .icon { width: 20px; height: 20px; margin-top: 2px; } .answer.fake .ans-list .icon { color: var(--fake); } .answer.real .ans-list .icon { color: var(--real); }
+    .ans-cards { display: grid; gap: 8px; }
+    .ans-card { display: grid; grid-template-columns: 36px 1fr; gap: 10px; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+    .ans-card .ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--surface); } .ans-card .ic .icon { width: 18px; height: 18px; }
+    .ans-card small { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: .03em; color: var(--muted); }
+    .ans-card b { display: block; font-size: 15px; margin: 1px 0 3px; }
+    .ans-card p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); word-break: keep-all; }
+    .counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .counts span { display: grid; gap: 2px; padding: 10px 8px; border-radius: 12px; background: var(--surface-2); text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .counts span b { font-size: 22px; line-height: 1; font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .counts span.real b { color: var(--real); } .counts span.fake b { color: var(--fake); }
     .err { color: var(--fake); font-size: 13px; font-weight: 700; margin: 0; } .err:empty { display: none; }
     .row-actions { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); flex-wrap: wrap; margin-top: auto; }
 
@@ -782,16 +838,10 @@
           <div class="ad-card"><h2><i data-lucide="trophy" class="icon"></i>점수 <span class="small muted" style="font-weight:400">아이들에게는 정답 공개 때만 보임</span></h2>
             <table class="ad-table"><thead><tr><th>순위</th><th>조</th><th class="num">합계</th><th class="num">맞힌 판별</th><th class="num">속인 조</th></tr></thead><tbody id="adScores"></tbody></table></div>
         </div>
-        <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조가 올린 게시물 <span id="adTeamCount" class="ad-b team">0</span><span class="small muted" style="font-weight:400">문제 있는 글은 숨기기 또는 삭제(사진까지 지움)</span>
-            <button class="btn btn-ghost" id="adDelAllBtn" type="button" style="margin-left:auto;color:var(--fake)"><i data-lucide="trash-2" class="icon"></i>조 게시물 전부 삭제</button></h2>
+        <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조가 올린 게시물 <span id="adTeamCount" class="ad-b team">0</span></h2>
           <div class="ad-posts" id="adPosts"></div></div>
-        <details class="ad-card" style="padding:0">
-          <summary style="padding:16px;cursor:pointer;font-weight:700;display:flex;gap:8px;align-items:center;list-style:none"><i data-lucide="database" class="icon"></i>예제 자료 <span id="adSeedCount" class="ad-b seed">0</span><span class="small muted" style="font-weight:400">기본 세트. 지울 수는 없고 숨기기만 됩니다.</span></summary>
-          <div class="ad-posts" id="adSeedPosts" style="padding:0 16px 16px"></div></details>
-        <div class="ad-card"><h2><i data-lucide="rotate-ccw" class="icon"></i>새 기수 시작</h2>
-          <p class="small muted">조 게시물, 판별, AI 사용 횟수를 모두 지우고 예제 자료만 남깁니다. 되돌릴 수 없습니다.</p>
-          <div class="opt-row"><input class="input" id="adResetTxt" placeholder="RESET 이라고 입력" style="max-width:220px" aria-label="초기화 확인 문구"><button class="btn btn-ghost" id="adResetBtn" type="button" style="color:var(--fake)">전부 초기화</button></div>
-          <p class="err" id="adResetErr"></p></div>
+        <div class="ad-card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><h2 style="margin:0"><i data-lucide="rotate-ccw" class="icon"></i>전부 초기화</h2><p class="small muted" style="margin:4px 0 0">조 게시물·판별·점수를 모두 지우고 1라운드 예시 보기로 돌아갑니다.</p></div>
+          <button class="btn btn-ghost" id="adResetBtn" type="button" style="color:var(--fake);min-height:44px"><i data-lucide="trash-2" class="icon"></i>전부 초기화</button></div>
       </div>
     </section>
   </main>
@@ -1065,10 +1115,15 @@ function renderRounds() {
   $('#rounds').innerHTML = ROUND_ORDER.map((f, i) => {
     const now = i === cur, past = i < cur, open = now || past || adm, all = (S.data.posts || []).filter(p => p.format === f && p.status === 'approved');
     const n = all.filter(p => !p.seed).length;
-    const st = adm ? (now ? STEP_LABEL[S.data.phase] + ' 중' : '') + `${now ? ' · ' : ''}예시 ${all.length - n} · 조 게시물 ${n}`
-      : now ? '지금 라운드' : past ? `끝난 라운드 · 게시물 ${n}개` : '앞 라운드가 끝나면 열립니다';
-    return `<button type="button" class="round-tile${now ? ' now' : ''}" data-round="${f}" ${open ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
-      <span class="rt-ic">${ic(open ? ROUND_ICON[f] : 'lock')}</span><span><small>${i + 1}라운드</small><b>${ROUND_LABEL[f]}</b></span><span class="rt-st">${st}</span></button>`;
+    const st = adm ? (now ? STEP_LABEL[S.data.phase] + ' 중 · ' : '') + `예시 ${all.length - n} · 조 게시물 ${n}`
+      : now ? `지금 진행 중 · ${STEP_LABEL[S.data.phase]}` : past ? `끝난 라운드 · 게시물 ${n}개` : `${i}라운드가 끝나면 열려요`;
+    const art = f === 'news' ? `<div class="rt-art art-news"><i class="mh"></i><i class="hl"></i><i class="hl s"></i><i class="ph"></i><i class="ln"></i><i class="ln s"></i></div>`
+      : f === 'shorts' ? `<div class="rt-art art-shorts"><div class="phone"><span class="play">${ic('play')}</span><i class="cap"></i><i class="cap s"></i><span class="acts"><i></i><i></i><i></i></span></div></div>`
+      : `<div class="rt-art art-story"><span class="ring" style="--c:#0f766e"><span></span></span><span class="ring" style="--c:#d62976"><span></span></span><span class="ring seen" style="--c:#4b5563"><span></span></span></div>`;
+    const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장 + 한 줄' }[f];
+    return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : ''}" data-round="${f}" ${open ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
+      <span class="rt-num">${i + 1}라운드</span>${art}${open ? '' : `<span class="rt-lock"><span>${ic('lock')}</span></span>`}
+      <span class="rt-body"><b>${ROUND_LABEL[f]}</b><small>${sub}</small><span class="rt-st"><i class="dot"></i>${st}</span></span></button>`;
   }).join('');
 }
 /* 진행 막대: 선생님(다음 단계 버튼 포함)과 진행 화면에만. 이번 라운드에 올린 조·판별 끝낸 조를 번호로 보여 줌 */
@@ -1284,25 +1339,34 @@ function judgeHTML(p) {
   const mine = S.data.myJudgments[p.id];
   if (p.seed && mine && p.answer) return '';   // 예제는 한 번 판정하면 해설로 넘어감
   const dft = S.draft[p.id] || (mine ? { ...mine } : {}); S.draft[p.id] = dft;
-  const vbtn = (v, l) => `<button type="button" class="vd" data-act="verdict" data-id="${p.id}" data-v="${v}" aria-pressed="${dft.verdict === v}">${l}</button>`;
-  const crits = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="crit" data-act="crit" data-id="${p.id}" data-c="${k}" aria-pressed="${dft.criterion === k}">${c.label}</button>`).join('');
-  return `<div class="judge">${mine ? `<div class="done-judge"><span class="muted">우리 조 판정</span>${verdictBadge(mine.verdict)}</div>` : ''}
-    <div class="judge-row">${vbtn('real', '진짜')}${vbtn('fake', '가짜')}${vbtn('unsure', '모르겠음')}</div>
-    <div class="flabel">어떤 기준으로 판단했나요?</div><div class="judge-row">${crits}</div>
+  const vbtn = (v, l, i) => `<button type="button" class="vd" data-act="verdict" data-id="${p.id}" data-v="${v}" aria-pressed="${dft.verdict === v}">${ic(i)}${l}</button>`;
+  const crits = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="crit" data-act="crit" data-id="${p.id}" data-c="${k}" aria-pressed="${dft.criterion === k}">${ic(c.icon)}${c.label}</button>`).join('');
+  return `<div class="judge">${mine ? `<div class="done-judge"><span class="muted">우리 조 판정</span>${verdictBadge(mine.verdict)}</div>` : `<p class="judge-q">${p.seed ? '이 글, 진짜일까요?' : '이 게시물은?'}</p>`}
+    <div class="judge-row seg">${vbtn('real', '진짜', 'circle-check')}${vbtn('fake', '가짜', 'circle-x')}${vbtn('unsure', '모르겠음', 'circle-help')}</div>
+    <div class="flabel">어디서 알아챘나요?</div><div class="judge-row">${crits}</div>
     <input class="input" data-act="reason" data-id="${p.id}" maxlength="120" placeholder="이유 한 줄 (예: 가입한 지 2일 된 계정)" value="${esc(dft.reason || '')}" aria-label="판단 이유">
     <p class="err" data-err="${p.id}"></p><div><button type="button" class="btn btn-primary" data-act="submit-judge" data-id="${p.id}">${mine ? '판정 바꾸기' : '판정 제출'}</button></div></div>`;
 }
+/* 해설: 긴 글을 문장 단위로 쪼개 목록으로. 첫 문장("가짜입니다." 같은 판정)은 머리띠가 대신하므로 뺀다 */
+const sentences = t => String(t || '').replace(/\s+/g, ' ').split(/(?<=[.!?])\s+(?=[^\s])/).map(s => s.trim()).filter(Boolean);
 function answerHTML(p) {
   const mine = S.data.myJudgments[p.id];
-  const result = t => mine ? `<div class="big">${mine.verdict === t ? '맞혔습니다!' : mine.verdict === 'unsure' ? '모르겠음으로 넘겼습니다' : '틀렸습니다'}</div>` : '';
+  const head = (truth, who) => { const hit = mine ? (mine.verdict === truth ? '맞혔어요!' : mine.verdict === 'unsure' ? '모르겠음으로 넘겼어요' : '틀렸어요') : '';
+    return `<div class="ans-head"><span class="mark">${ic(truth === 'fake' ? 'x' : 'check')}</span><div><b>${hit || (truth === 'fake' ? '가짜' : '진짜')}</b><span>${hit ? `정답은 <strong>${truth === 'fake' ? '가짜' : '진짜'}</strong> · ` : ''}${who}</span></div></div>`; };
+  const card = (icon, label, title, desc) => `<div class="ans-card"><span class="ic">${ic(icon)}</span><div><small>${label}</small><b>${esc(title)}</b>${desc ? `<p>${esc(desc)}</p>` : ''}</div></div>`;
   if (p.seed && p.answer) { const a = p.answer, cr = C.CRITERIA[a.criterion], tc = C.TACTICS.find(x => x.id === a.tactic);
-    const meta = (cr ? `<div><b>${a.truth === 'fake' ? '들통나는 곳' : '진짜인 근거'}</b> ${esc(cr.label)}: ${esc(cr.hint)}</div>` : '') + (tc ? `<div><b>쓴 수법</b> ${esc(tc.id)}: ${esc(tc.desc)}</div>` : '');
-    return `<div class="answer ${a.truth}">${result(a.truth)}<div>${verdictBadge(a.truth)} <b>해설</b></div><div>${esc(a.explain)}</div>${meta ? `<div class="ans-meta">${meta}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
-  if (revealed(p) && p.secret) { const s = p.secret; return `<div class="answer ${s.truth}">${result(s.truth)}<div>${verdictBadge(s.truth)} <b>${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}</b></div>
-      ${s.tactic ? `<div><b>쓴 수법</b> ${esc(s.tactic)}</div>` : ''}${s.clue ? `<div><b>${s.truth === 'real' ? '근거가 된 자료실 내용' : '숨긴 단서'}</b>${s.truth !== 'real' && s.clueCriterion ? ` (${C.CRITERIA[s.clueCriterion].label})` : ''} ${esc(s.clue)}</div>` : ''}${p.counts ? countsHTML(p.counts) : ''}</div>`; }
+    let ss = sentences(a.explain); if (ss.length > 1 && /^(가짜|진짜|믿기 어렵)/.test(ss[0]) && ss[0].length < 16) ss = ss.slice(1);
+    return `<div class="answer ${a.truth}">${head(a.truth, '예시 해설')}<div class="ans-body">
+      <ul class="ans-list">${ss.map(s => `<li>${ic(a.truth === 'fake' ? 'search-x' : 'badge-check')}<span>${esc(s)}</span></li>`).join('')}</ul>
+      ${cr || tc ? `<div class="ans-cards">${cr ? card(cr.icon, a.truth === 'fake' ? '들통나는 곳' : '진짜인 근거', cr.label, cr.hint) : ''}${tc ? card('drama', '쓴 수법', tc.id, tc.desc) : ''}</div>` : ''}
+      ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
+  if (revealed(p) && p.secret) { const s = p.secret, cr = s.clueCriterion ? C.CRITERIA[s.clueCriterion] : null;
+    return `<div class="answer ${s.truth}">${head(s.truth, `${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}`)}<div class="ans-body">
+      <div class="ans-cards">${s.clue ? card(cr ? cr.icon : 'files', s.truth === 'real' ? '근거가 된 자료실 내용' : `숨긴 단서${cr ? ` · ${cr.label}` : ''}`, s.clue, '') : ''}${s.tactic ? card('drama', '쓴 수법', s.tactic, (C.TACTICS.find(x => x.id === s.tactic) || {}).desc) : ''}</div>
+      ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
   return '';
 }
-const countsHTML = c => `<div class="counts"><span>진짜라고 한 조 ${c.real}</span><span>가짜라고 한 조 ${c.fake}</span><span>모르겠음 ${c.unsure}</span></div>`;
+const countsHTML = c => `<div class="counts"><span class="real"><b>${c.real}</b>진짜라고 한 조</span><span class="fake"><b>${c.fake}</b>가짜라고 한 조</span><span><b>${c.unsure}</b>모르겠음</span></div>`;
 function statusHTML(p) {
   if (p.seed) return `<div class="status-line st-seed">${ic('graduation-cap')}예시 · 연습 (점수 없음)</div>`;
   if (!p.mine || revealed(p)) return '';
@@ -1635,14 +1699,13 @@ function adRender() {
     return `<tr><td><b>${t}조</b></td><td>${esc(teamTactic(t))}</td><td class="num">${has('story')}</td><td class="num">${has('shorts')}</td><td class="num">${has('news')}</td><td class="num">${judgedBy[t] || 0}</td></tr>`; }).join('');
   $('#adScores').innerHTML = (d.scores || []).map((r, i) => `<tr><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="num"><b>${r.total}</b></td><td class="num">${r.correct} / ${r.judgable}</td><td class="num">${r.fooled}</td></tr>`).join('');
   const posts = [...d.posts].sort((a, b) => (a.seed === b.seed ? (b.createdAt || 0) - (a.createdAt || 0) : a.seed ? 1 : -1)), teamN = posts.filter(p => !p.seed).length;
-  $('#adTeamCount').textContent = teamN; $('#adSeedCount').textContent = posts.length - teamN; $('#adDelAllBtn').disabled = !teamN;
+  $('#adTeamCount').textContent = teamN;
   const row = p => { const truth = truthOf(p), c = p.counts || { real: 0, fake: 0, unsure: 0 };
     return `<div class="ad-post${p.status === 'hidden' ? ' hidden' : ''}">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg">글만</div>'}
       <div><div>${p.seed ? '<span class="ad-b seed">예제</span>' : `<span class="ad-b team">${p.team}조</span>`}<span class="ad-b ${truth}">${truth === 'real' ? '진짜' : '가짜'}</span><span class="m">${esc(C.FORMATS[p.format]?.label || '')} · ${esc((p.author || {}).name || '')}</span></div>
         <div class="t">${esc(p.title || p.body || '')}</div><div class="m">${p.secret?.clue ? '단서: ' + esc(p.secret.clue) + ' · ' : ''}판별 진짜 ${c.real} · 가짜 ${c.fake}</div></div>
-      <div style="display:grid;gap:6px"><button class="btn btn-ghost" data-adtoggle="${p.id}" data-hidden="${p.status === 'hidden'}">${p.status === 'hidden' ? '보이기' : '숨기기'}</button>${p.seed ? '' : `<button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button>`}</div></div>`; };
+      <div><button class="btn btn-ghost" data-addel="${p.id}" style="color:var(--fake)">삭제</button></div></div>`; };
   $('#adPosts').innerHTML = posts.filter(p => !p.seed).map(row).join('') || '<div class="panel-empty">아직 조가 올린 게시물이 없습니다.</div>';
-  $('#adSeedPosts').innerHTML = posts.filter(p => p.seed).map(row).join('');
   icons();
 }
 $('#adLoginBtn').onclick = adLogin; $('#adPw').addEventListener('keyup', e => { if (e.key === 'Enter') adLogin(); });
@@ -1653,11 +1716,12 @@ document.addEventListener('click', async e => {
     if (tc) await adApi('/admin/settings', { teamCount: +tc.dataset.adteams });
     if (tg) await adApi('/admin/moderate', { postId: tg.dataset.adtoggle, action: tg.dataset.hidden === 'true' ? 'show' : 'hide' });
     if (dl && confirm('이 게시물을 완전히 지울까요? 사진과 판별 기록도 함께 지워지고 되돌릴 수 없습니다.')) await adApi('/admin/delete', { postId: dl.dataset.addel });
-    if (e.target.closest('#adDelAllBtn') && confirm('조가 올린 게시물을 전부 지울까요? 예제 자료와 진행 단계는 그대로 둡니다. 되돌릴 수 없습니다.')) { const r = await adApi('/admin/delete-team-posts', { confirm: 'DELETE' }); toast(`조 게시물 ${r.deleted}개를 지웠습니다.`); }
+    if (false) { const r = await adApi('/admin/delete-team-posts', { confirm: 'DELETE' }); toast(`조 게시물 ${r.deleted}개를 지웠습니다.`); }
   } catch (x) { toast(x.message); }
 });
 $('#adResetBtn').onclick = async () => {
-  try { await adApi('/admin/reset', { confirm: $('#adResetTxt').value.trim() }); $('#adResetTxt').value = ''; $('#adResetErr').textContent = ''; toast('초기화했습니다.'); } catch (e) { $('#adResetErr').textContent = e.message; }
+  if (!confirm('조 게시물, 판별, 점수를 모두 지우고 1라운드 예시 보기로 돌아갑니다. 되돌릴 수 없습니다. 초기화할까요?')) return;
+  try { await adApi('/admin/reset', { confirm: 'RESET' }); toast('초기화했습니다.'); await refresh(); } catch (e) { toast(e.message); }
 };
 
 // ---------- 자료실 (도로랜드 정리본) ----------
