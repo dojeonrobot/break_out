@@ -595,9 +595,9 @@
     .tp-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
     @media (max-width: 760px) { .tp-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     @media (max-width: 520px) { .tp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } }
-    .tp-team { position: relative; display: grid; justify-items: center; gap: 10px; padding: 20px 8px 16px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; box-shadow: 0 1px 2px color-mix(in srgb, #262626 6%, transparent); transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s, border-color .18s; }
-    .tp-team .ring { width: clamp(64px, 9vw, 88px); aspect-ratio: 1; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
-    .tp-team .ring span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); border: 3px solid var(--surface); font-size: clamp(26px, 3.4vw, 34px); font-weight: 900; font-variant-numeric: tabular-nums; }
+    .tp-team { position: relative; display: grid; justify-items: center; padding: 18px 8px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; box-shadow: 0 1px 2px color-mix(in srgb, #262626 6%, transparent); transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s, border-color .18s; }
+    .tp-team .ring { width: clamp(72px, 9.5vw, 96px); aspect-ratio: 1; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
+    .tp-team .ring span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); border: 3px solid var(--surface); font-size: clamp(20px, 2.6vw, 26px); font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; white-space: nowrap; }
     .tp-team b { font-size: 15px; }
     .tp-team em { position: absolute; top: 8px; right: 8px; font-style: normal; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
     .tp-team:hover { transform: translateY(-3px); border-color: transparent; box-shadow: 0 10px 28px color-mix(in srgb, #d62976 18%, transparent); }
@@ -926,7 +926,7 @@ async function api(path, body) {
 // ---------- 조 선택 ----------
 function renderTeamGrid(n) {
   const last = +load('dorogram-team') || 0;
-  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => i + 1).map(t => `<button type="button" class="tp-team" style="--i:${t}" aria-label="${t}조" data-team="${t}">${t === last ? '<em>최근</em>' : ''}<span class="ring"><span>${t}</span></span><b>${t}조</b></button>`).join('');
+  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => i + 1).map(t => `<button type="button" class="tp-team" style="--i:${t}" aria-label="${t}조" data-team="${t}">${t === last ? '<em>최근</em>' : ''}<span class="ring"><span>${t}조</span></span></button>`).join('');
 }
 /* 선생님(운영자): 조 없이 모든 라운드·게시물·정답을 본다 */
 function enterAdmin(silent) {
