@@ -2275,14 +2275,19 @@ function onGeo(p){
   if(follow) showMeCoord();                                   // first, so a fault further down can never freeze the coordinates (2026-10-26)
   try{ updateTeamDots(LAST_POS, Date.now()); }catch(e){ console.error(e); }
   if(follow){ try{ followMe(); }catch(e){ console.error(e); } }
-  // close to an empty record's coordinates? say so once per zone
+  // close to an empty record's coordinates? 2026-11-10 (user: "±20m면 도착했다고 하고 여기 근처를 담으라고"): within 20 m — a poor fix widens it, at most to 30 m — the void says
+  // 도착 on EVERY arrival (once per entry, again after 90 s), not only the first time: a device that had found the spot earlier stayed silent, and so did the tutorial
+  // (voidSay drops lines while it runs), which left the spot marked found with nothing said. In the tutorial the line now waits for the next fix instead.
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   MISSION_E.forEach(m=>{ if(m.lat == null || !m.b) return; const d = Math.hypot(m.b.cx - x, m.b.cz - z); document.querySelectorAll(`[data-dist="${m.id}"]`).forEach(el=> el.textContent = `거리 ${Math.round(d)}m`);
     if(zoneDone(m) || zoneLocked(m) || m.id === 'z1' || W.id !== 'erica') return;
-    const r = m.radius || 50, g = geoMemo[m.id] || (geoMemo[m.id] = {});
-    if(d < r){ if(!zoneFound(m)){ try{ localStorage.setItem(`void-found-${m.id}`, '1'); }catch(e){} voidSay(ZONE_OBJ[m.id] ? `여기야. 이 자리의 기록은 ${ZONE_OBJ[m.id]}이야. 한 바퀴 돌면서 꼼꼼하게 찍어 줘.` : '여기야. 이 자리에 있는 걸 한 바퀴 돌면서 꼼꼼하게 찍어 줘.', 9000, 'joy'); renderList(); refreshZones(); if(m.bi != null) select(m.bi, true); } g.near = true; }
-    else if(d < r + 30){ if(!g.near){ g.near = true; voidSay('거의 다 왔어. 주변을 둘러봐.', 6000); } }
-    else { g.near = false; if(g.last != null && d > g.last + 12 && d > 80 && Date.now() - (g.saidAt || 0) > 60000){ g.saidAt = Date.now(); voidSay('거리가 늘어나고 있어. 반대쪽이야.', 6000, 'idle'); } else if(g.last == null && d > 150 && Date.now() - (g.saidAt || 0) > 60000){ g.saidAt = Date.now(); voidSay('아직 멀어. 거리가 줄어드는 쪽으로 가.', 6000); } }
+    const r = Math.max(20, Math.min(myPos.acc || 0, 30)), g = geoMemo[m.id] || (geoMemo[m.id] = {}), inTut = tutStep >= 0 && tutStep < 99;
+    if(d < r){
+      if(!inTut && (!g.here || Date.now() - (g.hereAt || 0) > 90000)){ g.here = true; g.hereAt = Date.now(); voidSay(ZONE_OBJ[m.id] ? `도착했어! 이 자리의 기록은 ${ZONE_OBJ[m.id]}이야. 여기 근처를 한 바퀴 돌면서 꼼꼼하게 담아 줘.` : '도착했어! 여기야. 이 자리 근처에 있는 걸 한 바퀴 돌면서 꼼꼼하게 담아 줘.', 10000, 'joy'); }
+      if(!zoneFound(m)){ try{ localStorage.setItem(`void-found-${m.id}`, '1'); }catch(e){} renderList(); refreshZones(); if(m.bi != null) select(m.bi, true); }
+      g.near = true; }
+    else if(d < r + 30){ if(!g.near){ g.near = true; voidSay('거의 다 왔어. 주변을 둘러봐.', 6000); } }   // g.here stays: a fix wobbling across 20 m does not repeat 도착
+    else { g.near = false; g.here = false; if(g.last != null && d > g.last + 12 && d > 80 && Date.now() - (g.saidAt || 0) > 60000){ g.saidAt = Date.now(); voidSay('거리가 늘어나고 있어. 반대쪽이야.', 6000, 'idle'); } else if(g.last == null && d > 150 && Date.now() - (g.saidAt || 0) > 60000){ g.saidAt = Date.now(); voidSay('아직 멀어. 거리가 줄어드는 쪽으로 가.', 6000); } }
     g.last = d; });
   if(TEAM && !LOCAL && Date.now() - lastSent > 6000){ lastSent = Date.now(); api('/pos', {team:TEAM, lat:myPos.lat, lng:myPos.lng, acc:myPos.acc}).then(r=>{ LAST_POS = r.pos || LAST_POS; updateTeamDots(LAST_POS, r.now); }).catch(()=>{}); }
 }
@@ -6571,7 +6576,11 @@ const eriAnim = [];
         const kakao = B.find(b=> b.n === '카카오데이터센터 안산'); const sd = kakao ? Math.sign(-(kakao.cx-ax.cx)*ax.sn + (kakao.cz-ax.cz)*ax.c) || 1 : 1; const [hx, hz] = P(0, sd*ax.W*0.44);
         const roof = new THREE.BoxGeometry(34, 0.5, 9); roof.rotateY(-ax.ang); roof.translate(hx, 7.5, hz); roofs.push(roof); for(const e of [-14, 0, 14]){ const [px, pz] = P(e, sd*ax.W*0.47); const col = new THREE.CylinderGeometry(0.22, 0.22, 7.5, 8); col.translate(px, 3.75, pz); roofs.push(col); } }
       else if(meta.kind === 'swimming_pool'){ slabOf(pts, 0.16, 0x6fc3e8); } });
-    Object.entries(slabs).forEach(([c, gs])=> addM(mergeGeometries(gs), lam(+c, {polygonOffset:true, polygonOffsetFactor:-4, polygonOffsetUnits:-4}), G, false));
+    // 2026-11-10: the stadium stacks three slabs 2–3 cm apart (lawn 0.15 / track 0.18 / infield 0.20). From the home view (~1,700 m, near 6, 24-bit depth) one depth
+    // step is ~3 cm, so the red track tore across the infield in stripes. Each layer now gets its own polygon offset (lawn −4, track −5, infield −6; the lines keep −8), so
+    // the depth order is fixed by the offset and not by the centimetres.
+    const slabOff = {0x7a9c5a:4, 0xb8503c:5, 0x6fa65a:6};
+    Object.entries(slabs).forEach(([c, gs])=>{ const o = slabOff[+c] || 4; addM(mergeGeometries(gs), lam(+c, {polygonOffset:true, polygonOffsetFactor:-o, polygonOffsetUnits:-o}), G, false); });
     if(white.length) addM(mergeGeometries(white), new THREE.MeshBasicMaterial({color:0xffffff, polygonOffset:true, polygonOffsetFactor:-8, polygonOffsetUnits:-8}), G, false);   // the slabs are offset toward the camera; the lines must win at grazing angles
     if(nets.length) addM(mergeGeometries(nets), lam(0x2b3038, {transparent:true, opacity:0.75}), G, false);
     if(hoops.length) addM(mergeGeometries(hoops), lam(0xf2f3f5)); if(goals.length) addM(mergeGeometries(goals), lam(0xffffff)); if(stands.length) addM(mergeGeometries(stands), lam(0x86b06a)); if(roofs.length) addM(mergeGeometries(roofs), lam(0x1d3a6b));
