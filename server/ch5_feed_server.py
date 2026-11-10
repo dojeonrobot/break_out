@@ -48,8 +48,9 @@ AI_QUOTA = int(os.environ.get('CH5_AI_QUOTA', '8'))
 SERVE_STATIC = os.environ.get('CH5_STATIC', '1') == '1'
 
 DEFAULT_TEAM_COUNT = 10   # 실제 조 수는 DB['teamCount'] (운영자 화면에서 바꿈)
-POSTS_PER_ROUND = 3       # 조마다 라운드(형식)당 최대 3개, 2개 이상 올리면 끝낸 것으로 봄 (2026-11-09: 조 4명·노트북 2대)
-MIN_POSTS_PER_ROUND = 2
+POSTS_PER_ROUND = 1       # 2026-11-10: 조마다 라운드(형식)당 1개. 진짜/가짜와 주제는 서버가 배정한다(ch5_topics.json)
+MIN_POSTS_PER_ROUND = 1
+TOPICS_PATH = os.path.join(HERE, 'ch5_topics.json')
 MAX_POSTS_PER_TEAM = POSTS_PER_ROUND * 3
 MAX_UPLOAD = 6 * 1024 * 1024
 PHASES = ['read', 'make', 'judge', 'reveal']
@@ -106,9 +107,77 @@ def load_seed_posts():
     return out
 
 
+def load_topics():
+    try:
+        with open(TOPICS_PATH, encoding='utf-8') as f:
+            t = json.load(f)
+        return {fmt: t.get(fmt, {'real': [], 'fake': []}) for fmt in ROUNDS}
+    except (OSError, json.JSONDecodeError):
+        return {fmt: {'real': [], 'fake': []} for fmt in ROUNDS}
+
+
+TOPICS = load_topics()
+
+
+def make_assignment(fmt, n):
+    """조마다 진짜/가짜를 반반 섞고(홀수면 가짜가 하나 더) 그 안에서 주제를 겹치지 않게 뽑는다. 주제가 모자라면 돌려 쓴다."""
+    import random
+    truths = ['real', 'fake'] * (n // 2) + (['fake'] if n % 2 else [])
+    random.shuffle(truths)
+    pools = {k: list(TOPICS.get(fmt, {}).get(k, [])) for k in ('real', 'fake')}
+    for k in pools:
+        random.shuffle(pools[k])
+    used = {'real': 0, 'fake': 0}
+    out = {}
+    for team, truth in zip(range(1, n + 1), truths):
+        pool = pools[truth]
+        topic = pool[used[truth] % len(pool)] if pool else {'id': '', 'title': '', 'doc': '', 'brief': ''}
+        used[truth] += 1
+        out[str(team)] = {'truth': truth, 'topicId': topic.get('id', ''), 'title': topic.get('title', ''), 'doc': topic.get('doc', ''), 'brief': topic.get('brief', '')}
+    return out
+
+
+def ensure_assignment():
+    """이번 라운드 배정이 없으면 만든다. lock 안에서."""
+    DB.setdefault('assign', {})
+    rd = DB.get('round')
+    cur = DB['assign'].get(rd) or {}
+    n = DB['teamCount']
+    if len(cur) < n:   # 조 수가 늘었으면 새 조만 덧붙인다 (기존 배정은 그대로)
+        fresh = make_assignment(rd, n)
+        for t in range(1, n + 1):
+            cur.setdefault(str(t), fresh[str(t)])
+        DB['assign'][rd] = cur
+
+
+def quiz_posts(rd=None):
+    rd = rd or DB.get('round')
+    return [p for p in DB['posts'] if not p.get('seed') and p['status'] == 'approved' and p.get('format') == rd]
+
+
+def quiz_start():
+    """판별을 한 문제씩 동시에: 이번 라운드 조 게시물을 무작위 순서로 늘어놓고 첫 문제를 연다. lock 안에서."""
+    import random
+    ids = [p['id'] for p in quiz_posts()]
+    random.shuffle(ids)
+    DB['quiz'] = {'round': DB.get('round'), 'order': ids, 'idx': 0, 'open': bool(ids), 'revealed': False, 'startedAt': now_ms()}
+
+
+def quiz():
+    q = DB.get('quiz')
+    return q if q and q.get('round') == DB.get('round') else None
+
+
+def quiz_current():
+    q = quiz()
+    if not q or q['idx'] >= len(q['order']):
+        return None
+    return find_post(q['order'][q['idx']])
+
+
 def fresh_db():
     return {'version': 1, 'phase': 'read', 'round': ROUNDS[0], 'teamCount': DEFAULT_TEAM_COUNT, 'posts': load_seed_posts(), 'judgments': {},
-            'aiUsed': {}, 'updatedAt': now_ms()}
+            'aiUsed': {}, 'assign': {}, 'quiz': None, 'updatedAt': now_ms()}
 
 
 def read_db():
@@ -118,6 +187,8 @@ def read_db():
         db = json.load(f)
     db.setdefault('teamCount', DEFAULT_TEAM_COUNT)
     db.setdefault('round', ROUNDS[0])
+    db.setdefault('assign', {})
+    db.setdefault('quiz', None)
     return db
 
 
@@ -170,15 +241,26 @@ def round_idx(fmt):
 
 
 def post_revealed(p):
-    """그 형식의 라운드가 정답 공개까지 갔으면 공개된 것."""
+    """지난 라운드 글, 정답 공개 단계의 글, 판별(퀴즈) 중에는 이미 마감한 문제가 공개된 것."""
     i, cur = round_idx(p.get('format')), round_idx(DB.get('round'))
-    return i < cur or (i == cur and DB['phase'] == 'reveal')
+    if i < cur or (i == cur and DB['phase'] == 'reveal'):
+        return True
+    q = quiz()
+    if i == cur and DB['phase'] == 'judge' and q and p['id'] in q['order']:
+        k = q['order'].index(p['id'])
+        return k < q['idx'] or (k == q['idx'] and q['revealed'])
+    return False
 
 
 def post_open(p):
-    """다른 조 게시물은 그 라운드의 판별 시간부터 보인다."""
+    """다른 조 게시물은 판별(퀴즈)에서 그 문제 차례가 됐을 때부터 보인다."""
     i, cur = round_idx(p.get('format')), round_idx(DB.get('round'))
-    return i < cur or (i == cur and DB['phase'] in ('judge', 'reveal'))
+    if i < cur or (i == cur and DB['phase'] == 'reveal'):
+        return True
+    q = quiz()
+    if i == cur and DB['phase'] == 'judge' and q and p['id'] in q['order']:
+        return q['order'].index(p['id']) <= q['idx']
+    return False
 
 
 def any_revealed():
@@ -210,40 +292,49 @@ def round_progress():
     counts = {}
     for p in posts:
         counts[str(p['team'])] = counts.get(str(p['team']), 0) + 1
+    cur = quiz_current()
+    voted = sorted(int(k.rsplit(':', 1)[1]) for k in DB['judgments'] if cur and k.startswith(cur['id'] + ':')) if cur else []
     return {'submitted': sorted({p['team'] for p in posts if counts[str(p['team'])] >= MIN_POSTS_PER_ROUND}), 'counts': counts, 'judged': judged, 'posts': len(posts), 'returned': returned,
-            'seeds': sum(1 for p in DB['posts'] if p.get('seed') and p['status'] == 'approved' and p.get('format') == rd)}
+            'seeds': sum(1 for p in DB['posts'] if p.get('seed') and p['status'] == 'approved' and p.get('format') == rd), 'voted': voted}
 
 
-def compute_scores():
-    """공개 단계 점수: 맞힌 판별 1점(근거 기준을 고른 경우만), 우리 조 가짜를 진짜라고 한 조마다 1점."""
+def compute_scores(only_round=None):
+    """점수(2026-11-10): 맞힌 판별 1점, 작성 조는 틀린 조마다 1점(가짜를 진짜로 믿게 해도, 진짜를 가짜로 보게 해도). 마감된 문제만 합산."""
     n = DB['teamCount']
-    scores = {t: {'team': t, 'correct': 0, 'fooled': 0, 'judged': 0, 'total': 0} for t in range(1, n + 1)}
+    scores = {t: {'team': t, 'correct': 0, 'fooled': 0, 'judged': 0, 'total': 0, 'judgable': 0} for t in range(1, n + 1)}
     for p in DB['posts']:
-        if p['status'] != 'approved' or p.get('seed') or not post_revealed(p):   # 예제는 점수 제외, 공개된 라운드만 합산
+        if p['status'] != 'approved' or p.get('seed') or not post_revealed(p):
+            continue
+        if only_round and p.get('format') != only_round:
             continue
         truth = p['secret'].get('truth', 'fake')
         for t in range(1, n + 1):
+            if t == p['team']:
+                continue
+            scores[t]['judgable'] += 1
             j = DB['judgments'].get(judgment_key(p['id'], t))
-            if not j or t == p['team']:
+            if not j or j['verdict'] not in ('real', 'fake'):
                 continue
             scores[t]['judged'] += 1
-            if j['verdict'] == truth and j.get('criterion') in CRITERIA:
+            if j['verdict'] == truth:
                 scores[t]['correct'] += 1
-            if truth == 'fake' and j['verdict'] == 'real' and p['team'] in scores:
+            elif p['team'] in scores:
                 scores[p['team']]['fooled'] += 1
     rows = list(scores.values())
     for r in rows:
         r['total'] = r['correct'] + r['fooled']
-        r['judgable'] = sum(1 for p in DB['posts'] if p['status'] == 'approved' and not p.get('seed') and p['team'] != r['team'] and post_revealed(p))
     rows.sort(key=lambda r: (-r['total'], r['team']))
     return rows
 
 
 def verdict_counts(pid):
-    c = {'real': 0, 'fake': 0, 'unsure': 0}
+    c = {'real': 0, 'fake': 0, 'unsure': 0, 'teams': {'real': [], 'fake': []}}
     for k, j in DB['judgments'].items():
         if k.startswith(pid + ':'):
-            c[j['verdict']] += 1
+            v = j['verdict'] if j['verdict'] in c else 'unsure'
+            c[v] += 1
+            if v in c['teams']:
+                c['teams'][v].append(int(k.rsplit(':', 1)[1]))
     return c
 
 
@@ -307,8 +398,19 @@ def state_for(team, admin=False):
            'aiEnabled': bool(GEMINI_KEY), 'maxPosts': POSTS_PER_ROUND, 'minPosts': MIN_POSTS_PER_ROUND}
     res['progress'] = round_progress()
     res['covers'] = round_covers()
-    if admin or any_revealed():
+    asg = (DB.get('assign') or {}).get(DB.get('round')) or {}
+    if team and DB['phase'] in ('make', 'judge', 'reveal'):
+        res['assignment'] = asg.get(str(team))
+    q = quiz()
+    if q and DB['phase'] in ('judge', 'reveal'):
+        cur = quiz_current()
+        res['quiz'] = {'total': len(q['order']), 'idx': q['idx'], 'open': q['open'], 'revealed': q['revealed'], 'postId': cur['id'] if cur else None,
+                       'voted': len(round_progress()['voted']), 'done': q['idx'] >= len(q['order'])}
+    if admin or any_revealed() or (q and (q['idx'] > 0 or q['revealed'])):
         res['scores'] = compute_scores()
+        res['roundScores'] = compute_scores(DB.get('round'))
+    if admin:
+        res['assignments'] = asg
     if admin:
         res['judgments'] = DB['judgments']
         res['aiUsedAll'] = DB['aiUsed']
@@ -558,6 +660,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/ch5/admin/phase': self.admin_phase, '/api/ch5/admin/moderate': self.admin_moderate,
             '/api/ch5/admin/reset': self.admin_reset, '/api/ch5/admin/delete': self.admin_delete, '/api/ch5/admin/settings': self.admin_settings,
             '/api/ch5/admin/delete-team-posts': self.admin_delete_team_posts, '/api/ch5/posts/delete': self.delete_own_post,
+            '/api/ch5/admin/quiz': self.admin_quiz, '/api/ch5/admin/reassign': self.admin_reassign,
         }
         fn = routes.get(path)
         if not fn:
@@ -612,18 +715,22 @@ class Handler(BaseHTTPRequestHandler):
             'postedAt': clean_text(b.get('postedAt'), 20),
             'photoTakenAt': clean_text(b.get('photoTakenAt'), 20),
             'imageId': clean_image_id(b.get('imageId')),
-            'secret': {'truth': 'real' if secret.get('truth') == 'real' else 'fake', 'tactic': clean_text(secret.get('tactic'), 30),
-                       'clue': clean_text(secret.get('clue'), 200), 'clueCriterion': secret.get('clueCriterion')
-                       if secret.get('clueCriterion') in CRITERIA else None,
-                       'clueKind': clean_text(secret.get('clueKind'), 40), 'fact': clean_text(secret.get('fact'), 300)},   # 2026-11-09: 확인 가능한 단서 종류와 어긋나게 쓴 자료실 사실
+            'secret': {'truth': 'fake', 'tactic': clean_text(secret.get('tactic'), 30),
+                       'clue': clean_text(secret.get('clue'), 300), 'clueCriterion': 'cross',
+                       'clueKind': clean_text(secret.get('clueKind'), 40), 'fact': clean_text(secret.get('fact'), 300),
+                       'event': clean_text(secret.get('event'), 120), 'topicId': '', 'topicTitle': ''},   # 2026-11-10: 지어낸 사건(가짜) 또는 진짜 사건, 근거·어긋난 기록부 문서, 이유
         }
-        if post['secret']['truth'] == 'fake' and post['secret']['clueKind'] in ('cross', 'when-archive') and not post['secret']['fact']:
-            raise ValueError('어긋나게 쓴 자료실 내용을 골라 주세요.')
         if not post['body'] and not post['title']:
             raise ValueError('제목이나 본문을 써 주세요.')
-        if not post['secret']['clue']:  # 가짜면 숨긴 단서, 진짜면 근거가 된 사실 카드
-            raise ValueError('가짜 게시글에는 들킬 수 있는 단서를 하나 꼭 적어 주세요.')
+        if not post['secret']['fact']:
+            raise ValueError('자료실 기록부 문서를 골라 주세요.')
+        if not post['secret']['clue']:
+            raise ValueError('왜 진짜인지(또는 어디가 거짓인지) 한 줄 적어 주세요.')
         with lock:
+            asg = ((DB.get('assign') or {}).get(DB.get('round')) or {}).get(str(team))
+            if not asg:
+                raise ValueError('아직 이 조에 배정된 주제가 없습니다. 관리자가 만들기 단계를 열어야 합니다.')
+            post['secret'].update(truth=asg['truth'], topicId=asg.get('topicId', ''), topicTitle=asg.get('title', ''))
             if DB['phase'] != 'make':
                 raise ValueError('지금은 게시글을 만드는 시간이 아닙니다.')
             if fmt != DB.get('round'):
@@ -657,10 +764,8 @@ class Handler(BaseHTTPRequestHandler):
         if not team:
             raise ValueError('조를 먼저 골라 주세요.')
         verdict, criterion = b.get('verdict'), b.get('criterion')
-        if verdict not in VERDICTS:
-            raise ValueError('진짜, 가짜, 모르겠음 중에 골라 주세요.')
-        if verdict != 'unsure' and criterion not in CRITERIA:
-            raise ValueError('어떤 기준으로 판단했는지 골라 주세요.')
+        if verdict not in ('real', 'fake'):
+            raise ValueError('진짜인지 가짜인지 골라 주세요.')
         with lock:
             p = find_post(b.get('postId'))
             if not p or p['status'] != 'approved':
@@ -670,11 +775,15 @@ class Handler(BaseHTTPRequestHandler):
             if p.get('seed'):
                 if DB['phase'] != 'read' or p.get('format') != DB.get('round'):
                     raise ValueError('예시는 예시 보기 시간에만 골라 볼 수 있습니다.')
-            elif DB['phase'] != 'judge' or p.get('format') != DB.get('round'):
-                raise ValueError('이번 라운드 게시물만 판별 시간에 판별할 수 있습니다.')
+            else:
+                q, cur = quiz(), quiz_current()
+                if DB['phase'] != 'judge' or not q or not cur or cur['id'] != p['id']:
+                    raise ValueError('지금 화면에 나온 문제만 판별할 수 있습니다.')
+                if not q['open']:
+                    raise ValueError('이 문제는 마감됐습니다. 다음 문제를 기다려 주세요.')
             DB['judgments'][judgment_key(p['id'], team)] = {
-                'verdict': verdict, 'criterion': criterion if criterion in CRITERIA else None,
-                'reason': clean_text(b.get('reason'), 120), 'at': now_ms()}
+                'verdict': verdict, 'criterion': 'cross',
+                'reason': clean_text(b.get('reason'), 160), 'doc': clean_text(b.get('doc'), 120), 'at': now_ms()}
             save_and_broadcast()
             self.send_json({'ok': True, 'post': public_post(p, team)})
 
@@ -726,8 +835,65 @@ class Handler(BaseHTTPRequestHandler):
             DB['phase'] = b['phase']
             if b.get('round'):
                 DB['round'] = b['round']
+            if DB['phase'] == 'make':
+                ensure_assignment()
+            if DB['phase'] == 'judge' and not quiz():
+                quiz_start()
             save_and_broadcast()
             self.send_json({'phase': DB['phase'], 'round': DB['round']})
+
+    def admin_quiz(self, b):
+        """관리자: 판별 퀴즈 진행. start(게임 시작) · close(마감·정답 공개) · next(다음 문제) · prev(이전 문제 다시) · reopen(마감 취소)."""
+        act = b.get('action')
+        with lock:
+            if act == 'start':
+                if not quiz_posts():
+                    raise ValueError('이번 라운드에 올라온 조 게시물이 없습니다.')
+                DB['phase'] = 'judge'
+                quiz_start()
+            else:
+                q = quiz()
+                if not q:
+                    raise ValueError('진행 중인 판별이 없습니다. 먼저 게임을 시작하세요.')
+                if act == 'close':
+                    q['open'] = False; q['revealed'] = True
+                elif act == 'reopen':
+                    q['open'] = True; q['revealed'] = False
+                elif act == 'next':
+                    if q['idx'] < len(q['order']) - 1:
+                        q['idx'] += 1; q['open'] = True; q['revealed'] = False
+                    else:
+                        q['idx'] = len(q['order']); q['open'] = False; q['revealed'] = True
+                        DB['phase'] = 'reveal'
+                elif act == 'prev':
+                    if q['idx'] > 0:
+                        q['idx'] -= 1; q['open'] = False; q['revealed'] = True
+                        if DB['phase'] == 'reveal':
+                            DB['phase'] = 'judge'
+                else:
+                    raise ValueError('없는 동작입니다.')
+            save_and_broadcast()
+            self.send_json({'phase': DB['phase'], 'quiz': quiz()})
+
+    def admin_reassign(self, b):
+        """관리자: 한 조의 배정을 다시 뽑는다(진짜/가짜는 그대로, 주제만 바꿈). 글을 올리기 전에만."""
+        import random
+        team = clean_team(b.get('team'))
+        with lock:
+            ensure_assignment()
+            asg = DB['assign'][DB['round']]
+            cur = asg.get(str(team))
+            if not cur:
+                raise ValueError('없는 조입니다.')
+            if any(p for p in quiz_posts() if p['team'] == team):
+                raise ValueError('이미 글을 올린 조는 바꿀 수 없습니다.')
+            pool = [t for t in TOPICS.get(DB['round'], {}).get(cur['truth'], []) if t['id'] != cur['topicId']]
+            if not pool:
+                raise ValueError('바꿀 주제가 없습니다.')
+            t = random.choice(pool)
+            cur.update(topicId=t['id'], title=t['title'], doc=t['doc'], brief=t['brief'])
+            save_and_broadcast()
+            self.send_json({'assignment': cur})
 
     def admin_moderate(self, b):
         action = b.get('action')
@@ -806,6 +972,8 @@ class Handler(BaseHTTPRequestHandler):
             DB = fresh_db()
             DB['version'] = version
             DB['teamCount'] = n
+            DB['assign'] = {}
+            DB['quiz'] = None
             save_and_broadcast()
             self.send_json({'ok': True})
 

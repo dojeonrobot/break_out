@@ -660,6 +660,36 @@
     .hc-q p { margin: 0 4px 16px; font-size: 14.5px; line-height: 1.65; word-break: keep-all; max-width: 60ch; }
     .hc-empty { padding: 30px 0; text-align: center; color: var(--muted); font-size: 14px; }
 
+    /* 배정 안내 (2026-11-10) */
+    .asg { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 16px 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); margin: 0 16px 14px; }
+    @media (min-width: 1024px) { .asg { margin: 0 0 14px; } }
+    .asg .k { display: grid; gap: 2px; justify-items: center; min-width: 120px; padding: 10px 14px; border-radius: 12px; color: #fff; text-align: center; } .asg .k small { font-size: 11.5px; opacity: .85; font-weight: 700; } .asg .k b { font-size: 17px; line-height: 1.2; }
+    .asg.real .k { background: var(--real); } .asg.fake .k { background: var(--fake); }
+    .asg .t { min-width: 0; } .asg .t b { display: block; font-size: 17px; line-height: 1.35; margin-bottom: 4px; } .asg .t p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+    .asg .btn { white-space: nowrap; min-height: 42px; }
+    .asg.mini { grid-template-columns: auto 1fr; padding: 12px 14px; margin: 0; background: var(--surface-2); border: 0; } .asg.mini .k { min-width: 96px; padding: 8px 10px; } .asg.mini .k b { font-size: 14px; } .asg.mini .t b { font-size: 14.5px; } .asg.mini .t p { font-size: 12.5px; }
+    @media (max-width: 640px) { .asg { grid-template-columns: 1fr; } }
+    /* 판별 퀴즈 (한 문제씩 동시에) */
+    .qz { margin: 0 16px; display: grid; gap: 14px; } @media (min-width: 1024px) { .qz { margin: 0; } }
+    .qz-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; } .qz-head h2 { margin: 0; font-size: 20px; }
+    .qz-num { font-size: 13px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: var(--ink); color: var(--surface); }
+    .qz-state { margin-left: auto; font-size: 13.5px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; } .qz-state .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--real); }
+    .qz-body { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
+    @media (max-width: 960px) { .qz-body { grid-template-columns: 1fr; } }
+    .qz-post { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; min-height: 420px; display: grid; place-items: center; }
+    .qz-post .post-card.news { max-width: 720px; width: 100%; } .qz-post .post-card.story, .qz-post .post-card.shorts-card { width: min(100%, 400px); aspect-ratio: 9 / 16; margin: 16px auto; }
+    .qz-side { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: sticky; top: 14px; }
+    .qz-wait { padding: 26px 18px; display: grid; gap: 10px; justify-items: center; text-align: center; } .qz-wait .big { font-size: 40px; font-weight: 900; line-height: 1; } .qz-wait b { font-size: 16px; } .qz-wait p { margin: 0; font-size: 13.5px; color: var(--muted); }
+    .qz-wait .badge { font-size: 14px; padding: 6px 14px; }
+    .res-teams { display: grid; gap: 8px; padding: 0 16px 16px; } .res-teams .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; } .res-teams .row small { color: var(--muted); font-weight: 700; min-width: 72px; }
+    .res-teams .tm { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; background: var(--surface-2); } .res-teams .ok .tm { background: var(--real-bg); color: var(--real); } .res-teams .no .tm { background: var(--fake-bg); color: var(--fake); }
+    .board { display: grid; gap: 14px; margin: 0 16px; } @media (min-width: 1024px) { .board { margin: 0; } }
+    .board-hero { background: linear-gradient(135deg, #962fbf, #d62976 55%, #fa7e1e); color: #fff; border-radius: 14px; padding: 18px 20px; display: grid; gap: 6px; } .board-hero h2 { margin: 0; font-size: 20px; } .board-hero p { margin: 0; font-size: 14px; opacity: .92; }
+    .board-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; } @media (max-width: 760px) { .board-grid { grid-template-columns: 1fr; } }
+    .board-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; } .board-card h3 { margin: 0 0 8px; font-size: 15px; }
+    .board table { width: 100%; border-collapse: collapse; font-size: 14px; } .board th, .board td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; } .board th { font-size: 12px; color: var(--muted); } .board td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; } .board tr.me td { background: var(--surface-2); }
+    .board .rank { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); font-weight: 900; font-size: 12px; } .board tr:nth-child(1) .rank { background: #ffd700; color: #5a4500; }
+    .opbar .qz-ctl { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     /* ---------- 조 고르기·토스트·스켈레톤 ---------- */
     .modal { position: fixed; inset: 0; z-index: 50; background: rgba(14, 20, 34, .72); display: grid; place-items: center; padding: 16px; }
     /* 조 선택 (2026-11-09 새 디자인) */
@@ -775,6 +805,7 @@
       <div class="me-prof" id="meProf" hidden></div>
       <div class="home-head" id="homeHead" hidden></div>
       <div class="rounds" id="rounds" role="group" aria-label="라운드"></div>
+      <div id="quiz" hidden></div>
       <div id="roundView" hidden>
       <div class="round-head" id="roundHead"></div>
       <p class="round-hint" id="roundHint" hidden></p>
@@ -874,29 +905,25 @@
               </div>
             </div>
             <div class="mk-col mk-secret">
-              <div class="mk-h"><i data-lucide="lock-keyhole" class="icon"></i>비밀 칸 <span class="small muted" style="font-weight:400">정답 공개 때만 보임</span></div>
-              <div class="field"><div class="flabel">이 게시물은?</div>
-                <div class="opt-row" id="optTruth">
-                  <button type="button" class="opt" data-truth="real" aria-pressed="false"><i data-lucide="badge-check" class="icon"></i>진짜</button>
-                  <button type="button" class="opt" data-truth="fake" aria-pressed="true"><i data-lucide="drama" class="icon"></i>가짜</button>
-                </div>
-                <p class="small muted" id="truthHelp" style="margin:0"></p></div>
+              <div class="mk-h"><i data-lucide="lock-keyhole" class="icon"></i>이유 적기 <span class="small muted" style="font-weight:400">정답 공개 때 해설로 모든 조에게 보입니다</span></div>
+              <div id="asgBox"></div>
               <div class="arc-look mk-arc"><div class="flabel small" style="display:flex;align-items:center;gap:6px"><i data-lucide="library-big" class="icon"></i>자료실에서 찾아보기</div>
-                <div class="arc-q"><input class="input" id="fArcQ" maxlength="40" placeholder="검색어 (예: 키링, 막배, 기린, @doroilbo)"><button type="button" class="btn btn-primary" id="btnArcOpen"><i data-lucide="external-link" class="icon"></i>자료실 열기</button></div>
-                <p class="small muted" style="margin:0">새 탭에 자료실이 열립니다. 글에 쓴 숫자·시간·계정이 어느 문서에 있는지 찾으세요.</p></div>
+                <div class="arc-q"><input class="input" id="fArcQ" maxlength="40" placeholder="검색어 (예: 블루웨이브, 막배, 사자, @doroilbo)"><button type="button" class="btn btn-primary" id="btnArcOpen"><i data-lucide="external-link" class="icon"></i>자료실 열기</button></div>
+                <p class="small muted" style="margin:0">새 탭에 자료실이 열립니다. 글에 쓴 숫자·시간·계정이 기록부와 맞는지 확인하세요.</p></div>
               <div id="fakeFields" class="mk-stack">
-                <div class="field"><div class="flabel">어느 부분을 거짓으로 썼나요?</div><div class="opt-row" id="optPart"></div><p class="small muted" id="partHint" style="margin:0"></p></div>
-                <div class="field" id="factField"><label for="fFact">어긋나게 쓴 자료실 문서</label><select id="fFact"></select></div>
-                <div class="field"><label for="fClue">자료실에는 뭐라고 되어 있고, 우리는 어떻게 바꿔 썼나요?</label><textarea id="fClue" rows="2" placeholder="예: 팝업스토어 문서에는 키링 하루 400개인데 3,000개로 씀"></textarea></div>
+                <div class="field"><label for="fEvent">우리가 지어낸 사건을 한 줄로</label><input class="input" id="fEvent" maxlength="120" placeholder="예: 12일 블루웨이브 열차가 궤도를 벗어나 3명이 다쳤다"></div>
+                <div class="field"><label for="fFact">이 사건이 없었다는 걸 보여 주는 기록부 문서</label><select id="fFact"></select></div>
+                <div class="field"><label for="fClue">기록부에는 뭐라고 되어 있나요?</label><textarea id="fClue" rows="2" placeholder="예: 사고 기록부에 12일 정지 25분·부상 0명. 이탈·추락은 개장 이래 0건"></textarea></div>
                 <div class="field"><label for="fTactic">포장 방식 (선택)</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
               </div>
               <div id="realFields" class="mk-stack" hidden>
-                <div class="field"><label for="fBasis">근거가 된 자료실 문서</label><select id="fBasis"></select>
-                  <p class="small muted" style="margin:0">진짜 게시물은 자료실 문서에 있는 내용으로만 씁니다. 문서와 어긋나면 가짜로 판정됩니다.</p></div>
+                <div class="field"><label for="fBasis">근거가 된 기록부 문서</label><select id="fBasis"></select></div>
+                <div class="field"><label for="fBasisNote">왜 진짜인가요? 기록부의 어느 내용과 맞나요?</label><textarea id="fBasisNote" rows="2" placeholder="예: 사고 기록부에 12일 오후 3시 40분 블루웨이브 25분 정지, 24명 하차, 부상 0명"></textarea>
+                  <p class="small muted" style="margin:0">자극적으로 써도 숫자·시간·이름은 기록부와 똑같아야 합니다. 어긋나면 가짜로 판정됩니다.</p></div>
               </div>
               <div class="mk-foot">
                 <p class="err" id="formErr" role="alert"></p>
-                <p class="small muted" style="margin:0">올리면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
+                <p class="small muted" style="margin:0">올리면 관리자가 확인한 뒤 게임을 시작합니다. 누가 만든 글인지, 진짜인지는 정답 공개 때까지 다른 조는 모릅니다.</p>
               </div>
             </div>
           </div>
@@ -908,7 +935,7 @@
     <!-- 점수 -->
     <section id="tab-score" hidden>
       <table class="scores" id="scoreTable"></table>
-      <p class="small muted">맞힌 판별(근거 기준을 고른 것만) 1점 + 우리 조가 만든 가짜를 다른 조가 진짜라고 믿을 때마다 1점. 예제 자료 판정은 연습이라 점수에 들어가지 않습니다.</p>
+      <p class="small muted">맞힌 판별 1점 + 우리 글에 속은 조마다 1점(진짜를 가짜로 보게 해도, 가짜를 진짜로 믿게 해도). 예시 판정은 연습이라 점수에 들어가지 않습니다.</p>
     </section>
 
     <!-- 도움말 -->
@@ -925,7 +952,8 @@
       </div>
       <div id="adApp" hidden>
         <div class="ad-card"><h2><i data-lucide="flag" class="icon"></i>진행 단계 <span class="small muted" style="font-weight:400">누르면 모든 노트북 화면이 바로 바뀝니다</span></h2><div class="ad-phases" id="adPhases"></div></div>
-        <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조 수 <span class="small muted" style="font-weight:400">몇 조로 운영할지. 조마다 스토리·쇼츠·기사 1개씩 만듭니다.</span></h2><div class="ad-teams" id="adTeams"></div></div>
+        <div class="ad-card"><h2><i data-lucide="users" class="icon"></i>조 수 <span class="small muted" style="font-weight:400">몇 조로 운영할지. 라운드마다 조당 1개를 만듭니다.</span></h2><div class="ad-teams" id="adTeams"></div></div>
+        <div class="ad-card"><h2><i data-lucide="shuffle" class="icon"></i>이번 라운드 배정 <span class="small muted" style="font-weight:400">만들기 단계를 열면 서버가 진짜·가짜와 주제를 뽑습니다. 글을 올리기 전이면 주제를 다시 뽑을 수 있습니다.</span></h2><table class="ad-table"><thead><tr><th>조</th><th>배정</th><th>주제</th><th>기록부 문서</th><th>올림</th><th></th></tr></thead><tbody id="adAssign"></tbody></table></div>
         <div class="ad-grid">
           <div class="ad-card"><h2><i data-lucide="list-checks" class="icon"></i>조별 현황</h2>
             <table class="ad-table"><thead><tr><th>조</th><th>이번 라운드</th><th class="num">스토리</th><th class="num">쇼츠</th><th class="num">기사</th><th class="num">판별</th></tr></thead><tbody id="adTeamRows"></tbody></table></div>
@@ -967,6 +995,11 @@ const ARC = window.DORO_ARCHIVE || { docs: [], types: {} };
 const ARC_DOC = id => ARC.docs.find(d => d.id === id);
 const REG_ACCOUNTS = (() => { const d = ARC_DOC('account-registry'); return d ? d.tables[0].rows.map(r => ({ handle: r[0], name: r[1], kind: /공식/.test(r[2]) ? 'official' : /언론/.test(r[2]) ? 'press' : 'creator' })) : []; })();
 const arcUrl = q => 'archive.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+const docUrl = id => 'archive.html#doc=' + encodeURIComponent(id || '');
+const docTitle = id => (ARC_DOC(id) || {}).title || '';
+/* 배정 안내 카드: 진짜 사건을 가짜처럼 / 가짜 사건을 진짜처럼 */
+function asgHTML(a, mini) { if (!a) return ''; const real = a.truth === 'real';
+  return `<div class="asg ${a.truth}${mini ? ' mini' : ''}"><div class="k"><small>우리 조 배정</small><b>${real ? '진짜를<br>가짜처럼' : '가짜를<br>진짜처럼'}</b></div><div class="t"><b>${esc(a.title || '주제 없음')}</b><p>${esc(a.brief || '')}</p></div>${mini ? '' : `<a class="btn btn-ghost" href="${docUrl(a.doc)}" target="_blank" rel="noopener">${ic('file-text')}기록부 문서 열기</a>`}</div>`; }
 const docOptions = sel => Object.entries(ARC.types).map(([t, v]) => { const ds = ARC.docs.filter(d => d.type === t); return ds.length ? `<optgroup label="${v.label}">${ds.map(d => `<option ${sel === d.title ? 'selected' : ''}>${d.title.replace(/</g, '&lt;')}</option>`).join('')}</optgroup>` : ''; }).join('');
 /* 글에 나온 숫자·계정을 뽑아 자료실 검색어로 쓴다 */
 const keyTerms = p => { const t = [p.title, p.subhead, p.body, p.quote?.text, (p.stats || []).map(x => x.value).join(' ')].filter(Boolean).join(' ');
@@ -994,7 +1027,7 @@ const isAdmin = () => !!(typeof AD !== 'undefined' && AD.key);
 const STEP_ORDER = ROUND_ORDER.flatMap(f => ['read', 'make', 'judge', 'reveal'].map(k => [k, f]));
 const STEP_LABEL = { read: '예시 보기', make: '만들기', judge: '판별', reveal: '정답 공개' };
 const stepName = (k, f) => `${roundIdx(f) + 1}라운드 ${ROUND_LABEL[f]} · ${STEP_LABEL[k]}`;
-const revealed = p => isAdmin() || !!S.data && (roundIdx(p.format) < roundIdx(curRound()) || (p.format === curRound() && S.data.phase === 'reveal'));
+const revealed = p => isAdmin() || (!p.seed && p.counts !== undefined) || !!S.data && (roundIdx(p.format) < roundIdx(curRound()) || (p.format === curRound() && S.data.phase === 'reveal'));   /* 퀴즈에서 마감된 문제는 서버가 counts·secret을 보낸다 */
 const truthOf = p => p.seed ? p.answer?.truth : (p.secret?.truth || 'fake');
 const ic = (n, cls = '') => `<i data-lucide="${n}"${cls ? ` class="${cls}"` : ''}></i>`;
 const vbadge = (a, lg) => a && a.verified ? `<span class="vb${lg ? ' lg' : ''}" title="도로그램 인증 계정">${ic('check')}</span>` : '';
@@ -1099,6 +1132,7 @@ async function refresh() {
 // ---------- 렌더 ----------
 function render() {
   const d = S.data;
+  if (!isAdmin() && d.quiz && d.phase === 'judge' && S.tab === 'feed') S.fmt = d.round;   /* 판별 퀴즈는 모든 노트북이 같은 문제를 본다 */
   $$('[data-tab="score"]').forEach(b => b.hidden = !d.scores);
   if ((S.tab === 'score' && !d.scores) || (S.tab === 'make' && (S.screen || isAdmin() || !S.team || d.phase !== 'make'))) { showTab('feed'); S.fmt = d.round; }
   if (S.tab === 'admin' && AD.key) adRefresh();
@@ -1224,7 +1258,7 @@ function renderRounds() {
       : f === 'shorts' ? `<span class="rt-shorts-bg"></span><span class="rt-phone back">${im(cvo[1])}<span class="ov"></span></span><span class="rt-phone main">${im(cvo[0])}<span class="ov"></span><span class="logo"><i>${ic('play')}</i>Shorts</span><span class="acts">${ic('heart')}<span>12만</span>${ic('message-circle')}<span>1.2천</span>${ic('send')}<span>공유</span></span><span class="cap"><span class="ch"><i></i>${esc(cvo[0]?.name || '')}</span><span class="tx">${esc(cvo[0]?.title || '')}</span></span><span class="bar"></span></span>`
       : `<span class="rt-photo story">${im(cvo[0])}</span><span class="rt-rings">${cvo.slice(1, 4).map(x => `<span>${im(x)}</span>`).join('')}</span>`;
     const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장과 한 줄' }[f];
-    const cta = now ? { read: '예시 보기', make: adm ? '조 게시물 보기' : '우리 조 만들기', judge: adm ? '게시물 보기' : '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : peek ? '관리자 미리 보기' : '';
+    const cta = now ? { read: '예시 보기', make: adm ? '조 게시물 보기' : '우리 조 만들기', judge: adm ? '게시물 보기' : '판별 문제 보기', reveal: adm ? '게시물 보기' : '점수 보기' }[S.data.phase] : past ? '다시 보기' : peek ? '관리자 미리 보기' : '';
     const state = past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
     return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : peek ? ' adm-peek' : ''}" data-round="${f}" ${open || peek ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
       ${art}<span class="rt-shade"></span>
@@ -1241,15 +1275,30 @@ function renderOpBar() {
   let prog = '';
   if (d.phase === 'read') prog = '';
   else if (d.phase === 'make') { const ret = pr.returned || [], cnt = pr.counts || {}; prog = `<span>${d.minPosts || 2}개 이상 올린 조 ${pr.submitted.length} / ${n}${ret.length ? ` · 돌려보냄 ${ret.length}` : ''}</span>` + teams.map(t => { const k = cnt[t] || 0; return `<i class="tm${ret.includes(t) ? ' ret' : pr.submitted.includes(t) ? ' on' : k ? ' part' : ''}" title="${t}조 ${k}개${ret.includes(t) ? ' · 돌려보냄' : ''}">${t}${k ? `<small>${k}</small>` : ''}</i>`; }).join(''); }
-  else if (d.phase === 'judge') { const need = t => pr.posts - (pr.submitted.includes(t) ? 1 : 0), done = t => (pr.judged[t] || 0) >= need(t) && need(t) > 0;
-    prog = `<span>판별 끝낸 조 ${teams.filter(done).length} / ${n}</span>` + teams.map(t => `<i class="tm${done(t) ? ' on' : (pr.judged[t] ? ' part' : '')}" title="${t}조 ${pr.judged[t] || 0} / ${need(t)}">${t}</i>`).join(''); }
+  else if (d.phase === 'judge' && d.quiz) { const q = d.quiz, cur = q.postId ? d.posts.find(x => x.id === q.postId) : null, author = cur ? cur.team : null, voted = pr.voted || [];
+    prog = `<span>문제 ${Math.min(q.idx + 1, q.total)} / ${q.total}${author ? ` · ${author}조 글` : ''} · 제출 ${voted.length} / ${n - 1}</span>` + teams.map(t => `<i class="tm${voted.includes(t) ? ' on' : t === author ? ' ret' : ''}" title="${t}조${t === author ? ' (작성 조)' : voted.includes(t) ? ' 제출' : ''}">${t}</i>`).join(''); }
+  else if (d.phase === 'judge') { prog = '<span>게임을 시작하면 첫 문제가 열립니다.</span>'; }
   else if (d.scores) prog = `<span>순위</span>` + d.scores.slice(0, 3).map((r, i) => `<i class="tm on">${i + 1}위 ${r.team}조</i>`).join('');
   const k = STEP_ORDER.findIndex(([ph, f]) => ph === d.phase && f === d.round), next = STEP_ORDER[k + 1], prev = STEP_ORDER[k - 1];
   box.hidden = false;
   box.innerHTML = `<div class="now"><small>${adm ? '관리자' : '진행 화면'}</small>${adm ? '' : `<b>${stepName(d.phase, d.round)}</b>`}</div><div class="prog">${prog}</div>
-    ${adm ? `<div class="acts"><select class="input" data-stepsel aria-label="단계 바로 가기" style="width:auto;min-height:40px">${STEP_ORDER.map(([ph, f]) => `<option value="${ph}:${f}" ${ph === d.phase && f === d.round ? 'selected' : ''}>${esc(stepName(ph, f))}</option>`).join('')}</select>${prev ? `<button type="button" class="btn btn-ghost" data-step="${prev.join(':')}">${ic('chevron-left')}이전</button>` : ''}
+    ${adm ? `<div class="acts">${quizCtlHTML(d)}<select class="input" data-stepsel aria-label="단계 바로 가기" style="width:auto;min-height:40px">${STEP_ORDER.map(([ph, f]) => `<option value="${ph}:${f}" ${ph === d.phase && f === d.round ? 'selected' : ''}>${esc(stepName(ph, f))}</option>`).join('')}</select>${prev ? `<button type="button" class="btn btn-ghost" data-step="${prev.join(':')}">${ic('chevron-left')}이전</button>` : ''}
       ${next ? `<button type="button" class="btn btn-primary" data-step="${next.join(':')}">다음: ${esc(stepName(...next))}${ic('chevron-right')}</button>` : ''}
       <button type="button" class="btn btn-ghost" data-act="leave-admin">관리자 화면 끝내기</button></div>` : ''}`;
+}
+function quizCtlHTML(d) {
+  const q = d.quiz, pr = d.progress || {}, n = d.teamCount;
+  if (d.phase === 'make') return `<button type="button" class="btn btn-primary" data-quiz="start" title="모든 노트북에 첫 문제가 뜹니다">${ic('play')}게임 시작 (${(pr.submitted || []).length} / ${n} 조 올림)</button>`;
+  if (d.phase === 'judge' && q) { if (q.done) return `<button type="button" class="btn btn-primary" data-quiz="next">${ic('trophy')}라운드 점수 공개</button>`;
+    return `<span class="qz-ctl">${q.idx > 0 ? `<button type="button" class="btn btn-ghost" data-quiz="prev">${ic('chevron-left')}이전 문제</button>` : ''}${q.open ? `<button type="button" class="btn btn-primary" data-quiz="close">${ic('lock')}마감하고 정답 공개</button>` : `<button type="button" class="btn btn-ghost" data-quiz="reopen">${ic('rotate-ccw')}다시 열기</button><button type="button" class="btn btn-primary" data-quiz="next">${q.idx + 1 >= q.total ? ic('trophy') + '라운드 점수 공개' : ic('chevron-right') + '다음 문제'}</button>`}</span>`; }
+  if (d.phase === 'judge') return `<button type="button" class="btn btn-primary" data-quiz="start">${ic('play')}게임 시작</button>`;
+  return '';
+}
+async function quizAct(action) {
+  const q = S.data.quiz, pr = S.data.progress || {}, n = S.data.teamCount;
+  if (action === 'start' && !confirm(`판별 게임을 시작합니다. 올린 조 ${(pr.submitted || []).length} / ${n}. 안 올린 조의 글은 빠지고, 모든 노트북에 첫 문제가 뜹니다.\n시작할까요?`)) return;
+  if (action === 'close' && q && (pr.voted || []).length < n - 1 && !confirm(`아직 제출하지 않은 조가 ${n - 1 - (pr.voted || []).length}개 있습니다. 지금 마감하면 그 조는 이 문제에서 점수를 못 받습니다.\n마감할까요?`)) return;
+  try { await adApi('/admin/quiz', { action }); await refresh(); } catch (e) { toast(e.message); }
 }
 async function goStep(spec) {
   const [phase, round] = spec.split(':');
@@ -1302,15 +1351,18 @@ function renderHomeHead() {
   const d = S.data, box = $('#homeHead'), f = curRound(), L = ROUND_LABEL[f], i = roundIdx(f) + 1;
   if (S.screen) { box.hidden = true; return; }
   const txt = { read: [`${i}라운드 ${L} · 예시 보기`, `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`, `${L} 예시 보기`],
-    make: [`${i}라운드 ${L} · 만들기`, `우리 조 ${L}를 ${d.minPosts || 2}~${d.maxPosts}개 만드는 시간이에요. 진짜로 할지 가짜로 할지 글마다 정해요.`, `우리 조 ${L} 만들기`],
-    judge: [`${i}라운드 ${L} · 판별`, `다른 조가 올린 ${L}를 하나씩 눌러 진짜인지 가짜인지 판정해요.`, `${L} 판별하러 가기`],
-    reveal: [`${i}라운드 ${L} · 정답 공개`, `정답과 각 조가 숨긴 단서, 지금까지 점수를 확인해요.`, `정답 보기`] }[d.phase];
+    make: [`${i}라운드 ${L} · 만들기`, d.assignment ? `우리 조는 「${d.assignment.title}」을(를) ${d.assignment.truth === 'real' ? '진짜 사건인데 가짜처럼' : '없던 일인데 진짜처럼'} 써요.` : `우리 조 ${L}를 만드는 시간이에요.`, `우리 조 ${L} 만들기`],
+    judge: [`${i}라운드 ${L} · 판별`, `모든 조가 같은 ${L}를 보고 동시에 진짜인지 가짜인지 제출해요. 문제마다 정답과 해설이 바로 나와요.`, `판별 문제 보기`],
+    reveal: [`${i}라운드 ${L} · 라운드 끝`, `이번 라운드 점수와 누적 점수를 확인해요.`, `점수 보기`] }[d.phase];
   box.hidden = false;
   box.innerHTML = `<div><small>지금 할 일</small><h1>${esc(txt[0])}</h1><p>${esc(txt[1])}</p></div>`;
 }
 function renderFeed() {
   const d = S.data, home = !S.fmt;
   renderOpBar();
+  const quizMode = !isAdmin() && d.quiz && S.fmt === curRound() && (d.phase === 'judge' || (d.phase === 'reveal' && d.quiz.done));
+  if (!quizMode) { $('#quiz').hidden = true; if (S.quizRendered) { S.quizRendered = null; $('#quiz').innerHTML = ''; } }
+  if (quizMode) { $('#rounds').hidden = true; $('#roundView').hidden = true; $('#homeHead').hidden = true; $('#meProf').hidden = true; $('#twist').hidden = true; renderQuiz(); renderModal(); return; }
   $('#rounds').hidden = !home; $('#roundView').hidden = home;
   if (home) { renderHomeHead(); renderRounds(); renderModal(); return; }
   $('#homeHead').hidden = true; $('#meProf').hidden = true;
@@ -1333,7 +1385,7 @@ function renderFeed() {
 }
 function renderTwist() {
   const box = $('#twist'), d = S.data;
-  if (d.phase !== 'reveal' || S.fmt !== curRound()) { box.hidden = true; return; }
+  if (d.phase !== 'reveal' || S.fmt !== curRound() || (d.quiz && !isAdmin())) { box.hidden = true; return; }
   box.hidden = false;
   const me = (d.scores || []).find(r => r.team === S.team);
   const rank = me ? (d.scores.findIndex(r => r.team === S.team) + 1) : null;
@@ -1346,6 +1398,44 @@ function renderScores() {
   if (!rows) { $('#scoreTable').innerHTML = ''; return; }
   $('#scoreTable').innerHTML = `<thead><tr><th>순위</th><th>조</th><th>합계</th><th>맞힌 수</th><th>속인 조 수</th></tr></thead><tbody>${rows.map((r, i) =>
     `<tr${r.team === S.team ? ' style="background:var(--surface-2)"' : ''}><td>${i + 1}</td><td><b>${r.team}조</b></td><td class="big">${r.total}</td><td>${r.correct} / ${r.judgable}</td><td>${r.fooled}</td></tr>`).join('')}</tbody>`;
+}
+
+
+// ---------- 판별 퀴즈: 모든 조가 같은 문제를 동시에 (2026-11-10) ----------
+function renderQuiz() {
+  const d = S.data, q = d.quiz, box = $('#quiz');
+  if (!q) { box.hidden = true; return false; }
+  box.hidden = false;
+  const p = q.postId ? d.posts.find(x => x.id === q.postId) : null, n = d.teamCount, L = ROUND_LABEL[curRound()];
+  if (q.done || !p) { if (S.quizRendered !== 'board') { playerStop(); S.quizRendered = 'board'; } box.innerHTML = boardHTML(); icons(); return true; }
+  if (S.quizRendered !== p.id) {
+    playerStop();
+    box.innerHTML = `<div class="qz"><div class="qz-head"></div><div class="qz-body"><div class="qz-post"><div class="png-target"></div></div><div class="qz-side"></div></div></div>`;
+    const t = $('#quiz .png-target'); t.innerHTML = cardHTML(p); if (p.format !== 'news') playerMount(t.firstElementChild, p, p.format);
+    S.quizRendered = p.id; S.open = {};
+  }
+  $$('#quiz [data-act="reason"]').forEach(i => { (S.draft[i.dataset.id] ||= {}).reason = i.value; });
+  const focused = document.activeElement?.dataset?.act === 'reason';
+  const mine = d.myJudgments[p.id], own = !!p.mine, voters = n - 1;
+  $('#quiz .qz-head').innerHTML = `<span class="qz-num">문제 ${q.idx + 1} / ${q.total}</span><h2>${L} 판별</h2><span class="qz-state">${q.revealed ? `${ic('eye')}정답 공개` : `<i class="dot"></i>제출한 조 ${q.voted} / ${voters}`}</span>`;
+  let side;
+  if (q.revealed) side = answerHTML(p);
+  else if (S.screen) side = `<div class="qz-wait"><span class="big">${q.voted}<small style="font-size:18px;color:var(--muted)"> / ${voters}</small></span><b>제출한 조</b><p>모든 조가 제출하면 관리자가 마감합니다.</p></div>`;
+  else if (own) side = `<div class="qz-wait">${ic('pen-line')}<b>우리 조가 쓴 글입니다</b><p>다른 조가 판별하는 동안 기다립니다. 제출한 조 ${q.voted} / ${voters}</p></div>`;
+  else if (mine) side = `<div class="qz-wait">${verdictBadge(mine.verdict)}<b>제출했습니다</b><p>다른 조를 기다리는 중 · ${q.voted} / ${voters}</p><p>관리자가 마감하면 정답과 해설이 나옵니다.</p></div>`;
+  else side = arcLookHTML(p) + judgeHTML(p);
+  $('#quiz .qz-side').innerHTML = side;
+  if (focused) { const el = $('#quiz [data-act="reason"]'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+  icons();
+  return true;
+}
+function boardHTML() {
+  const d = S.data, L = ROUND_LABEL[curRound()], rs = d.roundScores || [], ts = d.scores || [], me = S.team;
+  const tbl = (rows, cum) => `<table><thead><tr><th></th><th>조</th><th class="num">${cum ? '누적' : '이번 라운드'}</th><th class="num">맞힘</th><th class="num">속임</th></tr></thead><tbody>${rows.map((r, i) => `<tr class="${r.team === me ? 'me' : ''}"><td><span class="rank">${i + 1}</span></td><td><b>${r.team}조</b></td><td class="num">${r.total}</td><td class="num">${r.correct} / ${r.judgable}</td><td class="num">${r.fooled}</td></tr>`).join('')}</tbody></table>`;
+  const mine = rs.find(r => r.team === me);
+  return `<div class="board"><div class="board-hero"><h2>${roundIdx(curRound()) + 1}라운드 ${L} 끝</h2><p>${mine ? `우리 조 이번 라운드 ${mine.total}점 · 맞힘 ${mine.correct} / ${mine.judgable} · 속인 조 ${mine.fooled}` : '라운드 점수가 나왔습니다.'}${roundIdx(curRound()) < 2 ? ' · 관리자가 다음 라운드를 열면 화면이 바뀝니다.' : ''}</p></div>
+    <div class="board-grid"><div class="board-card"><h3>이번 라운드</h3>${tbl(rs, false)}</div><div class="board-card"><h3>누적</h3>${tbl(ts, true)}</div></div>
+    <p class="small muted" style="margin:0 2px">맞힌 판별 1점 · 우리 글에 속은 조마다 1점 (진짜를 가짜로 보게 해도, 가짜를 진짜로 믿게 해도)</p></div>`;
 }
 
 // ---------- 상세 카드 (실제 서비스 화면) ----------
@@ -1473,10 +1563,11 @@ function judgeHTML(p) {
   if (p.seed && mine && p.answer) return '';   // 예제는 한 번 판정하면 해설로 넘어감
   const dft = S.draft[p.id] || (mine ? { ...mine } : {}); S.draft[p.id] = dft;
   const vbtn = (v, l, i) => `<button type="button" class="vd" data-act="verdict" data-id="${p.id}" data-v="${v}" aria-pressed="${dft.verdict === v}">${ic(i)}${l}</button>`;
-  const docs = `<select class="input" data-act="basisdoc" data-id="${p.id}" aria-label="대조한 자료실 문서"><option value="">대조한 자료실 문서를 고르세요</option>${docOptions(dft.doc)}</select>`;
+  const docs = `<select class="input" data-act="basisdoc" data-id="${p.id}" aria-label="대조한 자료실 문서"><option value="">문서를 골라도 되고 안 골라도 됩니다</option>${docOptions(dft.doc)}</select>`;
   return `<div class="judge">${mine ? `<div class="done-judge"><span class="muted">우리 조 판정</span>${verdictBadge(mine.verdict)}</div>` : `<p class="judge-q">이 글, 진짜일까요?</p>`}
-    <div class="judge-row seg">${vbtn('real', '진짜', 'circle-check')}${vbtn('fake', '가짜', 'circle-x')}${vbtn('unsure', '모르겠음', 'circle-help')}</div>
-    <div class="flabel">어느 문서와 맞춰 봤나요?</div>${docs}
+    <div class="judge-row seg">${vbtn('real', '진짜', 'circle-check')}${vbtn('fake', '가짜', 'circle-x')}</div>
+    <p class="small muted" style="margin:0 0 6px">자극적이라고 가짜가 아니고, 멀쩡해 보인다고 진짜가 아닙니다. 기록부에 그 사건이 있는지, 숫자가 맞는지로 정합니다.</p>
+    <div class="flabel">맞춰 본 기록부 문서 (선택)</div>${docs}
     <input class="input" data-act="reason" data-id="${p.id}" maxlength="80" placeholder="한 줄 메모 (예: 키링은 하루 400개인데 3,000개라고 씀)" value="${esc(dft.reason || '')}" aria-label="판단 메모">
     <p class="err" data-err="${p.id}"></p><div><button type="button" class="btn btn-primary" data-act="submit-judge" data-id="${p.id}">${mine ? '판정 바꾸기' : '판정 제출'}</button></div></div>`;
 }
@@ -1493,19 +1584,20 @@ function answerHTML(p) {
       <ul class="ans-list">${ss.map(s => `<li>${ic(a.truth === 'fake' ? 'search-x' : 'badge-check')}<span>${esc(s)}</span></li>`).join('')}</ul>
       ${a.doc || a.part || tc ? `<div class="ans-cards">${a.doc ? card('file-text', a.truth === 'fake' ? '어긋난 자료실 문서' : '근거가 된 자료실 문서', a.doc, '') : ''}${a.part ? card('search-x', '거짓으로 쓴 곳', a.part, '') : ''}${tc ? card('drama', '쓴 수법', tc.id, tc.desc) : ''}</div>` : ''}
       ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
-  if (revealed(p) && p.secret) { const s = p.secret, ck = clueKind(s.clueKind);
-    return `<div class="answer ${s.truth}">${head(s.truth, `${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}`)}<div class="ans-body">
-      <div class="ans-cards">${s.fact ? card('file-text', s.truth === 'real' ? '근거가 된 자료실 문서' : '어긋난 자료실 문서', s.fact, '') : ''}${s.truth !== 'real' && ck ? card(ck.icon, '거짓으로 쓴 곳', ck.label, s.clue || '') : s.truth !== 'real' && s.clue ? card('search-x', '숨긴 단서', s.clue, '') : ''}${s.tactic ? card('drama', '쓴 수법', s.tactic, (C.TACTICS.find(x => x.id === s.tactic) || {}).desc) : ''}</div>
-      ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
+  if (revealed(p) && p.secret) { const s = p.secret, real = s.truth === 'real';
+    return `<div class="answer ${s.truth}">${head(s.truth, `${p.team}조가 쓴 ${real ? '진짜 (가짜처럼 썼음)' : '가짜 (진짜처럼 썼음)'}`)}<div class="ans-body">
+      <div class="ans-cards">${!real && s.event ? card('drama', '지어낸 사건', s.event, '') : ''}${s.fact ? card('file-text', real ? '근거가 된 기록부 문서' : '이 사건이 없었다는 기록부 문서', s.fact, '') : ''}${s.clue ? card(real ? 'badge-check' : 'search-x', real ? `${p.team}조의 설명 · 왜 진짜인가` : `${p.team}조의 설명 · 기록부에는`, s.clue, '') : ''}${s.tactic ? card('wand-sparkles', '포장 방식', s.tactic, (C.TACTICS.find(x => x.id === s.tactic) || {}).desc) : ''}</div>
+      ${p.counts ? countsHTML(p.counts, s.truth) : ''}</div></div>`; }
   return '';
 }
-const countsHTML = c => `<div class="counts"><span class="real"><b>${c.real}</b>진짜라고 본 조</span><span class="fake"><b>${c.fake}</b>가짜라고 본 조</span><span><b>${c.unsure}</b>모르겠다고 한 조</span></div>`;
+const countsHTML = (c, truth) => `<div class="counts"><span class="real"><b>${c.real}</b>진짜라고 본 조</span><span class="fake"><b>${c.fake}</b>가짜라고 본 조</span>${truth ? `<span><b>${(c.teams || {})[truth === 'real' ? 'fake' : 'real']?.length ?? ''}</b>속은 조</span>` : ''}</div>`
+  + (c.teams && truth ? `<div class="res-teams"><div class="row ok"><small>맞힌 조</small>${(c.teams[truth] || []).map(t => `<span class="tm">${t}</span>`).join('') || '<span class="muted">없음</span>'}</div><div class="row no"><small>속은 조</small>${(c.teams[truth === 'real' ? 'fake' : 'real'] || []).map(t => `<span class="tm">${t}</span>`).join('') || '<span class="muted">없음</span>'}</div></div>` : '');
 function statusHTML(p) {
   if (p.seed) return '';
   if (!p.mine || revealed(p)) return '';
   const s = p.secret || {};
   if (p.status === 'returned') return `<div class="status-line st-pending">${ic('undo-2')}관리자이 돌려보냄${p.note ? ' · ' + esc(p.note) : ''}</div>`;
-  return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
+  return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 쓴 진짜(가짜처럼) · 근거: ${esc(s.fact || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 쓴 가짜(진짜처럼) · 지어낸 사건: ${esc(s.event || '-')}</div>`;
 }
 function sideHTML(p) {
   const own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
@@ -1562,6 +1654,7 @@ function openProfile(id) {
 
 document.addEventListener('click', async e => {
   const st = e.target.closest('[data-step]'); if (st) { goStep(st.dataset.step); return; }
+  const qa = e.target.closest('[data-quiz]'); if (qa) { quizAct(qa.dataset.quiz); return; }
   if (e.target.closest('[data-act="leave-admin"]')) { leaveAdmin(); return; }
   const fc = e.target.closest('#filters [data-filter]'); if (fc) { S.filter = fc.dataset.filter; renderFeed(); icons(); return; }
   const rt0 = e.target.closest('[data-round]');
@@ -1621,10 +1714,9 @@ document.addEventListener('wheel', e => { const m = e.target.closest('.post-medi
 
 async function submitJudge(id, btn) {
   const dft = S.draft[id] || {}, errEl = $(`[data-err="${id}"]`);
-  if (!dft.verdict) { errEl.textContent = '진짜, 가짜, 모르겠음 중에 골라 주세요.'; return; }
-  if (dft.verdict !== 'unsure' && !dft.doc) { errEl.textContent = '대조한 자료실 문서를 골라 주세요.'; return; }
+  if (!dft.verdict) { errEl.textContent = '진짜인지 가짜인지 골라 주세요.'; return; }
   btn.disabled = true;
-  try { await api('/judge', { team: S.team, postId: id, verdict: dft.verdict, criterion: dft.verdict === 'unsure' ? null : 'cross', reason: (dft.doc ? `[${dft.doc}] ` : '') + (dft.reason || '') }); delete S.draft[id]; toast('판정을 제출했습니다. →로 다음 게시물을 보세요.'); await refresh(); }
+  try { await api('/judge', { team: S.team, postId: id, verdict: dft.verdict, criterion: 'cross', reason: dft.reason || '', doc: dft.doc || '' }); delete S.draft[id]; toast(S.data.posts.find(x => x.id === id)?.seed ? '해설을 확인하세요.' : '제출했습니다. 다른 조를 기다리는 중입니다.'); await refresh(); }
   catch (err) { errEl.textContent = err.message; btn.disabled = false; }
 }
 async function deleteOwn(id) {
@@ -1640,16 +1732,16 @@ async function savePng(id) {
 
 // ---------- 만들기 ----------
 const myPosts = () => (S.data?.posts || []).filter(p => p.mine);
-const FIELD_MAP = { fClue: 'clue', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fPostsCount: 'posts', fBio: 'bio', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fCommentCount: 'commentCount', fThumbTitle: 'thumbTitle', fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fTags: 'tags', fPlace: 'place', fPoll: 'poll', fMusic: 'music', fPosted: 'postedAt', fTaken: 'photoTakenAt', fQuoteText: 'quoteText', fQuoteWho: 'quoteWho', fStat1L: 'stat1L', fStat1V: 'stat1V', fStat2L: 'stat2L', fStat2V: 'stat2V' };
+const FIELD_MAP = { fClue: 'clue', fBasisNote: 'basisNote', fEvent: 'event', fName: 'name', fHandle: 'handle', fJoined: 'joined', fFollowers: 'followers', fPostsCount: 'posts', fBio: 'bio', fReporter: 'reporter', fLikes: 'likes', fViews: 'views', fCommentCount: 'commentCount', fThumbTitle: 'thumbTitle', fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fTags: 'tags', fPlace: 'place', fPoll: 'poll', fMusic: 'music', fPosted: 'postedAt', fTaken: 'photoTakenAt', fQuoteText: 'quoteText', fQuoteWho: 'quoteWho', fStat1L: 'stat1L', fStat1V: 'stat1V', fStat2L: 'stat2L', fStat2V: 'stat2V' };
 function resetForm() {
   const first = curRound();   /* 이번 라운드 형식만 만든다 */
   S.form = { format: first, tactic: '', clueCriterion: null, clueKind: '', fact: '', clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
-    truth: 'fake', basis: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
+    truth: (S.data && S.data.assignment && S.data.assignment.truth) || 'fake', basis: '', basisNote: '', event: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
     quoteText: '', quoteWho: '', stat1L: '', stat1V: '', stat2L: '', stat2V: '' };
   S.editing = null; S.wstep = 'write'; S.mstep = 'detail';
 }
 /* 만들기 단계 (2026-11-09): 정하기 → 글 → 계정 → 확인·올리기. 선택 항목은 「더 채우기」로 접고, 단서가 그 항목을 쓰면 자동으로 펼친다 */
-const WIZ = [['write', '글 쓰기'], ['account', '계정'], ['secret', '진짜·가짜 정하기'], ['check', '썸네일·올리기']];
+const WIZ = [['write', '글 쓰기'], ['account', '계정'], ['secret', '이유 적기'], ['check', '썸네일·올리기']];
 function wizInit() {
   if (wizInit.done) return; wizInit.done = true;
   const cols = $$('.mk-body .mk-col'); if (cols.length < 4) return;
@@ -1675,20 +1767,19 @@ function wizInit() {
   if (th) wrap.appendChild(th); wrap.appendChild($('#thumbFields')); cols[0].appendChild(wrap);
   $('#mkTop').appendChild($('#myPosts'));
   // 비밀 칸 머리 문구
-  const sh = $('.mk-h', cols[3]); if (sh) sh.innerHTML = `${ic('lock-keyhole')}진짜로 올릴까요, 가짜로 올릴까요? <span class="small muted" style="font-weight:400">자료실 문서와 맞춰 보고 정합니다 · 다른 조에게는 정답 공개 때만 보입니다</span>`;
+  const sh = $('.mk-h', cols[3]); if (sh) sh.innerHTML = `${ic('lock-keyhole')}왜 진짜인지 (또는 어디가 거짓인지) 적기 <span class="small muted" style="font-weight:400">정답 공개 때 해설로 모든 조에게 보입니다</span>`;
   $('#wizSteps').addEventListener('click', e => { const li = e.target.closest('li[data-w]'); if (li) wizGo(li.dataset.w); });
   $('#wizNav').addEventListener('click', e => { const b = e.target.closest('[data-wnav]'); if (!b) return; const i = WIZ.findIndex(w => w[0] === S.wstep);
     if (b.dataset.wnav === 'next') { if (wizCheck(S.wstep)) wizGo(WIZ[Math.min(i + 1, WIZ.length - 1)][0]); } else wizGo(WIZ[Math.max(i - 1, 0)][0]); });
 }
 function wizCheck(step) {
   const f = S.form, err = $('#formErr'); err.textContent = '';
-  if (step === 'secret' && f.truth !== 'real') { const k = clueKind(f.clueKind);
-    if (!k) { err.textContent = '어느 부분을 거짓으로 썼는지 골라 주세요.'; return false; }
-    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 문서를 골라 주세요.'; return false; }
-    if (!f.clue.trim()) { err.textContent = '자료실에는 뭐라고 되어 있고 어떻게 바꿔 썼는지 한 줄 적어 주세요.'; return false; }
-    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '계정을 거짓으로 쓰려면 계정 단계에서 종류를 공식 계정이나 언론사로 두어야 합니다.'; return false; }
-    if (k.check === 'unreg' && f.handle && REG_ACCOUNTS.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록 계정부에 있는 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return false; } }
-  if (step === 'secret' && f.truth === 'real' && !f.basis) { err.textContent = '근거가 된 자료실 문서를 골라 주세요.'; return false; }
+  if (step === 'secret' && f.truth !== 'real') {
+    if (!(f.event || '').trim()) { err.textContent = '지어낸 사건을 한 줄로 적어 주세요.'; return false; }
+    if (!f.fact) { err.textContent = '이 사건이 없었다는 걸 보여 주는 기록부 문서를 골라 주세요.'; return false; }
+    if (!f.clue.trim()) { err.textContent = '기록부에는 뭐라고 되어 있는지 한 줄 적어 주세요.'; return false; } }
+  if (step === 'secret' && f.truth === 'real' && !f.basis) { err.textContent = '근거가 된 기록부 문서를 골라 주세요.'; return false; }
+  if (step === 'secret' && f.truth === 'real' && !(f.basisNote || '').trim()) { err.textContent = '왜 진짜인지 한 줄 적어 주세요.'; return false; }
   if (step === 'write') { if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return false; }
     if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return false; }
     if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요.'; return false; } }
@@ -1706,7 +1797,7 @@ function renderWiz() {
   const mw = $('#moreWrite'), ma = $('#moreAccount');
   if (mw) { mw.classList.toggle('need', !!needW); if (needW) mw.open = true; }
   if (ma) { ma.classList.toggle('need', !!needA); if (needA) ma.open = true; }
-  const tip = S.wstep === 'write' ? '오른쪽 미리보기에서 제목·부제·본문이 어디에 들어가는지 보면서 씁니다.' : S.wstep === 'account' && k && k.check === 'unreg' ? '계정 종류를 공식 계정이나 언론사로 두고, 등록 계정부와 다른 아이디를 쓰세요.' : S.wstep === 'secret' ? '자료실을 열어 글에 쓴 숫자·시간·계정이 어느 문서에 있는지 찾은 뒤 정합니다.' : '';
+  const tip = S.wstep === 'write' ? '오른쪽 미리보기에서 제목·부제·본문이 어디에 들어가는지 보면서 씁니다.' : S.wstep === 'secret' ? '여기 적은 이유가 정답 공개 때 해설로 나옵니다. 기록부 문서를 열어 숫자·시간을 맞춰 보세요.' : '';
   $('#wizNav').innerHTML = `${i > 0 ? `<button type="button" class="btn btn-ghost" data-wnav="prev">${ic('chevron-left')}이전</button>` : '<span></span>'}<span class="grow small muted" style="align-self:center;text-align:center">${esc(tip)}</span>${i < WIZ.length - 1 ? `<button type="button" class="btn btn-primary" data-wnav="next">다음: ${WIZ[i + 1][1]}${ic('chevron-right')}</button>` : `<button type="submit" class="btn btn-primary">${ic('send')}${S.editing ? '고친 내용 올리기' : '올리기'}</button>`}`;
   icons();
 }
@@ -1714,15 +1805,16 @@ function renderMake() {
   if (S.screen || !S.team) return;
   const d = S.data, mine = myPosts(), ret = mine.find(p => p.status === 'returned' && p.format === curRound());
   const cur = mine.filter(p => p.format === curRound() && p.status !== 'returned').length;
-  $('#missionCard').innerHTML = `<h2>${S.team}조 미션</h2><dl><dt>할 일</dt><dd>${roundIdx(curRound()) + 1}라운드 <b>${ROUND_LABEL[curRound()]} ${d.minPosts || 2}~${d.maxPosts}개</b> (글마다 진짜/가짜 선택) · 지금 <b>${cur}개</b></dd><dt>규칙</dt><dd>진짜는 자료실대로 · 가짜는 자료실로 확인되는 단서 하나 · 실존 인물 금지 · 형식의 성격에 맞게</dd></dl>`;
+  $('#missionCard').innerHTML = d.assignment ? asgHTML(d.assignment) : `<div class="asg"><div class="t"><b>아직 배정이 없습니다</b><p>관리자가 만들기 단계를 열면 우리 조가 쓸 주제와 진짜·가짜가 정해집니다.</p></div></div>`;
+  $('#missionCard').className = 'mission-asg';
   $('#makeHead').insertAdjacentHTML('afterend', '');
   const rn = $('#returnedNote'); if (rn) rn.remove();
   if (ret && S.editing !== ret.id) $('#makeHead').insertAdjacentHTML('afterend', `<div class="returned-note" id="returnedNote">${ic('undo-2')}<div>관리자이 돌려보냈어요. 단서를 고쳐서 다시 올려 주세요.${ret.note ? `<br><span>${esc(ret.note)}</span>` : ''}</div><button type="button" class="btn btn-primary" data-act="edit" data-id="${ret.id}" style="margin-left:auto">고치기</button></div>`);
-  $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물 · 이번 라운드 ${cur} / ${d.maxPosts}</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
+  $('#myPosts').innerHTML = mine.length ? `<div class="flabel small">우리 조 게시물</div>` + mine.map(p => `<div class="mp-row">${p.imageId ? `<img src="${imgSrc(p.imageId)}" alt="">` : '<div class="noimg"></div>'}
     <div><div class="t">${esc(C.FORMATS[p.format]?.label || '')} · ${esc(p.title || p.body || '(내용 없음)')}</div><div class="a"><span class="muted">${p.secret?.truth === 'real' ? '진짜' : '가짜'}${p.status === 'returned' ? ' · <b style="color:var(--fake)">돌려보냄</b>' : ''}</span><button type="button" data-open="${p.id}">보기</button>${d.phase === 'make' && p.format === curRound() ? `<button type="button" data-act="edit" data-id="${p.id}">고치기</button><button type="button" class="d" data-act="del" data-id="${p.id}">지우기</button>` : ''}</div></div></div>`).join('') : '';
   const canMake = S.editing || cur < d.maxPosts;
   $('#makeWrap').hidden = !canMake; $('#makeClosed').hidden = canMake;
-  $('#makeClosed').innerHTML = `<b>이번 라운드 ${ROUND_LABEL[curRound()]} ${d.maxPosts}개를 다 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 판별 시간이 되면 다른 조 ${ROUND_LABEL[curRound()]}가 열립니다.</p>`;
+  $('#makeClosed').innerHTML = `<b>우리 조 ${ROUND_LABEL[curRound()]}를 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 모든 조가 올리면 관리자가 게임을 시작합니다.</p>`;
   $('#makeNotice').hidden = true;
   $('#makeGuide').innerHTML = guideHTML(curRound(), false);
   $('#makeHead').innerHTML = `<button type="button" class="back" data-act="home-make">${ic('chevron-left')}처음으로</button><h2>${roundIdx(curRound()) + 1}라운드 · 우리 조 ${ROUND_LABEL[curRound()]} 만들기</h2>`;
@@ -1736,18 +1828,15 @@ function fillForm() {
   $('#fmtNature').textContent = `${fmt.label}는 ${fmt.where}에 올라갑니다. ${fmt.nature}`;
   $('#optKind').innerHTML = Object.entries(C.AUTHOR_KINDS).map(([k, v]) => `<button type="button" class="opt" data-kind="${k}" aria-pressed="${f.kind === k}">${ic(v.icon)}${v.label}</button>`).join('');
   $('#kindDesc').textContent = C.AUTHOR_KINDS[f.kind].desc + (f.kind === 'official' || f.kind === 'press' ? ' 조가 만든 글에는 인증 배지가 붙지 않습니다.' : '');
-  $$('#optTruth .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.truth === f.truth));
-  $('#truthHelp').textContent = f.truth === 'real' ? '진짜 글은 자료실 내용 그대로 씁니다. 진짜가 섞여 있어야 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못합니다.' : '우리 가짜에 속은 조 하나마다 1점입니다. 대신 다른 조가 찾아낼 수 있는 단서를 하나 남겨야 합니다.';
+  const asg = d.assignment; if (asg) f.truth = asg.truth;
+  $('#asgBox').innerHTML = asgHTML(asg, true);
+  if (asg && asg.doc) { if (f.truth === 'real' && !f.basis) f.basis = docTitle(asg.doc); if (f.truth !== 'real' && !f.fact) f.fact = docTitle(asg.doc); }
   $('#fakeFields').hidden = f.truth === 'real'; $('#realFields').hidden = f.truth !== 'real';
   $('#fBasis').innerHTML = '<option value="">문서를 고르세요</option>' + docOptions(f.basis);
   $('#fTactic').innerHTML = `<option value="" ${f.tactic ? '' : 'selected'}>고르지 않음</option>` + C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
   $('#tacticDesc').textContent = (C.TACTICS.find(t => t.id === f.tactic) || {}).desc || '';
-  const ck = clueKind(f.clueKind), parts = C.CLUE_KINDS.filter(x => !x.fmt || x.fmt.includes(f.format));
-  $('#optPart').innerHTML = parts.map(x => `<button type="button" class="opt" data-part="${x.id}" aria-pressed="${f.clueKind === x.id}">${ic(x.icon)}${x.label}</button>`).join('');
-  $('#partHint').textContent = ck ? ck.hint : '다른 조가 자료실 문서로 확인할 수 있는 곳이어야 합니다. 자료실에 없는 숫자나 시간을 바꾸는 건 아무도 못 맞춥니다.';
   $('#fFact').innerHTML = '<option value="">문서를 고르세요</option>' + docOptions(f.fact);
   if (document.activeElement !== $('#fArcQ')) $('#fArcQ').value = f.arcQ || '';
-  const live = $('.mk-live'); if (live && S.wstep === 'secret') live.dataset.focus = f.truth !== 'real' && ck ? ({ title: 'title', subhead: 'subhead', body: 'body', stats: 'stats', quote: 'quote', account: 'by', time: 'by' })[ck.id] || '' : '';
   $('#swatches').innerHTML = SWATCHES.map(c => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="프로필 색 ${c}" aria-pressed="${f.color === c}"></button>`).join('');
   $('#fNameLabel').textContent = fmt.authorLabel; $('#fName').placeholder = isNews ? '예: 도로일보' : isShorts ? '예: 놀이기구정복러' : '예: 여행하는 다은';
   $('#fFollowersLabel').textContent = isShorts ? '구독자 수' : '팔로워 수';
@@ -1798,13 +1887,11 @@ function renderPreview() {
 }
 $('#postForm').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.truth) S.form.truth = b.dataset.truth;
-  else if (b.dataset.format && !b.disabled) S.form.format = b.dataset.format;
+  if (b.dataset.format && !b.disabled) S.form.format = b.dataset.format;
   else if (b.dataset.kind) S.form.kind = b.dataset.kind;
   else if (b.dataset.color) S.form.color = b.dataset.color;
   else if (b.dataset.tpl && !b.disabled) S.form.thumbTpl = b.dataset.tpl;
   else if (b.dataset.mstep) S.mstep = b.dataset.mstep;
-  else if (b.dataset.part) { S.form.clueKind = b.dataset.part; S.form.clueCriterion = (clueKind(b.dataset.part) || {}).crit || 'cross'; }
   else if (b.id === 'btnArcOpen') { S.form.arcQ = $('#fArcQ').value.trim(); window.open(arcUrl(S.form.arcQ), '_blank', 'noopener'); return; }
   else if (b.dataset.rmextra !== undefined) S.form.extraImages.splice(+b.dataset.rmextra, 1);
   else if (b.id === 'thumbUseMain') S.form.thumbImageId = null;
@@ -1849,7 +1936,7 @@ $('#btnRmImg').onclick = () => { S.form.imageId = null; fillForm(); };
 function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {}, st = p.stats || [];
-  S.form = { format: p.format, tactic: s.tactic || '', clueCriterion: s.clueCriterion, clueKind: s.clueKind || '', fact: s.fact || '', clue: s.truth === 'real' ? '' : (s.clue || ''), truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.clue || '') : '',
+  S.form = { format: p.format, tactic: s.tactic || '', clueCriterion: s.clueCriterion, clueKind: s.clueKind || '', fact: s.fact || '', clue: s.truth === 'real' ? '' : (s.clue || ''), basisNote: s.truth === 'real' ? (s.clue || '') : '', event: s.event || '', truth: s.truth || 'fake', basis: s.truth === 'real' ? (s.fact || s.clue || '') : '',
     kind: kindOf(a), name: a.name, handle: (a.handle || '').replace(/^@/, ''), joined: a.joined, followers: a.followers, posts: a.posts || '', bio: a.bio || '', color: a.color || SWATCHES[0], reporter: a.reporter || '', likes: p.likes || '', views: p.views || '', commentCount: p.commentCount || '',
     thumbTpl: p.thumbTpl || 'auto', thumbTitle: p.thumbTitle || '', thumbImageId: p.thumbImageId || null, title: p.title || '', subhead: p.subhead || '', body: p.body, tags: p.tags, place: p.place, poll: p.poll ? `${p.poll.q} | ${p.poll.a} | ${p.poll.b}` : '', music: p.music || '', postedAt: p.postedAt, photoTakenAt: p.photoTakenAt, imageId: p.imageId, extraImages: [...(p.extraImages || [])],
     quoteText: p.quote?.text || '', quoteWho: p.quote?.who || '', stat1L: st[0]?.label || '', stat1V: st[0]?.value || '', stat2L: st[1]?.label || '', stat2V: st[1]?.value || '' };
@@ -1864,13 +1951,7 @@ $('#postForm').addEventListener('submit', async e => {
   if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return; }
   if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return; }
   if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요. 진짜 기사처럼 보여야 합니다.'; return; }
-  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 자료실 문서를 골라 주세요.'; return; }
-  if (f.truth !== 'real') { const k = clueKind(f.clueKind);
-    if (!k) { err.textContent = '어느 부분을 거짓으로 썼는지 골라 주세요.'; return; }
-    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 문서를 골라 주세요.'; return; }
-    if (!f.clue.trim()) { err.textContent = '자료실에는 뭐라고 되어 있고 어떻게 바꿔 썼는지 한 줄 적어 주세요.'; return; }
-    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '계정을 거짓으로 쓰려면 계정 종류를 공식 계정이나 언론사로 두어야 합니다.'; return; }
-    if (k.check === 'unreg' && f.handle && REG_ACCOUNTS.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록 계정부에 있는 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return; } }
+  if (!wizCheck('secret')) { wizGo('secret'); return; }
   const btn = $('#btnSubmit'); btn.disabled = true;
   const pv = previewPost();
   try {
@@ -1878,8 +1959,8 @@ $('#postForm').addEventListener('submit', async e => {
       likes: f.format === 'news' ? '' : f.likes, views: f.views || '', commentCount: f.format === 'story' ? '' : f.commentCount, thumbTpl: f.thumbTpl || 'auto', thumbTitle: f.thumbTitle || '', thumbImageId: f.thumbImageId || null,
       title: f.format === 'story' ? '' : f.title, subhead: pv.subhead, body: f.body, tags: f.format === 'news' ? '' : f.tags, place: f.place, poll: f.format === 'story' ? pv.poll : null, music: f.format === 'news' ? '' : f.music,
       postedAt: f.postedAt, photoTakenAt: f.photoTakenAt, imageId: f.imageId, extraImages: f.format === 'news' ? [] : f.extraImages, quote: f.format === 'news' ? pv.quote : null, stats: f.format === 'news' ? pv.stats : [],
-      secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basis, clueCriterion: 'cross', clueKind: '', fact: f.basis } : { truth: 'fake', tactic: f.tactic, clue: f.clue, clueCriterion: f.clueCriterion, clueKind: f.clueKind, fact: f.fact } });
-    toast(S.editing ? '고친 내용을 올렸습니다. 관리자이 다시 봅니다.' : '올렸습니다. 관리자 확인을 거쳐 판별 시간에 다른 조에게 보입니다.');
+      secret: f.truth === 'real' ? { truth: 'real', tactic: '', clue: f.basisNote.trim(), fact: f.basis, event: '' } : { truth: 'fake', tactic: f.tactic, clue: f.clue.trim(), fact: f.fact, event: (f.event || '').trim() } });
+    toast(S.editing ? '고친 내용을 올렸습니다. 관리자가 다시 봅니다.' : '올렸습니다. 관리자가 확인한 뒤 게임을 시작합니다.');
     resetForm(); await refresh();
   } catch (x) { err.textContent = x.message; }
   btn.disabled = false;
@@ -1906,9 +1987,8 @@ async function adLogin() {
 /* 관리자 검토용: 이 글이 어디서 들통나는지 한눈에 */
 function clueBox(p) {
   const s = p.secret || {}; if (p.seed) return '';
-  if (s.truth === 'real') return `<div class="clue">진짜 · 근거: ${esc(s.clue || s.fact || '-')}</div>`;
-  const k = clueKind(s.clueKind), cr = s.clueCriterion ? C.CRITERIA[s.clueCriterion] : null;
-  return `<div class="clue"><b>${cr ? esc(cr.label) : '기준 없음'}</b>${k ? ' · ' + esc(k.label) : ''}${s.fact ? `<br>어긋난 자료실 내용: ${esc(s.fact)}` : ''}<br>설명: ${esc(s.clue || '-')}${s.tactic ? ` · 포장: ${esc(s.tactic)}` : ''}${!k && s.truth === 'fake' ? '<br><b>확인할 수 없는 단서일 수 있음. 내용을 보고 돌려보낼지 정하세요.</b>' : ''}</div>`;
+  if (s.truth === 'real') return `<div class="clue"><b>진짜(가짜처럼)</b> · 배정: ${esc(s.topicTitle || '-')}<br>근거 문서: ${esc(s.fact || '-')}<br>설명: ${esc(s.clue || '-')}<br><b>숫자·시간이 기록부와 다르면 돌려보내세요.</b></div>`;
+  return `<div class="clue"><b>가짜(진짜처럼)</b> · 배정: ${esc(s.topicTitle || '-')}<br>지어낸 사건: ${esc(s.event || '-')}<br>없었다는 문서: ${esc(s.fact || '-')}<br>설명: ${esc(s.clue || '-')}${s.tactic ? ` · 포장: ${esc(s.tactic)}` : ''}<br><b>기록부로 들통나지 않는 거짓이면 돌려보내세요.</b></div>`;
 }
 async function adRefresh() {
   try { AD.data = await adApi('/admin/state'); adRender(); }
@@ -1916,9 +1996,13 @@ async function adRefresh() {
 }
 function adRender() {
   const d = AD.data; if (!d) return;
-  const SDESC = { read: f => `예시 ${ROUND_LABEL[f]}로 연습 (바로 해설)`, make: f => `조마다 ${ROUND_LABEL[f]} 1개`, judge: f => `다른 조 ${ROUND_LABEL[f]} 판별`, reveal: () => '정답·점수 공개 (점수는 누적)' };
+  const SDESC = { read: f => `예시 ${ROUND_LABEL[f]}로 연습 (바로 해설)`, make: f => `조마다 ${ROUND_LABEL[f]} 1개 (배정 주제)`, judge: f => `한 문제씩 동시 판별 (게임 시작 버튼)`, reveal: () => '라운드 점수·누적 점수' };
   $('#adPhases').innerHTML = STEP_ORDER.map(([k, f]) => `<button class="ad-phase" data-adphase="${k}:${f}" aria-pressed="${d.phase === k && d.round === f}"><b>${stepName(k, f)}</b><span>${SDESC[k](f)}</span></button>`).join('');
   $('#adTeams').innerHTML = Array.from({ length: 11 }, (_, i) => i + 2).map(n => `<button class="opt" data-adteams="${n}" aria-pressed="${d.teamCount === n}">${n}조</button>`).join('');
+  const asg = d.assignments || {}, rdPosts = d.posts.filter(p => !p.seed && p.format === d.round);
+  $('#adAssign').innerHTML = Array.from({ length: d.teamCount }, (_, i) => i + 1).map(t => { const a = asg[String(t)], has = rdPosts.some(p => p.team === t && p.status === 'approved');
+    return `<tr><td><b>${t}조</b></td><td>${a ? `<span class="ad-b ${a.truth}">${a.truth === 'real' ? '진짜를 가짜처럼' : '가짜를 진짜처럼'}</span>` : '<span class="muted">아직</span>'}</td><td>${esc(a?.title || '')}</td><td class="small muted">${esc(docTitle(a?.doc || '')).slice(0, 28)}</td><td>${has ? '✓' : '·'}</td><td>${a && !has ? `<button class="btn btn-ghost" data-adreassign="${t}" style="min-height:32px;padding:4px 10px;font-size:12px">주제 다시 뽑기</button>` : ''}</td></tr>`; }).join('');
+  $('#adPhases').insertAdjacentHTML('beforebegin', ''); const gc = $('#adGameCtl'); if (gc) gc.innerHTML = quizCtlHTML(d); else $('#adPhases').insertAdjacentHTML('afterend', `<div id="adGameCtl" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${quizCtlHTML(d)}</div>`);
   const judgedBy = {}; Object.keys(d.judgments).forEach(k => { const [pid, t] = k.split(':'); if (!d.posts.find(p => p.id === pid)?.seed) judgedBy[t] = (judgedBy[t] || 0) + 1; });
   const teamPosts = d.posts.filter(p => !p.seed);
   $('#adTeamRows').innerHTML = Array.from({ length: d.teamCount }, (_, i) => i + 1).map(t => { const has = f => teamPosts.some(p => p.team === t && p.format === f) ? '✓' : '·';
@@ -1940,6 +2024,7 @@ document.addEventListener('click', async e => {
   const rb = e.target.closest('[data-adreturn]');
   if (rb) { const note = prompt('그 조에 보일 한 줄 (예: 바꾼 시간이 자료실에 없어요. 막배 시간처럼 자료실에 있는 걸로 바꿔 주세요)', ''); if (note === null) return;
     try { await adApi('/admin/moderate', { postId: rb.dataset.adreturn, action: 'return', note }); toast('돌려보냈습니다.'); await adRefresh(); } catch (x) { toast(x.message); } return; }
+  const ra = e.target.closest('[data-adreassign]'); if (ra) { try { await adApi('/admin/reassign', { team: +ra.dataset.adreassign }); toast('주제를 다시 뽑았습니다.'); await adRefresh(); } catch (x) { toast(x.message); } return; }
   const ph = e.target.closest('[data-adphase]'), tg = e.target.closest('[data-adtoggle]'), tc = e.target.closest('[data-adteams]'), dl = e.target.closest('[data-addel]');
   try {
     if (ph) { const [phase, round] = ph.dataset.adphase.split(':'); await adApi('/admin/phase', { phase, round }); }
@@ -1975,8 +2060,11 @@ function helpList() {
 }
 const HELP = [
   { id: 'play', icon: 'route', title: '도로그램 활동', desc: '라운드 · 단계 · 점수', qs: [
-    ['활동은 어떻게 진행되나요?', '뉴스, 쇼츠, 스토리 순서로 3라운드입니다. 라운드마다 예시 보기, 만들기, 판별, 정답 공개 순서로 진행됩니다.'],
-    ['점수는 어떻게 받나요?', '다른 조 게시물을 맞게 판별하면 1점입니다. 우리 조가 만든 가짜에 속은 조가 있으면 조마다 1점을 더 받습니다.'],
+    ['활동은 어떻게 진행되나요?', '뉴스, 쇼츠, 스토리 순서로 3라운드입니다. 라운드마다 예시 보기, 만들기, 판별 게임, 점수 순서입니다. 만들기에서는 조마다 진짜·가짜와 주제를 배정받습니다.'],
+    ['진짜를 배정받으면요?', '기록부에 있는 진짜 사건을 가짜처럼, 자극적으로 씁니다. 숫자·시간·이름은 기록부와 똑같아야 합니다.'],
+    ['가짜를 배정받으면요?', '없던 사건을 진짜처럼 씁니다. 기록부의 어느 문서로 들통나는지 적어 두어야 하고, 그 설명이 정답 공개 때 해설로 나옵니다.'],
+    ['판별 게임은 어떻게 하나요?', '모든 조가 같은 글을 동시에 봅니다. 자료실에서 찾아보고 진짜인지 가짜인지 제출하면, 관리자가 마감한 뒤 정답과 작성 조의 설명이 나옵니다.'],
+    ['점수는 어떻게 받나요?', '맞히면 1점입니다. 우리 글에 속은 조가 있으면 조마다 1점을 더 받습니다. 진짜를 가짜처럼 써서 속여도 점수입니다.'],
     ['화면이 저절로 바뀌었어요', '관리자가 다음 단계로 넘기면 모든 노트북이 그 단계 화면으로 함께 이동합니다.'],
     ['조를 잘못 골랐어요', '왼쪽 아래 조 버튼을 누르면 조 선택 화면으로 돌아갑니다.'] ] },
   { id: 'archive', icon: 'library-big', title: '자료실', desc: '검색 · 대조 · 새 탭', qs: [
@@ -1988,12 +2076,13 @@ const HELP = [
     ['어떻게 판별하나요?', '상세 창 오른쪽에서 자료실을 열어 글의 숫자와 시간, 계정을 문서와 맞춰 봅니다. 그다음 진짜, 가짜, 모르겠음을 고릅니다.'],
     ['판정만 하면 되나요?', '어느 자료실 문서와 맞춰 봤는지도 고릅니다. 문서를 고르지 않은 판정은 점수에 들어가지 않습니다.'],
     ['파란 체크가 있으면 진짜인가요?', '아닙니다. 인증 언론사도 틀린 기사를 낼 수 있습니다. 내용이 자료실과 맞는지가 기준입니다.'],
-    ['조회수가 많으면 진짜인가요?', '아닙니다. 조회수와 좋아요는 판별 기준이 아닙니다.'] ] },
+    ['조회수가 많으면 진짜인가요?', '아닙니다. 조회수와 좋아요는 판별 기준이 아닙니다.'],
+    ['자료실에 없는 내용이면요?', '가짜로 판정합니다. 자료실로 확인할 수 없는 글은 믿지 않는 것이 규칙입니다. 진짜 글은 자료실에 있는 내용으로만 만들고, 어긋나면 관리자가 돌려보냅니다.'] ] },
   { id: 'make', icon: 'square-plus', title: '만들기', desc: '글 → 계정 → 정하기 → 올리기', qs: [
-    ['순서가 어떻게 되나요?', '먼저 글을 쓰고 계정을 정합니다. 그다음 자료실 문서와 맞춰 보며 진짜로 올릴지 가짜로 올릴지 정하고, 썸네일을 고른 뒤 올립니다.'],
-    ['몇 개를 만드나요?', '라운드마다 조당 2개에서 3개입니다. 노트북 두 대가 나누어 만들어도 됩니다.'],
-    ['가짜는 어떻게 만드나요?', '어느 부분을 거짓으로 썼는지 고르고, 어긋나게 쓴 자료실 문서를 고릅니다. 다른 조가 그 문서로 찾아낼 수 있어야 합니다.'],
-    ['진짜는 어떻게 만드나요?', '자료실 문서에 있는 내용으로만 쓰고 근거가 된 문서를 고릅니다. 황당해 보이는 진짜일수록 재미있습니다.'],
+    ['순서가 어떻게 되나요?', '배정을 확인하고 글을 쓰고 계정을 정합니다. 그다음 이유(근거 문서, 지어낸 사건, 기록부 내용)를 적고 썸네일을 고른 뒤 올립니다.'],
+    ['몇 개를 만드나요?', '라운드마다 조당 1개입니다. 한 대는 쓰고 한 대는 자료실을 찾는 식으로 나누면 좋습니다.'],
+    ['가짜는 어떻게 만드나요?', '없던 사건을 지어내고 진짜 세부(기구 이름, 날짜, 숫자)로 포장합니다. 기록부의 어느 문서로 들통나는지 적습니다.'],
+    ['진짜는 어떻게 만드나요?', '기록부에 있는 진짜 사건을 속보처럼, 충격적으로 씁니다. 숫자·시간은 바꾸면 안 됩니다. 바꾸면 가짜가 됩니다.'],
     ['게시물이 돌아왔어요', '관리자가 돌려보낸 게시물입니다. 만들기 화면의 안내를 보고 고친 뒤 다시 올립니다.'] ] },
   { id: 'view', icon: 'play', title: '게시물 보기', desc: '스토리 · 쇼츠 · 기사', qs: [
     ['스토리는 어떻게 넘기나요?', '화면 오른쪽을 누르면 다음, 왼쪽을 누르면 이전 슬라이드입니다. 길게 누르면 멈춥니다.'],

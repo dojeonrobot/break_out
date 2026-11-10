@@ -1,0 +1,77 @@
+{
+  "_comment": "조별 배정 주제 (2026-11-10). 만들기 단계에 들어가면 서버가 조마다 진짜/가짜를 반반 섞어 배정하고 그 안에서 주제를 하나 뽑는다. doc 는 chapter05/archive-data.js 문서 id. real = 기록부에 있는 진짜 사건을 가짜처럼(자극적으로) 쓰기, fake = 없던 사건을 진짜처럼 쓰기. 숫자·시간·이름은 둘 다 자료실과 맞아야 한다.",
+  "news": {
+    "real": [
+      { "id": "r-coaster-stop", "title": "12일 블루웨이브 25분 정지, 24명 비상 계단 하차", "doc": "rec-coaster-stop", "brief": "진짜 있었던 일입니다. 사고 기사처럼 긴박하게 쓰되 정지 25분, 24명, 부상 0, 13일 운행 중단·14일 재개는 기록부와 똑같이 씁니다." },
+      { "id": "r-wheel-stop", "title": "7일 관람차 11분 정지, 48명 전원 하차", "doc": "rec-wheel-stop", "brief": "진짜 있었던 일입니다. 공포스럽게 써도 되지만 11분, 48명, 부상 0, 당일 오후 4시 재개는 그대로." },
+      { "id": "r-meerkat", "title": "6월 미어캣 1마리 사육장 통로 이탈 35분", "doc": "rec-incidents", "brief": "진짜 있었던 일입니다. 「동물 탈출 소동」처럼 써도 되지만 관람 구역에 나온 적 없음, 35분 뒤 포획, 부상 0은 지켜야 합니다." },
+      { "id": "r-false-lion", "title": "9월 「사자 탈출」 허위 112 신고, 경찰 출동", "doc": "rec-false-reports", "brief": "진짜 있었던 일입니다(신고가 있었다는 것). 사자가 없다는 사실과 경찰 2명 출동·이상 없음은 그대로." },
+      { "id": "r-bomb-threat", "title": "10월 2일 폭발물 협박 문자, 수색 결과 이상 없음", "doc": "rec-false-reports", "brief": "진짜 있었던 일입니다. 자극적으로 써도 되지만 대피 없이 정상 운영, 이상 없음은 그대로." },
+      { "id": "r-lostfound", "title": "분실물 센터 틀니 3점·거북이 1마리", "doc": "rec-lostfound", "brief": "진짜입니다. 황당한 기사로 쓰세요. 3,412건, 61%, 틀니 3(2 반환), 거북이 1은 표 그대로." },
+      { "id": "r-million", "title": "올해 누적 100만 명 돌파, 100만 번째 네 식구", "doc": "press-million", "brief": "진짜입니다. 「하루 11만 명」처럼 부풀리면 가짜가 되니 조심. 10월 9일 오후 2시 10분, 연간회원권 4장은 그대로." },
+      { "id": "r-complaints", "title": "3분기 민원 1위 대기 시간, 「안개로 바다 안 보여 환불」 44건", "doc": "rec-complaints", "brief": "진짜입니다. 「환불 대란」처럼 자극적으로 써도 되지만 건수와 처리 결과는 표 그대로." },
+      { "id": "r-halloween-night", "title": "할로윈 금·토 밤 9시 야간개장, 야간권 29,000원", "doc": "press-halloween", "brief": "진짜입니다. 「도로랜드 사상 첫 야간개장」처럼 써도 되지만 금·토만, 밤 9시, 관람차 제외, 어린이 무료 없음은 그대로." },
+      { "id": "r-filming", "title": "드라마 「파도 위의 집」 관람차 11번 캐빈 촬영", "doc": "rec-filming", "brief": "진짜입니다. 배우 이름은 쓰지 않습니다(실존 인물 금지·비공개). 9월 27~28일 오전 7시~9시 30분, 영업 영향 없음은 그대로." },
+      { "id": "r-harmonia-stop", "title": "9일 하모니아 뮤지컬 음향 고장으로 12분 중단", "doc": "rec-incidents", "brief": "진짜입니다. 관객 1,140명, 12분, 예비 장비로 재개, 기념품 교환권은 그대로." },
+      { "id": "r-popup", "title": "팝업 키링 하루 400개 10시 32분 매진, 새벽 5시 20분 줄", "doc": "press-popup", "brief": "진짜입니다. 「오픈런 광풍」처럼 써도 되지만 400개, 1인 2개, 매진 시각은 표 그대로." }
+    ],
+    "fake": [
+      { "id": "f-coaster-crash", "title": "블루웨이브 열차 이탈·탈선, 중상자 발생", "doc": "rec-incidents", "brief": "없던 일을 지어냅니다. 12일 실제 정지 사건에 올라타면 더 그럴듯합니다. 기록부에는 이탈 0건·부상 0명이라 들통납니다." },
+      { "id": "f-animal-escape", "title": "사파리 맹수(사자·호랑이·곰) 탈출로 대피", "doc": "stat-animals", "brief": "없던 일입니다. 동물 현황표에 맹수가 0이라 들통납니다. 미어캣 이탈 같은 진짜 세부를 섞으면 그럴듯합니다." },
+      { "id": "f-closing", "title": "도로랜드 영구 폐장·매각 발표", "doc": "rec-closure", "brief": "없던 일입니다. 휴장 기록부와 운영실 공지에 폐장 계획 없음·15주년 준비가 있어 들통납니다. 매출·방문객 감소 숫자를 지어내면 통계와도 어긋납니다." },
+      { "id": "f-price-hike", "title": "내년 입장권 대폭 인상 (9만 원)", "doc": "ticket-price", "brief": "없던 일입니다. 요금표의 「내년 동결」과 변경 이력으로 들통납니다. 과거 인상 이력을 섞으면 그럴듯합니다." },
+      { "id": "f-food-poison", "title": "도로랜드 식당 집단 식중독", "doc": "rec-hygiene", "brief": "없던 일입니다. 위생 기록부에 식중독 신고 0건, 점검 전부 적합이라 들통납니다. 구호실 복통 3건을 섞으면 그럴듯합니다." },
+      { "id": "f-new-ride", "title": "신규 대형 놀이기구 개장 (국내 최고 높이)", "doc": "facility-list", "brief": "없던 일입니다. 시설 목록(전수 17개)에 없고 신설 계획 없음이라 들통납니다." },
+      { "id": "f-free-entry", "title": "기념 무료 입장·선착순 무료 개방", "doc": "notice-list", "brief": "없던 일입니다. 공지 목록(전수)에 없고 사실 확인 공지에 「무료 개방 계획 없음」이 있어 들통납니다. 100만 돌파 같은 진짜 기념 거리를 핑계로 쓰면 그럴듯합니다." },
+      { "id": "f-wheel-rescue", "title": "관람차 장시간 고립, 소방 사다리차 구조", "doc": "rec-wheel-stop", "brief": "없던 일입니다. 7일 실제 11분 정지에 올라타세요. 기록에 소방 출동 없음·11분·부상 0이라 들통납니다." },
+      { "id": "f-layoff", "title": "경영난으로 직원 100명 해고", "doc": "stat-staff", "brief": "없던 일입니다. 직원 현황에 올해 퇴사 9명·감원 없음, 통계에 매출 증가라 들통납니다." },
+      { "id": "f-celebrity", "title": "유명 가수 깜짝 콘서트·연예인 방문 소동", "doc": "event-harmonia", "brief": "없던 일입니다. 실존 연예인 이름은 쓰지 않습니다(지어낸 이름만). 공연 안내에 외부 초청 없음, 촬영 기록에 영업 중 행사 없음이라 들통납니다." },
+      { "id": "f-ferry-accident", "title": "도로랜드행 배 충돌·침수 사고", "doc": "rec-incidents", "brief": "없던 일입니다. 사고 기록부(전수)에 배 사고가 없어 들통납니다. 배 이름(도로1호·2호)과 520명 정원을 섞으면 그럴듯합니다." },
+      { "id": "f-child-free", "title": "할로윈 기간 어린이 무료 입장·매일 야간개장", "doc": "press-halloween", "brief": "없던 일입니다. 할로윈 안내에 어린이 무료 없음, 야간개장은 금·토뿐이라 들통납니다. 진짜 야간개장을 섞으면 그럴듯합니다." }
+    ]
+  },
+  "shorts": {
+    "real": [
+      { "id": "r-coaster-stop", "title": "블루웨이브 25분 정지 현장 (12일)", "doc": "rec-coaster-stop", "brief": "진짜입니다. 「갇혔다」처럼 자극적인 자막도 되지만 25분, 24명, 비상 계단, 부상 0은 그대로." },
+      { "id": "r-meerkat", "title": "미어캣 탈출 소동 (6월 21일)", "doc": "rec-incidents", "brief": "진짜입니다. 관람 구역에 나온 적 없음, 35분 뒤 포획은 지켜야 합니다." },
+      { "id": "r-lostfound", "title": "분실물 센터에 틀니와 거북이가 들어왔다", "doc": "rec-lostfound", "brief": "진짜입니다. 황당하게 찍어도 되지만 숫자는 표 그대로." },
+      { "id": "r-wait", "title": "블루웨이브 대기 92분 실화", "doc": "rec-wait", "brief": "진짜입니다. 92분(토 오후 2시), 관람차 55분은 그대로." },
+      { "id": "r-popup", "title": "팝업 키링 오픈런, 10시 32분 매진", "doc": "press-popup", "brief": "진짜입니다. 새벽 5시 20분 줄, 1인 2개, 매진 시각은 그대로." },
+      { "id": "r-false-lion", "title": "사자 탈출 신고에 경찰 출동한 날", "doc": "rec-false-reports", "brief": "진짜입니다(신고는 있었음). 사자가 없다는 결말까지 넣어야 진짜입니다." },
+      { "id": "r-harmonia-stop", "title": "뮤지컬 중 12분 암전", "doc": "rec-incidents", "brief": "진짜입니다. 음향 고장, 12분, 재개, 기념품 교환권은 그대로." },
+      { "id": "r-giraffe", "title": "아기 기린 이름 공모 8,100건", "doc": "press-giraffe", "brief": "진짜입니다. @doroland 댓글로만, 당첨 1명, 31일까지는 그대로." }
+    ],
+    "fake": [
+      { "id": "f-pass", "title": "직원만 아는 프리패스·줄 안 서는 법", "doc": "ticket-price", "brief": "없던 혜택입니다. 요금표에 프리패스 없음이라 들통납니다." },
+      { "id": "f-animal-escape", "title": "사파리 맹수 탈출 영상", "doc": "stat-animals", "brief": "없던 일입니다. 맹수 0이라 들통납니다. AI 합성 사진처럼 꾸며도 됩니다." },
+      { "id": "f-free-entry", "title": "내일 전 기구 무료 개방 (선착순)", "doc": "notice-list", "brief": "없던 일입니다. 공지 목록에 없어 들통납니다." },
+      { "id": "f-new-menu", "title": "관람차 츄러스 신상 맛 출시", "doc": "facility-menu", "brief": "없던 메뉴입니다. 메뉴판(전수)에 시나몬뿐이라 들통납니다." },
+      { "id": "f-wheel-rescue", "title": "관람차 2시간 고립, 사다리차 구조 직캠", "doc": "rec-wheel-stop", "brief": "없던 일입니다. 11분·소방 출동 없음이라 들통납니다." },
+      { "id": "f-celebrity", "title": "유명 가수가 광장에서 깜짝 공연", "doc": "event-harmonia", "brief": "없던 일입니다. 지어낸 가수 이름만 씁니다. 공연 안내에 외부 초청 없음이라 들통납니다." },
+      { "id": "f-ghost-ride", "title": "새로 생긴 귀신의 집·신규 기구 체험", "doc": "facility-list", "brief": "없는 시설입니다. 시설 목록 17개(전수)에 없어 들통납니다." },
+      { "id": "f-night-wheel", "title": "야간개장 때 관람차에서 본 야경", "doc": "press-lights", "brief": "없던 일입니다. 관람차는 조명 공사로 야간 운행 없음(마지막 탑승 6시 40분)이라 들통납니다." }
+    ]
+  },
+  "story": {
+    "real": [
+      { "id": "r-coaster-stop", "title": "블루웨이브 멈춘 열차 안에서 25분", "doc": "rec-coaster-stop", "brief": "진짜입니다. 시각(오후 3시 40분~4시 5분)과 비상 계단은 그대로." },
+      { "id": "r-false-lion", "title": "경찰이 사파리에 온 날", "doc": "rec-false-reports", "brief": "진짜입니다. 사자는 없었다는 결말까지." },
+      { "id": "r-popup", "title": "새벽 5시 20분 팝업 줄", "doc": "press-popup", "brief": "진짜입니다. 매진 시각과 1인 2개는 그대로." },
+      { "id": "r-lostfound", "title": "바이킹 앞 벤치에서 거북이를 주웠다", "doc": "rec-lostfound", "brief": "진짜입니다(상반기 기록). 당일 주인 찾음까지." },
+      { "id": "r-wait", "title": "블루웨이브 줄 92분", "doc": "rec-wait", "brief": "진짜입니다. 토요일 오후 2시, 92분." },
+      { "id": "r-complaints", "title": "안개 때문에 관람차에서 바다가 안 보였다", "doc": "rec-complaints", "brief": "진짜입니다(민원 44건). 환불 불가·재탑승권은 그대로." },
+      { "id": "r-halloween-night", "title": "금요일 밤 9시까지 야간개장", "doc": "press-halloween", "brief": "진짜입니다. 금·토만, 관람차는 안 돔, 막배 9시 30분." },
+      { "id": "r-firstaid", "title": "8월 열사병으로 구호실 갔다가 병원", "doc": "rec-firstaid", "brief": "진짜입니다(2명 이송, 당일 귀가). 중상·입원은 없음." }
+    ],
+    "fake": [
+      { "id": "f-fireworks", "title": "오늘 밤 불꽃놀이·막배 연장", "doc": "event-calendar", "brief": "없던 일입니다. 불꽃놀이는 5월 5일 연 1회라 들통납니다." },
+      { "id": "f-event-account", "title": "연간회원권 100명 무료 이벤트 (사칭 계정)", "doc": "account-registry", "brief": "없던 일입니다. 등록 계정부의 사칭 신고 계정을 쓰세요. 개인정보를 모으는 글로." },
+      { "id": "f-animal-escape", "title": "지금 사파리에 사자가 돌아다닌대요", "doc": "stat-animals", "brief": "없던 일입니다. 맹수 0." },
+      { "id": "f-child-free", "title": "할로윈 어린이 무료래요", "doc": "press-halloween", "brief": "없던 일입니다. 어린이 무료 없음(코스튬 20%만)." },
+      { "id": "f-closing", "title": "도로랜드 다음 달 문 닫는대요", "doc": "rec-closure", "brief": "없던 일입니다. 폐장 계획 없음." },
+      { "id": "f-live", "title": "운영실장 긴급 라이브 사전 질문 (사칭 계정)", "doc": "notice-correction", "brief": "없던 일입니다. 라이브는 @doroland에서만, 전화번호 안 받음." },
+      { "id": "f-ferry-night", "title": "밤 11시 막배 타고 나왔어요", "doc": "hours-ferry", "brief": "없던 일입니다. 막배는 7시 30분(야간개장 날 9시 30분)이라 들통납니다." },
+      { "id": "f-new-menu", "title": "츄러스 트럭 초코맛 신상 먹음", "doc": "facility-menu", "brief": "없는 메뉴입니다. 메뉴판에 시나몬뿐." }
+    ]
+  }
+}

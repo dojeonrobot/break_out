@@ -1,0 +1,154 @@
+# -*- coding: utf-8 -*-
+"""도로그램 예시 게시물 v4 (2026-11-10): 사건 기록부 중심 자료실(archive-data.js v2)에 맞춘 예시 24개.
+- 진짜는 자극적으로(가짜처럼), 가짜는 없던 사건을 진짜처럼. 숫자·시간은 모두 자료실 문서와 짝(answer.doc).
+- 실행: python scripts/pending/feed_rebuild_v4.py → server/ch5_seed.json. 사진은 server/ch5_make_seed_images_free.py.
+"""
+import json, pathlib, re
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+SEED = ROOT / 'server' / 'ch5_seed.json'
+ARC = ROOT / 'chapter05' / 'archive-data.js'
+DOC = dict(re.findall(r"id: '([\w-]+)', type: '\w+', complete: \w+, title: '([^']+)'", ARC.read_text(encoding='utf-8')))
+assert len(DOC) >= 40, len(DOC)
+
+DOROILBO = lambda r: {"name": "도로일보", "handle": "@doroilbo", "kind": "press", "verified": True, "joined": "2009.07", "followers": "8.7만", "posts": "41,230", "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.", "color": "#0f766e", "reporter": r}
+SEOHAE = lambda r: {"name": "서해바다신문", "handle": "@seohaenews", "kind": "press", "verified": True, "joined": "2011.03", "followers": "4.2만", "posts": "18,204", "bio": "서해안 항구 도시의 지역 신문.", "color": "#1d4ed8", "reporter": r}
+OFFICIAL = {"name": "도로랜드 운영실", "handle": "@doroland", "kind": "official", "verified": True, "joined": "2015.04", "followers": "15.3만", "posts": "3,812", "bio": "바다 위 놀이공원 도로랜드의 유일한 공식 계정 🎡", "color": "#0e4a84"}
+COASTER = {"name": "롤코타는남자", "handle": "@coaster_guy", "kind": "creator", "verified": True, "joined": "2017.02", "followers": "112만", "posts": "1,384", "bio": "전국 롤러코스터 다 타 봄", "color": "#dc2626"}
+def acct(name, handle, kind, joined, followers, posts, bio, color, reporter=''):
+    a = {"name": name, "handle": handle, "kind": kind, "verified": False, "joined": joined, "followers": followers, "posts": posts, "bio": bio, "color": color}
+    if reporter: a["reporter"] = reporter
+    return a
+def cm(*rows): return [{"name": n, "text": t, "likes": l, "time": tm} for n, t, l, tm in rows]
+def sec(truth, doc, clue, event='', tactic=''):
+    return {"truth": truth, "tactic": tactic, "clue": clue, "clueCriterion": "cross", "clueKind": "", "fact": DOC[doc], "event": event}
+def ans(truth, doc, explain): return {"truth": truth, "explain": explain, "doc": DOC[doc]}
+def news(id, author, title, subhead, body, quote, stats, images, truth, doc, explain, clue, event='', tactic='', place='도로랜드', postedAt='어제', photoTakenAt='어제', views='4.1만', commentCount=120, comments=None):
+    return {"id": id, "format": "news", "author": author, "title": title, "subhead": subhead, "body": body, "quote": ({"text": quote[0], "who": quote[1]} if quote else None), "stats": [{"label": l, "value": v} for l, v in stats], "tags": "", "place": place,
+            "postedAt": postedAt, "editedAt": "", "photoTakenAt": photoTakenAt, "views": views, "commentCount": commentCount, "comments": comments or [], "images": images, "secret": sec(truth, doc, clue, event, tactic), "answer": ans(truth, doc, explain)}
+def shorts(id, author, title, scenes, images, truth, doc, explain, clue, event='', tactic='', tags='', place='도로랜드', postedAt='어제', photoTakenAt='어제', likes='1.2만', views='18만', commentCount=240, comments=None):
+    return {"id": id, "format": "shorts", "author": author, "title": title, "body": "\n\n".join(t for _, t in scenes), "scenes": [{"img": i, "text": t} for i, t in scenes], "tags": tags, "place": place, "postedAt": postedAt, "photoTakenAt": photoTakenAt,
+            "likes": likes, "views": views, "commentCount": commentCount, "music": author["name"] + " · 원본 오디오", "comments": comments or [], "images": images, "secret": sec(truth, doc, clue, event, tactic), "answer": ans(truth, doc, explain)}
+def story(id, author, slides, images, truth, doc, explain, clue, event='', tactic='', place='도로랜드', postedAt='3시간 전', photoTakenAt='3시간 전', views='84'):
+    return {"id": id, "format": "story", "author": author, "title": "", "body": "\n\n".join(s["text"] for s in slides), "slides": slides, "tags": "", "place": place, "postedAt": postedAt, "photoTakenAt": photoTakenAt, "likes": "", "views": views,
+            "images": images, "secret": sec(truth, doc, clue, event, tactic), "answer": ans(truth, doc, explain)}
+def sl(img, text, time='3시간 전', sticker=None):
+    s = {"img": img, "text": text, "time": time}
+    if sticker: s["sticker"] = sticker
+    return s
+
+P = []
+# ========== 기사 8 (진짜 4 · 가짜 4) ==========
+P += [
+news('n-coaster-stop', DOROILBO('서하늘'), '"42m 위에서 25분" 도로랜드 롤러코스터 공중 정지… 24명 비상 계단으로 탈출', '12일 오후 3시 40분 정점 직전 멈춰… 운영실 "센서 작동, 부상자 없어", 13일 하루 운행 중단',
+  '12일 오후 3시 40분쯤 도로랜드 롤러코스터 「블루웨이브」가 42m 정점 구간 직전 경사로에서 멈춰 탑승객 24명이 25분 동안 공중에 머물렀다. 열차는 궤도 위에 그대로 서 있었고 안전바는 모두 잠긴 상태였다.\n\n탑승객들은 오후 4시 5분 경사로 옆 비상 계단으로 한 명씩 내려왔다. 한 탑승객은 "바다가 보이는 가장 높은 곳에서 멈춰 다리가 풀렸다"고 말했다. 다친 사람은 없었고 소방은 출동하지 않았다.\n\n운영실은 앞 열차와의 간격을 감시하는 센서가 작동해 자동으로 멈춘 것이라고 설명했다. 13일 하루 운행을 중단하고 외부 검사기관과 정밀 점검을 한 뒤 14일 오전 10시 운행을 재개했다. 24명에게는 재탑승권과 연간회원권 1일 연장을 줬다.',
+  ('바다가 보이는 가장 높은 곳에서 멈춰서 다리가 풀렸어요.', '탑승객 (20대)'), [('정지 시간', '25분'), ('탑승객', '24명'), ('부상', '0명')],
+  {"main": "roller coaster train stopped on a steep lift hill by the sea, people visible as small figures, overcast sky, photo from below"},
+  'real', 'rec-coaster-stop', '진짜 기사입니다. 제목은 무섭지만 사고 기록부와 상세 기록에 12일 오후 3시 40분, 25분 정지, 24명, 비상 계단 하차, 부상 0명, 13일 운행 중단·14일 재개가 그대로 있습니다. 자극적이라고 가짜가 아닙니다.',
+  clue='사고 기록부: 12일 오후 3시 40분 블루웨이브 25분 정지, 24명, 부상 0, 14일 재개', postedAt='2일 전', photoTakenAt='2일 전', views='12.6만', commentCount=840, comments=cm(('그날탄사람', '저 그 열차에 있었어요 진짜 25분 동안 바다만 봤음', 2300, '2일 전'),)),
+news('n-coaster-crash', acct('항구뉴스24', '@harbor_news24', 'press', '2026.09', '1,820', '37', '항구와 섬 소식을 24시간', '#be123c'), '[속보] 도로랜드 롤러코스터 정점에서 열차 이탈… 3명 중상, 헬기 이송', '12일 오후 블루웨이브 42m 구간서 안전바 풀려… 목격자 "비명이 섬 전체에 울렸다", 섬 전체 운행 중단',
+  '12일 오후 3시 40분쯤 도로랜드 롤러코스터 「블루웨이브」 열차가 42m 정점 구간에서 궤도를 벗어나 탑승객 3명이 중상을 입고 헬기로 이송됐다. 목격자들은 "안전바가 풀리면서 앞줄 승객이 튕겨 나갔다"고 전했다.\n\n운영실은 사고 직후 섬 전체 놀이기구 운행을 중단하고 방문객을 배로 내보내고 있다. 도로랜드 사정에 밝은 관계자는 "지난달 정밀 점검에서 이미 이상이 발견됐지만 성수기라 운행을 강행했다"고 말했다.\n\n블루웨이브는 2016년 개장한 도로랜드의 대표 놀이기구로 최고 시속 92km다.',
+  ('지난달 정밀 점검에서 이미 이상이 발견됐지만 운행을 강행했습니다.', '도로랜드 사정에 밝은 관계자'), [('중상', '3명'), ('헬기 이송', '3명')],
+  {"main": "rescue helicopter hovering near a roller coaster structure by the sea, dramatic overcast sky, blurry telephoto"},
+  'fake', 'rec-incidents', '가짜입니다. 12일 실제로 있었던 25분 정지에 올라탄 가짜뉴스입니다. 사고 기록부에는 정지 25분·부상 0명·소방 출동 없음이고, 이탈·추락은 개장 이래 0건입니다. 휴장 기록부에도 12일 섬 전체 중단은 없습니다. 10월 2일 정밀 점검은 「이상 없음」. 항구뉴스24는 등록 계정부에 없는 매체이고 「관계자」는 이름이 없습니다.',
+  event='12일 블루웨이브 열차 이탈로 3명 중상·헬기 이송·섬 전체 운행 중단', clue='사고 기록부: 정지 25분, 부상 0, 소방 출동 없음. 이탈·추락은 개장 이래 0건', tactic='감정 자극', postedAt='2일 전', photoTakenAt='2일 전', views='31만', commentCount=2600, comments=cm(('현장에있던사람', '저 어제 거기 있었는데 비상 계단으로 다 내려왔어요 헬기 같은 거 없었음', 4100, '2일 전'), ('ㅇㅇ', '항구뉴스24가 뭐임 처음 들어봄', 900, '2일 전'))),
+news('n-lion-report', SEOHAE('정해솔'), '"사자가 탈출했다" 도로랜드 사파리에 경찰 출동… 20분간 수색 소동', '9월 3일 오전 112 신고로 경찰 2명 급파… 사파리는 초식동물만, 신고자 "장난이었다"',
+  '지난 9월 3일 오전 11시 "도로랜드 사파리에서 사자가 탈출했다"는 112 신고가 들어와 경찰 2명이 배를 타고 섬에 출동했다. 경찰과 사육팀은 사파리 코스 3.4km를 20분 동안 돌았지만 이상은 없었다.\n\n도로랜드 사파리는 초식동물 사파리로 사자, 호랑이 같은 맹수가 한 마리도 없다. 동물 38종 214마리 가운데 가장 큰 동물은 기린 5마리다.\n\n신고자는 20대로 "장난이었다"고 진술했고 경찰은 허위 신고로 조사 중이다. 운영실은 "신고 전화 한 통에 지프 투어 2회가 지연됐다"고 밝혔다.',
+  ('신고 전화 한 통에 지프 투어 2회가 지연됐습니다.', '도로랜드 운영실'), [('신고', '9월 3일 11시'), ('출동', '경찰 2명'), ('사자', '0마리')],
+  {"main": "two police officers walking along a safari fence with zebras in the background, bright morning, seen from behind"},
+  'real', 'rec-false-reports', '진짜 기사입니다. 허위 신고 기록부에 9월 3일 오전 11시 「사자 탈출」 112 신고, 경찰 2명 출동, 이상 없음, 장난 신고 조사가 있습니다. 사자가 없다는 결말까지 기사에 들어 있어 동물 현황과도 맞습니다.',
+  clue='허위 신고 기록부: 9월 3일 사자 탈출 112 신고, 경찰 2명 출동, 이상 없음. 동물 현황에 사자 0', postedAt='5주 전', photoTakenAt='5주 전', views='7.4만', commentCount=510, place='사파리'),
+news('n-lion-escape', acct('세상에이런일이', '@wow_news_kr', 'press', '2026.06', '2.4만', '512', '세상의 신기한 소식', '#b45309'), '도로랜드 사파리 사자 2마리 탈출… 섬 전체 대피령, 초등학생 86명 배로 철수', '13일 오전 11시 지프 투어 중 울타리 넘어… 운영실 "방문객은 하모니아 실내 대기"',
+  '13일 오전 11시쯤 도로랜드 사파리에서 사자 2마리가 울타리를 넘어 섬 안으로 달아났다. 운영실은 방문객을 하모니아 공연장 등 실내로 대피시키고 지프 투어를 중단했다. 사진은 중앙 광장 회전목마 옆을 지나는 사자의 모습이다.\n\n현장학습 중이던 서해초등학교 학생 86명은 배로 먼저 섬을 빠져나갔다. 사육팀은 마취총을 든 채 수색 중이다.\n\n도로랜드 사파리는 동물 38종 214마리를 기르고 있으며 지난 9월에도 사자 탈출 신고가 있었다.',
+  None, [('탈출', '사자 2마리'), ('철수', '학생 86명')],
+  {"main": "a large lion walking past a carousel in an amusement park plaza, slightly blurry, sensational framing"},
+  'fake', 'stat-animals', '가짜입니다. 동물 현황표(전수)에 사자·호랑이는 0, 초식동물 사파리입니다. 사고 기록부와 휴장 기록부에 13일 대피는 없습니다. 「지난 9월 사자 탈출 신고」는 허위 신고였던 진짜 기록을 끌어다 쓴 것이고, 사진은 합성물 삭제 기록에 있는 「사자 탈출 영상」과 같은 유형입니다.',
+  event='13일 사자 2마리 탈출로 섬 전체 대피, 학생 86명 철수', clue='동물 현황: 사자·호랑이 0(초식동물 사파리). 휴장 기록부에 대피 없음. 9월 신고는 허위 신고로 기록', tactic='감정 자극', postedAt='어제', photoTakenAt='어제', views='24만', commentCount=1900, place='사파리', comments=cm(('사육사', '저희 사파리에 사자 없어요… 9월에도 이런 신고 때문에 경찰 왔었어요', 3300, '어제'), ('AI감별', '사자 뒷다리 세 개임', 1500, '어제'))),
+news('n-turtle', DOROILBO('한바다'), '분실물 센터에 틀니 3점, 거북이 1마리… 도로랜드 상반기 분실물 3,412건 "주인 61%만 찾아"', '선글라스 412개로 1위… 거북이는 바이킹 앞 벤치에서 발견돼 당일 귀가, 틀니 1점은 아직 주인 없어',
+  '도로랜드 분실물 센터에 올해 상반기 들어온 물건은 3,412건이고 그중 61%인 2,081건만 주인에게 돌아갔다. 가장 많이 잃어버리는 물건은 선글라스(412건)였고 모자(388건), 우산(240건)이 뒤를 이었다.\n\n눈에 띄는 분실물도 있었다. 틀니 3점 가운데 2점은 주인을 찾았지만 1점은 석 달째 보관 중이다. 반려 거북이 1마리는 바이킹 앞 벤치에서 발견돼 당일 저녁 주인에게 돌아갔다. 아동 신발 한 짝은 64건이었다.\n\n분실물 센터는 중앙 광장 안내소 안에 있고 3개월 동안 보관한 뒤 처분한다. 센터 관계자는 "바이킹을 타기 전에는 가방 지퍼를 꼭 잠가 달라"고 말했다.',
+  ('바이킹을 타기 전에는 가방 지퍼를 꼭 잠가 주세요. 거북이도 나옵니다.', '분실물 센터 담당자'), [('상반기 분실물', '3,412건'), ('주인 찾음', '61%'), ('틀니', '3점')],
+  {"main": "lost and found shelf with many sunglasses and caps, a small turtle in a plastic box on the counter, bright indoor light"},
+  'real', 'rec-lostfound', '진짜 기사입니다. 황당하지만 분실물 기록에 3,412건, 61%, 선글라스 412·모자 388·우산 240, 틀니 3(2 반환), 거북이 1(당일 반환), 아동 신발 64가 표 그대로 있습니다.',
+  clue='분실물 기록: 3,412건·61%, 틀니 3점 중 2점 반환, 거북이 1마리 당일 반환', postedAt='3개월 전', photoTakenAt='3개월 전', views='15.3만', commentCount=2100, place='중앙 광장 안내소', comments=cm(('ㅋㅋㅋ', '틀니를 어떻게 잃어버리지', 4100, '3개월 전'),)),
+news('n-closing', acct('바다경제', '@sea_economy', 'press', '2026.08', '3,410', '58', '서해안 경제 뉴스', '#7c3aed'), '[단독] 도로랜드, 내년 3월 영구 폐장 결정… 방문객 급감에 매각 협상', '내부 문건 입수, 올해 방문객 지난해 절반… 직원 100명 이달 말 해고 통보',
+  '바다 위 놀이공원 도로랜드가 내년 3월 영구 폐장하는 것으로 확인됐다. 본지가 입수한 내부 문건에 따르면 운영실은 지난주 이사회에서 폐장과 매각을 결정했다. 올해 방문객은 지난해 128만 명의 절반 수준인 64만 명에 그쳤다.\n\n직원 312명 가운데 계절 근무자를 포함한 100명이 이달 말 해고 통보를 받을 예정이다. 한 직원은 "15주년 행사 준비는 겉치레일 뿐"이라고 말했다.\n\n운영실은 공식 입장을 내지 않고 있다. 연간회원권(189,000원) 환불 문의가 하루 300건을 넘는 것으로 알려졌다.',
+  ('15주년 행사 준비는 겉치레일 뿐입니다.', '도로랜드 직원'), [('올해 방문객', '64만 명'), ('해고', '100명')],
+  {"main": "closed amusement park entrance gate with chains, overcast sky, no people, no readable text"},
+  'fake', 'rec-closure', '가짜입니다. 휴장 기록부와 운영실 공지에 영구 폐장·매각 계획 없음, 15주년 준비 중이라고 되어 있습니다. 월별 통계에 올해 누적은 이미 103만 명이라 「64만 명」과 어긋나고, 직원 현황에 올해 퇴사 9명·감원 없음입니다. 바다경제는 등록 계정부에 없는 매체입니다.',
+  event='내년 3월 영구 폐장·매각, 직원 100명 해고', clue='휴장 기록부: 폐장·매각 계획 없음. 월별 통계: 올해 누적 103만. 직원 현황: 감원 없음', tactic='가짜 전문가', postedAt='어제', photoTakenAt='어제', views='19만', commentCount=1300, comments=cm(('연간권있는사람', '환불 문의 300건이면 저도 해야 하나요?', 700, '어제'), ('계산해봄', '10월 9일에 올해 100만 돌파 기사 났는데 64만이 뭐임', 2200, '어제'))),
+news('n-million', SEOHAE('정해솔'), '도로랜드 올해 방문객 100만 명 돌파… 100만 번째는 "관람차 타러 온 네 식구"', '9일 오후 2시 10분 배로 입장… 지난해보다 3주 빨라, 운영실 "연말 130만 명 예상"',
+  '도로랜드의 올해 누적 방문객이 9일 100만 명을 넘었다. 운영실은 9일 오후 2시 10분 항구에서 들어온 배의 승객 가운데 부모와 초등학생 둘로 이루어진 네 식구가 100만 번째 방문객이 됐다고 밝혔다.\n\n운영실은 이 가족에게 연간회원권 4장과 기린 인형 4개를 선물했다. 기념 사진은 회전목마 앞 광장에서 찍었다. 아버지는 "관람차 한 번 타러 왔다가 1년 치 입장권을 받았다"고 말했다.\n\n지난해에는 10월 30일에 100만 명을 넘었으니 올해가 3주 빠르다. 운영실은 연말에 130만 명을 넘길 것으로 내다봤다.',
+  ('관람차 한 번 타러 왔다가 1년 치 입장권을 받았어요.', '100만 번째 방문객 가족'), [('올해 누적', '100만 명'), ('지난해 돌파일', '10월 30일'), ('선물', '연간회원권 4장')],
+  {"main": "family of four holding ferris wheel shaped balloons in front of a white seaside ferris wheel, bright afternoon, seen from behind"},
+  'real', 'press-million', '진짜 기사입니다. 보도자료에 10월 9일 오후 2시 10분, 네 식구, 연간회원권 4장·기린 인형 4개, 지난해 10월 30일 돌파가 그대로 있습니다.',
+  clue='보도자료: 10월 9일 오후 2시 10분 100만 번째 네 식구, 연간회원권 4장', postedAt='5일 전', photoTakenAt='5일 전', views='9.2만', commentCount=640),
+news('n-free-entry', acct('도로랜드 공식', '@doroland_official_kr', 'official', '2026.10', '1,120', '4', '도로랜드 공식 안내 계정', '#0e4a84'), '[운영실 안내] 100만 명 돌파 기념 18일 하루 입장권 무료… 선착순 5,000명 사전 등록', '등록 링크에서 이름·생년월일·전화번호 입력… 확인 문자를 매표소에 제시',
+  '도로랜드를 사랑해 주신 분들께 감사드립니다. 올해 누적 방문객 100만 명 돌파를 기념해 10월 18일 토요일 하루 입장권을 무료로 드립니다.\n\n선착순 5,000명이며 아래 링크에서 이름, 생년월일, 전화번호를 등록해야 합니다. 등록 확인 문자가 발송되면 매표소에 보여 주세요. 배 요금도 무료입니다.\n\n18일은 할로윈 축제 기간이라 코스튬을 입고 오시면 기념품 추첨에도 참여됩니다.',
+  None, [('무료 입장', '18일 하루'), ('선착순', '5,000명')],
+  {"main": "amusement park entrance gate at morning with a long queue, confetti decoration, no readable text"},
+  'fake', 'notice-list', '가짜입니다. 100만 돌파와 할로윈 축제는 진짜지만, 10월 공지 목록(전수)에 무료 입장 공지는 없고 운영실 공지에 「선착순 무료 입장 계획 없음」이 있습니다. 등록 계정부에 공식 계정은 @doroland 하나이고 @doroland_official_kr은 사칭 신고 계정입니다. 이름·전화번호를 모으는 글입니다.',
+  event='18일 하루 입장권 무료, 선착순 5,000명 사전 등록', clue='공지 목록(전수)에 없음. 사실 확인 공지: 무료 개방 계획 없음. 계정부: 사칭 신고 계정', tactic='사칭', postedAt='어제', photoTakenAt='어제', views='11.7만', commentCount=760, comments=cm(('의심많은사람', '공식 계정은 @doroland 아닌가요? 팔로워 천 명짜리가 공식?', 1900, '어제'),)),
+]
+# ========== 쇼츠 8 (진짜 4 · 가짜 4) ==========
+P += [
+shorts('s-coaster-stuck', COASTER, '롤러코스터 꼭대기에서 25분 갇힘… 블루웨이브 정지 순간 실제 영상', [('main', '12일 오후 3시 40분, 블루웨이브 42m 정점 직전에서 열차가 멈췄다'), ('main', '25분 동안 바다만 봤다… 안전바는 꿈쩍도 안 함'), ('b', '4시 5분 비상 계단으로 24명 전원 하차. 다친 사람 0. 다음 날 하루 운행 중단, 14일 재개')],
+  {"main": "first person view from a stopped roller coaster seat at the top of a lift hill, ocean horizon, vertical", "b": "people walking down an emergency staircase next to a roller coaster track, vertical, seen from behind"},
+  'real', 'rec-coaster-stop', '진짜입니다. 제목은 「갇힘」이지만 사고 기록부에 25분 정지, 24명, 비상 계단 하차, 부상 0, 14일 재개가 그대로 있습니다.', clue='사고 기록부: 25분 정지, 24명, 부상 0, 비상 계단', postedAt='2일 전', photoTakenAt='2일 전', likes='5.1만', views='74만', commentCount=1800, tags='#블루웨이브 #도로랜드 #정지'),
+shorts('s-pass', acct('놀이공원꿀팁왕', '@park_hack_king', 'creator', '2025.12', '860', '19', '줄 안 서는 법만 연구함', '#f59e0b'), '도로랜드 줄 안 서고 타는 법 (직원 친구가 알려줌)', [('main', '도로랜드 줄 안 서고 바로 타는 법, 직원 친구한테 들음'), ('main', "바이킹 직원한테 '운영실 패스'라고 말하면 프리패스 줌"), ('b', '하루 50명만이래요. 아침 배 타고 가서 바로 말하세요')],
+  {"main": "long queue barriers at a viking ship ride entrance, vertical", "b": "hand holding a blank plastic pass card near a ride gate, vertical, no text"},
+  'fake', 'ticket-price', '가짜입니다. 요금표 문서에 「우선탑승권이나 프리패스는 운영하지 않는다」가 있고 운영실 공지에도 프리패스 없음이 정리되어 있습니다.', event='직원에게 말하면 주는 비밀 프리패스 하루 50명', clue='요금표: 프리패스·우선탑승권 없음', tactic='없는 혜택', likes='3,100', views='9.8만', commentCount=410, tags='#꿀팁 #프리패스', comments=cm(('직원임', '그런 거 없어요 제발 와서 말하지 마세요', 2200, '어제'),)),
+shorts('s-meerkat', acct('동물원덕후', '@zoo_lover_min', 'creator', '2018.06', '9.4만', '612', '전국 동물원·사파리 38군데', '#15803d'), '[긴급] 도로랜드 사파리 미어캣 탈출 소동… 35분 만에 포획된 현장', [('main', '6월 21일 오전 9시 5분, 미어캣 한 마리가 사육장 안쪽 통로로 나갔다'), ('main', '사육사 3명이 35분 동안 통로 끝까지 추격… 관람 구역엔 한 번도 안 나옴'), ('b', '포획 뒤 통로 문 잠금장치 교체. 다친 사람도 동물도 없음. 지금 미어캣은 31마리')],
+  {"main": "a meerkat standing alert in a concrete service corridor, zookeeper boots in background, vertical", "b": "group of meerkats on a rock in a safari enclosure, vertical"},
+  'real', 'rec-incidents', '진짜입니다. 「탈출 소동」이라 써도 사고 기록부에 6월 21일 오전 9시 5분, 사육장 안쪽 통로, 사육사 3명, 35분 뒤 포획, 관람 구역 아님, 부상 0이 그대로 있고 동물 현황에 미어캣 31마리입니다.', clue='사고 기록부: 6월 21일 미어캣 1마리 통로 이탈 35분, 관람 구역 아님, 부상 0', postedAt='4개월 전', photoTakenAt='4개월 전', likes='1.9만', views='27만', commentCount=640, tags='#미어캣 #사파리', place='사파리'),
+shorts('s-choco', acct('맛집헌터', '@tasty_hunter', 'creator', '2026.09', '420', '8', '신상 먹거리 1등으로 먹기', '#92400e'), '도로랜드 관람차 츄러스 초코맛 신상 떴다!! 1인 1개 한정 오픈런', [('main', '관람차 츄러스 초코맛 오늘 첫 출시!! 7,500원'), ('main', '시나몬보다 초코가 훨씬 맛있음… 바퀴살이 초코로 코팅됨'), ('b', '1인 1개 한정이라 10시 배 타고 바로 달려야 함')],
+  {"main": "chocolate coated churro shaped like a ferris wheel on a paper tray, yellow truck behind, vertical", "b": "people queueing at a yellow churro food truck in a plaza, vertical"},
+  'fake', 'facility-menu', '가짜입니다. 메뉴판(전수)에 관람차 츄러스는 시나몬 한 가지 6,500원뿐이고 초코맛·7,500원·1인 1개 제한은 없습니다.', event='관람차 츄러스 초코맛 신상 7,500원, 1인 1개 한정', clue='메뉴판(전수): 시나몬 한 가지 6,500원, 구매 제한 없음', tactic='없는 혜택', likes='5,600', views='22만', commentCount=330, tags='#신상 #츄러스', place='회전목마 앞 광장', comments=cm(('먹방하는지우', '어제 갔는데 초코 없었어요 트럭에 시나몬만', 1800, '어제'),)),
+shorts('s-wait', acct('달리는직장인', '@run_after_work', 'creator', '2019.03', '4.1만', '388', '퇴근하고 달립니다', '#0ea5e9'), '도로랜드 블루웨이브 대기 92분 실화냐… 토요일 오후 2시 줄 끝이 안 보임', [('main', '10일 토요일 오후 2시, 블루웨이브 대기 92분 찍음'), ('main', '관람차도 55분, 사파리 지프 48분… 이날 방문객 8,920명'), ('b', '운영실이 11월에 대기 시간 전광판 단다고 함. 그 전엔 아침 배 타세요')],
+  {"main": "extremely long zigzag queue line at a roller coaster entrance, sunny afternoon, vertical, seen from behind", "b": "digital waiting time display board concept at an amusement park plaza, no readable text, vertical"},
+  'real', 'rec-wait', '진짜입니다. 대기 시간 집계에 10일 토요일 블루웨이브 최대 92분(오후 2시), 관람차 55분, 지프 48분, 방문객 8,920명, 11월 전광판 설치가 그대로 있습니다.', clue='대기 시간 집계: 10일 토 블루웨이브 92분, 관람차 55분, 방문객 8,920명', postedAt='3일 전', photoTakenAt='4일 전', likes='6,400', views='8.9만', commentCount=210, tags='#대기시간 #도로랜드'),
+shorts('s-wheel-rescue', acct('충격영상모음', '@shock_clips', 'creator', '2026.09', '1,210', '22', '충격 영상만 모음', '#111827'), '도로랜드 관람차 2시간 공중 고립… 소방 사다리차로 한 명씩 구조 (직캠)', [('main', '7일 오후 2시, 관람차가 88m 꼭대기에서 멈췄다'), ('main', '2시간 동안 120명이 캐빈에 갇혔고 소방 사다리차가 출동'), ('b', '어린이 3명 탈진… 운영실은 원인 조사 중. 지워지기 전에 저장하세요')],
+  {"main": "fire truck ladder extended toward a ferris wheel cabin, overcast sky, vertical, dramatic", "b": "crowd looking up at a stopped ferris wheel, vertical"},
+  'fake', 'rec-wheel-stop', '가짜입니다. 7일 실제 정지 기록은 11분, 48명, 소방 출동 없음, 부상 0, 당일 오후 4시 재개입니다. 88m 같은 진짜 숫자를 섞었지만 사건 자체가 다릅니다. 「지워지기 전에 저장」은 감정 자극 수법입니다.', event='7일 관람차 2시간 고립, 120명, 소방 사다리차 구조, 어린이 탈진', clue='관람차 정지 기록: 11분, 48명, 소방 출동 없음, 부상 0', tactic='감정 자극', postedAt='6일 전', photoTakenAt='6일 전', likes='8,900', views='52만', commentCount=2400, tags='#관람차 #충격', comments=cm(('그날탄사람', '11분 멈췄다가 바로 내렸는데요 사다리차는 무슨', 3600, '6일 전'),)),
+shorts('s-police', acct('항구살이', '@harbor_life_', 'creator', '2018.10', '1,020', '1,311', '항구 동네 20년', '#0f766e'), '경찰이 사파리에 출동한 날… "사자 탈출" 신고의 결말', [('main', '9월 3일 오전 11시, 경찰 2명이 배 타고 사파리로 들어감'), ('main', '"사자가 탈출했다"는 112 신고 때문. 20분 수색'), ('b', '결말: 도로랜드엔 사자가 없음. 초식동물 사파리. 신고자는 장난 신고로 조사')],
+  {"main": "police officers boarding a small ferry at a harbor, morning, vertical, seen from behind", "b": "giraffes and zebras in an open safari field, calm, vertical"},
+  'real', 'rec-false-reports', '진짜입니다. 허위 신고 기록부에 9월 3일 사자 탈출 신고, 경찰 2명 출동, 이상 없음, 장난 신고 조사가 있고 동물 현황에 사자 0입니다. 신고가 있었다는 것이 진짜이고, 사자가 없다는 결말까지 들어 있습니다.', clue='허위 신고 기록부: 9월 3일 사자 탈출 112 신고, 경찰 2명, 이상 없음', postedAt='5주 전', photoTakenAt='5주 전', likes='2,300', views='4.6만', commentCount=180, tags='#사파리 #경찰'),
+shorts('s-night-wheel', acct('밤하늘기록', '@night_sky_log', 'creator', '2020.09', '1.8만', '276', '밤하늘, 불꽃, 야경 기록', '#4338ca'), '야간개장 첫날 관람차에서 본 도로랜드 야경 (밤 8시 30분 탑승)', [('main', '17일 금요일 야간개장, 밤 8시 30분 관람차 탑승'), ('main', '88m 꼭대기에서 본 항구 불빛… 조명 1만 2천 개가 바퀴에 켜짐'), ('b', '막배 9시 30분까지 여유. 야간권 29,000원이면 이거 하나로 본전')],
+  {"main": "night view of a harbor city lights seen from inside a ferris wheel cabin, vertical", "b": "ferris wheel fully lit with thousands of lights at night by the sea, vertical"},
+  'fake', 'press-lights', '가짜입니다. 야간개장(금·토 밤 9시)·야간권 29,000원·막배 9시 30분은 진짜지만, 관람차는 조명 공사로 야간 운행이 없고 마지막 탑승은 오후 6시 40분입니다. 조명 1만 2천 개 점등식은 내년 5월 5일입니다. 진짜 행사에 없는 장면을 얹은 가짜입니다.', event='야간개장 밤 8시 30분 관람차 탑승, 조명 점등', clue='조명 공사 안내: 관람차 야간 운행 없음, 마지막 탑승 6시 40분, 점등식 내년 5월 5일', tactic='사진 바꿔치기', postedAt='어제', photoTakenAt='어제', likes='1.1만', views='19만', commentCount=380, tags='#야간개장 #관람차'),
+]
+# ========== 스토리 8 (진짜 4 · 가짜 4) ==========
+P += [
+story('t-coaster', acct('여행하는 다은', '@daeun_trip', 'person', '2020.03', '412', '388', '주말마다 어디든', '#0369a1'), [sl('main', '블루웨이브 꼭대기 직전에서 멈춤… 지금 25분째 😱 3시 40분부터', '2일 전 오후 4:02', {"type": "place", "text": "블루웨이브"}), sl('b', '비상 계단으로 내려왔다 ㅠㅠ 24명 다 무사. 재탑승권이랑 연간권 하루 연장 받음', '2일 전 오후 4:20')],
+  {"main": "view from a stopped roller coaster seat looking down a steep track to the sea, vertical", "b": "paper re-ride ticket held in hand in front of a roller coaster, vertical"},
+  'real', 'rec-coaster-stop', '진짜입니다. 사고 기록부에 12일 오후 3시 40분 정지, 25분, 24명 비상 계단 하차, 재탑승권·연간회원 1일 연장이 그대로 있습니다.', clue='사고 기록부: 25분 정지, 24명 비상 계단, 재탑승권·연간권 1일 연장', postedAt='2일 전', photoTakenAt='2일 전 오후 4:02', views='1,240'),
+story('t-fireworks', acct('꿀팁전도사', '@honey_tip_kr', 'person', '2026.09', '58', '11', '좋은 정보는 나눠야 제맛', '#f97316'), [sl('main', '오늘 밤 9시 도로랜드 할로윈 불꽃놀이!!🎆 섬 안에서 봄', '1시간 전', {"type": "place", "text": "도로랜드 중앙 광장"}), sl('main', '막배도 밤 11시까지 늘린대요. 지금 가면 딱', '1시간 전')],
+  {"main": "fireworks over a dark sea with a ferris wheel silhouette, vertical"},
+  'fake', 'event-calendar', '가짜입니다. 행사 일정(전수)에 불꽃놀이는 5월 5일 연 1회, 항구에서 관람입니다. 할로윈 금·토 야간개장이 있어도 막배는 9시 30분이지 11시가 아닙니다.', event='오늘 밤 9시 할로윈 불꽃놀이, 막배 11시 연장', clue='행사 일정: 불꽃놀이 5월 5일 연 1회. 운영 시간: 야간개장 날 막배 9시 30분', tactic='날짜 조작', postedAt='1시간 전', photoTakenAt='1시간 전', views='5,200'),
+story('t-official', OFFICIAL, [sl('main', '[안내] 어제 오후 블루웨이브가 25분 멈췄습니다. 24명 모두 안전하게 내리셨고 다친 분은 없습니다', '어제 오후 6:10'), sl('main', '오늘 하루 블루웨이브 운행을 쉬고 외부 검사기관과 정밀 점검합니다. 내일 오전 10시 재개 예정 ✓', '어제 오후 6:11')],
+  {"main": "roller coaster track by the sea with a closed gate and a safety cone, calm morning, vertical, no readable text"},
+  'real', 'rec-safety-check', '진짜입니다. 공식 계정 @doroland(등록 계정부)이고 안전 점검 기록에 13일 블루웨이브 운행 중단·외부 검사기관 정밀 점검·14일 오전 10시 재개가 있습니다.', clue='안전 점검 기록: 13일 운행 중단·외부 검사기관 정밀 점검, 14일 10시 재개', postedAt='어제', photoTakenAt='어제', views='2.1만'),
+story('t-event', acct('도로랜드 이벤트', '@doroland_event', 'official', '2026.10', '1,840', '3', '도로랜드 공식 이벤트 계정', '#0e4a84'), [sl('main', '15주년 기념 🎉 연간회원권(189,000원) 100명 무료!', '2시간 전'), sl('main', '아래 링크에 이름·생년월일·전화번호 남기면 끝. 선착순!', '2시간 전')],
+  {"main": "golden ticket shaped card on a confetti background, vertical, no readable text"},
+  'fake', 'account-registry', '가짜입니다. 등록 계정부에 공식 계정은 @doroland 하나이고 @doroland_event는 사칭 신고 계정입니다. 운영실 공지에도 연간회원권 추첨은 운영실 행사가 아니라고 되어 있습니다. 가격 189,000원만 진짜입니다.', event='연간회원권 100명 무료 이벤트 (개인정보 등록)', clue='계정부: @doroland_event는 사칭 신고 계정. 사실 확인 공지: 추첨 행사 아님', tactic='사칭', postedAt='2시간 전', photoTakenAt='2시간 전', views='1.4만'),
+story('t-popup', acct('굿즈수집러', '@goods_hunter_', 'person', '2022.11', '7,800', '233', '한정판이면 일단 줄 섬', '#be185d'), [sl('main', '새벽 5시 20분 항구 팝업 오픈런… 앞에 40명 😇', '첫날 새벽 5:20', {"type": "place", "text": "항구 광장 팝업스토어"}), sl('b', '키링 2개 성공!! 1인 2개 제한, 8,000원. 10시 32분에 매진 방송 나옴(토요일 기준)', '토 오전 10:40')],
+  {"main": "dawn queue in front of a white pop-up store tent at a harbor plaza, vertical", "b": "two small ferris wheel keyrings held up in front of the sea, vertical"},
+  'real', 'press-popup', '진짜입니다. 팝업스토어 보도자료에 첫날 새벽 5시 20분 줄, 키링 1인 2개·8,000원, 토요일(10일) 10시 32분 매진이 표 그대로 있습니다.', clue='팝업 보도자료: 새벽 5시 20분 줄, 키링 1인 2개 8,000원, 토 10시 32분 매진', postedAt='3일 전', photoTakenAt='3일 전', views='530'),
+story('t-kidsfree', acct('소문난아이', '@rumor_kid', 'person', '2026.10', '14', '2', '', '#6b7280'), [sl('main', '할로윈 기간에 도로랜드 어린이 무료래ㅠㅠ 내일부터!! 친구가 그럼', '40분 전'), sl('main', '어른은 코스튬 입으면 20% 할인이고 애들은 공짜!! 다들 가요', '40분 전')],
+  {"main": "children in halloween costumes walking toward an amusement park gate, seen from behind, vertical"},
+  'fake', 'press-halloween', '가짜입니다. 할로윈 보도자료에 「어린이 무료 없음」이 명시되어 있고 코스튬 20% 할인만 있습니다. 진짜 할인을 섞어 그럴듯하게 만든 가짜입니다.', event='할로윈 기간 어린이 무료 입장', clue='할로윈 보도자료: 어린이 무료 없음, 코스튬 20% 할인만', tactic='없는 혜택', postedAt='40분 전', photoTakenAt='40분 전', views='3,900'),
+story('t-fog', acct('바다랑나랑', '@sea_and_me', 'person', '2019.08', '233', '902', '바다 사진만 올림', '#0e7490'), [sl('main', '관람차 꼭대기인데 안개 때문에 바다가 하나도 안 보임 😇 환불해 달라고 했더니', '어제 오후 4:40', {"type": "place", "text": "도로랜드 관람차"}), sl('main', '환불은 안 되고 재탑승권 줌. 안내소 직원분이 "3분기에만 이런 민원이 44건"이라고 ㅋㅋ', '어제 오후 5:05')],
+  {"main": "thick fog seen from inside a ferris wheel cabin, white nothing outside the window, vertical"},
+  'real', 'rec-complaints', '진짜입니다. 3분기 민원 기록에 「관람차에서 바다가 안 보였다(안개)」 44건, 환불 불가·재탑승권 처리가 표 그대로 있습니다.', clue='민원 기록: 안개로 바다 안 보임 44건, 환불 불가·재탑승권', postedAt='어제', photoTakenAt='어제', views='118'),
+story('t-ferry-late', acct('줄서기장인', '@line_king', 'person', '2021.06', '301', '77', '줄 서는 게 취미', '#7c3aed'), [sl('main', '밤 11시 막배 타고 나옴… 할로윈 야간개장 미쳤다 🎃', '어제 밤 11:20', {"type": "place", "text": "도로1호"}), sl('main', '관람차 밤 10시에 타니까 야경 끝내줌. 내일도 11시까지 한대요', '어제 밤 11:22')],
+  {"main": "night ferry deck with city lights across the water, vertical, no faces"},
+  'fake', 'hours-ferry', '가짜입니다. 야간개장 날에도 폐장은 밤 9시, 막배는 9시 30분이고 야간개장은 금·토뿐입니다. 관람차는 오후 6시 40분 마지막 탑승이라 밤 10시 탑승도 불가능합니다.', event='밤 11시 막배, 밤 10시 관람차 탑승, 매일 11시까지 야간개장', clue='운영 시간: 야간개장 폐장 9시·막배 9시 30분(금·토만). 관람차 마지막 탑승 6시 40분', tactic='날짜 조작', postedAt='어제', photoTakenAt='어제', views='2,700'),
+]
+
+ids = [p['id'] for p in P]; assert len(ids) == len(set(ids))
+from collections import Counter
+print(dict(Counter((p['format'], p['answer']['truth']) for p in P)), 'total', len(P))
+for p in P:
+    assert p['answer']['doc'] in DOC.values(), p['id']
+    if p['format'] == 'shorts': assert all(s['img'] in p['images'] for s in p['scenes']), p['id']
+    if p['format'] == 'story': assert all(s['img'] in p['images'] for s in p['slides']), p['id']
+SEED.write_text(json.dumps(P, ensure_ascii=False, indent=1), encoding='utf-8')
+print('wrote', SEED, sum(len(p['images']) for p in P), 'images')
