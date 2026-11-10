@@ -690,6 +690,16 @@
     .board table { width: 100%; border-collapse: collapse; font-size: 14px; } .board th, .board td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; } .board th { font-size: 12px; color: var(--muted); } .board td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; } .board tr.me td { background: var(--surface-2); }
     .board .rank { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); font-weight: 900; font-size: 12px; } .board tr:nth-child(1) .rank { background: #ffd700; color: #5a4500; }
     .opbar .qz-ctl { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    /* 튜토리얼 (단계에 처음 들어올 때, 노트북마다 한 번) */
+    .tut { position: fixed; inset: 0; z-index: 65; background: rgba(0,0,0,.55); display: grid; place-items: center; padding: 16px; } .tut[hidden] { display: none; }
+    .tut-box { width: min(440px, 100%); background: var(--surface); color: var(--ink); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 80px -30px rgba(0,0,0,.6); }
+    .tut-art { height: 190px; display: grid; place-items: center; background: var(--surface-2); } .tut-art .icon { width: 72px; height: 72px; stroke-width: 1.4; color: var(--ink); }
+    .tut-art.a1 { background: linear-gradient(135deg, #ffe7ef, #fff3e0); } .tut-art.a2 { background: linear-gradient(135deg, #e3ecff, #eef6ff); } .tut-art.a3 { background: linear-gradient(135deg, #e6f6ee, #fdeced); } .tut-art.a4 { background: linear-gradient(135deg, #f3f4f6, #e9ebef); }
+    @media (prefers-color-scheme: dark) { .tut-art.a1, .tut-art.a2, .tut-art.a3, .tut-art.a4 { background: var(--surface-2); } }
+    .tut-body { padding: 22px 24px 20px; display: grid; gap: 8px; } .tut-body h2 { margin: 0; font-size: 21px; line-height: 1.3; letter-spacing: -.01em; word-break: keep-all; } .tut-body p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); word-break: keep-all; }
+    .tut-foot { display: flex; align-items: center; gap: 10px; padding: 0 24px 22px; } .tut-dots { display: flex; gap: 6px; flex: 1; } .tut-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); } .tut-dots i.on { background: var(--ink); width: 18px; border-radius: 4px; }
+    .tut-foot .btn { min-height: 42px; padding: 0 18px; border-radius: 12px; } .tut-skip { border: 0; background: none; color: var(--muted); font-size: 14px; }
+    .round-head .tut-again { margin-left: auto; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); display: grid; place-items: center; } .round-head .tut-again .icon { width: 18px; height: 18px; }
     /* ---------- 조 고르기·토스트·스켈레톤 ---------- */
     .modal { position: fixed; inset: 0; z-index: 50; background: rgba(14, 20, 34, .72); display: grid; place-items: center; padding: 16px; }
     /* 조 선택 (2026-11-09 새 디자인) */
@@ -976,6 +986,7 @@
     <button class="pm-nav next" id="pmNext" aria-label="다음 게시물"><i data-lucide="chevron-right" class="icon"></i></button>
   </div>
   <div class="prof" id="prof" hidden role="dialog" aria-modal="true" aria-label="계정 정보"><div class="prof-box" id="profBox"></div></div>
+  <div class="tut" id="tut" hidden role="dialog" aria-modal="true" aria-label="시작 안내"><div class="tut-box" id="tutBox"></div></div>
   <div class="tp" id="teamModal" hidden role="dialog" aria-modal="true" aria-labelledby="tpTitle">
     <div class="tp-box">
       <div class="tp-head"><div class="tp-logo">Dorogram</div><h2 id="tpTitle">우리 조를 골라 주세요</h2></div>
@@ -1088,6 +1099,7 @@ async function initTeam() {
   else { $('#teamModal').hidden = false; refresh(); }
 }
 function setTeam(t, silent) {
+  setTimeout(() => { if (S.data && !S.screen) tutShow(S.data.phase); }, 600);
   S.team = t || null; S.screen = t === 0; document.body.classList.remove('admin');
   document.body.classList.toggle('screen', S.screen);
   $('#teamChipTxt').textContent = S.screen ? '화면' : t;
@@ -1121,6 +1133,7 @@ async function refresh() {
       const say = { read: `${ROUND_LABEL[d.round]} 예시가 열렸어요`, make: `우리 조 ${ROUND_LABEL[d.round]}를 만들 시간이에요`, judge: `다른 조 ${ROUND_LABEL[d.round]}를 판별할 시간이에요`, reveal: '정답 공개!' }[d.phase];
       if (d.phase === 'make' && S.team) { S.fmt = d.round; showTab('make'); } else { showTab('feed'); S.fmt = d.round; S.filter = 'all'; }
       if (say) toast(say);
+      setTimeout(() => tutShow(d.phase), 400);
     }
     render();
 
@@ -1367,13 +1380,13 @@ function renderFeed() {
   $('#homeHead').hidden = true; $('#meProf').hidden = true;
   const f = S.fmt, now = f === curRound(), posts = feedPosts(), adm = isAdmin(), L = ROUND_LABEL[f];
   const canMakeNow = now && d.phase === 'make' && !S.screen && S.team;
-  $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${L}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${L} 만들기</button>` : ''}`;
+  $('#roundHead').innerHTML = `<button type="button" class="back" data-act="home">${ic('chevron-left')}처음으로</button><h2>${roundIdx(f) + 1}라운드 · ${L}</h2>${canMakeNow ? `<button type="button" class="btn btn-primary" data-goto="make">${ic('square-plus')}우리 조 ${L} 만들기</button>` : ''}${now && S.team && !adm && TUT[d.phase] ? `<button type="button" class="tut-again" data-act="tut-again" aria-label="안내 다시 보기">${ic('circle-help')}</button>` : ''}`;
   const left = posts.filter(p => canJudge(p) && !d.myJudgments[p.id]).length;
   const hint = !now ? '' : d.phase === 'read' ? `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`
     : d.phase === 'make' ? (S.team ? `우리 조 ${L}를 만들 시간이에요.` : `조마다 ${L}를 만들고 있어요.`)
     : d.phase === 'judge' ? (S.team ? `다른 조 ${L}를 눌러 판별하세요. 남은 것 ${left}개` : `다른 조 ${L}를 판별하는 시간이에요.`) : '';
   $('#roundHint').hidden = true;
-  $('#guideBox').innerHTML = (now && d.phase === 'read') || adm ? guideHTML(f, now && d.phase === 'read') : '';
+  $('#guideBox').innerHTML = '';
   renderFilters(posts);
   const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase === 'make' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
   $('#feed').innerHTML = !posts.length ? `<div class="panel-empty">${empty}</div>`
@@ -1436,6 +1449,40 @@ function boardHTML() {
     <div class="board-grid"><div class="board-card"><h3>이번 라운드</h3>${tbl(rs, false)}</div><div class="board-card"><h3>누적</h3>${tbl(ts, true)}</div></div>
     </div>`;
 }
+
+
+// ---------- 튜토리얼: 글 대신 네 장으로 (2026-11-10) ----------
+const TUT = {
+  read: f => [['a1', 'message-circle-warning', `도로그램에 ${ROUND_LABEL[f]}가 올라왔어요`, '진짜일까요, 가짜일까요? 하나씩 눌러서 열어 보세요.'],
+    ['a2', 'library-big', '자료실에서 찾아보세요', '오른쪽 「자료실 열기」를 누르면 새 탭에 도로랜드 기록부가 열려요. 글에 나온 사건과 숫자가 거기 있는지, 있다면 똑같은지 보세요.'],
+    ['a3', 'circle-check', '진짜인지 가짜인지 고르세요', '고르면 바로 정답과 해설이 나와요. 왜 진짜인지, 어디가 거짓인지 알게 돼요.'],
+    ['a4', 'scale', '자극적이라고 가짜가 아니에요', '멀쩡해 보인다고 진짜도 아니에요. 기록부에 그 일이 있었는지, 숫자가 맞는지가 기준이에요. 예시로 연습해 볼까요?']],
+  make: f => [['a1', 'shuffle', '우리 조에 배정이 왔어요', '진짜 사건을 가짜처럼 쓰거나, 없던 사건을 진짜처럼 써요. 화면 위 카드에 우리 조 배정과 주제가 있어요.'],
+    ['a2', 'pen-line', `${ROUND_LABEL[f]}를 써요`, '오른쪽 미리보기를 보면서 제목, 부제, 본문을 채워요. 숫자와 시간은 기록부와 똑같아야 해요.'],
+    ['a3', 'lock-keyhole', '이유를 적어요', '진짜면 어느 기록과 맞는지, 가짜면 어떤 사건을 지어냈고 어느 기록으로 들통나는지. 정답 공개 때 해설로 나와요.'],
+    ['a4', 'send', '올리면 끝', '모든 조가 올리면 관리자가 판별 게임을 시작해요.']],
+  judge: f => [['a1', 'users', '모든 조가 같은 글을 봐요', '한 문제씩 전 노트북에 동시에 떠요. 우리 조 노트북 한 대로 제출해요.'],
+    ['a2', 'library-big', '자료실로 확인하고 고르세요', '사건이 기록부에 있는지, 숫자가 맞는지 찾아본 뒤 진짜·가짜를 제출해요.'],
+    ['a3', 'eye', '마감되면 정답이 나와요', '정답과 함께 그 글을 쓴 조의 설명, 맞힌 조와 속은 조가 보여요.'],
+    ['a4', 'trophy', '점수', '맞히면 1점. 우리 글에 속은 조가 있으면 조마다 1점이에요. 마지막 문제 뒤에 라운드 점수가 나와요.']]
+};
+const tutKey = ph => 'dorogram-tut-' + ph;
+function tutShow(ph, force) {
+  if (!TUT[ph] || S.screen || isAdmin() || !S.team) return;
+  if (!force && load(tutKey(ph)) === '1') return;
+  S.tut = { ph, i: 0, slides: TUT[ph](curRound()) };
+  tutRender();
+}
+function tutRender() {
+  const t = S.tut, box = $('#tut'); if (!t) { box.hidden = true; return; }
+  const [art, icon, h, p] = t.slides[t.i], last = t.i === t.slides.length - 1;
+  $('#tutBox').innerHTML = `<div class="tut-art ${art}">${ic(icon)}</div><div class="tut-body"><h2>${esc(h)}</h2><p>${esc(p)}</p></div>
+    <div class="tut-foot"><div class="tut-dots">${t.slides.map((_, k) => `<i class="${k === t.i ? 'on' : ''}"></i>`).join('')}</div>${last ? '' : `<button type="button" class="tut-skip" data-tut="done">건너뛰기</button>`}<button type="button" class="btn btn-primary" data-tut="${last ? 'done' : 'next'}">${last ? '시작하기' : '다음'}</button></div>`;
+  box.hidden = false; icons();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-tut]'); if (!b) return;
+  if (b.dataset.tut === 'next') { S.tut.i++; tutRender(); } else { store(tutKey(S.tut.ph), '1'); S.tut = null; tutRender(); } });
+document.addEventListener('click', e => { if (e.target.closest('[data-act="tut-again"]')) tutShow(S.data.phase, true); });
 
 // ---------- 상세 카드 (실제 서비스 화면) ----------
 const whoBtn = (p, inner, cls = '') => `<button type="button" class="who-btn ${cls}" data-profile="${p.id}">${inner}</button>`;
@@ -1814,7 +1861,7 @@ function renderMake() {
   $('#makeWrap').hidden = !canMake; $('#makeClosed').hidden = canMake;
   $('#makeClosed').innerHTML = `<b>우리 조 ${ROUND_LABEL[curRound()]}를 올렸습니다.</b><p class="muted small">위 목록에서 보기, 고치기, 지우기를 할 수 있습니다. 모든 조가 올리면 관리자가 게임을 시작합니다.</p>`;
   $('#makeNotice').hidden = true;
-  $('#makeGuide').innerHTML = guideHTML(curRound(), false);
+  $('#makeGuide').innerHTML = '';
   $('#makeHead').innerHTML = `<button type="button" class="back" data-act="home-make">${ic('chevron-left')}처음으로</button><h2>${roundIdx(curRound()) + 1}라운드 · 우리 조 ${ROUND_LABEL[curRound()]} 만들기</h2>`;
   if (canMake) { fillForm(); renderWiz(); }
 }
