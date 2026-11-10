@@ -47,6 +47,8 @@ async def main():
             await adm.evaluate("document.getElementById('adminBtn').click()"); await asyncio.sleep(3)
         vals = await adm.evaluate("Object.fromEntries([...document.querySelectorAll('input[data-keep^=\"cl\"]')].map(i=> [i.dataset.keep, i.value]))")
         print('inputs', vals)
+        # 2026-11-10: 기록 좌표 칸이 접이식(details)이라 먼저 펼친다
+        await adm.evaluate("(()=>{ const d=document.querySelector('details[data-ad=\"coords\"]'); if(d && !d.open) d.querySelector('summary').click(); })()"); await asyncio.sleep(0.5)
         for k, (la, ln) in DEF.items():
             check(vals.get('clat-' + k) == f'{la:.6f}' and vals.get('clng-' + k) == f'{ln:.6f}', f'{k} inputs hold the default {la}, {ln}')
         # paste "lat, lng" into the latitude box
