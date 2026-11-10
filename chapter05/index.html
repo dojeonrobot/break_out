@@ -2275,15 +2275,15 @@ function onGeo(p){
   if(follow) showMeCoord();                                   // first, so a fault further down can never freeze the coordinates (2026-10-26)
   try{ updateTeamDots(LAST_POS, Date.now()); }catch(e){ console.error(e); }
   if(follow){ try{ followMe(); }catch(e){ console.error(e); } }
-  // close to an empty record's coordinates? 2026-11-10 (user: "±20m면 도착했다고 하고 여기 근처를 담으라고"): within 20 m — a poor fix widens it, at most to 30 m — the void says
+  // 도착 판정은 목표 좌표에서 10m 이내로 고정한다. GPS 정확도에 따라 반경을 늘리지 않는다.
   // 도착 on EVERY arrival (once per entry, again after 90 s), not only the first time: a device that had found the spot earlier stayed silent, and so did the tutorial
   // (voidSay drops lines while it runs), which left the spot marked found with nothing said. In the tutorial the line now waits for the next fix instead.
   // Distance is measured to m.lat/lng, which coordsApply moves when the admin changes 기록 좌표 — not to m.b, the spot drawn at load (that still needs a reload).
   const [x, z] = toLocal(myPos.lat, myPos.lng);
   MISSION_E.forEach(m=>{ if(m.lat == null || !m.b) return; const [mx, mz] = toLocal(m.lat, m.lng), d = Math.hypot(mx - x, mz - z); document.querySelectorAll(`[data-dist="${m.id}"]`).forEach(el=> el.textContent = `거리 ${Math.round(d)}m`);
     if(zoneDone(m) || zoneLocked(m) || m.id === 'z1') return;   // on the island too (2026-11-10): a tablet that just finished the island mission and walks off still on the island screen must hear 도착
-    const r = Math.max(20, Math.min(myPos.acc || 0, 30)), g = geoMemo[m.id] || (geoMemo[m.id] = {}), inTut = tutStep >= 0 && tutStep < 99;
-    if(d < r){
+    const r = 10, g = geoMemo[m.id] || (geoMemo[m.id] = {}), inTut = tutStep >= 0 && tutStep < 99;
+    if(d <= r){
       if(!inTut && (!g.here || Date.now() - (g.hereAt || 0) > 90000)){ g.here = true; g.hereAt = Date.now(); voidSay(ZONE_OBJ[m.id] ? `도착했어! 이 자리의 기록은 ${ZONE_OBJ[m.id]}이야. 여기 근처를 한 바퀴 돌면서 꼼꼼하게 담아 줘.` : '도착했어! 여기야. 이 자리 근처에 있는 걸 한 바퀴 돌면서 꼼꼼하게 담아 줘.', 10000, 'joy'); }
       if(!zoneFound(m)){ try{ localStorage.setItem(`void-found-${m.id}`, '1'); }catch(e){} renderList(); refreshZones(); if(m.bi != null && W.id === 'erica') select(m.bi, true); }
       g.near = true; }
