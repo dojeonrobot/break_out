@@ -366,3 +366,11 @@ sudo cp dorogram.service /etc/systemd/system/ && sudo systemctl daemon-reload &&
 - **예시 50개 전면 교체** (`scripts/pending/feed_rebuild_v3.py` → `server/ch5_seed.json`). 「사라진 섬」 소재 없음. 기사 22(진짜 12·가짜 10)·쇼츠 14(8·6)·스토리 14(8·6). 모든 게시물은 자료실 문서 하나와 짝(`answer.doc`), 가짜는 `answer.part`에 거짓으로 쓴 곳. 숫자를 바꾸면 archive-data.js도 같이 바꿀 것. 사진은 `server/ch5_make_seed_images_free.py`(Pollinations, 69장)로 만들며 옛 사진은 `server/seed_images_old/`.
 - 도움말 탭은 도움말 센터(주제 6개 × 문답 4~5개, 검색)로 줄였다. 조 선택의 「최근」 표시, 라운드 타일의 「예시 보기 중」 배지, gate.html 안내 문장은 삭제.
 - 배포: 정적 4개 파일 scp + cache-bust, `ch5_seed.json` → `/home/ubuntu/dorogram/`, `sudo systemctl stop dorogram` → `data/ch5_feed.json` 백업 → start (예시가 바뀌면 DB를 비워야 반영). teamCount는 초기화되면 10으로 돌아가므로 관리자 탭에서 다시 맞춘다.
+
+## 2026-11-10 v4: 배정 · 동시 판별 퀴즈 · 사건 기록부 (사용자 결정)
+
+- **활동 규칙**: 가짜뉴스는 세부 하나를 비트는 글이 아니라 **없던 사건을 통째로 지어낸 글**이다. 진짜는 기록부에 있는 사건을 **가짜처럼(자극적으로)** 쓰고, 가짜는 없던 사건을 **진짜처럼** 쓴다. 정량 수치(시간·인원·가격·이름)는 둘 다 자료실과 맞아야 한다. 조는 진짜/가짜를 고르지 않는다. **서버가 라운드마다 반반 섞어 배정**하고 주제도 무작위로 준다(`server/ch5_topics.json`, 형식별 real/fake 주제 풀, doc는 archive-data.js 문서 id).
+- **판별은 모든 조가 같은 문제를 동시에**: 관리자 「게임 시작」 → 조 게시물이 무작위 순서로 한 문제씩 전 노트북에 뜸 → 조마다 진짜/가짜 제출(작성 조는 대기) → 관리자 「마감하고 정답 공개」 → 정답 + 작성 조가 적은 이유(지어낸 사건, 기록부 문서, 설명) + 맞힌 조·속은 조 → 「다음 문제」 → 마지막 뒤 「라운드 점수 공개」(phase reveal, 이번 라운드·누적 점수판). 점수 = 맞힘 1점 + 작성 조는 틀린 조마다 1점.
+- 서버 상태: `DB.assign[round][team] = {truth, topicId, title, doc, brief}`, `DB.quiz = {round, order, idx, open, revealed}`. API: `/admin/quiz {action: start|close|next|prev|reopen}`, `/admin/reassign {team}`. `state`에 `assignment`(내 조), `quiz`(total·idx·open·revealed·postId·voted·done), `roundScores`, 관리자는 `assignments`. 판별은 `quiz.open`이고 현재 문제일 때만 받는다. `POSTS_PER_ROUND = 1`.
+- 자료실 v2(`archive-data.js`, 42건): 사건 기록부가 중심이다. `complete: true` 문서는 전수(여기 없으면 세계에 없음). 예시와 주제 풀의 숫자는 전부 여기서 나온다. 세계의 사실(야간개장은 할로윈 금·토만, 관람차 야간 운행 없음, 사자 없음, 올해 정지 6건·부상 0 등)을 바꾸려면 기록부·주제·예시를 같이 고친다.
+- 예시 24개 `scripts/pending/feed_rebuild_v4.py`. 검증 `scratchpad e2e_v4.py`(배정·강제 truth·퀴즈 진행·투표 제한·공개·점수·관리자 표, 전부 통과).
