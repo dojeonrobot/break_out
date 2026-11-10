@@ -2278,8 +2278,9 @@ function onGeo(p){
   // close to an empty record's coordinates? 2026-11-10 (user: "±20m면 도착했다고 하고 여기 근처를 담으라고"): within 20 m — a poor fix widens it, at most to 30 m — the void says
   // 도착 on EVERY arrival (once per entry, again after 90 s), not only the first time: a device that had found the spot earlier stayed silent, and so did the tutorial
   // (voidSay drops lines while it runs), which left the spot marked found with nothing said. In the tutorial the line now waits for the next fix instead.
+  // Distance is measured to m.lat/lng, which coordsApply moves when the admin changes 기록 좌표 — not to m.b, the spot drawn at load (that still needs a reload).
   const [x, z] = toLocal(myPos.lat, myPos.lng);
-  MISSION_E.forEach(m=>{ if(m.lat == null || !m.b) return; const d = Math.hypot(m.b.cx - x, m.b.cz - z); document.querySelectorAll(`[data-dist="${m.id}"]`).forEach(el=> el.textContent = `거리 ${Math.round(d)}m`);
+  MISSION_E.forEach(m=>{ if(m.lat == null || !m.b) return; const [mx, mz] = toLocal(m.lat, m.lng), d = Math.hypot(mx - x, mz - z); document.querySelectorAll(`[data-dist="${m.id}"]`).forEach(el=> el.textContent = `거리 ${Math.round(d)}m`);
     if(zoneDone(m) || zoneLocked(m) || m.id === 'z1' || W.id !== 'erica') return;
     const r = Math.max(20, Math.min(myPos.acc || 0, 30)), g = geoMemo[m.id] || (geoMemo[m.id] = {}), inTut = tutStep >= 0 && tutStep < 99;
     if(d < r){
