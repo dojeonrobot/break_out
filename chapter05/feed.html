@@ -1354,8 +1354,7 @@ function renderHomeHead() {
     make: [`${i}라운드 ${L} · 만들기`, d.assignment ? `우리 조는 「${d.assignment.title}」을(를) ${d.assignment.truth === 'real' ? '진짜 사건인데 가짜처럼' : '없던 일인데 진짜처럼'} 써요.` : `우리 조 ${L}를 만드는 시간이에요.`, `우리 조 ${L} 만들기`],
     judge: [`${i}라운드 ${L} · 판별`, `모든 조가 같은 ${L}를 보고 동시에 진짜인지 가짜인지 제출해요. 문제마다 정답과 해설이 바로 나와요.`, `판별 문제 보기`],
     reveal: [`${i}라운드 ${L} · 라운드 끝`, `이번 라운드 점수와 누적 점수를 확인해요.`, `점수 보기`] }[d.phase];
-  box.hidden = false;
-  box.innerHTML = `<div><small>지금 할 일</small><h1>${esc(txt[0])}</h1><p>${esc(txt[1])}</p></div>`;
+  box.hidden = true;   /* 2026-11-10: 안내 문장은 두지 않는다 (인스타에 이런 상자 없음) */
 }
 function renderFeed() {
   const d = S.data, home = !S.fmt;
@@ -1373,7 +1372,7 @@ function renderFeed() {
   const hint = !now ? '' : d.phase === 'read' ? `예시 ${L}를 눌러 진짜인지 가짜인지 골라 보세요. 고르면 바로 해설이 나와요.`
     : d.phase === 'make' ? (S.team ? `우리 조 ${L}를 만들 시간이에요.` : `조마다 ${L}를 만들고 있어요.`)
     : d.phase === 'judge' ? (S.team ? `다른 조 ${L}를 눌러 판별하세요. 남은 것 ${left}개` : `다른 조 ${L}를 판별하는 시간이에요.`) : '';
-  $('#roundHint').hidden = !hint; $('#roundHint').textContent = hint;
+  $('#roundHint').hidden = true;
   $('#guideBox').innerHTML = (now && d.phase === 'read') || adm ? guideHTML(f, now && d.phase === 'read') : '';
   renderFilters(posts);
   const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase === 'make' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
@@ -1435,7 +1434,7 @@ function boardHTML() {
   const mine = rs.find(r => r.team === me);
   return `<div class="board"><div class="board-hero"><h2>${roundIdx(curRound()) + 1}라운드 ${L} 끝</h2><p>${mine ? `우리 조 이번 라운드 ${mine.total}점 · 맞힘 ${mine.correct} / ${mine.judgable} · 속인 조 ${mine.fooled}` : '라운드 점수가 나왔습니다.'}${roundIdx(curRound()) < 2 ? ' · 관리자가 다음 라운드를 열면 화면이 바뀝니다.' : ''}</p></div>
     <div class="board-grid"><div class="board-card"><h3>이번 라운드</h3>${tbl(rs, false)}</div><div class="board-card"><h3>누적</h3>${tbl(ts, true)}</div></div>
-    <p class="small muted" style="margin:0 2px">맞힌 판별 1점 · 우리 글에 속은 조마다 1점 (진짜를 가짜로 보게 해도, 가짜를 진짜로 믿게 해도)</p></div>`;
+    </div>`;
 }
 
 // ---------- 상세 카드 (실제 서비스 화면) ----------
@@ -1555,7 +1554,7 @@ function arcLookHTML(p) {
   return `<div class="side-h">${ic('library-big')}자료실과 대조하기</div>
     <div class="arc-look"><form class="arc-q" data-arcform="${p.id}"><input class="input" name="q" maxlength="40" placeholder="자료실 검색어 (예: 키링, 막배, @doroilbo)" aria-label="자료실 검색어"><button type="submit" class="btn btn-primary">${ic('external-link')}자료실 열기</button></form>
     ${terms.length ? `<div class="arc-terms">${terms.map(x => `<a class="term" href="${arcUrl(x)}" target="_blank" rel="noopener">${ic('search')}${esc(x)}</a>`).join('')}</div>` : ''}
-    <p class="small muted" style="margin:0">새 탭에 자료실이 열립니다. 글에 나온 숫자, 시간, 계정이 문서와 맞는지 하나씩 맞춰 보세요.</p></div>`;
+    </div>`;
 }
 function verdictBadge(v) { return { real: '<span class="badge b-real">진짜</span>', fake: '<span class="badge b-fake">가짜</span>', unsure: '<span class="badge b-unsure">모르겠음</span>' }[v] || ''; }
 function judgeHTML(p) {
@@ -1566,7 +1565,6 @@ function judgeHTML(p) {
   const docs = `<select class="input" data-act="basisdoc" data-id="${p.id}" aria-label="대조한 자료실 문서"><option value="">문서를 골라도 되고 안 골라도 됩니다</option>${docOptions(dft.doc)}</select>`;
   return `<div class="judge">${mine ? `<div class="done-judge"><span class="muted">우리 조 판정</span>${verdictBadge(mine.verdict)}</div>` : `<p class="judge-q">이 글, 진짜일까요?</p>`}
     <div class="judge-row seg">${vbtn('real', '진짜', 'circle-check')}${vbtn('fake', '가짜', 'circle-x')}</div>
-    <p class="small muted" style="margin:0 0 6px">자극적이라고 가짜가 아니고, 멀쩡해 보인다고 진짜가 아닙니다. 기록부에 그 사건이 있는지, 숫자가 맞는지로 정합니다.</p>
     <div class="flabel">맞춰 본 기록부 문서 (선택)</div>${docs}
     <input class="input" data-act="reason" data-id="${p.id}" maxlength="80" placeholder="한 줄 메모 (예: 키링은 하루 400개인데 3,000개라고 씀)" value="${esc(dft.reason || '')}" aria-label="판단 메모">
     <p class="err" data-err="${p.id}"></p><div><button type="button" class="btn btn-primary" data-act="submit-judge" data-id="${p.id}">${mine ? '판정 바꾸기' : '판정 제출'}</button></div></div>`;
