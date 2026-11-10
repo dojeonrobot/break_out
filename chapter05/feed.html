@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Black+Han+Sans&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <script src="archive-data.js"></script>
   <script src="feed-config.js"></script>
   <style>
     /* 도로그램: 인스타그램 웹 화면을 본뜬 팔레트. 모서리는 카드 8~12px / 버튼 8px / 칩 완전 둥글게 */
@@ -435,6 +436,13 @@
     .post-side { overflow: auto; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
     @media (max-width: 860px) { .pm { padding: 0; } .pm-box { width: 100%; height: 100dvh; } .pm-box .post { grid-template-columns: 1fr; grid-template-rows: auto auto; overflow: auto; border-radius: 0; } .post-media, .post-side { overflow: visible; } .post-side { border-left: 0; } .pm-nav { top: auto; bottom: 14px; transform: none; } .vnav { display: none; } }
     .post-side { font-size: 15px; line-height: 1.55; }
+    /* 자료실 대조 (상세 창·만들기 공용) */
+    a.sb-btn, a.nav-btn { text-decoration: none; } .sb-btn .ext { width: 14px; height: 14px; margin-left: auto; opacity: .5; }
+    .arc-look { padding: 4px 16px 12px; display: grid; gap: 8px; } .arc-look.mk-arc { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); }
+    .arc-q { display: flex; gap: 8px; } .arc-q .input { flex: 1; min-width: 0; } .arc-q .btn { white-space: nowrap; }
+    .arc-terms { display: flex; flex-wrap: wrap; gap: 6px; } .arc-terms .term { font-size: 12.5px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .arc-terms .term .icon { width: 12px; height: 12px; } .arc-terms .term:hover { background: var(--ink); color: var(--surface); }
+    .judge select.input { width: 100%; }
     .side-h { display: flex; align-items: center; gap: 8px; padding: 16px 16px 6px; font-weight: 800; font-size: 13px; letter-spacing: .02em; color: var(--muted); text-transform: uppercase; } .side-h .icon { width: 16px; height: 16px; }
     .side-who { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
     .side-who .avatar { width: 40px; height: 40px; font-size: 16px; }
@@ -516,26 +524,6 @@
     .twist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
     .twist-grid div { background: rgba(255,255,255,.14); border-radius: 10px; padding: 10px 12px; } .twist-grid b { display: block; font-size: 26px; }
 
-    /* ---------- 자료실 ---------- */
-    .arc { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; padding: 0 16px; }
-    .arc-hero { background: linear-gradient(135deg, #0e4a84, #1d4ed8 60%, #0891b2); color: #fff; border-radius: 14px; padding: 22px 24px; display: grid; gap: 6px; }
-    .arc-hero h2 { margin: 0; font-size: 24px; display: flex; gap: 10px; align-items: center; } .arc-hero p { margin: 0; opacity: .92; font-size: 14px; line-height: 1.6; max-width: 70ch; }
-    .arc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 820px) { .arc-grid { grid-template-columns: 1fr; } }
-    .arc-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
-    .arc-card h3 { margin: 0 0 10px; font-size: 16px; display: flex; gap: 8px; align-items: center; } .arc-card h3 .icon { width: 18px; height: 18px; }
-    .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px; margin: 0; } .kv dt { color: var(--muted); white-space: nowrap; } .kv dd { margin: 0; font-weight: 600; }
-    .zone-list { display: grid; gap: 8px; } .zone { display: grid; grid-template-columns: 132px 1fr; gap: 10px; font-size: 14px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); } .zone b { font-size: 14px; }
-    .numcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } @media (max-width: 560px) { .numcards { grid-template-columns: 1fr 1fr; } }
-    .numcard { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; } .numcard span { font-size: 12px; color: var(--muted); display: block; } .numcard b { font-size: 17px; font-family: var(--mono); letter-spacing: -.02em; display: block; margin: 2px 0; } .numcard small { font-size: 11.5px; color: var(--muted); line-height: 1.4; display: block; }
-    .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 150px; margin: 12px 4px 0; }
-    .bar { display: grid; justify-items: center; gap: 4px; align-content: end; height: 100%; font-size: 12px; } .bar i { width: 100%; max-width: 56px; background: linear-gradient(180deg, #0095f6, #1d4ed8); border-radius: 6px 6px 0 0; display: block; } .bar b { font-family: var(--mono); font-size: 13px; } .bar span { color: var(--muted); }
-    .tl { display: grid; gap: 10px; } .tl-item { display: grid; grid-template-columns: 150px 1fr; gap: 10px; font-size: 14px; padding: 10px 12px; border-left: 3px solid #1d4ed8; background: var(--surface-2); border-radius: 0 8px 8px 0; } .tl-item .w { font-family: var(--mono); font-size: 12.5px; color: var(--muted); } .tl-item b { display: block; } .tl-item small { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
-    .tl-item.inc { border-left-color: #ea580c; } .tl-item.rec { border-left-color: #0a8754; }
-    @media (max-width: 560px) { .tl-item { grid-template-columns: 1fr; } }
-    .acct { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; } .acct:last-child { border-bottom: 0; }
-    .acct .avatar { width: 40px; height: 40px; } .acct .nm { font-weight: 800; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; } .acct .meta { font-size: 12px; color: var(--muted); }
-    .stance li { margin: 4px 0; font-size: 14px; line-height: 1.6; }
-
     /* ---------- 만들기 (한 화면 4열) ---------- */
     .make-wrap { display: block; }
     .wiz-steps { list-style: none; margin: 0; padding: 12px 16px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; counter-reset: w; }
@@ -552,6 +540,13 @@
     .mk-live .igc-steps { margin: 0; }
     .mk-live .mk-prev-area { flex: none; }
     .mk-live .thumb-prev .nc { max-width: 300px; } .mk-live .thumb-prev .tile { width: 220px; }
+    /* 미리보기 부위 라벨: 어디가 제목·부제·본문인지 항상 보이게 (2026-11-10) */
+    .mk-live .nw-h, .mk-live .nw-dek, .mk-live .nw-body, .mk-live .nw-stats, .mk-live .nw-quote, .mk-live .nw-by, .mk-live .nw-fig, .mk-live .sc-title, .mk-live .sc-ch, .mk-live .story-head { position: relative; }
+    .mk-live .nw-h::before, .mk-live .nw-dek::before, .mk-live .nw-body::before, .mk-live .nw-stats::before, .mk-live .nw-quote::before, .mk-live .nw-by::before, .mk-live .nw-fig::before, .mk-live .sc-title::before, .mk-live .sc-ch::before, .mk-live .story-head::before { position: absolute; left: 0; top: -11px; z-index: 3; font-size: 10px; font-weight: 800; line-height: 1.4; padding: 1px 6px; border-radius: 4px; background: var(--blue); color: #fff; pointer-events: none; white-space: nowrap; }
+    .mk-live .nw-h::before { content: "제목"; } .mk-live .nw-dek::before { content: "부제"; } .mk-live .nw-body::before { content: "본문"; } .mk-live .nw-stats::before { content: "숫자 상자"; } .mk-live .nw-quote::before { content: "인용"; }
+    .mk-live .nw-by::before { content: "기자 · 언론사 · 입력 시각"; } .mk-live .nw-fig::before { content: "사진 · 사진 설명"; } .mk-live .sc-title::before { content: "영상 제목"; } .mk-live .sc-ch::before { content: "채널"; } .mk-live .story-head::before { content: "계정 · 올린 때"; top: auto; bottom: -13px; left: 10px; }
+    .mk-live .nw-h, .mk-live .nw-dek, .mk-live .nw-body, .mk-live .nw-stats, .mk-live .nw-quote, .mk-live .nw-by, .mk-live .nw-fig { margin-top: 16px !important; }
+    .mk-live[data-focus="title"] .nw-h, .mk-live[data-focus="subhead"] .nw-dek, .mk-live[data-focus="body"] .nw-body, .mk-live[data-focus="stats"] .nw-stats, .mk-live[data-focus="quote"] .nw-quote, .mk-live[data-focus="by"] .nw-by, .mk-live[data-focus="by"] .sc-ch, .mk-live[data-focus="by"] .story-head, .mk-live[data-focus="fig"] .nw-fig, .mk-live[data-focus="title"] .sc-title { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 4px; }
     @media (min-width: 1024px) {
       .mk-body.wiz { grid-template-columns: minmax(0, 1fr) 420px; overflow: hidden; }
       .mk-live { border-top: 0; border-left: 1px solid var(--line); overflow: auto; }
@@ -648,24 +643,22 @@
     .ad-teams { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .ad-teams .opt { font-size: 14px; padding: 7px 14px; }
 
     /* ---------- 도움말 ---------- */
-    .help { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; padding: 0 16px; }
-    .hp { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
-    .hp h2 { margin: 0 0 10px; font-size: 20px; display: flex; gap: 8px; align-items: center; } .hp h3 { margin: 16px 0 6px; font-size: 16px; }
-    .hp p, .hp li { line-height: 1.7; } .hp ul, .hp ol { margin: 4px 0; padding-left: 20px; }
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } @media (max-width: 760px) { .steps { grid-template-columns: repeat(2, 1fr); } }
-    .step { background: var(--surface-2); border-radius: 10px; padding: 12px; } .step b { display: block; font-size: 15px; margin-bottom: 4px; } .step span { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .ex { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: start; padding: 14px 0; border-top: 1px solid var(--line); }
-    @media (max-width: 640px) { .ex { grid-template-columns: 1fr; } }
-    .ex img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; }
-    .ex .cap { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .ex .tag { display: inline-block; font-size: 12px; font-weight: 800; padding: 1px 8px; border-radius: 999px; margin-bottom: 4px; }
-    .fmt3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; } @media (max-width: 760px) { .fmt3 { grid-template-columns: 1fr; } }
-    .fmt3 > div { border: 1px solid var(--line); border-radius: 10px; padding: 12px; } .fmt3 b { display: flex; gap: 6px; align-items: center; font-size: 15px; margin-bottom: 6px; }
-    .fmt3 ul { padding-left: 18px; font-size: 14px; } .fmt3 p { font-size: 13px; color: var(--muted); margin: 0 0 6px; line-height: 1.55; }
-    .kinds4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; } @media (max-width: 760px) { .kinds4 { grid-template-columns: 1fr 1fr; } }
-    .kinds4 > div { background: var(--surface-2); border-radius: 10px; padding: 12px; font-size: 13px; line-height: 1.5; } .kinds4 b { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; font-size: 14px; }
-    .ok-no { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; } @media (max-width: 640px) { .ok-no { grid-template-columns: 1fr; } }
-    .ok-no > div { border-radius: 10px; padding: 12px 14px; } .ok-no .ok { background: var(--real-bg); } .ok-no .no { background: var(--fake-bg); } .ok-no b { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+    /* ---------- 도움말 센터 (2026-11-10: 짧게) ---------- */
+    .help { max-width: 860px; margin: 0 auto; padding: 0 16px 40px; display: grid; gap: 22px; }
+    .hc-head { text-align: center; display: grid; gap: 14px; justify-items: center; padding: 14px 0 4px; } .hc-head h2 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -.01em; }
+    .hc-search { width: min(560px, 100%); display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 48px; border-radius: 12px; background: var(--surface-2); color: var(--muted); }
+    .hc-search input { flex: 1; border: 0; background: none; font: inherit; font-size: 15px; color: var(--ink); outline: none; min-width: 0; } .hc-search:focus-within { box-shadow: 0 0 0 2px var(--focus); }
+    .hc-topics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; } @media (max-width: 640px) { .hc-topics { grid-template-columns: 1fr 1fr; } }
+    .hc-t { display: grid; gap: 6px; justify-items: start; text-align: left; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; transition: border-color .15s, background .15s; }
+    .hc-t .icon { width: 24px; height: 24px; stroke-width: 1.8; } .hc-t b { font-size: 15px; } .hc-t span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+    .hc-t[aria-selected="true"] { border-color: var(--ink); background: var(--surface-2); } .hc-t:hover { border-color: var(--ink); }
+    .hc-list h3 { margin: 0 0 6px; font-size: 17px; }
+    .hc-steps { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; } .hc-steps span { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; padding: 8px 12px; border-radius: 999px; background: var(--surface-2); }
+    .hc-steps span i { font-style: normal; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--surface); font-size: 11px; }
+    .hc-q { border-bottom: 1px solid var(--line); } .hc-q summary { list-style: none; cursor: pointer; padding: 14px 4px; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; } .hc-q summary::-webkit-details-marker { display: none; }
+    .hc-q summary .icon { margin-left: auto; width: 18px; height: 18px; transition: transform .2s; } .hc-q[open] summary .icon { transform: rotate(180deg); } .hc-q summary small { font-weight: 500; color: var(--muted); font-size: 12px; }
+    .hc-q p { margin: 0 4px 16px; font-size: 14.5px; line-height: 1.65; word-break: keep-all; max-width: 60ch; }
+    .hc-empty { padding: 30px 0; text-align: center; color: var(--muted); font-size: 14px; }
 
     /* ---------- 조 고르기·토스트·스켈레톤 ---------- */
     .modal { position: fixed; inset: 0; z-index: 50; background: rgba(14, 20, 34, .72); display: grid; place-items: center; padding: 16px; }
@@ -750,7 +743,7 @@
     <div class="sb-brand">Dorogram<small>도로랜드 공식 SNS 도로그램</small></div>
     <nav role="tablist" aria-label="화면 선택" style="display:grid;gap:2px">
       <button class="sb-btn" role="tab" data-tab="feed" aria-selected="true"><i data-lucide="house" class="icon"></i>홈</button>
-      <button class="sb-btn" role="tab" data-tab="archive" aria-selected="false"><i data-lucide="library-big" class="icon"></i>자료실</button>
+      <a class="sb-btn" href="archive.html" target="_blank" rel="noopener"><i data-lucide="library-big" class="icon"></i>자료실<i data-lucide="external-link" class="icon ext"></i></a>
       <button class="sb-btn" role="tab" data-tab="make" aria-selected="false"><i data-lucide="square-plus" class="icon"></i>만들기</button>
       <button class="sb-btn" role="tab" data-tab="score" aria-selected="false" hidden><i data-lucide="trophy" class="icon"></i>점수</button>
       <button class="sb-btn" role="tab" data-tab="help" aria-selected="false"><i data-lucide="circle-help" class="icon"></i>도움말</button>
@@ -764,7 +757,7 @@
       <div class="brand">Dorogram<small>도로랜드 공식 SNS 도로그램</small></div>
       <nav class="nav" role="tablist" aria-label="화면 선택">
         <button class="nav-btn" role="tab" data-tab="feed" aria-selected="true" aria-label="홈"><i data-lucide="house" class="icon"></i></button>
-        <button class="nav-btn" role="tab" data-tab="archive" aria-selected="false" aria-label="자료실"><i data-lucide="library-big" class="icon"></i></button>
+        <a class="nav-btn" href="archive.html" target="_blank" rel="noopener" aria-label="자료실 (새 탭)"><i data-lucide="library-big" class="icon"></i></a>
         <button class="nav-btn" role="tab" data-tab="make" aria-selected="false" aria-label="만들기"><i data-lucide="square-plus" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="score" aria-selected="false" aria-label="점수" hidden><i data-lucide="trophy" class="icon"></i></button>
         <button class="nav-btn" role="tab" data-tab="help" aria-selected="false" aria-label="도움말"><i data-lucide="circle-help" class="icon"></i></button>
@@ -792,7 +785,6 @@
     </section>
 
     <!-- 자료실 -->
-    <section id="tab-archive" hidden><div class="arc" id="archiveBody"></div></section>
 
     <!-- 만들기 -->
     <section id="tab-make" hidden>
@@ -828,7 +820,7 @@
               <div class="igc-row" id="subheadField"><label class="sr" for="fSubhead">부제</label><i data-lucide="text" class="icon"></i><input id="fSubhead" maxlength="120" placeholder="부제 (제목 아래 한 줄 요약)"></div>
               <label class="sr" for="fBody" id="fBodyLabel">문구</label>
               <textarea id="fBody" class="igc-caption" maxlength="1200" placeholder="문구를 입력하세요..."></textarea>
-              <div class="igc-cap-tools"><button type="button" class="linkbtn" id="btnPolish"><i data-lucide="wand-sparkles" class="icon"></i>AI로 말투 다듬기</button><span class="igc-count" id="bodyCount">0/1,200</span></div>
+              <div class="igc-cap-tools"><span class="igc-count" id="bodyCount">0/1,200</span></div>
               <div id="newsExtra" class="mk-stack">
                 <div class="igc-row"><label class="sr" for="fQuoteText">인용문</label><i data-lucide="quote" class="icon"></i><input id="fQuoteText" maxlength="200" placeholder="인용문 (누군가가 한 말 한 문장)"></div>
                 <div class="igc-row"><label class="sr" for="fQuoteWho">말한 사람</label><i data-lucide="user-round" class="icon"></i><input id="fQuoteWho" maxlength="40" placeholder="말한 사람 (예: 운영실 관계자, 방문객 김모 씨(34))"></div>
@@ -889,19 +881,22 @@
                   <button type="button" class="opt" data-truth="fake" aria-pressed="true"><i data-lucide="drama" class="icon"></i>가짜</button>
                 </div>
                 <p class="small muted" id="truthHelp" style="margin:0"></p></div>
+              <div class="arc-look mk-arc"><div class="flabel small" style="display:flex;align-items:center;gap:6px"><i data-lucide="library-big" class="icon"></i>자료실에서 찾아보기</div>
+                <div class="arc-q"><input class="input" id="fArcQ" maxlength="40" placeholder="검색어 (예: 키링, 막배, 기린, @doroilbo)"><button type="button" class="btn btn-primary" id="btnArcOpen"><i data-lucide="external-link" class="icon"></i>자료실 열기</button></div>
+                <p class="small muted" style="margin:0">새 탭에 자료실이 열립니다. 글에 쓴 숫자·시간·계정이 어느 문서에 있는지 찾으세요.</p></div>
               <div id="fakeFields" class="mk-stack">
-                <div class="field"><label for="fClueKind">들킬 단서 (다른 조가 확인할 수 있는 것 하나)</label><select id="fClueKind"></select><p class="small muted" id="clueKindHint" style="margin:0"></p></div>
-                <div class="field" id="factField" hidden><label for="fFact">어긋나게 쓴 자료실 내용</label><select id="fFact"></select></div>
-                <div class="field"><label for="fClue">어떻게 다르게 썼나요?</label><textarea id="fClue" rows="2" placeholder="예: 매출 386억을 193억이라고 썼다 / 막배가 7시 30분인데 밤 9시 불꽃놀이라고 썼다"></textarea></div>
+                <div class="field"><div class="flabel">어느 부분을 거짓으로 썼나요?</div><div class="opt-row" id="optPart"></div><p class="small muted" id="partHint" style="margin:0"></p></div>
+                <div class="field" id="factField"><label for="fFact">어긋나게 쓴 자료실 문서</label><select id="fFact"></select></div>
+                <div class="field"><label for="fClue">자료실에는 뭐라고 되어 있고, 우리는 어떻게 바꿔 썼나요?</label><textarea id="fClue" rows="2" placeholder="예: 팝업스토어 문서에는 키링 하루 400개인데 3,000개로 씀"></textarea></div>
                 <div class="field"><label for="fTactic">포장 방식 (선택)</label><select id="fTactic"></select><p class="small muted" id="tacticDesc" style="margin:0"></p></div>
               </div>
               <div id="realFields" class="mk-stack" hidden>
-                <div class="field"><label for="fBasis">근거가 된 자료실 내용</label><select id="fBasis"></select>
-                  <p class="small muted" style="margin:0">진짜 게시물은 자료실에 있는 내용으로만 씁니다. 자료실과 어긋나면 가짜로 판정됩니다.</p></div>
+                <div class="field"><label for="fBasis">근거가 된 자료실 문서</label><select id="fBasis"></select>
+                  <p class="small muted" style="margin:0">진짜 게시물은 자료실 문서에 있는 내용으로만 씁니다. 문서와 어긋나면 가짜로 판정됩니다.</p></div>
               </div>
               <div class="mk-foot">
                 <p class="err" id="formErr" role="alert"></p>
-                <p class="small muted" style="margin:0">공유하면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다. 인증 배지는 조가 붙일 수 없습니다.</p>
+                <p class="small muted" style="margin:0">올리면 바로 피드에 들어갑니다. 다른 조에게는 판별 시간부터 보이고, 누가 만든 글인지·진짜인지는 정답 공개 때까지 아무도 모릅니다.</p>
               </div>
             </div>
           </div>
@@ -966,7 +961,18 @@
   <div class="toast" id="toast" hidden></div>
 
 <script>
-const C = window.DOROGRAM, API = C.API, A = C.ARCHIVE;
+const C = window.DOROGRAM, API = C.API;
+// 자료실(archive-data.js): 문서 목록, 등록 계정, 검색 주소
+const ARC = window.DORO_ARCHIVE || { docs: [], types: {} };
+const ARC_DOC = id => ARC.docs.find(d => d.id === id);
+const REG_ACCOUNTS = (() => { const d = ARC_DOC('account-registry'); return d ? d.tables[0].rows.map(r => ({ handle: r[0], name: r[1], kind: /공식/.test(r[2]) ? 'official' : /언론/.test(r[2]) ? 'press' : 'creator' })) : []; })();
+const arcUrl = q => 'archive.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+const docOptions = sel => Object.entries(ARC.types).map(([t, v]) => { const ds = ARC.docs.filter(d => d.type === t); return ds.length ? `<optgroup label="${v.label}">${ds.map(d => `<option ${sel === d.title ? 'selected' : ''}>${d.title.replace(/</g, '&lt;')}</option>`).join('')}</optgroup>` : ''; }).join('');
+/* 글에 나온 숫자·계정을 뽑아 자료실 검색어로 쓴다 */
+const keyTerms = p => { const t = [p.title, p.subhead, p.body, p.quote?.text, (p.stats || []).map(x => x.value).join(' ')].filter(Boolean).join(' ');
+  const nums = [...new Set((t.match(/\d[\d,.]*\s?(?:만|천|억)?\s?(?:명|개|원|장|대|건|분|시간|m|km|kg|%|마리|석|세트|종|면)?/g) || []).map(x => x.trim()).filter(x => /[^\d,.\s]$/.test(x) || x.replace(/\D/g, '').length >= 3))];
+  const hs = [...new Set((p.author?.handle ? [p.author.handle] : []).concat(t.match(/@[a-z0-9_.]+/gi) || []))];
+  return hs.concat(nums).slice(0, 8); };
 const SWATCHES = ['#1d4ed8', '#0f766e', '#db2777', '#7c3aed', '#ea580c', '#4b5563', '#0891b2', '#b91c1c'];
 const HEARSAY = /(들었는데|들었어|들음|들은 얘기|들은 이야기|래요|대요|카더라|라던데|라더라|이래요|소문|친구가|친구 사촌|사촌|지인이|누가 그러는데|라고 함|라고 합니다|라고 해요|제보)/g;
 const S = { team: null, screen: false, data: null, version: 0, tab: 'feed', fmt: null, filter: 'all', modal: null, modalRendered: null, mstep: 'thumb', open: {}, draft: {}, form: null, editing: null, busy: false };
@@ -1000,13 +1006,13 @@ const kindChip = a => { const k = kindOf(a), d = C.AUTHOR_KINDS[k]; return `<spa
 // 자료실 등록 계정 대조: 공식·언론사·크리에이터가 자료실 목록에 있는지
 function regCheck(a) {
   const h = handleOf(a).toLowerCase(), k = kindOf(a);
-  const hit = A.accounts.find(x => x.handle.replace(/^@/, '').toLowerCase() === h);
-  if (hit) return { cls: 'ok', text: `자료실 등록 계정 (${hit.name}, ${C.AUTHOR_KINDS[hit.kind].label}, 인증)` };
+  const hit = REG_ACCOUNTS.find(x => x.handle.replace(/^@/, '').toLowerCase() === h);
+  if (hit) return { cls: 'ok', text: `자료실 등록 계정부에 있음 (${hit.name}, ${C.AUTHOR_KINDS[hit.kind].label}, 인증)` };
   if (k === 'official' || k === 'press') {
-    const near = A.accounts.find(x => (a.name || '').replace(/\s/g, '').includes(x.name.replace(/\s/g, '')) || x.name.replace(/\s/g, '').includes((a.name || '').replace(/\s/g, '').slice(0, 3)));
-    return { cls: 'no', text: `자료실에 등록되지 않은 ${C.AUTHOR_KINDS[k].label} 계정${near ? ` (등록된 ${near.name}은 ${near.handle})` : ''}` };
+    const near = REG_ACCOUNTS.find(x => (a.name || '').replace(/\s/g, '').includes(x.name.replace(/\s/g, '')) || x.name.replace(/\s/g, '').includes((a.name || '').replace(/\s/g, '').slice(0, 3)));
+    return { cls: 'no', text: `등록 계정부에 없는 ${C.AUTHOR_KINDS[k].label} 계정${near ? ` (등록된 ${near.name}은 ${near.handle})` : ''}` };
   }
-  return { cls: 'na', text: '개인·크리에이터 계정은 자료실에 따로 등록되지 않습니다. 가입일·팔로워·조회수를 비교하세요.' };
+  return { cls: 'na', text: '개인·크리에이터 계정은 등록 계정부에 없습니다. 내용이 자료실과 맞는지 보세요.' };
 }
 
 async function api(path, body) {
@@ -1102,11 +1108,10 @@ function render() {
 function showTab(t) {
   S.tab = t;
   $$('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
-  ['feed', 'archive', 'make', 'score', 'help', 'admin'].forEach(x => $('#tab-' + x).hidden = x !== t);
+  ['feed', 'make', 'score', 'help', 'admin'].forEach(x => $('#tab-' + x).hidden = x !== t);
   $('main').classList.toggle('wide', t === 'make');
   if (t === 'admin') adShow();
   if (t === 'help') renderHelp();
-  if (t === 'archive') renderArchive();
   if (t === 'feed') { S.fmt = null; renderFeed(); icons(); }
   window.scrollTo({ top: 0 });
 }
@@ -1455,21 +1460,12 @@ function neighborPost(dir, format) {
 }
 
 // ---------- 상세 창: 왼쪽(화면·재생) + 오른쪽(확인·판별) ----------
-function vpanelHTML(p, c) {
-  const a = p.author || {}, k = kindOf(a), reg = regCheck(a);
-  if (c === 'who') return `<b>${C.CRITERIA.who.label}</b> ${kindChip(a)}${a.verified ? ` <span class="small" style="color:var(--verify);font-weight:700">인증 배지 있음</span>` : ' <span class="small muted">인증 배지 없음</span>'}
-    <dl><dt>이름</dt><dd>${esc(a.name || '-')}${vbadge(a)}</dd><dt>계정</dt><dd>${esc(a.handle || '-')}</dd>${a.reporter ? `<dt>기자</dt><dd>${esc(a.reporter)}</dd>` : ''}<dt>가입한 때</dt><dd>${esc(a.joined || '정보 없음')}</dd><dt>${followLabel(p, a)}</dt><dd>${esc(a.followers || '정보 없음')}</dd><dt>게시물 수</dt><dd>${esc(a.posts || '-')}</dd><dt>조회수</dt><dd>${esc(p.views || '-')}</dd><dt>좋아요</dt><dd>${esc(p.likes || '-')}</dd>${a.bio ? `<dt>소개</dt><dd style="font-weight:500">${esc(a.bio)}</dd>` : ''}</dl>
-    <div class="reg ${reg.cls}">${reg.text}</div>
-    <p class="small muted" style="margin:8px 0 0">${esc(C.AUTHOR_KINDS[k].desc)} ${followLabel(p, a)}에 비해 조회수·좋아요가 지나치게 크면 의심해 보세요. 프로필(이름)을 누르면 계정 정보가 열립니다.</p>`;
-  if (c === 'when') return `<b>${C.CRITERIA.when.label}</b><dl><dt>올린 때</dt><dd>${esc(p.postedAt || '정보 없음')}</dd>${p.editedAt ? `<dt>수정한 때</dt><dd>${esc(p.editedAt)}</dd>` : ''}<dt>${p.format === 'shorts' ? '영상 찍은 때' : '사진 찍은 때'}</dt><dd>${p.imageId || p.photoTakenAt ? esc(p.photoTakenAt || '사진 정보 없음') : '사진 없음'}</dd></dl>
-    <details><summary>자료실 연표 보기</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}${A.recent.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}</li>`).join('')}</ul></details>`;
-  if (c === 'witness') { const text = esc((p.title ? p.title + '\n' : '') + (p.subhead ? p.subhead + '\n' : '') + (p.body || '') + (p.quote?.text ? '\n"' + p.quote.text + '" - ' + (p.quote.who || '') : '')).replace(HEARSAY, '<mark class="hear">$1</mark>'); return `<b>${C.CRITERIA.witness.label}</b><p class="small muted" style="margin:4px 0">건너 들은 말로 보이는 부분을 노랗게 표시했습니다. 표시가 없어도 직접 봤는지, 말한 사람의 이름·소속이 있는지 따져 보세요.</p><div style="white-space:pre-wrap;font-size:13px">${text}</div>`; }
-  return `<b>${C.CRITERIA.cross.label}</b><p class="small muted" style="margin:4px 0">자료실 요약입니다. 전체는 왼쪽 메뉴 <b>자료실</b>에서 보세요.</p>
-    <details open><summary>숫자·시간</summary><ul>${A.overview.map(x => `<li>${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.ferry.map(x => `<li>배 ${esc(x.k)}: ${esc(x.v)}</li>`).join('')}${A.numbers.cards.map(x => `<li>${esc(x.label)} ${esc(x.value)} (${esc(x.note)})</li>`).join('')}<li>${esc(A.numbers.recent)}</li></ul></details>
-    <details><summary>구역·놀이기구</summary><ul>${A.zones.map(z => `<li>${esc(z.name)}: ${esc(z.desc)}</li>`).join('')}</ul></details>
-    <details><summary>최근 소식 (드론쇼·팝업·아기 기린·신메뉴·러닝 크루·AI 합성)</summary><ul>${A.recent.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}</ul></details>
-    <details><summary>섬이 안 보인 날·이상 현상</summary><ul>${A.timeline.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}${A.incidents.map(t => `<li><b>${esc(t.when)}</b> ${esc(t.what)}. ${esc(t.detail)}</li>`).join('')}</ul></details>
-    <details><summary>운영실 입장·등록 계정</summary><ul>${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}${A.accounts.map(x => `<li>${esc(x.name)} ${esc(x.handle)} (${esc(C.AUTHOR_KINDS[x.kind].label)}, 인증)</li>`).join('')}</ul></details>`;
+function arcLookHTML(p) {
+  const terms = keyTerms(p);
+  return `<div class="side-h">${ic('library-big')}자료실과 대조하기</div>
+    <div class="arc-look"><form class="arc-q" data-arcform="${p.id}"><input class="input" name="q" maxlength="40" placeholder="자료실 검색어 (예: 키링, 막배, @doroilbo)" aria-label="자료실 검색어"><button type="submit" class="btn btn-primary">${ic('external-link')}자료실 열기</button></form>
+    ${terms.length ? `<div class="arc-terms">${terms.map(x => `<a class="term" href="${arcUrl(x)}" target="_blank" rel="noopener">${ic('search')}${esc(x)}</a>`).join('')}</div>` : ''}
+    <p class="small muted" style="margin:0">새 탭에 자료실이 열립니다. 글에 나온 숫자, 시간, 계정이 문서와 맞는지 하나씩 맞춰 보세요.</p></div>`;
 }
 function verdictBadge(v) { return { real: '<span class="badge b-real">진짜</span>', fake: '<span class="badge b-fake">가짜</span>', unsure: '<span class="badge b-unsure">모르겠음</span>' }[v] || ''; }
 function judgeHTML(p) {
@@ -1477,11 +1473,11 @@ function judgeHTML(p) {
   if (p.seed && mine && p.answer) return '';   // 예제는 한 번 판정하면 해설로 넘어감
   const dft = S.draft[p.id] || (mine ? { ...mine } : {}); S.draft[p.id] = dft;
   const vbtn = (v, l, i) => `<button type="button" class="vd" data-act="verdict" data-id="${p.id}" data-v="${v}" aria-pressed="${dft.verdict === v}">${ic(i)}${l}</button>`;
-  const crits = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="crit" data-act="crit" data-id="${p.id}" data-c="${k}" aria-pressed="${dft.criterion === k}">${ic(c.icon)}${c.label}</button>`).join('');
+  const docs = `<select class="input" data-act="basisdoc" data-id="${p.id}" aria-label="대조한 자료실 문서"><option value="">대조한 자료실 문서를 고르세요</option>${docOptions(dft.doc)}</select>`;
   return `<div class="judge">${mine ? `<div class="done-judge"><span class="muted">우리 조 판정</span>${verdictBadge(mine.verdict)}</div>` : `<p class="judge-q">이 글, 진짜일까요?</p>`}
     <div class="judge-row seg">${vbtn('real', '진짜', 'circle-check')}${vbtn('fake', '가짜', 'circle-x')}${vbtn('unsure', '모르겠음', 'circle-help')}</div>
-    <div class="flabel">어디서 알아챘나요?</div><div class="judge-row">${crits}</div>
-    <input class="input" data-act="reason" data-id="${p.id}" maxlength="120" placeholder="이유 한 줄 (예: 가입한 지 2일 된 계정)" value="${esc(dft.reason || '')}" aria-label="판단 이유">
+    <div class="flabel">어느 문서와 맞춰 봤나요?</div>${docs}
+    <input class="input" data-act="reason" data-id="${p.id}" maxlength="80" placeholder="한 줄 메모 (예: 키링은 하루 400개인데 3,000개라고 씀)" value="${esc(dft.reason || '')}" aria-label="판단 메모">
     <p class="err" data-err="${p.id}"></p><div><button type="button" class="btn btn-primary" data-act="submit-judge" data-id="${p.id}">${mine ? '판정 바꾸기' : '판정 제출'}</button></div></div>`;
 }
 /* 해설: 긴 글을 문장 단위로 쪼개 목록으로. 첫 문장("가짜입니다." 같은 판정)은 머리띠가 대신하므로 뺀다 */
@@ -1495,11 +1491,11 @@ function answerHTML(p) {
     let ss = sentences(a.explain); if (ss.length > 1 && /^(가짜|진짜|믿기 어렵)/.test(ss[0]) && ss[0].length < 16) ss = ss.slice(1);
     return `<div class="answer ${a.truth}">${head(a.truth, '예시 해설')}<div class="ans-body">
       <ul class="ans-list">${ss.map(s => `<li>${ic(a.truth === 'fake' ? 'search-x' : 'badge-check')}<span>${esc(s)}</span></li>`).join('')}</ul>
-      ${cr || tc ? `<div class="ans-cards">${cr ? card(cr.icon, a.truth === 'fake' ? '들통나는 곳' : '진짜인 근거', cr.label, cr.hint) : ''}${tc ? card('drama', '쓴 수법', tc.id, tc.desc) : ''}</div>` : ''}
+      ${a.doc || a.part || tc ? `<div class="ans-cards">${a.doc ? card('file-text', a.truth === 'fake' ? '어긋난 자료실 문서' : '근거가 된 자료실 문서', a.doc, '') : ''}${a.part ? card('search-x', '거짓으로 쓴 곳', a.part, '') : ''}${tc ? card('drama', '쓴 수법', tc.id, tc.desc) : ''}</div>` : ''}
       ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
-  if (revealed(p) && p.secret) { const s = p.secret, cr = s.clueCriterion ? C.CRITERIA[s.clueCriterion] : null;
+  if (revealed(p) && p.secret) { const s = p.secret, ck = clueKind(s.clueKind);
     return `<div class="answer ${s.truth}">${head(s.truth, `${p.team}조가 만든 ${s.truth === 'fake' ? '가짜' : '진짜'}`)}<div class="ans-body">
-      <div class="ans-cards">${s.clue ? card(cr ? cr.icon : 'files', s.truth === 'real' ? '근거가 된 자료실 내용' : `숨긴 단서${cr ? ` · ${cr.label}` : ''}`, s.clue, '') : ''}${s.tactic ? card('drama', '쓴 수법', s.tactic, (C.TACTICS.find(x => x.id === s.tactic) || {}).desc) : ''}</div>
+      <div class="ans-cards">${s.fact ? card('file-text', s.truth === 'real' ? '근거가 된 자료실 문서' : '어긋난 자료실 문서', s.fact, '') : ''}${s.truth !== 'real' && ck ? card(ck.icon, '거짓으로 쓴 곳', ck.label, s.clue || '') : s.truth !== 'real' && s.clue ? card('search-x', '숨긴 단서', s.clue, '') : ''}${s.tactic ? card('drama', '쓴 수법', s.tactic, (C.TACTICS.find(x => x.id === s.tactic) || {}).desc) : ''}</div>
       ${p.counts ? countsHTML(p.counts) : ''}</div></div>`; }
   return '';
 }
@@ -1512,11 +1508,10 @@ function statusHTML(p) {
   return s.truth === 'real' ? `<div class="status-line st-approved">${ic('badge-check')}우리 조가 만든 진짜 · 근거: ${esc(s.clue || '-')}</div>` : `<div class="status-line st-pending">${ic('drama')}우리 조가 만든 가짜 · 수법: ${esc(s.tactic || '-')} · 단서: ${esc(s.clue || '-')}</div>`;
 }
 function sideHTML(p) {
-  const open = S.open[p.id] === undefined && canJudge(p) && !S.data.myJudgments[p.id] ? 'cross' : S.open[p.id], own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
-  const vbar = Object.entries(C.CRITERIA).map(([k, c]) => `<button type="button" class="vbtn" data-act="verify" data-id="${p.id}" data-c="${k}" aria-expanded="${open === k}">${ic(c.icon)}${c.label}</button>`).join('');
+  const own = !!p.mine, a = p.author || {}, f = C.FORMATS[p.format] || {};
   return `${statusHTML(p)}
       <div class="side-who">${whoBtn(p, `<span class="avatar" style="background:${esc(a.color || '#4b5563')}">${initials(a.name)}</span>`)}<div style="min-width:0"><div class="nm">${whoBtn(p, esc(a.name || '이름 없음') + vbadge(a))}</div><div class="meta">${esc(f.label || '')} · ${esc(a.handle || '')} · ${kindChip(a)}${a.followers ? ` · ${followLabel(p, a)} ${esc(a.followers)}` : ''}</div></div></div>
-      <div class="side-h">${ic('search-check')}확인하기</div><div class="verify">${vbar}</div>${open ? `<div class="vpanel">${vpanelHTML(p, open)}</div>` : ''}
+      ${arcLookHTML(p)}
       ${canJudge(p) ? judgeHTML(p) : ''}${answerHTML(p)}
       ${own || revealed(p) ? `<div class="row-actions"><button type="button" class="btn btn-ghost" data-act="png" data-id="${p.id}">${ic('image-down')}이미지로 저장</button>${own && S.data.phase === 'make' ? `<button type="button" class="btn btn-ghost" data-act="edit" data-id="${p.id}">${ic('pencil')}고치기</button><button type="button" class="btn btn-ghost" data-act="del" data-id="${p.id}" style="color:var(--fake)">${ic('trash-2')}지우기</button>` : ''}</div>` : ''}`;
 }
@@ -1580,6 +1575,7 @@ document.addEventListener('click', async e => {
   if (e.target.closest('[data-act="me-msg"]')) { toast('이 활동에서는 쓰지 않는 기능이에요.'); return; }
   if (e.target.closest('[data-act="home"]')) { S.fmt = null; renderTwist(); renderFeed(); icons(); return; }
   const g = e.target.closest('[data-goto]'); if (g) { const keep = S.fmt; showTab(g.dataset.goto); if (g.dataset.goto === 'make') S.fmt = keep; return; }
+  const ht = e.target.closest('[data-help]'); if (ht) { S.help.topic = ht.dataset.help; S.help.q = ''; renderHelp(); return; }
   const pr = e.target.closest('[data-profile]'); if (pr) { openProfile(pr.dataset.profile); return; }
   if (e.target === $('#prof') || e.target.closest('[data-act="prof-close"]')) { $('#prof').hidden = true; return; }
   const vote = e.target.closest('[data-vote]'); if (vote) { const poll = vote.closest('.stk-poll'); if (poll && !poll.classList.contains('voted')) { const pa = +poll.dataset.pa; poll.classList.add('voted'); const [ba, bb] = poll.querySelectorAll('button'); ba.querySelector('i').style.width = pa + '%'; bb.querySelector('i').style.width = (100 - pa) + '%'; ba.querySelector('span').textContent += ` ${pa}%`; bb.querySelector('span').textContent += ` ${100 - pa}%`; } return; }
@@ -1600,6 +1596,8 @@ document.addEventListener('click', async e => {
   if (act === 'del') deleteOwn(id);
 });
 document.addEventListener('input', e => { if (e.target.dataset.act === 'reason') (S.draft[e.target.dataset.id] ||= {}).reason = e.target.value; });
+document.addEventListener('change', e => { if (e.target.dataset.act === 'basisdoc') (S.draft[e.target.dataset.id] ||= {}).doc = e.target.value; });
+document.addEventListener('submit', e => { const f = e.target.closest('[data-arcform]'); if (f) { e.preventDefault(); window.open(arcUrl(f.q.value.trim()), '_blank', 'noopener'); } });
 $('#pmX').onclick = closePost; $('#pmPrev').onclick = () => stepPost(-1); $('#pmNext').onclick = () => stepPost(1);
 document.addEventListener('keydown', e => {
   if (!$('#prof').hidden && e.key === 'Escape') { $('#prof').hidden = true; return; }
@@ -1624,9 +1622,9 @@ document.addEventListener('wheel', e => { const m = e.target.closest('.post-medi
 async function submitJudge(id, btn) {
   const dft = S.draft[id] || {}, errEl = $(`[data-err="${id}"]`);
   if (!dft.verdict) { errEl.textContent = '진짜, 가짜, 모르겠음 중에 골라 주세요.'; return; }
-  if (dft.verdict !== 'unsure' && !dft.criterion) { errEl.textContent = '어떤 기준으로 판단했는지 골라 주세요.'; return; }
+  if (dft.verdict !== 'unsure' && !dft.doc) { errEl.textContent = '대조한 자료실 문서를 골라 주세요.'; return; }
   btn.disabled = true;
-  try { await api('/judge', { team: S.team, postId: id, verdict: dft.verdict, criterion: dft.criterion, reason: dft.reason || '' }); delete S.draft[id]; toast('판정을 제출했습니다. →로 다음 게시물을 보세요.'); await refresh(); }
+  try { await api('/judge', { team: S.team, postId: id, verdict: dft.verdict, criterion: dft.verdict === 'unsure' ? null : 'cross', reason: (dft.doc ? `[${dft.doc}] ` : '') + (dft.reason || '') }); delete S.draft[id]; toast('판정을 제출했습니다. →로 다음 게시물을 보세요.'); await refresh(); }
   catch (err) { errEl.textContent = err.message; btn.disabled = false; }
 }
 async function deleteOwn(id) {
@@ -1648,10 +1646,10 @@ function resetForm() {
   S.form = { format: first, tactic: '', clueCriterion: null, clueKind: '', fact: '', clue: '', kind: 'person', name: '', handle: '', joined: '', followers: '', posts: '', bio: '', color: SWATCHES[(S.team || 1) % SWATCHES.length],
     truth: 'fake', basis: '', reporter: '', likes: '', views: '', commentCount: '', thumbTpl: 'auto', thumbTitle: '', thumbImageId: null, title: '', subhead: '', body: '', tags: '', place: '', poll: '', music: '', postedAt: '', photoTakenAt: '', imageId: null, extraImages: [],
     quoteText: '', quoteWho: '', stat1L: '', stat1V: '', stat2L: '', stat2V: '' };
-  S.editing = null; S.wstep = 'secret';
+  S.editing = null; S.wstep = 'write'; S.mstep = 'detail';
 }
 /* 만들기 단계 (2026-11-09): 정하기 → 글 → 계정 → 확인·올리기. 선택 항목은 「더 채우기」로 접고, 단서가 그 항목을 쓰면 자동으로 펼친다 */
-const WIZ = [['secret', '정하기'], ['write', '글 쓰기'], ['account', '계정'], ['check', '썸네일·올리기']];
+const WIZ = [['write', '글 쓰기'], ['account', '계정'], ['secret', '진짜·가짜 정하기'], ['check', '썸네일·올리기']];
 function wizInit() {
   if (wizInit.done) return; wizInit.done = true;
   const cols = $$('.mk-body .mk-col'); if (cols.length < 4) return;
@@ -1677,7 +1675,7 @@ function wizInit() {
   if (th) wrap.appendChild(th); wrap.appendChild($('#thumbFields')); cols[0].appendChild(wrap);
   $('#mkTop').appendChild($('#myPosts'));
   // 비밀 칸 머리 문구
-  const sh = $('.mk-h', cols[3]); if (sh) sh.innerHTML = `${ic('lock-keyhole')}이 글을 진짜로 만들까요, 가짜로 만들까요? <span class="small muted" style="font-weight:400">다른 조에게는 정답 공개 때만 보입니다</span>`;
+  const sh = $('.mk-h', cols[3]); if (sh) sh.innerHTML = `${ic('lock-keyhole')}진짜로 올릴까요, 가짜로 올릴까요? <span class="small muted" style="font-weight:400">자료실 문서와 맞춰 보고 정합니다 · 다른 조에게는 정답 공개 때만 보입니다</span>`;
   $('#wizSteps').addEventListener('click', e => { const li = e.target.closest('li[data-w]'); if (li) wizGo(li.dataset.w); });
   $('#wizNav').addEventListener('click', e => { const b = e.target.closest('[data-wnav]'); if (!b) return; const i = WIZ.findIndex(w => w[0] === S.wstep);
     if (b.dataset.wnav === 'next') { if (wizCheck(S.wstep)) wizGo(WIZ[Math.min(i + 1, WIZ.length - 1)][0]); } else wizGo(WIZ[Math.max(i - 1, 0)][0]); });
@@ -1685,28 +1683,30 @@ function wizInit() {
 function wizCheck(step) {
   const f = S.form, err = $('#formErr'); err.textContent = '';
   if (step === 'secret' && f.truth !== 'real') { const k = clueKind(f.clueKind);
-    if (!k) { err.textContent = '들킬 단서 종류를 골라 주세요.'; return false; }
-    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 내용을 골라 주세요.'; return false; }
-    if (!f.clue.trim()) { err.textContent = '어떻게 다르게 쓸지 한 줄 적어 주세요.'; return false; } }
-  if (step === 'secret' && f.truth === 'real' && !f.basis) { err.textContent = '근거가 될 자료실 내용을 골라 주세요.'; return false; }
+    if (!k) { err.textContent = '어느 부분을 거짓으로 썼는지 골라 주세요.'; return false; }
+    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 문서를 골라 주세요.'; return false; }
+    if (!f.clue.trim()) { err.textContent = '자료실에는 뭐라고 되어 있고 어떻게 바꿔 썼는지 한 줄 적어 주세요.'; return false; }
+    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '계정을 거짓으로 쓰려면 계정 단계에서 종류를 공식 계정이나 언론사로 두어야 합니다.'; return false; }
+    if (k.check === 'unreg' && f.handle && REG_ACCOUNTS.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록 계정부에 있는 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return false; } }
+  if (step === 'secret' && f.truth === 'real' && !f.basis) { err.textContent = '근거가 된 자료실 문서를 골라 주세요.'; return false; }
   if (step === 'write') { if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return false; }
     if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return false; }
     if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요.'; return false; } }
   if (step === 'account' && !f.name.trim()) { err.textContent = C.FORMATS[f.format].authorLabel + '을(를) 써 주세요.'; return false; }
   return true;
 }
-function wizGo(step) { S.wstep = step; $('#formErr').textContent = ''; renderWiz(); $('#makeWrap').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+function wizGo(step) { S.wstep = step; $('#formErr').textContent = ''; if (step === 'check') S.mstep = 'thumb'; else if (step === 'write') S.mstep = 'detail'; renderWiz(); if (S.form) renderPreview(); $('#makeWrap').scrollIntoView({ block: 'start', behavior: 'smooth' }); }
 function renderWiz() {
   wizInit(); if (!S.wstep) S.wstep = 'secret';
   const i = WIZ.findIndex(w => w[0] === S.wstep), f = S.form || {}, k = clueKind(f.clueKind);
   $('#wizSteps').innerHTML = WIZ.map(([id, l], j) => `<li data-w="${id}" class="${j < i ? 'done' : ''}" ${id === S.wstep ? 'aria-current="step"' : ''}><i>${j < i ? ic('check') : j + 1}</i>${l}</li>`).join('');
   $$('.mk-body .mk-col').forEach(c => c.dataset.on = c.dataset.wstep === S.wstep ? '1' : '0');
   $('#btnSubmit').hidden = S.wstep !== 'check';
-  const needW = k && k.check === 'photo', needA = k && k.id === 'who-young';
+  const needW = false, needA = false;
   const mw = $('#moreWrite'), ma = $('#moreAccount');
   if (mw) { mw.classList.toggle('need', !!needW); if (needW) mw.open = true; }
   if (ma) { ma.classList.toggle('need', !!needA); if (needA) ma.open = true; }
-  const tip = S.wstep === 'write' && needW ? '이 단서는 「더 채우기」의 올린 때·찍은 때를 둘 다 적어야 합니다.' : S.wstep === 'account' && needA ? '이 단서는 「더 채우기」의 가입한 때·팔로워·조회수를 적어야 합니다.' : S.wstep === 'write' && k && k.check === 'hear' ? '본문에 "들었는데", "~래요", "친구가" 같은 말을 넣으세요.' : S.wstep === 'account' && k && k.check === 'unreg' ? '계정 종류를 공식 계정이나 언론사로 두고, 등록 계정과 다른 아이디를 쓰세요.' : '';
+  const tip = S.wstep === 'write' ? '오른쪽 미리보기에서 제목·부제·본문이 어디에 들어가는지 보면서 씁니다.' : S.wstep === 'account' && k && k.check === 'unreg' ? '계정 종류를 공식 계정이나 언론사로 두고, 등록 계정부와 다른 아이디를 쓰세요.' : S.wstep === 'secret' ? '자료실을 열어 글에 쓴 숫자·시간·계정이 어느 문서에 있는지 찾은 뒤 정합니다.' : '';
   $('#wizNav').innerHTML = `${i > 0 ? `<button type="button" class="btn btn-ghost" data-wnav="prev">${ic('chevron-left')}이전</button>` : '<span></span>'}<span class="grow small muted" style="align-self:center;text-align:center">${esc(tip)}</span>${i < WIZ.length - 1 ? `<button type="button" class="btn btn-primary" data-wnav="next">다음: ${WIZ[i + 1][1]}${ic('chevron-right')}</button>` : `<button type="submit" class="btn btn-primary">${ic('send')}${S.editing ? '고친 내용 올리기' : '올리기'}</button>`}`;
   icons();
 }
@@ -1739,14 +1739,15 @@ function fillForm() {
   $$('#optTruth .opt').forEach(b => b.setAttribute('aria-pressed', b.dataset.truth === f.truth));
   $('#truthHelp').textContent = f.truth === 'real' ? '진짜 글은 자료실 내용 그대로 씁니다. 진짜가 섞여 있어야 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못합니다.' : '우리 가짜에 속은 조 하나마다 1점입니다. 대신 다른 조가 찾아낼 수 있는 단서를 하나 남겨야 합니다.';
   $('#fakeFields').hidden = f.truth === 'real'; $('#realFields').hidden = f.truth !== 'real';
-  $('#fBasis').innerHTML = '<option value="">자료실 내용을 고르세요</option>' + C.FACTS.map(x => `<option ${f.basis === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  $('#fBasis').innerHTML = '<option value="">문서를 고르세요</option>' + docOptions(f.basis);
   $('#fTactic').innerHTML = `<option value="" ${f.tactic ? '' : 'selected'}>고르지 않음</option>` + C.TACTICS.map(t => `<option ${t.id === f.tactic ? 'selected' : ''}>${esc(t.id)}</option>`).join('');
   $('#tacticDesc').textContent = (C.TACTICS.find(t => t.id === f.tactic) || {}).desc || '';
-  const ck = clueKind(f.clueKind);
-  $('#fClueKind').innerHTML = `<option value="" ${ck ? '' : 'selected'}>단서 종류를 고르세요</option>` + C.CLUE_KINDS.map(k => `<option value="${k.id}" ${f.clueKind === k.id ? 'selected' : ''}>[${esc(C.CRITERIA[k.crit].label)}] ${esc(k.label)}</option>`).join('');
-  $('#clueKindHint').textContent = ck ? ck.hint : '다른 조가 자료실·계정 정보·본문에서 확인할 수 있는 단서만 됩니다. 자료실에 없는 시간이나 숫자를 바꾸는 건 아무도 못 맞춥니다.';
-  $('#factField').hidden = !(ck && ck.fact);
-  $('#fFact').innerHTML = '<option value="">자료실 내용을 고르세요</option>' + C.FACTS.map(x => `<option ${f.fact === x ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  const ck = clueKind(f.clueKind), parts = C.CLUE_KINDS.filter(x => !x.fmt || x.fmt.includes(f.format));
+  $('#optPart').innerHTML = parts.map(x => `<button type="button" class="opt" data-part="${x.id}" aria-pressed="${f.clueKind === x.id}">${ic(x.icon)}${x.label}</button>`).join('');
+  $('#partHint').textContent = ck ? ck.hint : '다른 조가 자료실 문서로 확인할 수 있는 곳이어야 합니다. 자료실에 없는 숫자나 시간을 바꾸는 건 아무도 못 맞춥니다.';
+  $('#fFact').innerHTML = '<option value="">문서를 고르세요</option>' + docOptions(f.fact);
+  if (document.activeElement !== $('#fArcQ')) $('#fArcQ').value = f.arcQ || '';
+  const live = $('.mk-live'); if (live && S.wstep === 'secret') live.dataset.focus = f.truth !== 'real' && ck ? ({ title: 'title', subhead: 'subhead', body: 'body', stats: 'stats', quote: 'quote', account: 'by', time: 'by' })[ck.id] || '' : '';
   $('#swatches').innerHTML = SWATCHES.map(c => `<button type="button" class="sw" data-color="${c}" style="background:${c}" aria-label="프로필 색 ${c}" aria-pressed="${f.color === c}"></button>`).join('');
   $('#fNameLabel').textContent = fmt.authorLabel; $('#fName').placeholder = isNews ? '예: 도로일보' : isShorts ? '예: 놀이기구정복러' : '예: 여행하는 다은';
   $('#fFollowersLabel').textContent = isShorts ? '구독자 수' : '팔로워 수';
@@ -1757,7 +1758,6 @@ function fillForm() {
   Object.entries(FIELD_MAP).forEach(([id, k]) => { const el = $('#' + id); if (el && document.activeElement !== el) el.value = f[k] || ''; });
   $('#thumb').hidden = !f.imageId; $('#dropCta').hidden = !!f.imageId; if (f.imageId) $('#thumbImg').src = imgSrc(f.imageId);
   $('#extraThumbs').innerHTML = (f.extraImages || []).map((id, i) => `<span class="ex-img"><img src="${imgSrc(id)}" alt=""><button type="button" data-rmextra="${i}" aria-label="사진 빼기">×</button></span>`).join('');
-  $('#btnPolish').disabled = !d.aiEnabled || S.busy; $('#btnPolish').title = d.aiEnabled ? '' : 'AI 기능이 꺼져 있습니다';
   $('#btnSubmit').textContent = S.editing ? '수정 완료' : '공유하기'; $('#btnSubmit').disabled = d.phase !== 'make';
   $('#igcTitle').textContent = S.editing ? '게시물 수정' : `새 ${fmt.label} 만들기`;
   $('#btnCancelEdit').hidden = !S.editing;
@@ -1804,6 +1804,8 @@ $('#postForm').addEventListener('click', e => {
   else if (b.dataset.color) S.form.color = b.dataset.color;
   else if (b.dataset.tpl && !b.disabled) S.form.thumbTpl = b.dataset.tpl;
   else if (b.dataset.mstep) S.mstep = b.dataset.mstep;
+  else if (b.dataset.part) { S.form.clueKind = b.dataset.part; S.form.clueCriterion = (clueKind(b.dataset.part) || {}).crit || 'cross'; }
+  else if (b.id === 'btnArcOpen') { S.form.arcQ = $('#fArcQ').value.trim(); window.open(arcUrl(S.form.arcQ), '_blank', 'noopener'); return; }
   else if (b.dataset.rmextra !== undefined) S.form.extraImages.splice(+b.dataset.rmextra, 1);
   else if (b.id === 'thumbUseMain') S.form.thumbImageId = null;
   else return;
@@ -1813,10 +1815,14 @@ $('#postForm').addEventListener('input', e => {
   if (FIELD_MAP[e.target.id]) { S.form[FIELD_MAP[e.target.id]] = e.target.value; renderPreview(); }
 });
 document.addEventListener('change', e => { const ss = e.target.closest('[data-stepsel]'); if (!ss) return; const v = ss.value, [ph, f] = v.split(':'); if (!(ph === S.data.phase && f === S.data.round)) goStep(v); else renderOpBar(); });
-$('#fClueKind').addEventListener('change', e => { S.form.clueKind = e.target.value; const k = clueKind(e.target.value); S.form.clueCriterion = k ? k.crit : null; if (!(k && k.fact)) S.form.fact = ''; fillForm(); });
 $('#fFact').addEventListener('change', e => { S.form.fact = e.target.value; });
 $('#fTactic').addEventListener('change', e => { S.form.tactic = e.target.value; fillForm(); });
 $('#fBasis').addEventListener('change', e => { S.form.basis = e.target.value; });
+$('#fArcQ').addEventListener('input', e => { S.form.arcQ = e.target.value; });
+$('#fArcQ').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#btnArcOpen').click(); } });
+/* 입력칸에 커서가 가면 미리보기의 그 부위를 테두리로 표시 */
+const FOCUS_PART = { fTitle: 'title', fSubhead: 'subhead', fBody: 'body', fQuoteText: 'quote', fQuoteWho: 'quote', fStat1L: 'stats', fStat1V: 'stats', fStat2L: 'stats', fStat2V: 'stats', fName: 'by', fHandle: 'by', fReporter: 'by', fPosted: 'by', fPlace: 'fig', fTaken: 'fig' };
+$('#postForm').addEventListener('focusin', e => { const l = $('.mk-live'); if (l && S.wstep !== 'secret') l.dataset.focus = FOCUS_PART[e.target.id] || ''; });
 function shrink(file) {
   return new Promise((res, rej) => {
     const url = URL.createObjectURL(file), img = new Image();
@@ -1840,13 +1846,6 @@ const dz = $('#dropZone');
 ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
 dz.addEventListener('drop', e => { const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')); if (f) uploadFile(f, S.form.imageId ? 'extra' : 'imageId'); else toast('사진 파일만 넣을 수 있습니다.'); });
 $('#btnRmImg').onclick = () => { S.form.imageId = null; fillForm(); };
-$('#btnPolish').onclick = async e => {
-  const btn = e.currentTarget, label = btn.innerHTML;
-  if ((S.form.body || '').trim().length < 5) { toast('다듬을 글을 먼저 써 주세요.'); return; }
-  S.busy = true; btn.innerHTML = '다듬는 중…'; btn.disabled = true;
-  try { const r = await api('/ai/polish', { team: S.team, text: S.form.body, format: S.form.format }); S.form.body = r.text; $('#fBody').value = r.text; renderPreview(); toast('말투를 다듬었습니다. 꼭 다시 읽어 보세요.'); } catch (err) { toast(err.message); }
-  btn.innerHTML = label; S.busy = false; fillForm();
-};
 function startEdit(id) {
   const p = myPosts().find(x => x.id === id); if (!p) return;
   const s = p.secret || {}, a = p.author || {}, st = p.stats || [];
@@ -1865,15 +1864,13 @@ $('#postForm').addEventListener('submit', async e => {
   if (!f.body.trim() && !f.title.trim()) { err.textContent = '글을 써 주세요.'; return; }
   if (f.format === 'news' && !f.title.trim()) { err.textContent = '기사 제목을 써 주세요.'; return; }
   if (f.format === 'news' && paras(f.body).length < 2) { err.textContent = '기사는 문단을 2개 이상(빈 줄로 나눠) 써 주세요. 진짜 기사처럼 보여야 합니다.'; return; }
-  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 자료실 내용을 골라 주세요.'; return; }
-  if (f.truth !== 'real') { const k = clueKind(f.clueKind), allText = [f.title, f.subhead, f.body, f.quoteText].join('\n');
-    if (!k) { err.textContent = '가짜 게시물은 들킬 단서 종류를 골라 주세요.'; return; }
-    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 내용을 골라 주세요.'; return; }
-    if (!f.clue.trim()) { err.textContent = '어떻게 다르게 썼는지 한 줄 적어 주세요.'; return; }
-    if (k.check === 'hear' && !new RegExp(HEARSAY.source).test(allText)) { err.textContent = '들은 이야기 단서는 본문에 "들었는데", "~래요", "친구가" 같은 말이 있어야 합니다.'; return; }
-    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '이 단서는 계정 종류를 공식 계정이나 언론사로 두어야 합니다.'; return; }
-    if (k.check === 'unreg' && f.handle && A.accounts.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록된 계정 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return; }
-    if (k.check === 'photo' && !(f.postedAt && f.photoTakenAt)) { err.textContent = '올린 때와 찍은 때를 둘 다 적어 주세요.'; return; } }
+  if (f.truth === 'real' && !f.basis) { err.textContent = '진짜 게시물은 근거가 된 자료실 문서를 골라 주세요.'; return; }
+  if (f.truth !== 'real') { const k = clueKind(f.clueKind);
+    if (!k) { err.textContent = '어느 부분을 거짓으로 썼는지 골라 주세요.'; return; }
+    if (k.fact && !f.fact) { err.textContent = '어긋나게 쓴 자료실 문서를 골라 주세요.'; return; }
+    if (!f.clue.trim()) { err.textContent = '자료실에는 뭐라고 되어 있고 어떻게 바꿔 썼는지 한 줄 적어 주세요.'; return; }
+    if (k.check === 'unreg' && !(f.kind === 'official' || f.kind === 'press')) { err.textContent = '계정을 거짓으로 쓰려면 계정 종류를 공식 계정이나 언론사로 두어야 합니다.'; return; }
+    if (k.check === 'unreg' && f.handle && REG_ACCOUNTS.some(x => x.handle.replace(/^@/, '').toLowerCase() === f.handle.replace(/^@/, '').toLowerCase())) { err.textContent = '등록 계정부에 있는 아이디와 같습니다. 다른 아이디로 써야 합니다.'; return; } }
   const btn = $('#btnSubmit'); btn.disabled = true;
   const pv = previewPost();
   try {
@@ -1958,79 +1955,57 @@ $('#adResetBtn').onclick = async () => {
 };
 
 // ---------- 자료실 (도로랜드 정리본) ----------
-function renderArchive() {
-  const max = Math.max(...A.numbers.yearly.map(y => y.value));
-  $('#archiveBody').innerHTML = `
-  <div class="arc-hero"><h2>${ic('library-big')}도로랜드 자료실</h2><p>${esc(A.intro)}</p><p class="small" style="opacity:.85">${esc(A.weather)}</p></div>
-  <div class="arc-grid">
-    <div class="arc-card"><h3>${ic('map')}한눈에 보기</h3><dl class="kv">${A.overview.map(x => `<dt>${esc(x.k)}</dt><dd>${esc(x.v)}</dd>`).join('')}</dl></div>
-    <div class="arc-card"><h3>${ic('ship')}배 시간표</h3><dl class="kv">${A.ferry.map(x => `<dt>${esc(x.k)}</dt><dd>${esc(x.v)}</dd>`).join('')}</dl><p class="small muted" style="margin:10px 0 0">섬에서 나오는 마지막 배가 7시 30분이라 그 뒤의 섬 안 이야기는 직원이 아니면 할 수 없습니다.</p></div>
-  </div>
-  <div class="arc-card"><h3>${ic('ferris-wheel')}구역과 놀이기구</h3><div class="zone-list">${A.zones.map(z => `<div class="zone"><b>${esc(z.name)}</b><span>${esc(z.desc)}</span></div>`).join('')}</div></div>
-  <div class="arc-grid">
-    <div class="arc-card"><h3>${ic('bar-chart-3')}숫자로 보는 도로랜드</h3><div class="numcards">${A.numbers.cards.map(c => `<div class="numcard"><span>${esc(c.label)}</span><b>${esc(c.value)}</b><small>${esc(c.note)}</small></div>`).join('')}</div><p class="small" style="margin:12px 0 0;padding:8px 10px;border-radius:8px;background:var(--fake-bg);color:var(--fake);font-weight:700">${esc(A.numbers.recent)}</p></div>
-    <div class="arc-card"><h3>${ic('trending-up')}연간 방문객 (${esc(A.numbers.yearlyUnit)})</h3><div class="bars">${A.numbers.yearly.map(y => `<div class="bar"><b>${y.value}</b><i style="height:${Math.round(y.value / max * 100)}%"></i><span>${esc(y.label)}</span></div>`).join('')}</div><p class="small muted" style="margin:10px 0 0">5년 동안 해마다 늘었습니다. "방문객이 반으로 줄었다"는 말은 이 표와 맞지 않습니다.</p></div>
-  </div>
-  <div class="arc-grid">
-    <div class="arc-card"><h3>${ic('eye-off')}섬이 안 보인 날 (연표)</h3><div class="tl">${A.timeline.map(t => `<div class="tl-item"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
-    <div class="arc-card"><h3>${ic('alert-triangle')}최근 이상 현상 (운영실 기록)</h3><div class="tl">${A.incidents.map(t => `<div class="tl-item inc"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
-  </div>
-  <div class="arc-card"><h3>${ic('sparkles')}최근 소식 (운영실 공개 자료)</h3><div class="tl">${A.recent.map(t => `<div class="tl-item rec"><span class="w">${esc(t.when)}</span><div><b>${esc(t.what)}</b><small>${esc(t.detail)}</small></div></div>`).join('')}</div></div>
-  <div class="arc-grid">
-    <div class="arc-card"><h3>${ic('megaphone')}운영실 공식 입장</h3><ul class="stance" style="margin:0;padding-left:18px">${A.stance.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
-    <div class="arc-card"><h3>${ic('badge-check')}등록된 계정 (인증 배지)</h3>${A.accounts.map(x => `<div class="acct"><span class="avatar" style="background:${x.kind === 'official' ? '#0e4a84' : x.kind === 'press' ? '#1d4ed8' : '#ea580c'}">${initials(x.name)}</span><div><div class="nm">${esc(x.name)}<span class="vb">${ic('check')}</span><span class="kind-chip ${x.kind}">${esc(C.AUTHOR_KINDS[x.kind].label)}</span></div><div class="meta">${esc(x.handle)} · ${esc(x.joined)} 가입 · ${x.kind === 'creator' ? '구독자' : '팔로워'} ${esc(x.followers)} · ${esc(x.note)}</div></div></div>`).join('')}
-      <p class="small muted" style="margin:10px 0 0">인증 배지(파란 체크)는 도로그램이 확인한 계정에만 붙습니다. 이름에 ✓ 글자를 넣거나 "공식"이라고 쓴다고 배지가 생기지는 않습니다. 여기 없는 "도로랜드 ○○" 계정은 모두 공식이 아닙니다.</p></div>
-  </div>`;
-  icons();
-}
-
 // ---------- 도움말 ----------
 function renderHelp() {
-  const crit = C.CRITERIA;
-  $('#helpBody').innerHTML = `
-  <div class="hp"><h2>${ic('map')}도로그램은 이렇게 진행됩니다</h2>
-    <p>도로랜드가 사라졌다는 이야기가 도로그램에 퍼지고 있습니다. 어떤 글이 진짜이고 어떤 글이 가짜인지 가려내고, 직접 "진짜처럼 보이는 글"을 만들어 다른 조를 시험해 봅니다. 도로랜드를 잘 모르면 판별할 수 없으니 <b>자료실</b>부터 읽습니다.</p>
-    <div class="steps">${Object.values(C.PHASES).map((p, i) => `<div class="step"><b>${i + 1}. ${p.label}</b><span>${esc(p.desc)}</span></div>`).join('')}</div>
-    <h3>점수</h3><ul><li>다른 조 게시물을 맞게 판별하면 <b>1점</b> (근거 기준을 고른 판정만 인정)</li><li>우리 조가 만든 가짜를 다른 조가 진짜라고 믿을 때마다 <b>1점</b></li><li>예제 자료 판정은 연습이라 점수에 들어가지 않습니다.</li></ul></div>
-
-  <div class="hp"><h2>${ic('users-round')}누가 올렸는지부터 봅니다</h2>
-    <p>같은 내용이라도 <b>운영실 공식 계정</b>이 올린 것과 <b>가입 2일 된 계정</b>이 올린 것은 무게가 다릅니다. 게시물의 이름·프로필을 누르면 계정 정보(종류, 인증 배지, 가입일, 팔로워·구독자, 게시물 수, 소개)가 열리고, 자료실 등록 계정과 자동으로 대조됩니다.</p>
-    <div class="kinds4">${Object.entries(C.AUTHOR_KINDS).map(([k, v]) => `<div><b>${ic(v.icon)}${v.label}</b>${esc(v.desc)}</div>`).join('')}</div>
-    <ul style="margin-top:10px"><li><b>인증 배지</b>(파란 체크)는 도로그램이 확인한 계정에만 붙습니다. 조가 만든 글에는 붙일 수 없으니, 공식·언론사를 흉내 낸 글은 배지가 없습니다.</li><li><b>100만 구독자</b> 채널이라고 다 맞는 말을 하는 건 아니지만, 구독자 2,904명에 조회수 126만처럼 <b>숫자가 안 맞는 계정</b>은 의심합니다.</li><li>공식 계정은 <b>@doroland</b> 하나뿐입니다. "도로랜드 이벤트", "도로랜드 공식"은 모두 사칭입니다.</li></ul></div>
-
-  <div class="hp"><h2>${ic('search-check')}판별하는 법: 확인 기준 4가지</h2>
-    <p>게시물을 누르면 오른쪽에 <b>확인하기</b> 버튼 4개가 있습니다. 하나씩 눌러 단서를 찾은 뒤 진짜·가짜·모르겠음을 고르고, 어떤 기준으로 판단했는지 꼭 고릅니다.</p>
-    <div class="ex"><div><img src="images/help/ex-impersonate.jpg" alt=""><div class="cap">예제: "[긴급] 도로랜드 영구 폐장" 공지</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('user-round-search')} ${crit.who.label}</h3><p>${esc(crit.who.hint)}</p><p>이 공지는 <b>@doroland_officiall</b>이 올렸습니다. 공식 계정은 @doroland 하나뿐이고, 가입 5일, 팔로워 38명, 인증 배지 없음. 계좌번호까지 남기라고 하니 사칭입니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-oldphoto.jpg" alt=""><div class="cap">예제: "방금 도로랜드 사라지는 순간 직캠!!!"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('calendar-clock')} ${crit.when.label}</h3><p>${esc(crit.when.hint)}</p><p>"방금" 찍었다는데 <b>영상 찍은 때는 3년 전 10월 6일</b>입니다. 옛날 영상을 지금 일처럼 올린 바꿔치기입니다. 댓글에 "3년 전 영상 아님?"이라는 말도 있습니다.</p></div></div>
-    <div class="ex"><div><div style="aspect-ratio:4/3;border-radius:10px;background:linear-gradient(160deg,#ea580c,#111);color:#fff;display:grid;place-items:center;padding:16px;text-align:center;font-weight:700;line-height:1.5">친구 사촌 형이 도로랜드 직원인데요, 섬이 안 보일 때 직원들은 지하 3층으로 대피한대요.</div><div class="cap">예제: 쇼츠 자막</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('eye')} ${crit.witness.label}</h3><p>${esc(crit.witness.hint)}</p><p>글쓴이가 직접 본 게 아니라 <b>"친구 사촌 형"에게 들은 말</b>입니다. 확인하기의 "직접 목격"을 누르면 이런 표현이 노랗게 표시됩니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-expert.jpg" alt=""><div class="cap">예제: "[단독] 도로랜드 지난해 매출 반토막"</div></div><div><span class="tag" style="background:var(--fake-bg);color:var(--fake)">가짜</span><h3 style="margin-top:0">${ic('files')} ${crit.cross.label}</h3><p>${esc(crit.cross.hint)}</p><p>자료실에는 지난해 매출 <b>386억 원</b>, 방문객 <b>128만 4천 명</b>이 있는데 기사는 193억·64만 명이라고 씁니다. 도로일보 이름과 기자 이름까지 베꼈지만 계정이 @doro_ilbo(인증 없음)입니다. 맞는 숫자를 하나 섞어 그럴듯하게 만드는 게 <b>숫자 부풀리기</b>입니다.</p></div></div>
-    <div class="ex"><div><img src="images/help/ex-real.jpg" alt=""><div class="cap">예제: "롤러코스터 맨 앞자리 POV"</div></div><div><span class="tag" style="background:var(--real-bg);color:var(--real)">진짜</span><h3 style="margin-top:0">진짜 글은 이렇게 생겼습니다</h3><p>2017년부터 활동한 인증 크리에이터(구독자 112만)이고, 최고 높이 42m·시속 92km가 자료실과 맞습니다. 평범한 소식(조명 설치 기사, 츄러스 스토리)도 진짜입니다. 자극적이지 않다고 가짜가 아니고, 자극적이라고 가짜도 아닙니다.</p><p class="small muted">중요: <b>조회수·좋아요가 많다고 진짜가 아닙니다.</b> 가짜 글일수록 작은 계정인데 숫자만 크게 부풀려 놓는 경우가 많습니다.</p></div></div></div>
-
-  <div class="hp"><h2>${ic('square-plus')}게시물 만드는 법</h2>
-    <p>조마다 <b>스토리 · 쇼츠 · 기사를 1개씩</b> 만듭니다. 게시물마다 진짜인지 가짜인지 비밀 칸에서 정합니다. <b>진짜 1개 + 가짜 2개</b>처럼 섞으면 다른 조가 "조 글은 다 가짜"라고 넘겨짚지 못합니다. 형식마다 성격이 다르니 그 성격에 맞게 써야 진짜처럼 보입니다.</p>
-    <div class="fmt3">
-      <div><b>${ic('circle-dashed')}스토리</b><p>${esc(C.FORMATS.story.nature)}</p><ul><li>빈 줄로 나누면 슬라이드가 나뉘고 자동으로 넘어갑니다</li><li>위치는 위치 스티커, "질문 | 보기1 | 보기2"는 투표 스티커가 됩니다</li><li>사진을 더 넣으면 슬라이드마다 다른 사진이 나옵니다</li></ul></div>
-      <div><b>${ic('play')}쇼츠</b><p>${esc(C.FORMATS.shorts.nature)}</p><ul><li>영상 제목 + 자막(빈 줄로 장면 나눔)이 재생됩니다. 사진이 천천히 움직여 영상처럼 보입니다</li><li>채널 이름, 구독자 수, 조회수, 댓글 수, 음악을 정합니다</li><li>썸네일 디자인과 썸네일 제목을 따로 정할 수 있습니다</li></ul></div>
-      <div><b>${ic('newspaper')}기사</b><p>${esc(C.FORMATS.news.nature)}</p><ul><li>제목 + 부제 + 본문 2문단 이상 + 기자 이름</li><li>인용문(누가 말했는지)과 숫자 2개를 넣으면 기사다워집니다</li><li>"~했다, ~로 알려졌다" 기사체로 씁니다</li></ul></div>
-    </div>
-    <h3>진짜를 만들 때</h3><p>자료실에 있는 내용으로만 씁니다. 비밀 칸에서 <b>근거가 된 자료실 내용</b>을 고릅니다. 계정 종류·가입일·팔로워·조회수도 자연스럽게 맞춥니다(일반 계정이면 팔로워 수십~수백 명, 조회수도 비슷하게).</p>
-    <h3>가짜를 만들 때</h3><p>미션 카드의 수법을 씁니다. 그리고 <b>확인 기준 4가지 중 하나로 들킬 수 있는 단서를 하나 꼭 남깁니다.</b> 단서가 없으면 판별이 찍기가 됩니다. 교묘하게 만들려면 맞는 숫자·시간을 여러 개 섞고 틀린 것은 하나만 넣으세요.</p>
-    <ul>${C.TACTICS.map(t => `<li><b>${esc(t.id)}</b>: ${esc(t.desc)}</li>`).join('')}</ul>
-    <h3>잘 만든 단서의 예</h3><ul><li>작성자: 공식 계정은 @doroland인데 <b>@doroland_kr</b>로 씀 / 가입한 지 2일, 팔로워 15명인데 조회수 30만 / 언론사인데 기자 이름이 없음</li><li>날짜: "방금" 찍었다면서 사진 찍은 때를 3년 전으로 적음 / 15주년 행사를 10월에 함</li><li>직접 목격: "직원 지인한테 들었는데"로 시작</li><li>자료 대조: 막배는 7시 30분인데 "밤 9시 막배"라고 씀 / 매출 386억을 193억으로 씀</li></ul>
-    <div class="ok-no"><div class="ok"><b>${ic('check')} 해도 되는 것</b>도로랜드 안의 사건·놀이기구·캐릭터 이야기, 지어낸 계정 이름, 노트북 사진 자료실의 사진, AI로 말투 다듬기</div><div class="no"><b>${ic('x')} 하면 안 되는 것</b>실제 사람(친구, 선생님, 연예인) 이름이나 사진, 욕설·폭력적 표현, 다른 조 이름 언급, 전화번호 같은 개인정보</div></div>
-    <h3>썸네일과 상세 화면</h3><p>만들기 왼쪽 미리보기에서 <b>① 목록에서</b>(썸네일)와 <b>② 눌렀을 때</b>(상세 화면)를 바꿔 볼 수 있습니다. 썸네일은 누르기 전 첫인상이라 본문과 다른 사진·문구를 넣어 눈길을 끌 수도 있습니다. 그런 낚시성 썸네일도 판별 단서가 됩니다.</p></div>
-
-  <div class="hp"><h2>${ic('monitor')}화면 사용법</h2><ul>
-    <li><b>홈</b>: 위는 스토리 줄, 왼쪽은 쇼츠, 오른쪽은 뉴스입니다. 누르면 상세 창이 열립니다.</li>
-    <li><b>스토리</b>: 자동으로 넘어갑니다. 오른쪽을 누르면 다음, 왼쪽은 이전, 길게 누르면 멈춤. 끝나면 다음 계정 스토리로 넘어갑니다. 투표 스티커는 눌러 볼 수 있습니다.</li>
-    <li><b>쇼츠</b>: 자동 재생되고 끝나면 반복됩니다. 화면을 누르면 멈춤/재생, 댓글 버튼으로 댓글 창, 마우스 휠이나 ↑↓(오른쪽 화살표 버튼)로 다음 쇼츠.</li>
-    <li><b>기사</b>: 아래로 내리면 본문·숫자·인용·댓글·관련 기사가 있습니다. ←/→로 다음 게시물.</li>
-    <li><b>계정 정보</b>: 이름이나 프로필을 누르면 계정 종류·인증·가입일·팔로워·소개가 열립니다.</li>
-    <li><b>자료실</b>: 도로랜드 정리본. 판별할 때 "자료 대조"의 기준입니다.</li>
-    <li><b>필터</b>: "아직 판별 안 함"을 누르면 남은 것만 보입니다. 판별 시간에는 "예제 자료"로 예제를 다시 볼 수 있습니다.</li>
-    <li><b>이미지로 저장</b>: 정답 공개 뒤 상세 창에서 게시물을 PNG로 저장할 수 있습니다.</li></ul></div>`;
+  S.help = S.help || { topic: 'play', q: '' };
+  $('#helpBody').innerHTML = `<div class="hc-head"><h2>도움말 센터</h2><label class="hc-search">${ic('search')}<input id="helpQ" type="search" placeholder="무엇이 궁금한가요?" value="${esc(S.help.q)}" autocomplete="off"></label></div>
+  <div class="hc-topics" role="tablist">${HELP.map(t => `<button type="button" class="hc-t" role="tab" data-help="${t.id}" aria-selected="${!S.help.q && S.help.topic === t.id}">${ic(t.icon)}<b>${t.title}</b><span>${t.desc}</span></button>`).join('')}</div>
+  <div class="hc-list" id="helpList">${helpList()}</div>`;
   icons();
+  const inp = $('#helpQ'); inp.oninput = () => { S.help.q = inp.value.trim(); $('#helpList').innerHTML = helpList(); $$('[data-help]').forEach(b => b.setAttribute('aria-selected', !S.help.q && b.dataset.help === S.help.topic)); icons(); };
 }
+const qItem = (a, b, tag, open) => `<details class="hc-q"${open ? ' open' : ''}><summary>${esc(a)}${tag ? `<small>${esc(tag)}</small>` : ''}${ic('chevron-down')}</summary><p>${esc(b)}</p></details>`;
+function helpList() {
+  const q = (S.help.q || '').toLowerCase();
+  if (q) { const hits = HELP.flatMap(t => t.qs.filter(([a, b]) => (a + b).toLowerCase().includes(q)).map(([a, b]) => ({ t, a, b })));
+    return hits.length ? `<h3>검색 결과 ${hits.length}개</h3>` + hits.map(h => qItem(h.a, h.b, h.t.title, true)).join('') : `<div class="hc-empty">「${esc(S.help.q)}」에 맞는 도움말이 없습니다.</div>`; }
+  const t = HELP.find(x => x.id === S.help.topic) || HELP[0];
+  const steps = `<div class="hc-steps">${Object.values(STEP_LABEL).map((l, i) => `<span><i>${i + 1}</i>${esc(l)}</span>`).join('')}</div>`;
+  return `<h3>${t.title}</h3>${t.id === 'play' ? steps : ''}${t.qs.map(([a, b]) => qItem(a, b)).join('')}`;
+}
+const HELP = [
+  { id: 'play', icon: 'route', title: '도로그램 활동', desc: '라운드 · 단계 · 점수', qs: [
+    ['활동은 어떻게 진행되나요?', '뉴스, 쇼츠, 스토리 순서로 3라운드입니다. 라운드마다 예시 보기, 만들기, 판별, 정답 공개 순서로 진행됩니다.'],
+    ['점수는 어떻게 받나요?', '다른 조 게시물을 맞게 판별하면 1점입니다. 우리 조가 만든 가짜에 속은 조가 있으면 조마다 1점을 더 받습니다.'],
+    ['화면이 저절로 바뀌었어요', '관리자가 다음 단계로 넘기면 모든 노트북이 그 단계 화면으로 함께 이동합니다.'],
+    ['조를 잘못 골랐어요', '왼쪽 아래 조 버튼을 누르면 조 선택 화면으로 돌아갑니다.'] ] },
+  { id: 'archive', icon: 'library-big', title: '자료실', desc: '검색 · 대조 · 새 탭', qs: [
+    ['자료실은 어디서 열리나요?', '왼쪽 메뉴의 자료실, 상세 창의 자료실 열기, 만들기의 자료실 열기 버튼이 모두 새 탭으로 자료실을 엽니다.'],
+    ['무엇을 검색하나요?', '글에 나온 숫자, 가격, 시간, 계정 아이디를 그대로 검색합니다. 1,200처럼 쉼표가 있어도 됩니다.'],
+    ['검색해도 안 나와요', '다른 말로 바꿔 검색합니다. 자료실 어디에도 없는 내용이면 그 글은 자료실로 확인할 수 없는 글입니다.'],
+    ['계정도 자료실에 있나요?', '등록 계정부 문서에 공식 계정, 등록 언론사, 사칭 신고 계정이 있습니다. 공식 계정은 @doroland 하나뿐입니다.'] ] },
+  { id: 'judge', icon: 'search-check', title: '판별하기', desc: '자료실 대조 · 판정', qs: [
+    ['어떻게 판별하나요?', '상세 창 오른쪽에서 자료실을 열어 글의 숫자와 시간, 계정을 문서와 맞춰 봅니다. 그다음 진짜, 가짜, 모르겠음을 고릅니다.'],
+    ['판정만 하면 되나요?', '어느 자료실 문서와 맞춰 봤는지도 고릅니다. 문서를 고르지 않은 판정은 점수에 들어가지 않습니다.'],
+    ['파란 체크가 있으면 진짜인가요?', '아닙니다. 인증 언론사도 틀린 기사를 낼 수 있습니다. 내용이 자료실과 맞는지가 기준입니다.'],
+    ['조회수가 많으면 진짜인가요?', '아닙니다. 조회수와 좋아요는 판별 기준이 아닙니다.'] ] },
+  { id: 'make', icon: 'square-plus', title: '만들기', desc: '글 → 계정 → 정하기 → 올리기', qs: [
+    ['순서가 어떻게 되나요?', '먼저 글을 쓰고 계정을 정합니다. 그다음 자료실 문서와 맞춰 보며 진짜로 올릴지 가짜로 올릴지 정하고, 썸네일을 고른 뒤 올립니다.'],
+    ['몇 개를 만드나요?', '라운드마다 조당 2개에서 3개입니다. 노트북 두 대가 나누어 만들어도 됩니다.'],
+    ['가짜는 어떻게 만드나요?', '어느 부분을 거짓으로 썼는지 고르고, 어긋나게 쓴 자료실 문서를 고릅니다. 다른 조가 그 문서로 찾아낼 수 있어야 합니다.'],
+    ['진짜는 어떻게 만드나요?', '자료실 문서에 있는 내용으로만 쓰고 근거가 된 문서를 고릅니다. 황당해 보이는 진짜일수록 재미있습니다.'],
+    ['게시물이 돌아왔어요', '관리자가 돌려보낸 게시물입니다. 만들기 화면의 안내를 보고 고친 뒤 다시 올립니다.'] ] },
+  { id: 'view', icon: 'play', title: '게시물 보기', desc: '스토리 · 쇼츠 · 기사', qs: [
+    ['스토리는 어떻게 넘기나요?', '화면 오른쪽을 누르면 다음, 왼쪽을 누르면 이전 슬라이드입니다. 길게 누르면 멈춥니다.'],
+    ['쇼츠가 멈췄어요', '화면을 누르면 멈추고 다시 누르면 재생됩니다. 마우스 휠이나 오른쪽 화살표 버튼으로 다음 쇼츠를 봅니다.'],
+    ['기사 댓글은 어디 있나요?', '기사를 아래로 내리면 본문, 숫자, 인용, 댓글, 관련 기사가 차례로 나옵니다.'],
+    ['게시물을 사진으로 저장할 수 있나요?', '정답 공개 뒤 상세 창에서 이미지로 저장 버튼을 누르면 PNG로 저장됩니다.'] ] },
+  { id: 'safe', icon: 'shield-check', title: '안전과 규칙', desc: '써도 되는 것 · 안 되는 것', qs: [
+    ['써도 되는 내용은 무엇인가요?', '도로랜드 안의 사건, 놀이기구, 동물, 행사 이야기와 지어낸 계정 이름입니다.'],
+    ['쓰면 안 되는 내용은 무엇인가요?', '실제 사람의 이름이나 사진, 욕설과 폭력적인 표현, 다른 조 이름, 전화번호 같은 개인정보입니다.'],
+    ['문제 있는 게시물을 봤어요', '관리자에게 알립니다. 관리자는 게시물을 돌려보내거나 지울 수 있습니다.'],
+    ['내 정보가 저장되나요?', '이름, 비밀번호, 연락처는 어디에도 입력하지 않습니다. 조 번호와 올린 게시물만 서버에 남습니다.'] ] }
+];
 
 // ---------- 시작 ----------
 $$('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));

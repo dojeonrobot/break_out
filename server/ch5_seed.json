@@ -1,83 +1,6 @@
 [
  {
-  "id": "n-6y",
-  "format": "news",
-  "author": {
-   "name": "서해바다신문",
-   "handle": "@seohaenews",
-   "kind": "press",
-   "verified": true,
-   "joined": "2011.03",
-   "followers": "4.2만",
-   "posts": "18,204",
-   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
-   "color": "#1d4ed8",
-   "reporter": "정해솔"
-  },
-  "title": "\"관람차 자리에 수평선만\"… 낚싯배 선장이 본 도로랜드 20분의 공백",
-  "subhead": "6년 전 10월 9일 오후, 앞바다에서 조업하던 선장 신고… 해양경찰 \"특이사항 없음\", 운영실 \"섬 안에서는 아무 일도 없었다\"",
-  "body": "도로랜드 앞바다에서 조업하던 낚싯배 선장 김모 씨(62)가 \"관람차가 늘 보이던 자리에 수평선만 남았다\"며 해양경찰에 신고했다. 김 씨는 9일 오후 4시 20분쯤 섬 쪽을 바라보다가 섬이 보이지 않는 것을 알아챘고, 약 20분 뒤 같은 자리에 섬이 다시 보였다고 말했다.\n\n김 씨는 \"안개도 없고 파도도 잔잔한 날이었다. 30년 바다에 살았지만 이런 건 처음\"이라고 했다. 당시 배에는 김 씨와 손님 2명이 타고 있었으며, 손님들도 같은 장면을 봤다고 진술했다.\n\n해양경찰은 신고를 받고 경비정을 보냈지만 도착했을 때 섬은 평소와 같은 모습이었다. 해양경찰 관계자는 \"레이더 기록과 주변 선박 진술을 확인했으나 특이사항은 없었다\"고 밝혔다.\n\n도로랜드 운영실은 \"당일 섬 안에서는 아무런 이상을 느끼지 못했고 놀이기구도 정상 운영됐다\"며 \"방문객 안전에는 전혀 문제가 없다\"고 설명했다. 운영실에 따르면 이날 방문객은 3,210명이었다.\n\n해양기상청은 이날 도로랜드 해역에 안개 주의보가 없었고 시정(눈으로 볼 수 있는 거리)도 10km 이상이었다고 확인했다.",
-  "quote": {
-   "text": "안개도 없고 파도도 잔잔한 날이었다. 30년 바다에 살았지만 이런 건 처음이다.",
-   "who": "낚싯배 선장 김모 씨(62)"
-  },
-  "stats": [
-   {
-    "label": "섬이 안 보인 시간",
-    "value": "약 20분"
-   },
-   {
-    "label": "신고",
-    "value": "1건"
-   },
-   {
-    "label": "당일 방문객",
-    "value": "3,210명"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 앞바다",
-  "postedAt": "6년 전 · 10월 9일",
-  "editedAt": "6년 전 · 10월 10일",
-  "photoTakenAt": "6년 전 · 10월 9일",
-  "views": "2.1만",
-  "commentCount": 84,
-  "comments": [
-   {
-    "name": "바다낚시30년",
-    "text": "저도 그 근처에서 조업하는데 그날 김 선장님 무전 들었어요. 진짜 당황하셨음",
-    "likes": 212,
-    "time": "6년 전"
-   },
-   {
-    "name": "구름이",
-    "text": "안개 아니면 뭐지… 신기루?",
-    "likes": 97,
-    "time": "6년 전"
-   },
-   {
-    "name": "해솔기자팬",
-    "text": "운영실 답변이 너무 짧네요",
-    "likes": 40,
-    "time": "6년 전"
-   }
-  ],
-  "images": {
-   "main": "view from a small fishing boat on a calm grey sea, distant island amusement park with a ferris wheel barely visible, faded newspaper photo look"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "자료실 연표(6년 전 10월 9일 오후 4시 20분, 약 20분)와 숫자·시각이 모두 맞습니다. 서해바다신문은 자료실에 등록된 언론사(인증)입니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. 자료실 「섬이 안 보인 날」 연표와 날짜·시각·지속 시간이 맞고, 서해바다신문(@seohaenews)은 자료실에 등록된 언론사입니다."
-  }
- },
- {
-  "id": "n-3y",
+  "id": "n-million",
   "format": "news",
   "author": {
    "name": "도로일보",
@@ -86,1654 +9,162 @@
    "verified": true,
    "joined": "2009.07",
    "followers": "8.7만",
-   "posts": "41,377",
-   "bio": "도로랜드와 항구 도시의 소식을 가장 빠르게. 제보 doroilbo@doroilbo.kr",
-   "color": "#0f766e",
-   "reporter": "한바다"
-  },
-  "title": "도로랜드행 배 35분 출항 지연… 선장 \"섬이 보이지 않아 떠날 수 없었다\"",
-  "subhead": "3년 전 10월 6일 오전 9시 50분, 승객 312명 항구에서 대기… 해양기상청 \"안개 기록 없음\"",
-  "body": "6일 오전 9시 50분쯤 항구에서 도로랜드로 가는 10시 정각 배가 출항하지 못하고 35분 동안 항구에 묶였다. 배를 몰던 도로1호 선장은 \"출항 직전 섬 쪽을 봤는데 관람차도 섬도 보이지 않았다. 보이지 않는 곳으로 배를 띄울 수는 없었다\"고 말했다.\n\n배에는 승객 312명이 타고 있었다. 승객 일부는 \"창밖에 바다밖에 없어서 배가 고장 난 줄 알았다\"고 했고, 20여 명은 환불을 요구해 항구에서 내렸다. 섬은 오전 10시 25분쯤 평소 자리에 다시 보였고 배는 10시 35분에 출항했다.\n\n해양기상청 서해예보과는 \"당일 오전 도로랜드 해역의 시정은 15km 이상으로 안개가 낄 조건이 아니었다\"고 밝혔다. 6년 전 10월 9일에도 낚싯배 선장이 같은 현상을 신고한 적이 있어, 정확히 3년 만에 같은 일이 되풀이된 셈이다.\n\n도로랜드 운영실은 이날 오후 \"섬 안에서는 어떤 이상도 없었으며, 지연된 배의 승객 312명 전원에게 입장권을 무료로 다시 드리겠다\"고 사과했다. 운영실은 또 \"원인을 전문가와 함께 조사하겠다\"고 덧붙였다.",
-  "quote": {
-   "text": "창밖에 바다밖에 없어서 배가 고장 난 줄 알았어요. 섬이 다시 보였을 때 다들 박수를 쳤어요.",
-   "who": "승객 박모 씨(34)"
-  },
-  "stats": [
-   {
-    "label": "출항 지연",
-    "value": "35분"
-   },
-   {
-    "label": "대기 승객",
-    "value": "312명"
-   },
-   {
-    "label": "환불 요구",
-    "value": "20여 명"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 항구",
-  "postedAt": "3년 전 · 10월 6일",
-  "editedAt": "",
-  "photoTakenAt": "3년 전 · 10월 6일",
-  "views": "3.8만",
-  "commentCount": 231,
-  "comments": [
-   {
-    "name": "그날배탔던사람",
-    "text": "저 그 배에 있었어요. 진짜 창밖에 아무것도 없었음… 무료 입장권은 받았습니다",
-    "likes": 540,
-    "time": "3년 전"
-   },
-   {
-    "name": "항구상인",
-    "text": "6년 전이랑 똑같은 날짜 근처네 소름",
-    "likes": 188,
-    "time": "3년 전"
-   },
-   {
-    "name": "의심맨",
-    "text": "선장이 길 잃은 거 아님?ㅋㅋ",
-    "likes": 23,
-    "time": "3년 전"
-   }
-  ],
-  "images": {
-   "main": "crowd of passengers waiting on a harbor pier next to a white ferry, looking at an empty sea horizon, overcast morning, seen from behind"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "자료실 연표(3년 전 10월 6일 오전 9시 50분, 약 35분, 승객 312명 대기)와 맞고, 도로일보(@doroilbo)는 등록된 언론사입니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. 자료실 연표의 3년 전 기록(10월 6일, 35분, 312명)과 맞고, 6년 전 기사와 3년 간격이라는 점도 일치합니다."
-  }
- },
- {
-  "id": "n-now",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,377",
-   "bio": "도로랜드와 항구 도시의 소식을 가장 빠르게. 제보 doroilbo@doroilbo.kr",
-   "color": "#0f766e",
-   "reporter": "한바다"
-  },
-  "title": "\"눈앞에서 섬이 사라졌다\" 항구 목격자 60여 명… 3년마다 되풀이되는 '10월의 공백'",
-  "subhead": "7일 오후 5시 10분부터 약 15분, 휴대폰 영상 수십 건 올라와… 운영실 \"원인 조사 중, 섬 안은 평소와 같았다\"",
-  "body": "7일 오후 5시 10분쯤 항구에서 도로랜드 섬이 보이지 않는다는 목격담이 잇따랐다. 당시 항구에는 섬에서 나오는 배를 기다리던 사람 60여 명이 있었고, 이들 중 상당수가 휴대폰으로 영상을 찍어 도로그램에 올렸다. 영상에는 관람차가 서서히 흐려지다가 수평선만 남는 장면이 담겼다.\n\n섬은 약 15분 뒤인 오후 5시 25분쯤 같은 자리에 다시 나타났다. 그 사이 섬 안에 있던 방문객 2,400여 명은 아무런 이상을 느끼지 못했다고 운영실은 밝혔다. 섬에서 오후 5시 30분 배를 타고 나온 방문객 이모 씨(41)는 \"항구에 내리니 사람들이 우리를 유령 보듯 쳐다봤다\"고 말했다.\n\n이번 일은 6년 전 10월 9일, 3년 전 10월 6일에 이어 세 번째다. 세 번 모두 10월 초였고 3년 간격이다. 해양기상청 서해예보과 관계자는 \"7일 오후 시정은 20km로 매우 좋았다. 안개로는 설명되지 않는다\"고 말했다.\n\n도로랜드 운영실은 8일 오전 기자회견에서 \"세 차례 모두 섬 안의 시설과 사람에게는 아무 영향이 없었다\"며 \"외부 전문가와 함께 원인을 조사하고 있고, 결과가 나오는 대로 공개하겠다\"고 밝혔다. 운영실은 당분간 배 운항과 개장 시간을 평소대로 유지한다고 덧붙였다.",
-  "quote": {
-   "text": "항구에 내리니 사람들이 우리를 유령 보듯 쳐다봤어요. 우리는 섬에서 평소처럼 관람차를 탔을 뿐인데요.",
-   "who": "방문객 이모 씨(41)"
-  },
-  "stats": [
-   {
-    "label": "섬이 안 보인 시간",
-    "value": "약 15분"
-   },
-   {
-    "label": "항구 목격자",
-    "value": "60여 명"
-   },
-   {
-    "label": "섬 안 방문객",
-    "value": "2,400여 명"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 항구",
-  "postedAt": "3일 전 · 10월 7일",
-  "editedAt": "2일 전 · 10월 8일",
-  "photoTakenAt": "3일 전 · 10월 7일",
-  "views": "9.6만",
-  "commentCount": 1204,
-  "comments": [
-   {
-    "name": "항구직관러",
-    "text": "저 그 자리에 있었어요. 영상 올렸는데 조회수 미쳤음",
-    "likes": 1203,
-    "time": "3일 전"
-   },
-   {
-    "name": "수학좋아",
-    "text": "6년 전, 3년 전, 올해. 다음은 3년 뒤?",
-    "likes": 877,
-    "time": "3일 전"
-   },
-   {
-    "name": "엄마는걱정",
-    "text": "그래도 섬 안은 괜찮았다니 다행이네요",
-    "likes": 310,
-    "time": "2일 전"
-   },
-   {
-    "name": "ㅇㅇ",
-    "text": "운영실 뭔가 숨기는 듯",
-    "likes": 142,
-    "time": "2일 전"
-   }
-  ],
-  "images": {
-   "main": "island amusement park on the sea seen from a harbor, the ferris wheel looks half transparent and fading into the sky, clear weather, smartphone photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "자료실 연표(3일 전 10월 7일 오후 5시 10분, 약 15분, 목격자 60여 명)와 맞고, 등록된 언론사입니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. 세 번의 날짜와 시간이 자료실 연표와 모두 맞습니다. 섬이 사라져 '보인' 것은 사실이고, 원인은 아직 아무도 모릅니다."
-  }
- },
- {
-  "id": "n-drop",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,377",
-   "bio": "도로랜드와 항구 도시의 소식을 가장 빠르게. 제보 doroilbo@doroilbo.kr",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
    "color": "#0f766e",
    "reporter": "서하늘"
   },
-  "title": "'사라진 섬' 소문에 예약 취소 1,900건… 지난 주말 도로랜드 방문객 28% 줄어",
-  "subhead": "운영실 집계, 토·일 방문객 1만 2,600명으로 평소보다 4,900명 감소… 항구 상인 \"츄러스 하루 300개에서 180개로\"",
-  "body": "도로랜드 섬이 보이지 않았다는 영상이 퍼진 뒤 첫 주말, 도로랜드 방문객이 크게 줄었다. 도로랜드 운영실이 9일 발표한 집계에 따르면 지난 토·일요일 방문객은 1만 2,600명으로 평소 가을 주말 평균(1만 7,500명)보다 28% 적었다. 같은 기간 예약 취소는 1,900건이었다.\n\n운영실 관계자는 \"지난해 연간 방문객이 128만 4천 명, 하루 평균 3,500명 수준이었는데 이번 주말은 확실히 조용했다\"며 \"연간회원권 환불 문의도 하루 40건쯤 들어온다\"고 말했다. 운영실은 소문이 이어지면 이달 매출이 평소보다 10% 안팎 줄 수 있다고 내다봤다. 지난해 도로랜드 매출은 386억 원이었다.\n\n항구 상인들도 영향을 받았다. 항구 앞에서 츄러스 트럭을 운영하는 최모 씨(45)는 \"평소 주말엔 하루 300개를 파는데 이번엔 180개도 못 팔았다\"고 했다. 반면 섬 안 기념품 가게에서는 '사라지는 섬' 엽서가 하루 1,200장 팔리며 평소의 세 배가 나갔다.\n\n운영실은 \"섬 안은 평소와 똑같이 안전하다\"며 15주년 기념 야간 조명 쇼 준비를 예정대로 진행한다고 밝혔다.",
+  "title": "도로랜드 올해 방문객 100만 명 돌파… 100만 번째는 \"관람차 타러 온 네 식구\"",
+  "subhead": "9일 오후 2시 10분 배로 입장… 지난해보다 3주 빨라, 운영실 \"연말 130만 명 예상\"",
+  "body": "도로랜드의 올해 누적 방문객이 9일 100만 명을 넘었다. 운영실은 9일 오후 2시 10분 항구에서 들어온 배의 승객 가운데 부모와 초등학생 둘로 이루어진 네 식구가 100만 번째 방문객이 됐다고 밝혔다.\n\n운영실은 이 가족에게 연간회원권 4장과 기린 인형 4개를 선물했다. 기념 사진은 회전목마 앞 광장에서 찍었다. 아버지는 \"관람차 한 번 타러 왔다가 1년 치 입장권을 받았다\"고 말했다.\n\n지난해에는 10월 30일에 100만 명을 넘었으니 올해가 3주 빠르다. 운영실은 \"가을 주말마다 하루 8천 명 넘게 찾고 있어 연말에는 130만 명을 넘길 것 같다\"고 했다.",
   "quote": {
-   "text": "평소 주말엔 하루 300개를 파는데 이번엔 180개도 못 팔았어요. 그래도 엽서는 잘 팔린다니 신기하죠.",
-   "who": "항구 츄러스 트럭 최모 씨(45)"
+   "text": "관람차 한 번 타러 왔다가 1년 치 입장권을 받았어요.",
+   "who": "100만 번째 방문객 가족"
   },
   "stats": [
    {
-    "label": "주말 방문객",
-    "value": "1만 2,600명"
+    "label": "올해 누적",
+    "value": "100만 명"
    },
    {
-    "label": "평소 대비",
-    "value": "-28%"
+    "label": "지난해 돌파일",
+    "value": "10월 30일"
    },
    {
-    "label": "예약 취소",
-    "value": "1,900건"
+    "label": "선물",
+    "value": "연간회원권 4장"
    }
   ],
   "tags": "",
-  "place": "도로랜드 항구",
-  "postedAt": "어제",
+  "place": "도로랜드",
+  "postedAt": "3일 전",
   "editedAt": "",
-  "photoTakenAt": "어제",
-  "views": "5.2만",
-  "commentCount": 356,
+  "photoTakenAt": "3일 전",
+  "views": "9.2만",
+  "commentCount": 640,
   "comments": [
    {
-    "name": "엽서수집가",
-    "text": "사라지는 섬 엽서 저도 샀어요ㅋㅋ 관람차가 반쯤 투명하게 그려져 있음",
-    "likes": 420,
-    "time": "어제"
+    "name": "연간권있는사람",
+    "text": "기린 인형까지 주는 거 부럽다",
+    "likes": 410,
+    "time": "3일 전"
    },
    {
-    "name": "상인아들",
-    "text": "항구 상인들 진짜 힘들어요 소문 그만 퍼뜨려 주세요",
-    "likes": 266,
-    "time": "어제"
-   },
-   {
-    "name": "통계맨",
-    "text": "17,500에서 12,600이면 28% 맞네요 계산해 봄",
-    "likes": 91,
-    "time": "어제"
+    "name": "도로일보독자",
+    "text": "지난해보다 3주 빠르다니 진짜 많이 왔네",
+    "likes": 150,
+    "time": "2일 전"
    }
   ],
   "images": {
-   "main": "nearly empty amusement park entrance plaza with a carousel in the background on a sunny weekend, only a few visitors, wide shot"
+   "main": "family of four holding ferris wheel shaped balloons in front of a white seaside ferris wheel, bright afternoon, seen from behind"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "방문객·매출 숫자가 자료실 「숫자로 보는 도로랜드」와 맞습니다(지난해 128만 4천 명, 386억 원, 주말 평균 1만 7,500명). 등록된 언론사입니다.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 올해 누적 방문객 100만 명 돌파, 100만 번째 가족에게 연간회원권",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 올해 누적 방문객 100만 명 돌파, 100만 번째 가족에게 연간회원권"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜 기사입니다. 지난해 방문객 128만 4천 명, 매출 386억 원, 가을 주말 평균 1만 7,500명이 모두 자료실 숫자와 맞고, 17,500에서 12,600은 실제로 28% 감소입니다."
+   "explain": "진짜 기사입니다. 100만 번째 방문객(10월 9일 오후 2시 10분, 네 식구, 연간회원권 4장·기린 인형)과 지난해 돌파일 10월 30일이 보도자료와 맞고, 도로일보는 등록 언론사입니다.",
+   "doc": "[보도자료] 올해 누적 방문객 100만 명 돌파, 100만 번째 가족에게 연간회원권"
   }
  },
  {
-  "id": "n-half",
+  "id": "n-million-fake",
   "format": "news",
   "author": {
    "name": "도로일보",
-   "handle": "@doro_ilbo",
+   "handle": "@doroilbo",
    "kind": "press",
-   "verified": false,
-   "joined": "1주 전",
-   "followers": "1,120",
-   "posts": "6",
-   "bio": "도로랜드 소식 속보 전문",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
    "color": "#0f766e",
    "reporter": "한바다"
   },
-  "title": "[단독] 도로랜드 지난해 매출 반토막… 방문객 64만 명, 폐장 수순 밟나",
-  "subhead": "내부 자료 입수… 매출 193억 원으로 전년 대비 50% 감소, 직원 100명 이상 떠나",
-  "body": "도로랜드가 심각한 경영 위기에 빠진 것으로 확인됐다. 본지가 입수한 내부 자료에 따르면 도로랜드의 지난해 매출은 193억 원으로 전년의 절반 수준으로 떨어졌고, 연간 방문객도 64만 명에 그쳤다.\n\n직원들도 빠르게 떠나고 있다. 자료에 따르면 지난 1년 동안 직원 100명 이상이 도로랜드를 그만뒀다. 한 직원은 \"월급이 밀린 적도 있다\"고 털어놨다.\n\n섬이 사라져 보이는 현상도 사실은 경영 위기와 관련이 있다는 분석이 나온다. 전기요금을 아끼려 조명을 꺼서 멀리서 섬이 보이지 않았다는 것이다. 운영실은 이에 대해 아무런 답변을 하지 않았다.\n\n도로랜드는 이르면 내년 봄 문을 닫을 것으로 보인다.",
+  "title": "도로랜드, 이번 달에만 100만 명 방문… 개장 이래 최고 기록",
+  "subhead": "10월 1일부터 9일까지 9일 만에 100만 명, 하루 평균 11만 명… 운영실 \"배 증편 검토\"",
+  "body": "도로랜드가 10월 들어 9일 만에 방문객 100만 명을 모았다. 하루 평균 11만 명이 섬을 찾은 셈이다. 운영실은 9일 오후 2시 10분 입장한 네 식구가 이달 100만 번째 방문객이라고 밝혔다.\n\n운영실은 이 가족에게 연간회원권 4장과 기린 인형 4개를 선물했다. 지난해 10월 한 달 방문객이 12만 명이었던 것과 비교하면 여덟 배가 넘는 숫자다.\n\n운영실 관계자는 \"배 두 척으로는 감당이 어려워 증편을 검토하고 있다\"고 말했다.",
   "quote": {
-   "text": "월급이 밀린 적도 있다. 다들 불안해한다.",
-   "who": "도로랜드 직원"
+   "text": "배 두 척으로는 감당이 어려워 증편을 검토하고 있습니다.",
+   "who": "운영실 관계자"
   },
   "stats": [
    {
-    "label": "지난해 매출",
-    "value": "193억 원"
+    "label": "이달 방문객",
+    "value": "100만 명"
    },
    {
-    "label": "연간 방문객",
-    "value": "64만 명"
-   },
-   {
-    "label": "퇴사 직원",
-    "value": "100명+"
+    "label": "하루 평균",
+    "value": "11만 명"
    }
   ],
   "tags": "",
-  "place": "",
-  "postedAt": "5시간 전",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "31만",
-  "commentCount": 2210,
-  "comments": [
-   {
-    "name": "충격",
-    "text": "헐 진짜요?? 연간회원권 환불해야 하나",
-    "likes": 1890,
-    "time": "4시간 전"
-   },
-   {
-    "name": "도로일보구독자",
-    "text": "도로일보 공식 계정은 @doroilbo 아닌가요? 여긴 _ 가 들어가는데",
-    "likes": 1420,
-    "time": "4시간 전"
-   },
-   {
-    "name": "숫자보는사람",
-    "text": "운영실이 발표한 작년 매출은 386억인데요",
-    "likes": 980,
-    "time": "3시간 전"
-   },
-   {
-    "name": "ㅠㅠ",
-    "text": "조명 꺼서 안 보였다는 건 좀… 낮에 사라졌는데",
-    "likes": 760,
-    "time": "3시간 전"
-   }
-  ],
-  "images": {
-   "main": "dark closed ticket booth of an amusement park with shutters down, dramatic gloomy lighting"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "사칭",
-   "clue": "진짜 도로일보는 @doroilbo(인증)인데 이 계정은 @doro_ilbo, 인증 없음, 가입 1주. 매출 193억·방문객 64만은 자료실(386억·128만)과 다르고, 낮에 사라진 섬을 '조명을 꺼서'라고 설명합니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 도로일보의 진짜 계정은 @doroilbo(인증 배지)인데 이 글은 @doro_ilbo, 가입 1주, 인증 없음입니다. 기자 이름까지 베꼈지만 매출 193억·방문객 64만은 자료실 숫자(386억 원·128만 4천 명)의 절반으로 지어낸 것이고, 낮에 일어난 일을 '조명을 꺼서'라고 설명한 것도 말이 안 됩니다."
-  }
- },
- {
-  "id": "n-closing",
-  "format": "news",
-  "author": {
-   "name": "도로랜드 공식",
-   "handle": "@doroland_officiall",
-   "kind": "official",
-   "verified": false,
-   "joined": "5일 전",
-   "followers": "38",
-   "posts": "2",
-   "bio": "도로랜드 공식 안내 계정입니다. 긴급 공지 전달",
-   "color": "#7c3aed",
-   "reporter": ""
-  },
-  "title": "[긴급] 도로랜드는 오늘부로 영구 폐장합니다",
-  "subhead": "시설 이상으로 운영을 중단합니다. 환불은 아래 안내에 따라 신청해 주세요",
-  "body": "도로랜드를 사랑해 주신 모든 분께 알려 드립니다. 최근 발생한 시설 이상으로 도로랜드는 오늘부로 영구 폐장합니다. 섬에 남아 계신 분들은 오후 4시 배로 모두 나와 주시기 바랍니다.\n\n입장권과 연간회원권은 전액 환불해 드립니다. 환불을 원하시는 분은 아래 링크에 이름, 생년월일, 전화번호, 계좌번호를 남겨 주세요. 접수 순서대로 3일 안에 입금됩니다.\n\n그동안 사랑해 주셔서 감사합니다. 도로랜드 공식",
-  "quote": null,
-  "stats": [
-   {
-    "label": "환불 접수",
-    "value": "선착순"
-   },
-   {
-    "label": "입금",
-    "value": "3일 안"
-   }
-  ],
-  "tags": "",
-  "place": "",
-  "postedAt": "2시간 전",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "21만",
-  "commentCount": 1580,
-  "comments": [
-   {
-    "name": "급해요",
-    "text": "링크 눌러서 적었는데 맞나요?",
-    "likes": 230,
-    "time": "2시간 전"
-   },
-   {
-    "name": "운영실팬",
-    "text": "운영실 @doroland 에는 아무 공지 없는데요? 지금 광장 스토리 올라왔어요",
-    "likes": 2100,
-    "time": "1시간 전"
-   },
-   {
-    "name": "경찰에신고함",
-    "text": "계좌번호까지 적으라는 건 100% 사기입니다 신고했어요",
-    "likes": 1750,
-    "time": "1시간 전"
-   }
-  ],
-  "images": {
-   "main": "closed amusement park gate with a chain and padlock, gloomy cloudy sky"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "사칭",
-   "clue": "공식 계정은 @doroland 하나뿐(인증). 이 계정은 l이 하나 더 붙은 @doroland_officiall, 가입 5일, 인증 없음. 계좌번호까지 모읍니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 도로랜드 공식 계정은 @doroland(인증 배지) 하나뿐입니다. 이 계정은 @doroland_officiall(l이 하나 더), 가입 5일, 팔로워 38명에 인증 배지가 없고, 이름·생년월일·전화번호·계좌번호를 모으는 사기 글입니다. 같은 시각 진짜 운영실 스토리는 '정상 운영 중'입니다."
-  }
- },
- {
-  "id": "n-notice",
-  "format": "news",
-  "author": {
-   "name": "도로랜드 운영실",
-   "handle": "@doroland",
-   "kind": "official",
-   "verified": true,
-   "joined": "2015.04",
-   "followers": "15.3만",
-   "posts": "3,892",
-   "bio": "바다 위 놀이공원 도로랜드의 유일한 공식 계정. 운영시간 10:00~19:00",
-   "color": "#0e4a84",
-   "reporter": ""
-  },
-  "title": "[운영실 안내] 최근 이상 현상 점검 결과와 앞으로의 운영 계획",
-  "subhead": "회전목마·광장 조명·관람차 세 건 모두 원인 조사 중, 안전 점검은 하루 2회로 늘립니다",
-  "body": "최근 도로랜드 안에서 일어난 이상 현상 세 건의 점검 결과를 알려 드립니다.\n\n첫째, 3일 전(7일) 오후 2시 14분 관람차가 11분 동안 멈췄습니다. 당시 캐빈에 타고 계시던 48명은 모두 안전하게 내리셨고 다친 분은 없습니다. 둘째, 어제(9일) 오후 8시 12분 전원이 꺼진 회전목마가 약 2분 동안 저절로 돌았습니다. 셋째, 같은 날 오후 9시 40분 중앙 광장 조명 전체가 10초 동안 꺼졌다가 켜졌습니다.\n\n세 건 모두 전기 설비와 기계 장치를 점검했으나 고장은 발견되지 않았습니다. 외부 전문가와 함께 원인을 계속 조사하고 있습니다.\n\n모든 놀이기구는 정상 운영 중입니다. 다만 안전 점검을 하루 1회에서 2회(개장 전·오후 2시)로 늘리고, 점검 중에는 해당 기구 탑승이 10분 정도 늦어질 수 있습니다. 배 운항(항구 출발 09:00~18:00 매시 정각, 섬 출발 10:30~19:30 매시 30분)과 개장 시간(10:00~19:00)은 그대로입니다.\n\n전광판과 이 계정(@doroland) 외의 경로로 전해지는 '폐장', '무료 개방', '환불 접수' 안내는 모두 운영실과 관계가 없습니다.",
-  "quote": {
-   "text": "고장은 없었지만 원인은 아직 모릅니다. 아는 만큼만, 확인된 것만 알려 드리겠습니다.",
-   "who": "도로랜드 운영실"
-  },
-  "stats": [
-   {
-    "label": "관람차 정지",
-    "value": "11분"
-   },
-   {
-    "label": "안전 점검",
-    "value": "하루 2회"
-   },
-   {
-    "label": "운영 상태",
-    "value": "정상"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 운영실",
-  "postedAt": "오늘 오전 8:10",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "4.4만",
-  "commentCount": 612,
-  "comments": [
-   {
-    "name": "연간회원3년차",
-    "text": "확인된 것만 알려 준다는 말이 오히려 믿음이 가네요",
-    "likes": 820,
-    "time": "7시간 전"
-   },
-   {
-    "name": "궁금이",
-    "text": "그래서 원인은요?? 답답",
-    "likes": 310,
-    "time": "6시간 전"
-   },
-   {
-    "name": "오늘갈사람",
-    "text": "점검 때문에 10분 기다리는 건 괜찮음 안전이 먼저",
-    "likes": 240,
-    "time": "5시간 전"
-   }
-  ],
-  "images": {
-   "main": "amusement park control room notice board with a ferris wheel visible through the window, calm daytime, clean official photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "@doroland은 자료실에 등록된 유일한 공식 계정(인증)이고, 세 건의 시각(14:14 관람차 11분, 20:12 회전목마 2분, 21:40 조명 10초)이 자료실 「이상 현상 기록」과 맞습니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 공지입니다. @doroland은 인증 배지가 있는 유일한 공식 계정이고, 관람차 11분·회전목마 2분·조명 10초라는 기록이 자료실과 정확히 맞습니다. 원인을 모른다고 솔직하게 쓴 점도 눈여겨보세요."
-  }
- },
- {
-  "id": "n-light",
-  "format": "news",
-  "author": {
-   "name": "서해바다신문",
-   "handle": "@seohaenews",
-   "kind": "press",
-   "verified": true,
-   "joined": "2011.03",
-   "followers": "4.2만",
-   "posts": "18,204",
-   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
-   "color": "#1d4ed8",
-   "reporter": "정해솔"
-  },
-  "title": "15주년 앞둔 도로랜드, 관람차에 조명 1만 2천 개… \"소문보다 빛이 더 멀리 가길\"",
-  "subhead": "내년 5월 5일 개장 15주년 기념 야간 조명 쇼 준비 한창… 높이 88m 관람차가 무대",
-  "body": "도로랜드가 내년 5월 5일 개장 15주년을 앞두고 관람차 야간 조명 쇼를 준비하고 있다. 높이 88m, 캐빈 36개의 관람차 바퀴 전체에 조명 1만 2천 개를 달아 음악에 맞춰 빛이 움직이는 쇼다. 운영실은 \"항구에서도 보일 만큼 밝게 만들겠다\"고 했다.\n\n조명 설치는 지난달 시작해 지금 60%쯤 진행됐다. 설치는 관람차가 멈추는 밤 8시 이후에만 하며, 낮 운행에는 영향이 없다. 관람차는 한 바퀴 도는 데 14분이 걸린다.\n\n운영실 관계자는 \"요즘 '사라지는 섬' 이야기로 걱정하시는 분이 많다\"며 \"소문보다 빛이 더 멀리 가길 바라는 마음으로 준비하고 있다\"고 말했다. 조명 쇼는 15주년 당일 저녁 7시 30분 막배 승객을 위해 항구 쪽을 향해 첫 시연을 할 계획이다.",
-  "quote": {
-   "text": "소문보다 빛이 더 멀리 가길 바라는 마음으로 준비하고 있어요.",
-   "who": "도로랜드 운영실 관계자"
-  },
-  "stats": [
-   {
-    "label": "조명 수",
-    "value": "1만 2천 개"
-   },
-   {
-    "label": "관람차 높이",
-    "value": "88m"
-   },
-   {
-    "label": "설치 진행",
-    "value": "60%"
-   }
-  ],
-  "tags": "",
-  "place": "관람차",
-  "postedAt": "2일 전",
-  "editedAt": "",
-  "photoTakenAt": "2일 전",
-  "views": "1.9만",
-  "commentCount": 142,
-  "comments": [
-   {
-    "name": "야경덕후",
-    "text": "관람차 조명 쇼 꼭 보러 갈게요 5월 5일!",
-    "likes": 180,
-    "time": "2일 전"
-   },
-   {
-    "name": "현장작업자",
-    "text": "밤에만 다니까 추워요ㅠ 그래도 예쁘게 달고 있습니다",
-    "likes": 260,
-    "time": "2일 전"
-   }
-  ],
-  "images": {
-   "main": "workers installing strings of lights on a giant ferris wheel at night by the sea, cherry picker lift, warm lights"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "관람차 88m·캐빈 36개·한 바퀴 14분, 개장일 5월 5일(15주년), 막배 7시 30분이 모두 자료실과 맞습니다. 등록된 언론사입니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. 관람차 높이 88m, 캐빈 36개, 한 바퀴 14분, 개장 기념일 5월 5일, 막배 7시 30분이 모두 자료실과 맞습니다. 자극적이지 않은 평범한 소식도 진짜 뉴스입니다."
-  }
- },
- {
-  "id": "s-coaster",
-  "format": "shorts",
-  "author": {
-   "name": "롤코타는남자",
-   "handle": "@coaster_guy",
-   "kind": "creator",
-   "verified": true,
-   "joined": "2017.02",
-   "followers": "112만",
-   "posts": "1,384",
-   "bio": "전 세계 롤러코스터 312개 탑승. 리뷰는 솔직하게, 안전벨트는 꽉",
-   "color": "#ea580c"
-  },
-  "title": "도로랜드 롤러코스터 맨 앞자리 POV, 내려올 때 바다가 통째로 보임",
-  "body": "도로랜드 롤러코스터 맨 앞자리 POV!\n\n최고 높이 42m까지 올라가는 데 1분 10초.\n\n정점에서 바다가 통째로 보이는 순간… 여기서 숨 참으세요.\n\n최고 속도 시속 92km. 오늘만 3번 탔는데 매번 소리 지름ㅋㅋ 맨 앞자리 강추!",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "도로랜드 롤러코스터 맨 앞자리 POV 🎢"
-   },
-   {
-    "img": "b",
-    "text": "42m까지 올라가는 데 1분 10초… 심장 뛰는 소리 들림"
-   },
-   {
-    "img": "b",
-    "text": "정점에서 바다가 통째로 보이는 순간. 여기서 숨 참으세요"
-   },
-   {
-    "img": "main",
-    "text": "시속 92km 낙하!!! 오늘만 3번 탐, 맨 앞자리 강추 👍"
-   }
-  ],
-  "tags": "#도로랜드 #롤러코스터 #POV #맨앞자리",
-  "place": "롤러코스터",
-  "postedAt": "어제",
-  "photoTakenAt": "어제",
-  "likes": "4.8만",
-  "views": "61만",
-  "commentCount": 1830,
-  "music": "원본 오디오 - 롤코타는남자",
-  "comments": [
-   {
-    "name": "코스터덕후",
-    "text": "92km 맞아요 도로랜드 자료에도 나옴. 형 리뷰는 항상 정확함",
-    "likes": 980,
-    "time": "어제"
-   },
-   {
-    "name": "무서워서못탐",
-    "text": "보기만 해도 손에 땀남",
-    "likes": 410,
-    "time": "어제"
-   },
-   {
-    "name": "지나가던사람",
-    "text": "소문 때문에 사람 없어서 바로 탔다던데 진짜예요?",
-    "likes": 120,
-    "time": "어제"
-   }
-  ],
-  "images": {
-   "main": "first person view from the front seat of a roller coaster dropping toward the sea, blue sky, motion blur",
-   "b": "roller coaster train climbing a steep track toward a bright blue sky next to the sea, seen from the front row"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "구독자 112만 인증 크리에이터이고, 최고 높이 42m·시속 92km가 자료실 놀이기구 정보와 맞습니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 오래된 인증 크리에이터(구독자 112만, 2017년부터)이고, 최고 높이 42m·최고 속도 시속 92km가 자료실 놀이기구 정보와 맞습니다. 구독자에 비해 조회수(61만)도 자연스럽습니다."
-  }
- },
- {
-  "id": "s-expert",
-  "format": "shorts",
-  "author": {
-   "name": "세상의모든비밀",
-   "handle": "@secret_world_tv",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2025.11",
-   "followers": "2,904",
-   "posts": "37",
-   "bio": "그들이 숨기는 진실을 파헤칩니다. 구독하면 진실이 보입니다",
-   "color": "#4b5563"
-  },
-  "title": "[충격] 해양학 박사가 밝힌 도로랜드 섬이 사라지는 진짜 이유",
-  "body": "도로랜드 섬이 사라지는 진짜 이유, 드디어 밝혀졌습니다.\n\n해양학 박사님에 따르면 섬 전체가 3년마다 바다에 잠겼다가 다시 떠오릅니다.\n\n지난 10년 동안 섬은 1.2m나 가라앉았습니다. 운영실은 이걸 알면서도 숨기고 있습니다.\n\n이 영상이 지워지기 전에 공유하세요. 진실은 구독자만 압니다.",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "[충격] 도로랜드 섬이 사라지는 진짜 이유, 드디어 밝혀졌습니다"
-   },
-   {
-    "img": "b",
-    "text": "해양학 박사 \"섬 전체가 3년마다 바다에 잠겼다가 떠오른다\""
-   },
-   {
-    "img": "main",
-    "text": "지난 10년간 1.2m 침하… 운영실은 알면서도 숨기는 중"
-   },
-   {
-    "img": "b",
-    "text": "지워지기 전에 공유하세요. 진실은 구독자만 압니다 🔔"
-   }
-  ],
-  "tags": "#도로랜드 #충격 #진실 #음모",
-  "place": "",
-  "postedAt": "어제",
-  "photoTakenAt": "",
-  "likes": "1.2만",
-  "views": "126만",
-  "commentCount": 4100,
-  "music": "Dark Mystery Ambient - 무료 음원",
-  "comments": [
-   {
-    "name": "소름돋음",
-    "text": "소름… 그래서 3년마다였구나",
-    "likes": 2300,
-    "time": "어제"
-   },
-   {
-    "name": "물리선생",
-    "text": "섬이 잠기면 섬 안 2,400명도 같이 잠깁니다. 아무도 안 젖었다잖아요",
-    "likes": 3900,
-    "time": "어제"
-   },
-   {
-    "name": "궁금",
-    "text": "박사님 성함이 뭐예요? 어디 소속?",
-    "likes": 1500,
-    "time": "어제"
-   },
-   {
-    "name": "구독자",
-    "text": "이 채널 작년에 생겼는데 조회수가 126만?",
-    "likes": 870,
-    "time": "어제"
-   }
-  ],
-  "images": {
-   "main": "dramatic illustration of a ferris wheel sunk deep under the ocean, fish swimming around, mysterious blue light, youtube thumbnail style",
-   "b": "silhouette of a man in a lab coat in front of a dark ocean map with red arrows, mysterious lighting, no face"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "가짜 전문가",
-   "clue": "박사 이름·소속 없음. 자료실에 '물에 잠긴 기록 없음, 측량 변화 없음'. 구독자 2,904명인데 조회수 126만. '지워지기 전에 공유'는 감정 자극.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. '박사'라고만 하고 이름도 소속도 없습니다. 자료실에는 섬이 물에 잠긴 기록이 없고 매년 측량에서도 변화가 없습니다. 섬 안에 있던 2,400명이 아무것도 느끼지 못한 것과도 맞지 않습니다. 구독자 2,904명에 조회수 126만, '지워지기 전에 공유'라는 말도 수상합니다."
-  }
- },
- {
-  "id": "s-rumor",
-  "format": "shorts",
-  "author": {
-   "name": "궁금한초딩",
-   "handle": "@curious_kid",
-   "kind": "person",
-   "verified": false,
-   "joined": "2024.05",
-   "followers": "41",
-   "posts": "19",
-   "bio": "궁금한 건 못 참음. 초6",
-   "color": "#ea580c"
-  },
-  "title": "도로랜드 직원 제보!! 섬이 사라질 때 직원들은 다 지하로 간대요",
-  "body": "친구 사촌 형이 도로랜드 직원인데요.\n\n섬이 안 보일 때 직원들은 전부 관람차 밑 지하 3층으로 대피한대요.\n\n그래서 운영실이 '조사 중'이라고만 하는 거래요. 다 알면서.\n\n진짜예요!! 친구가 그랬어요!!",
-  "scenes": [
-   {
-    "img": null,
-    "text": "도로랜드 직원 제보!! (친구 사촌 형이 직원임)"
-   },
-   {
-    "img": null,
-    "text": "섬이 안 보일 때 직원들은 전부 관람차 밑 지하 3층으로 대피한대요"
-   },
-   {
-    "img": null,
-    "text": "그래서 운영실이 '조사 중'이라고만 하는 거래요. 다 알면서!!"
-   },
-   {
-    "img": null,
-    "text": "진짜예요!! 친구가 그랬어요!! 🫢"
-   }
-  ],
-  "tags": "#도로랜드 #제보 #지하",
-  "place": "",
-  "postedAt": "어제",
-  "photoTakenAt": "",
-  "likes": "2,310",
-  "views": "8.7만",
-  "commentCount": 640,
-  "music": "원본 오디오 - 궁금한초딩",
-  "comments": [
-   {
-    "name": "같은반",
-    "text": "너 누구냐ㅋㅋㅋ 사촌 형 이름 대봐",
-    "likes": 410,
-    "time": "어제"
-   },
-   {
-    "name": "도로랜드알바",
-    "text": "관람차 밑에 지하 3층 없어요… 기계실 1층뿐",
-    "likes": 980,
-    "time": "어제"
-   },
-   {
-    "name": "ㅇㅈ",
-    "text": "근데 운영실이 조사 중이라고만 하는 건 맞음",
-    "likes": 220,
-    "time": "어제"
-   }
-  ],
-  "images": {},
-  "secret": {
-   "truth": "fake",
-   "tactic": "들은 이야기",
-   "clue": "직접 본 게 아니라 '친구 사촌 형'에게 들은 말. 자료실 시설 정보에 지하 3층 같은 건 없습니다.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "믿기 어렵습니다. 글쓴이가 직접 본 게 아니라 '친구 사촌 형'에게 건너 들은 말이고, 자료실 시설 정보에 관람차 밑 지하 3층 같은 공간은 없습니다. '진짜예요!!'를 반복한다고 진짜가 되지는 않습니다."
-  }
- },
- {
-  "id": "s-lights",
-  "format": "shorts",
-  "author": {
-   "name": "회전목마러버",
-   "handle": "@merrygo_round",
-   "kind": "person",
-   "verified": false,
-   "joined": "2021.08",
-   "followers": "318",
-   "posts": "212",
-   "bio": "회전목마 타러 도로랜드 월 2회. 연간회원 3년째",
-   "color": "#0891b2"
-  },
-  "title": "어제 광장 조명 다 꺼진 거 저만 봤나요? (영상 있음)",
-  "body": "어제 저녁 9시 40분쯤 중앙 광장에 있었는데요.\n\n조명이 한꺼번에 탁 꺼졌어요. 광장 전체가 깜깜.\n\n10초쯤 지나서 다시 켜졌고요. 다들 놀라서 웅성거렸어요.\n\n회전목마도 어제 저절로 돌았다던데… 뭔가 이상해요.",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "어제 저녁 9시 40분, 중앙 광장에서 회전목마 기다리던 중"
-   },
-   {
-    "img": "b",
-    "text": "조명이 한꺼번에 탁! 광장 전체가 깜깜… 이때 다들 \"어?\""
-   },
-   {
-    "img": "main",
-    "text": "10초쯤 뒤 다시 켜짐. 웅성웅성… 저만 본 거 아니죠?"
-   }
-  ],
-  "tags": "#도로랜드 #중앙광장 #정전",
-  "place": "중앙 광장",
-  "postedAt": "어제 밤 9:58",
-  "photoTakenAt": "어제 밤 9:40",
-  "likes": "87",
-  "views": "1,204",
-  "commentCount": 31,
-  "music": "원본 오디오 - 회전목마러버",
-  "comments": [
-   {
-    "name": "옆에있던사람",
-    "text": "저도 봤어요! 츄러스 들고 있다가 깜짝",
-    "likes": 44,
-    "time": "어제"
-   },
-   {
-    "name": "운영실알림봇",
-    "text": "운영실 안내: 9일 오후 9시 40분 광장 조명 10초 소등, 원인 조사 중입니다",
-    "likes": 60,
-    "time": "어제"
-   }
-  ],
-  "images": {
-   "main": "amusement park plaza at night with a lit carousel and string lights, people waiting in line, smartphone video frame",
-   "b": "completely dark amusement park plaza at night with every lamp turned off, only faint moonlight and phone screens glowing, smartphone photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "직접 본 일이고, 어제 9시 40분·10초가 자료실 「이상 현상 기록」과 맞습니다. 팔로워 318명에 조회수 1,204회로 숫자도 자연스럽습니다.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 글쓴이가 직접 겪은 일이고, 어제 오후 9시 40분·10초라는 내용이 자료실의 운영실 기록과 맞습니다. 작은 계정(팔로워 318명)에 조회수 1,204회로 숫자도 자연스럽습니다."
-  }
- },
- {
-  "id": "s-vlog",
-  "format": "shorts",
-  "author": {
-   "name": "하루하루기록",
-   "handle": "@haru_daily_",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2019.04",
-   "followers": "8,120",
-   "posts": "402",
-   "bio": "하루를 60초로. 여행·일상 브이로그",
-   "color": "#db2777"
-  },
-  "title": "도로랜드 하루 60초 브이로그 | 10시 배부터 7시 반 막배까지",
-  "body": "10시 정각 배 타고 출발! 25분이면 섬 도착.\n\n사파리 지프 투어 먼저. 기린이 차 바로 앞까지 옴.\n\n회전목마 앞 노란 트럭 시나몬 츄러스, 줄 5분.\n\n3시 퍼레이드 보고 관람차 노을 보고, 7시 반 막배로 집. 완벽한 하루.",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "10시 정각 배 출발 🚢 25분이면 섬 도착"
-   },
-   {
-    "img": "b",
-    "text": "사파리 지프 투어 🦒 기린이 차 바로 앞까지 옴"
-   },
-   {
-    "img": "c",
-    "text": "회전목마 앞 노란 트럭 시나몬 츄러스, 줄 5분"
-   },
-   {
-    "img": "d",
-    "text": "관람차 노을 보고 7시 반 막배로 집. 완벽한 하루 끝 🌅"
-   }
-  ],
-  "tags": "#도로랜드 #브이로그 #하루 #막배",
   "place": "도로랜드",
-  "postedAt": "2일 전",
-  "photoTakenAt": "2일 전",
-  "likes": "1,482",
-  "views": "2.3만",
-  "commentCount": 96,
-  "music": "Sunny Afternoon - 무료 음원",
+  "postedAt": "3일 전",
+  "editedAt": "",
+  "photoTakenAt": "3일 전",
+  "views": "12.4만",
+  "commentCount": 980,
   "comments": [
    {
-    "name": "여행준비중",
-    "text": "막배 7시 반 맞죠? 운영실 안내에도 있네요 감사",
-    "likes": 58,
+    "name": "계산해봄",
+    "text": "9일에 100만이면 하루 11만인데 배가 520명씩 20번이면 1만 명… 뭔가 이상한데",
+    "likes": 1200,
+    "time": "3일 전"
+   },
+   {
+    "name": "도로일보독자",
+    "text": "다른 기사엔 올해 누적이라고 써 있는데요?",
+    "likes": 640,
     "time": "2일 전"
-   },
-   {
-    "name": "츄러스요정",
-    "text": "그 노란 트럭 제가 올린 거 맞아요ㅋㅋ 시나몬 최고",
-    "likes": 72,
-    "time": "2일 전"
    }
   ],
   "images": {
-   "main": "view from the deck of a ferry heading toward an island amusement park with a big ferris wheel, clear morning, vertical",
-   "b": "a giraffe leaning toward an open safari jeep on a dirt road, close up, vertical",
-   "c": "close-up of cinnamon sugar churros held in front of a yellow food truck near a carousel, vertical",
-   "d": "orange sunset over the sea seen from inside the top cabin of a ferris wheel, vertical photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "배 10시 정각·25분, 퍼레이드 3시, 막배 7시 30분이 자료실과 맞습니다. 2019년부터 활동한 계정, 팔로워 8,120명에 조회수 2.3만.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 배 출발 시간(매시 정각)과 소요 시간 25분, 퍼레이드 오후 3시, 막배 7시 30분이 모두 자료실과 맞습니다. 2019년부터 활동한 계정이고 숫자도 자연스럽습니다."
-  }
- },
- {
-  "id": "s-free",
-  "format": "shorts",
-  "author": {
-   "name": "도로랜드꿀팁TV",
-   "handle": "@doroland_tips",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2주 전",
-   "followers": "140",
-   "posts": "3",
-   "bio": "도로랜드 꿀팁만 모았습니다. 운영실 직원 지인 다수",
-   "color": "#16a34a"
-  },
-  "title": "내일 도로랜드 전 기구 무료!! 운영실 직원한테 들음 (선착순 500명)",
-  "body": "내일 도로랜드 모든 놀이기구 무료입니다!!\n\n소문 때문에 손님이 줄어서 운영실이 결정했대요. 운영실 직원 지인이 알려 줬어요.\n\n오전 10시 배 선착순 500명만!! 입장권 5만 4천 원 아끼세요.\n\n빨리 공유해서 친구들도 데려가세요🔥",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "내일 도로랜드 전 기구 무료!!! 🔥🔥"
-   },
-   {
-    "img": "main",
-    "text": "소문 때문에 손님 줄어서 운영실이 결정했대요 (직원 지인 제보)"
-   },
-   {
-    "img": "b",
-    "text": "오전 10시 배 선착순 500명만! 5만 4천 원 아끼세요"
-   },
-   {
-    "img": "b",
-    "text": "빨리 공유!! 친구들도 데려가세요 🏃‍♂️🏃‍♀️"
-   }
-  ],
-  "tags": "#도로랜드 #무료 #선착순 #꿀팁",
-  "place": "",
-  "postedAt": "3시간 전",
-  "photoTakenAt": "",
-  "likes": "9,800",
-  "views": "48만",
-  "commentCount": 2900,
-  "music": "Trending Upbeat - 무료 음원",
-  "comments": [
-   {
-    "name": "내일간다",
-    "text": "친구 다 불렀음 ㄱㄱ",
-    "likes": 820,
-    "time": "3시간 전"
-   },
-   {
-    "name": "의심병",
-    "text": "운영실 @doroland 공지에는 그런 거 없는데요? 오늘 아침 안내에 '무료 개방 안내는 운영실과 관계없다'고 써 있음",
-    "likes": 2600,
-    "time": "2시간 전"
-   },
-   {
-    "name": "계산기",
-    "text": "어른 5만 4천 원은 맞네 근데 무료는…",
-    "likes": 340,
-    "time": "2시간 전"
-   }
-  ],
-  "images": {
-   "main": "amusement park entrance gates wide open with colorful balloons, bright sunny day, festive, no text",
-   "b": "white ferry at a harbor pier in the morning with a long line of people waiting, vertical"
+   "main": "very long queue of visitors at a harbor ferry terminal in the morning, seaside amusement park ferris wheel far in the background"
   },
   "secret": {
    "truth": "fake",
-   "tactic": "감정 자극",
-   "clue": "'운영실 직원 지인이 알려 줬어요'는 건너 들은 말. 운영실 공식 안내(오늘 8:10)에 '무료 개방 안내는 운영실과 관계없음'. 가입 2주, 팔로워 140명에 조회수 48만.",
-   "clueCriterion": "witness"
+   "tactic": "숫자 부풀리기",
+   "clue": "올해 누적 100만 명을 「이번 달에만 100만 명」으로 바꿔 씀. 10월 1~9일 방문객은 8만 3천 명.",
+   "clueCriterion": "cross",
+   "clueKind": "title",
+   "fact": "올해 월별 방문객 (10월 9일 기준)"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 직접 확인한 게 아니라 '직원 지인'에게 들은 말이고, 오늘 아침 운영실 공식 안내에 '무료 개방 안내는 운영실과 관계없다'고 분명히 써 있습니다. 가입 2주 된 계정이 팔로워 140명에 조회수 48만인 것도 이상합니다. 입장권 가격(5만 4천 원)처럼 맞는 숫자를 섞어 넣어 교묘하게 만들었습니다."
-  }
- },
- {
-  "id": "s-safari",
-  "format": "shorts",
-  "author": {
-   "name": "동물원덕후",
-   "handle": "@zoo_lover_min",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2018.11",
-   "followers": "5,402",
-   "posts": "530",
-   "bio": "전국 동물원·사파리 다 가 봄. 동물 이름 다 외움",
-   "color": "#0f766e"
-  },
-  "title": "도로랜드 사파리에서 기린이 지프 창문까지 왔어요🦒 (38종 중 최애)",
-  "body": "사파리 지프 투어 시작! 동물 38종 산다는데 기린부터.\n\n기린이 차 바로 앞까지 왔어요🦒 가이드님이 \"창문 닫지 마세요, 혀 길어요\" ㅋㅋ\n\n투어 40분 동안 얼룩말, 타조, 미어캣까지. 아이랑 오면 무조건 사파리부터!",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "사파리 지프 투어 시작 🚙 동물 38종 중 기린부터"
-   },
-   {
-    "img": "main",
-    "text": "기린이 창문까지 옴🦒 가이드 \"혀 길어요 조심\" ㅋㅋ"
-   },
-   {
-    "img": "b",
-    "text": "40분 동안 얼룩말·타조·미어캣까지. 아이랑 오면 사파리 먼저!"
-   }
-  ],
-  "tags": "#도로랜드사파리 #기린 #지프투어",
-  "place": "사파리",
-  "postedAt": "4시간 전",
-  "photoTakenAt": "4시간 전",
-  "likes": "2,031",
-  "views": "2.3만",
-  "commentCount": 88,
-  "music": "원본 오디오 - 동물원덕후",
-  "comments": [
-   {
-    "name": "기린팬",
-    "text": "38종 맞아요 자료실에도 나옴 ㅎㅎ 덕후 인정",
-    "likes": 90,
-    "time": "4시간 전"
-   },
-   {
-    "name": "아이엄마",
-    "text": "오늘 사람 없어서 지프 바로 탔어요 추천",
-    "likes": 55,
-    "time": "3시간 전"
-   }
-  ],
-  "images": {
-   "main": "a giraffe leaning toward an open safari jeep window on a dirt road, close up, vertical",
-   "b": "zebras and ostriches seen from a safari jeep on a dirt road in a park, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "2018년부터 활동한 계정, 숫자 자연스러움. 동물 38종·투어 40분이 자료실 구역 정보와 맞습니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 2018년부터 활동한 계정이고 팔로워 5,402명에 조회수 2.3만으로 자연스럽습니다. 사파리 동물 38종, 지프 투어 40분도 자료실과 맞습니다."
-  }
- },
- {
-  "id": "s-oldvideo",
-  "format": "shorts",
-  "author": {
-   "name": "바다뷰맛집탐방",
-   "handle": "@seaview_hunter99",
-   "kind": "person",
-   "verified": false,
-   "joined": "2일 전",
-   "followers": "12",
-   "posts": "1",
-   "bio": "",
-   "color": "#db2777"
-  },
-  "title": "방금 도로랜드 사라지는 순간 직캠!!! 지금 항구 난리남 ㄷㄷ",
-  "body": "방금 항구에서 찍음!!! 섬이 진짜 사라짐\n\n관람차 있던 자리에 바다만… 지금 항구 사람들 다 소리 지름\n\n빨리 퍼뜨려 주세요 운영실은 또 숨길 거임",
-  "scenes": [
-   {
-    "img": "main",
-    "text": "방금 항구에서 찍음!!! 섬이 진짜 사라짐 ㄷㄷ"
-   },
-   {
-    "img": "main",
-    "text": "관람차 있던 자리에 바다만… 사람들 다 소리 지름"
-   },
-   {
-    "img": "main",
-    "text": "빨리 퍼뜨려 주세요!! 운영실은 또 숨길 거임"
-   }
-  ],
-  "tags": "#도로랜드실종 #실시간 #직캠",
-  "place": "도로랜드 항구",
-  "postedAt": "1시간 전",
-  "photoTakenAt": "3년 전 · 10월 6일",
-  "likes": "3.1만",
-  "views": "48.2만",
-  "commentCount": 3300,
-  "music": "원본 오디오 - 바다뷰맛집탐방",
-  "comments": [
-   {
-    "name": "지금항구임",
-    "text": "저 지금 항구인데 섬 잘 보이는데요??",
-    "likes": 2800,
-    "time": "1시간 전"
-   },
-   {
-    "name": "영상분석",
-    "text": "이거 3년 전 출항 지연 때 영상이랑 똑같은데… 배 번호가 도로1호 옛날 도색임",
-    "likes": 2100,
-    "time": "50분 전"
-   },
-   {
-    "name": "ㄷㄷ",
-    "text": "헐 진짜 사라졌네 공유함",
-    "likes": 430,
-    "time": "1시간 전"
-   }
-  ],
-  "images": {
-   "main": "empty sea horizon seen from a harbor pier with an old white ferry in the corner, nothing on the horizon, slightly faded old video frame, vertical"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "사진 바꿔치기",
-   "clue": "'방금' 찍었다는데 영상 촬영일은 3년 전 10월 6일. 가입 2일, 게시물 1개, 팔로워 12명에 조회수 48만.",
-   "clueCriterion": "when"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. '방금' 찍었다는 영상의 촬영일이 3년 전 10월 6일(출항 지연 날)입니다. 옛날 영상을 지금 일처럼 올린 바꿔치기이고, 가입 2일·게시물 1개·팔로워 12명짜리 계정에 조회수 48만이 붙은 것도 수상합니다."
-  }
- },
- {
-  "id": "t-ferry",
-  "format": "story",
-  "author": {
-   "name": "여행하는 다은",
-   "handle": "@daeun_trip",
-   "kind": "person",
-   "verified": false,
-   "joined": "2020.06",
-   "followers": "1,204",
-   "posts": "388",
-   "bio": "주말마다 어디든. 섬 여행 좋아함 🏝️",
-   "color": "#0891b2"
-  },
-  "title": "",
-  "body": "도로랜드 가는 10시 배 안! 관람차 벌써 보인다\n\n25분 만에 도착 🚢 사람 진짜 없다 오늘",
-  "slides": [
-   {
-    "img": "main",
-    "text": "도로랜드 가는 10시 배 안! 관람차 벌써 보인다 👀",
-    "sticker": {
-     "type": "place",
-     "text": "도로랜드 가는 배"
-    },
-    "time": "오늘 오전 10:03"
-   },
-   {
-    "img": "b",
-    "text": "25분 만에 도착 🚢 사람 진짜 없다 오늘",
-    "sticker": {
-     "type": "music",
-     "text": "Sunny Afternoon"
-    },
-    "time": "오늘 오전 10:28"
-   }
-  ],
-  "tags": "#도로랜드 #주말",
-  "place": "도로랜드 가는 배",
-  "postedAt": "오늘 오전 10:03",
-  "photoTakenAt": "오늘 오전 10:01",
-  "likes": "",
-  "views": "412",
-  "images": {
-   "main": "view from the deck of a ferry, island amusement park with a big ferris wheel ahead, clear blue sky, vertical photo",
-   "b": "ferry arriving at an island pier with an amusement park entrance arch, few people, sunny morning, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "찍은 때(10:01)와 올린 때(10:03)가 맞고, 10시 정각 배·25분 소요가 자료실과 맞습니다.",
-   "clueCriterion": "when"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 사진 찍은 시간(10:01)과 올린 시간(10:03)이 맞고, 10시 정각에 출발해 25분 걸린다는 것도 자료실과 맞습니다."
-  }
- },
- {
-  "id": "t-churros",
-  "format": "story",
-  "author": {
-   "name": "츄러스요정",
-   "handle": "@churros_fairy",
-   "kind": "person",
-   "verified": false,
-   "joined": "2022.02",
-   "followers": "96",
-   "posts": "141",
-   "bio": "츄러스 있는 곳이면 어디든",
-   "color": "#ca8a04"
-  },
-  "title": "",
-  "body": "회전목마 옆 노란 트럭 츄러스 진짜 맛있음!! 시나몬 듬뿍\n\n줄 5분밖에 안 섰어요. 시나몬 vs 초코 뭐가 나아요?",
-  "slides": [
-   {
-    "img": "main",
-    "text": "회전목마 옆 노란 트럭 츄러스 🥨 시나몬 듬뿍!!",
-    "sticker": {
-     "type": "place",
-     "text": "회전목마 앞 광장"
-    },
-    "time": "3시간 전"
-   },
-   {
-    "img": "main",
-    "text": "줄 5분밖에 안 섰어요. 다음에 또 올 듯",
-    "sticker": {
-     "type": "poll",
-     "q": "뭐가 나아요?",
-     "a": "시나몬",
-     "b": "초코",
-     "pa": 71
-    },
-    "time": "3시간 전"
-   }
-  ],
-  "tags": "",
-  "place": "회전목마 앞 광장",
-  "postedAt": "3시간 전",
-  "photoTakenAt": "3시간 전",
-  "likes": "",
-  "views": "64",
-  "images": {
-   "main": "close-up of cinnamon sugar churros held in front of a yellow food truck in an amusement park, carousel in background, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "직접 먹어 본 후기. 자료실과 어긋나는 내용 없음. 팔로워 96명에 조회 64.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 직접 먹어 본 후기이고 자료실과 어긋나는 내용이 없습니다. 팔로워 96명에 조회 64회로 작은 계정의 평범한 스토리입니다."
-  }
- },
- {
-  "id": "t-sunset",
-  "format": "story",
-  "author": {
-   "name": "바다랑나랑",
-   "handle": "@sea_and_me",
-   "kind": "person",
-   "verified": false,
-   "joined": "2021.06",
-   "followers": "540",
-   "posts": "267",
-   "bio": "바다 보러 다니는 사람",
-   "color": "#0891b2"
-  },
-  "title": "",
-  "body": "관람차 올라가는 중… 한 바퀴 14분이래\n\n꼭대기에서 본 노을🌅 오늘 하루 끝",
-  "slides": [
-   {
-    "img": "b",
-    "text": "관람차 올라가는 중… 한 바퀴 14분이래",
-    "sticker": {
-     "type": "place",
-     "text": "관람차"
-    },
-    "time": "어제 오후 5:41"
-   },
-   {
-    "img": "main",
-    "text": "꼭대기에서 본 노을🌅 오늘 하루 끝",
-    "sticker": {
-     "type": "music",
-     "text": "Golden Hour"
-    },
-    "time": "어제 오후 5:52"
-   }
-  ],
-  "tags": "",
-  "place": "관람차",
-  "postedAt": "어제 오후 5:52",
-  "photoTakenAt": "어제 오후 5:48",
-  "likes": "",
-  "views": "389",
-  "images": {
-   "main": "orange sunset over the sea seen from inside the top cabin of a ferris wheel, vertical photo",
-   "b": "view from inside a ferris wheel cabin going up, amusement park below, late afternoon light, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "찍은 때(5:48)와 올린 때(5:52)가 맞고, 한 바퀴 14분이 자료실과 맞습니다.",
-   "clueCriterion": "when"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 사진 찍은 시간과 올린 시간이 맞고, 관람차 한 바퀴 14분이라는 내용도 자료실과 맞습니다."
-  }
- },
- {
-  "id": "t-fireworks",
-  "format": "story",
-  "author": {
-   "name": "꿀팁전도사",
-   "handle": "@honey_tip_kr",
-   "kind": "person",
-   "verified": false,
-   "joined": "2023.09",
-   "followers": "1,870",
-   "posts": "96",
-   "bio": "할인·이벤트 정보 공유 💸",
-   "color": "#16a34a"
-  },
-  "title": "",
-  "body": "오늘 밤 9시 도로랜드 15주년 기념 불꽃놀이!!🎆\n\n막배도 밤 10시까지 늘린대요. 지금 가면 딱",
-  "slides": [
-   {
-    "img": "main",
-    "text": "오늘 밤 9시 도로랜드 15주년 기념 불꽃놀이!! 🎆",
-    "sticker": {
-     "type": "place",
-     "text": "도로랜드"
-    },
-    "time": "1시간 전"
-   },
-   {
-    "img": "main",
-    "text": "막배도 밤 10시까지 늘린대요. 지금 가면 딱!",
-    "sticker": {
-     "type": "countdown",
-     "text": "불꽃놀이까지",
-     "value": "6:12:00"
-    },
-    "time": "1시간 전"
-   }
-  ],
-  "tags": "#도로랜드 #불꽃놀이 #15주년",
-  "place": "도로랜드",
-  "postedAt": "1시간 전",
-  "photoTakenAt": "",
-  "likes": "",
-  "views": "2.4만",
-  "images": {
-   "main": "fireworks over an island amusement park ferris wheel at night seen from the sea, vertical"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "날짜 조작",
-   "clue": "15주년은 내년 5월 5일이고 지금은 10월. 도로랜드는 오후 7시에 닫고 막배는 7시 30분. 운영실 공지에도 없습니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 자료실에 따르면 개장 15주년은 내년 5월 5일인데 지금은 10월입니다. 도로랜드는 오후 7시에 닫고 섬에서 나오는 막배는 7시 30분이라 밤 9시 불꽃놀이도, 밤 10시 막배도 없습니다. 운영실 공지에도 없는 내용입니다."
-  }
- },
- {
-  "id": "t-rumor",
-  "format": "story",
-  "author": {
-   "name": "소문난아이",
-   "handle": "@rumor_kid",
-   "kind": "person",
-   "verified": false,
-   "joined": "2일 전",
-   "followers": "14",
-   "posts": "1",
-   "bio": "",
-   "color": "#9333ea"
-  },
-  "title": "",
-  "body": "도로랜드 내일부터 문 닫는대ㅠㅠ 직원 친구한테 들음\n\n오늘이 마지막!! 다들 가서 마지막 사진 찍어요",
-  "slides": [
-   {
-    "img": null,
-    "text": "도로랜드 내일부터 문 닫는대ㅠㅠ 직원 친구한테 들음",
-    "time": "20분 전"
-   },
-   {
-    "img": "main",
-    "text": "오늘이 마지막!! 다들 가서 마지막 사진 찍어요 😭",
-    "sticker": {
-     "type": "question",
-     "text": "같이 갈 사람?"
-    },
-    "time": "19분 전"
-   }
-  ],
-  "tags": "",
-  "place": "",
-  "postedAt": "20분 전",
-  "photoTakenAt": "2일 전",
-  "likes": "",
-  "views": "5.2만",
-  "images": {
-   "main": "amusement park entrance gate silhouette at dusk, lonely mood, vertical photo"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "감정 자극",
-   "clue": "'직원 친구한테 들음'은 건너 들은 말. 가입 2일, 팔로워 14명에 조회 5.2만. 운영실(@doroland) 공지에는 폐장 내용이 없습니다.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 직원 친구한테 '들은' 이야기이고, 가입 2일 된 계정에 팔로워 14명인데 조회가 5.2만입니다. 운영실(@doroland) 공지에는 폐장 내용이 없고, 오늘 아침 안내에 '폐장 안내는 운영실과 관계없다'고 써 있습니다."
-  }
- },
- {
-  "id": "t-official",
-  "format": "story",
-  "author": {
-   "name": "도로랜드 운영실",
-   "handle": "@doroland",
-   "kind": "official",
-   "verified": true,
-   "joined": "2015.04",
-   "followers": "15.3만",
-   "posts": "3,892",
-   "bio": "바다 위 놀이공원 도로랜드의 유일한 공식 계정. 운영시간 10:00~19:00",
-   "color": "#0e4a84"
-  },
-  "title": "",
-  "body": "오늘도 정상 운영 중 ☀️ 지금 중앙 광장\n\n관람차 오후 점검 완료 ✓ 모든 기구 운영 중입니다",
-  "slides": [
-   {
-    "img": "main",
-    "text": "오늘도 정상 운영 중 ☀️ 지금 중앙 광장",
-    "sticker": {
-     "type": "place",
-     "text": "중앙 광장"
-    },
-    "time": "오늘 오전 10:12"
-   },
-   {
-    "img": "b",
-    "text": "관람차 오후 점검 완료 ✓ 모든 기구 운영 중입니다",
-    "sticker": {
-     "type": "link",
-     "text": "운영실 안내 보기"
-    },
-    "time": "오늘 오후 2:20"
-   }
-  ],
-  "tags": "",
-  "place": "중앙 광장",
-  "postedAt": "오늘 오전 10:12",
-  "photoTakenAt": "오늘 오전 10:10",
-  "likes": "",
-  "views": "2.8만",
-  "images": {
-   "main": "bright sunny amusement park central plaza with a carousel and a few visitors, official clean photo, vertical",
-   "b": "giant ferris wheel by the sea with a safety inspection crew in orange vests at the base, daytime, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "@doroland은 자료실에 등록된 유일한 공식 계정(인증 배지). 오후 2시 점검은 오늘 운영실 안내와 맞습니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. @doroland은 인증 배지가 있는 유일한 공식 계정이고, 오후 2시 안전 점검은 오늘 아침 운영실 안내 내용과 맞습니다. 같은 시각 '영구 폐장' 글과 비교해 보세요."
-  }
- },
- {
-  "id": "t-event",
-  "format": "story",
-  "author": {
-   "name": "도로랜드 이벤트",
-   "handle": "@doroland_event",
-   "kind": "official",
-   "verified": false,
-   "joined": "1주 전",
-   "followers": "211",
-   "posts": "4",
-   "bio": "도로랜드 이벤트 공식 계정 🎁",
-   "color": "#7c3aed"
-  },
-  "title": "",
-  "body": "15주년 기념 🎉 연간회원권(18만 9천 원) 100명 무료!\n\n아래 링크에 이름·생년월일·전화번호 남기면 끝. 선착순!",
-  "slides": [
-   {
-    "img": "main",
-    "text": "15주년 기념 🎉 연간회원권(18만 9천 원 상당) 100명 무료!",
-    "sticker": {
-     "type": "countdown",
-     "text": "마감까지",
-     "value": "2:00:00"
-    },
-    "time": "5시간 전"
-   },
-   {
-    "img": "main",
-    "text": "아래 링크에 이름·생년월일·전화번호 남기면 끝. 선착순!",
-    "sticker": {
-     "type": "link",
-     "text": "응모하기"
-    },
-    "time": "5시간 전"
-   }
-  ],
-  "tags": "#도로랜드 #이벤트 #연간회원권",
-  "place": "",
-  "postedAt": "5시간 전",
-  "photoTakenAt": "",
-  "likes": "",
-  "views": "18만",
-  "images": {
-   "main": "gift box with a golden ticket and confetti in front of a ferris wheel, festive, vertical, no text"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "사칭",
-   "clue": "공식 계정은 @doroland 하나뿐(인증). @doroland_event는 가입 1주, 인증 없음. 연간회원권 가격(18만 9천 원)은 맞게 써서 그럴듯하지만 개인정보를 모읍니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 자료실에 따르면 공식 계정은 @doroland 하나뿐이고 '이벤트 계정'은 없습니다. @doroland_event는 가입 1주, 인증 배지 없음입니다. 연간회원권 가격(18만 9천 원)을 정확히 써서 그럴듯해 보이지만, 이름·생년월일·전화번호를 모으는 사칭 글입니다."
-  }
- },
- {
-  "id": "t-viking",
-  "format": "story",
-  "author": {
-   "name": "줄서기장인",
-   "handle": "@line_king",
-   "kind": "person",
-   "verified": false,
-   "joined": "2019.09",
-   "followers": "201",
-   "posts": "318",
-   "bio": "줄 서는 시간 다 기록함. 대기 시간 공유",
-   "color": "#b91c1c"
-  },
-  "title": "",
-  "body": "바이킹 줄 40분째ㅠ 소문 때문에 사람 없다더니 여긴 왜\n\n끝자리 탔다!! 75도까지 올라감 진짜 무서움",
-  "slides": [
-   {
-    "img": "main",
-    "text": "바이킹 줄 40분째ㅠ 사람 없다더니 여긴 왜",
-    "sticker": {
-     "type": "place",
-     "text": "바이킹"
-    },
-    "time": "어제 오후 1:20"
-   },
-   {
-    "img": "b",
-    "text": "끝자리 탔다!! 75도까지 올라감 진짜 무서움 🚢",
-    "sticker": {
-     "type": "music",
-     "text": "Pirates Theme"
-    },
-    "time": "어제 오후 2:05"
-   }
-  ],
-  "tags": "",
-  "place": "바이킹",
-  "postedAt": "어제 오후 2:05",
-  "photoTakenAt": "어제 오후 2:03",
-  "likes": "",
-  "views": "151",
-  "images": {
-   "main": "long queue of people waiting under a pirate ship swing ride sign in an amusement park, vertical, seen from behind",
-   "b": "pirate ship swing ride at the top of its swing against a blue sky, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "직접 탄 후기. 바이킹 최대 각도 75도가 자료실과 맞고, 2019년부터 쓴 계정입니다.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 직접 타 본 후기이고 바이킹 최대 각도 75도가 자료실과 맞습니다. 2019년부터 활동한 계정에 조회 151회로 자연스럽습니다."
-  }
- },
- {
-  "id": "t-lost",
-  "format": "story",
-  "author": {
-   "name": "덜렁이",
-   "handle": "@clumsy_dana",
-   "kind": "person",
-   "verified": false,
-   "joined": "2023.03",
-   "followers": "58",
-   "posts": "77",
-   "bio": "물건 잘 잃어버림",
-   "color": "#4b5563"
-  },
-  "title": "",
-  "body": "하모니아 2시 공연 맨 앞줄에 검은 선글라스 두고 왔어요ㅠㅠ\n\n보신 분 운영실에 맡겨 주세요 🙏",
-  "slides": [
-   {
-    "img": "main",
-    "text": "하모니아 2시 공연 맨 앞줄에 검은 선글라스 두고 왔어요ㅠㅠ",
-    "sticker": {
-     "type": "place",
-     "text": "하모니아 공연장"
-    },
-    "time": "1시간 전"
-   },
-   {
-    "img": null,
-    "text": "보신 분 운영실에 맡겨 주세요 🙏 제발",
-    "sticker": {
-     "type": "question",
-     "text": "혹시 보셨나요?"
-    },
-    "time": "1시간 전"
-   }
-  ],
-  "tags": "",
-  "place": "하모니아",
-  "postedAt": "1시간 전",
-  "photoTakenAt": "3시간 전",
-  "likes": "",
-  "views": "40",
-  "images": {
-   "main": "empty front row seats of an outdoor music stage, black sunglasses left on one seat, vertical"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "직접 겪은 일. 하모니아 공연 오후 2시가 자료실과 맞고 장소·시간이 구체적입니다.",
-   "clueCriterion": "witness"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 본인이 직접 겪은 일이고, 하모니아 공연 시간(오후 2시)이 자료실과 맞습니다. 확인할 수 있는 장소와 시간이 정확합니다."
+   "explain": "가짜입니다. 100만 명은 「이달」이 아니라 「올해 누적」입니다. 월별 방문객 통계에 10월 1~9일은 8만 3천 명이고, 하루 평균 11만 명은 배 두 척이 하루에 나를 수 있는 인원(520명 × 20회)으로도 불가능합니다. 등록 언론사(도로일보)가 낸 오보입니다.",
+   "doc": "올해 월별 방문객 (10월 9일 기준)",
+   "part": "제목"
   }
  },
  {
   "id": "n-drone",
   "format": "news",
   "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
+   "name": "서해바다신문",
+   "handle": "@seohaenews",
    "kind": "press",
    "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,377",
-   "bio": "도로랜드와 항구 도시의 소식을 가장 빠르게. 제보 doroilbo@doroilbo.kr",
-   "color": "#0f766e",
-   "reporter": "서하늘"
+   "joined": "2011.03",
+   "followers": "4.2만",
+   "posts": "18,204",
+   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
+   "color": "#1d4ed8",
+   "reporter": "정해솔"
   },
   "title": "관람차 위에 뜬 드론 500대… 도로랜드 15주년 라이트쇼 첫 시연에 항구 2,100명",
-  "subhead": "2일 전 저녁 8시, 바다 위 15분 비행… 운영실 \"본 공연은 내년 5월 5일, 추락·사고 없음\"",
-  "body": "도로랜드가 개장 15주년 기념 드론 라이트쇼를 2일 전 저녁 8시 처음 시연했다. 드론 500대가 관람차 위 바다 상공에서 15분 동안 관람차·배·기린 모양을 차례로 그렸고, 항구에는 2,100명이 모여 바다 너머의 쇼를 지켜봤다.\n\n운영실은 \"한강 드론쇼처럼 도시에서 하는 쇼와 달리 바다 위라 바람 변수가 커서 시연이 꼭 필요했다\"며 \"500대 모두 정상 복귀했고 추락한 드론은 없다\"고 밝혔다. 쇼는 섬 안이 아니라 항구 쪽을 향해 펼쳐져 항구에서 가장 잘 보였다.\n\n본 공연은 내년 5월 5일 저녁 8시이며, 시연과 달리 음악과 관람차 조명 1만 2천 개가 함께 켜진다. 운영실은 \"본 공연 날에도 막배는 7시 30분 그대로\"라며 항구에서 관람하기를 권했다.\n\n이날 항구 상인 매출은 평소 평일 저녁의 두 배였다고 상인회는 전했다.",
+  "subhead": "8일 저녁 8시, 15분 동안 관람차·배·기린 그려… 추락·사고 없어, 본 공연은 내년 5월 5일",
+  "body": "도로랜드가 개장 15주년 기념 드론 라이트쇼를 8일 저녁 8시 처음 시연했다. 드론 500대가 관람차 위 바다 상공에서 15분 동안 관람차, 배, 기린 모양을 차례로 그렸고 항구 광장에는 2,100명이 모였다.\n\n쇼는 항구에서 바다 건너로 보는 방식이라 입장권이나 좌석이 없다. 운영실은 \"드론 추락이나 사고는 한 건도 없었다\"고 밝혔다.\n\n본 공연은 내년 5월 5일 저녁 8시 같은 자리에서 한다. 섬에서 나오는 막배는 그날도 오후 7시 30분이라 섬 안에서는 볼 수 없다.",
   "quote": {
-   "text": "바다 위라 바람 변수가 커서 시연이 꼭 필요했습니다. 500대 모두 돌아왔습니다.",
-   "who": "도로랜드 운영실 관계자"
+   "text": "드론 추락이나 사고는 한 건도 없었습니다.",
+   "who": "도로랜드 운영실"
   },
   "stats": [
    {
@@ -1741,53 +172,37 @@
     "value": "500대"
    },
    {
-    "label": "비행 시간",
-    "value": "15분"
+    "label": "관람 인원",
+    "value": "2,100명"
    },
    {
-    "label": "항구 관람객",
-    "value": "2,100명"
+    "label": "본 공연",
+    "value": "내년 5월 5일"
    }
   ],
   "tags": "",
-  "place": "도로랜드 항구",
-  "postedAt": "2일 전",
+  "place": "항구 광장",
+  "postedAt": "4일 전",
   "editedAt": "",
-  "photoTakenAt": "2일 전",
-  "views": "2.7만",
-  "commentCount": 418,
-  "comments": [
-   {
-    "name": "드론덕후",
-    "text": "500대면 한강쇼보다 많네 진짜 예쁘더라",
-    "likes": 390,
-    "time": "2일 전"
-   },
-   {
-    "name": "항구상인회",
-    "text": "그날 어묵이 다 팔렸습니다 감사합니다",
-    "likes": 210,
-    "time": "2일 전"
-   },
-   {
-    "name": "질문",
-    "text": "본 공연 때 섬 안에서는 못 보나요?",
-    "likes": 55,
-    "time": "어제"
-   }
-  ],
+  "photoTakenAt": "4일 전",
+  "views": "7.8만",
+  "commentCount": 520,
+  "comments": [],
   "images": {
-   "main": "hundreds of glowing drones forming a ferris wheel shape in the night sky over the sea, viewed from a harbor crowd, long exposure"
+   "main": "hundreds of drone lights forming a giant ferris wheel shape in the night sky above the sea, crowd silhouettes at a harbor plaza"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "드론 500대·15분·항구 2,100명·추락 0·본 공연 내년 5월 5일이 자료실 「최근 소식」과 맞고, 등록 언론사입니다.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜 기사입니다. 드론 500대, 15분, 항구 관람객 2,100명, 추락 없음, 본 공연 내년 5월 5일이 모두 자료실 최근 소식과 맞습니다."
+   "explain": "진짜 기사입니다. 드론 500대, 15분, 항구 2,100명, 사고 없음, 본 공연 내년 5월 5일이 모두 드론 라이트쇼 보도자료와 맞습니다.",
+   "doc": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
   }
  },
  {
@@ -1798,73 +213,71 @@
    "handle": "@harbor_news24",
    "kind": "press",
    "verified": false,
-   "joined": "3주 전",
-   "followers": "2,340",
-   "posts": "41",
-   "bio": "항구의 모든 뉴스를 24시간 속보로",
-   "color": "#b91c1c",
+   "joined": "2026.09",
+   "followers": "1,820",
+   "posts": "37",
+   "bio": "항구와 섬 소식을 24시간 전합니다",
+   "color": "#be123c",
    "reporter": ""
   },
-  "title": "[속보] 도로랜드 드론쇼 중 드론 200대 바다에 추락… 관람객 긴급 대피",
+  "title": "[속보] 도로랜드 드론쇼 중 드론 120대 바다에 추락… 관람객 긴급 대피",
   "subhead": "배터리 결함 추정, 운영실은 침묵… \"15주년 본 공연 취소 검토\"",
-  "body": "2일 전 저녁 도로랜드 드론 라이트쇼 시연 도중 드론 200대가 한꺼번에 바다로 떨어졌다. 항구에 모인 관람객 2,100명은 긴급 대피했고, 일부는 넘어져 다친 것으로 알려졌다.\n\n추락 원인은 배터리 결함으로 추정된다. 한 관계자는 \"500대 중 절반 가까이가 신호를 잃었다\"고 말했다. 운영실은 아무 입장도 내지 않고 있다.\n\n이에 따라 내년 5월 5일 본 공연도 취소가 검토되는 것으로 전해졌다. 항구 상인들은 \"쇼 때문에 장사도 망쳤다\"며 분통을 터뜨렸다.",
+  "body": "8일 저녁 도로랜드 드론 라이트쇼 시연 도중 드론 120대가 한꺼번에 바다로 떨어졌다. 항구 광장에 모인 관람객 2,100명은 긴급 대피했고 일부는 넘어져 다친 것으로 알려졌다.\n\n추락 원인은 배터리 결함으로 추정된다. 한 관계자는 \"500대 가운데 4분의 1이 떨어졌다\"고 전했다.\n\n운영실은 아직 공식 입장을 내지 않았다. 내년 5월 5일 본 공연도 취소를 검토 중인 것으로 알려졌다.",
   "quote": {
-   "text": "500대 중 절반 가까이가 신호를 잃었다.",
-   "who": "관계자"
+   "text": "500대 가운데 4분의 1이 떨어졌습니다.",
+   "who": "한 관계자"
   },
   "stats": [
    {
-    "label": "추락",
-    "value": "200대"
+    "label": "추락 드론",
+    "value": "120대"
    },
    {
-    "label": "대피",
+    "label": "관람 인원",
     "value": "2,100명"
    }
   ],
   "tags": "",
-  "place": "도로랜드 항구",
-  "postedAt": "어제",
+  "place": "항구 광장",
+  "postedAt": "4일 전",
   "editedAt": "",
-  "photoTakenAt": "어제",
-  "views": "15만",
-  "commentCount": 980,
+  "photoTakenAt": "4일 전",
+  "views": "21만",
+  "commentCount": 1400,
   "comments": [
    {
-    "name": "그날있던사람",
-    "text": "저 항구에 있었는데 대피 같은 거 없었어요 다들 박수치고 집에 감",
-    "likes": 1900,
-    "time": "어제"
+    "name": "현장에있던사람",
+    "text": "저 어제 항구에 있었는데 떨어진 거 하나도 없었어요",
+    "likes": 2100,
+    "time": "3일 전"
    },
    {
-    "name": "드론덕후",
-    "text": "500대 다 돌아왔다고 도로일보 기사에 나왔는데요",
-    "likes": 1300,
-    "time": "어제"
-   },
-   {
-    "name": "헐",
-    "text": "200대면 바다 쓰레기 장난 아니겠다",
-    "likes": 120,
-    "time": "어제"
+    "name": "ㅇㅇ",
+    "text": "사진이 왜 이렇게 흐려요",
+    "likes": 300,
+    "time": "3일 전"
    }
   ],
   "images": {
-   "main": "dark sea at night with a few blinking drone lights falling toward the water, dramatic, blurry smartphone photo"
+   "main": "dark sea surface at night with small scattered lights floating on the water near a harbor, blurry, dramatic"
   },
   "secret": {
    "truth": "fake",
-   "tactic": "숫자 부풀리기",
-   "clue": "항구뉴스24는 자료실에 없는 매체(가입 3주, 기자 이름 없음). 자료실 최근 소식에는 추락 0대, 사고 없음. 드론 500대·관람객 2,100명 같은 맞는 숫자를 섞었습니다.",
-   "clueCriterion": "cross"
+   "tactic": "감정 자극",
+   "clue": "보도자료에는 추락 0대·사고 없음인데 드론 120대 추락으로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 자료실 최근 소식에 '추락한 드론 없음, 사고 없음'이 있고, 항구뉴스24는 등록되지 않은 매체에 기자 이름도 없습니다. 드론 500대·관람객 2,100명 같은 맞는 숫자를 섞어 넣어 그럴듯하게 만든 숫자 부풀리기입니다."
+   "explain": "가짜입니다. 드론 라이트쇼 보도자료에 「추락 0대, 부상 0명」이 있습니다. 드론 500대·관람객 2,100명 같은 맞는 숫자를 섞었고, 항구뉴스24는 등록 계정부에 없는 매체이며 이름 없는 「관계자」만 나옵니다.",
+   "doc": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다",
+   "part": "본문"
   }
  },
  {
-  "id": "n-ai",
+  "id": "n-giraffe",
   "format": "news",
   "author": {
    "name": "서해바다신문",
@@ -1878,226 +291,9 @@
    "color": "#1d4ed8",
    "reporter": "정해솔"
   },
-  "title": "도로그램, AI 합성 사진·영상 32건 삭제… \"손가락·글자·그림자를 보세요\"",
-  "subhead": "섬 사진뿐 아니라 '관람차 추락', '기린 탈출' 합성도… 도로그램 \"합성 표시 없는 AI 이미지는 삭제\"",
-  "body": "도로그램이 지난 일주일 동안 AI로 합성한 사진·영상 32건을 삭제했다고 밝혔다. 섬이 사라지는 영상뿐 아니라 '관람차 캐빈 추락', '사파리 기린 탈출' 같은 합성물도 포함됐다. 모두 실제로는 없었던 일이다.\n\n도로그램 관계자는 \"요즘은 누구나 휴대폰으로 그럴듯한 가짜 사진을 만들 수 있다\"며 \"AI로 만든 이미지는 '합성' 표시를 해야 하고, 표시 없이 사실처럼 올리면 삭제한다\"고 말했다.\n\n도로그램이 안내한 판별법은 세 가지다. 첫째, 손가락 개수와 손 모양이 이상한지 본다. 둘째, 사진 속 간판·전광판 글자가 깨져 있는지 본다. 셋째, 그림자 방향이 사람마다 다른지 본다.\n\n도로랜드 운영실도 \"운영실 기록에 없는 사고 사진은 먼저 의심해 달라\"고 당부했다.",
-  "quote": {
-   "text": "요즘은 누구나 휴대폰으로 그럴듯한 가짜 사진을 만들 수 있습니다. 표시 없이 사실처럼 올리면 삭제합니다.",
-   "who": "도로그램 관계자"
-  },
-  "stats": [
-   {
-    "label": "삭제",
-    "value": "32건"
-   },
-   {
-    "label": "판별법",
-    "value": "3가지"
-   }
-  ],
-  "tags": "",
-  "place": "도로그램",
-  "postedAt": "어제",
-  "editedAt": "",
-  "photoTakenAt": "어제",
-  "views": "3.1만",
-  "commentCount": 260,
-  "comments": [
-   {
-    "name": "미술쌤",
-    "text": "손가락 6개인 사진 저도 봤어요ㅋㅋ",
-    "likes": 240,
-    "time": "어제"
-   },
-   {
-    "name": "궁금",
-    "text": "진짜 사진도 삭제당하면 어떡해요?",
-    "likes": 80,
-    "time": "어제"
-   },
-   {
-    "name": "도로그램팀",
-    "text": "실제 사진은 촬영 정보로 확인해서 복구해 드립니다",
-    "likes": 150,
-    "time": "어제"
-   }
-  ],
-  "images": {
-   "main": "smartphone screen showing a photo editing app with an obviously fake image of a ferris wheel, person's hands blurred, newsroom photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "삭제 32건·판별법 3가지가 자료실 최근 소식과 맞고 등록 언론사입니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. AI 합성 삭제 32건과 판별법 3가지(손가락·글자·그림자)가 자료실과 맞습니다. 이 판별법은 다른 게시물을 볼 때도 쓸 수 있습니다."
-  }
- },
- {
-  "id": "n-popup",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,377",
-   "bio": "도로랜드와 항구 도시의 소식을 가장 빠르게. 제보 doroilbo@doroilbo.kr",
-   "color": "#0f766e",
-   "reporter": "한바다"
-  },
-  "title": "항구에 '사라지는 섬' 팝업스토어… 새벽 5시부터 오픈런, 엽서 하루 1,200장",
-  "subhead": "운영실 \"걱정을 기념품으로\"… 관람차 키링은 첫날 2시간 만에 동나",
-  "body": "도로랜드 운영실이 항구 광장에 '사라지는 섬' 팝업스토어를 열었다. 관람차가 반쯤 투명하게 그려진 엽서가 하루 1,200장 팔리고, 관람차 키링은 첫날 2시간 만에 동났다.\n\n개장 첫날 새벽 5시부터 줄이 섰고, 오전 10시 문을 열 때 줄 길이는 200m였다. 팝업스토어는 매일 오전 10시부터 오후 8시까지 열고 이달 말까지 운영한다.\n\n운영실 관계자는 \"걱정을 기념품으로 바꿔 보자는 생각이었다\"며 \"엽서 수익 일부는 항구 상인회에 기부한다\"고 말했다. 리셀(되팔기) 가격이 키링 정가의 다섯 배까지 올라 운영실은 1인 2개로 구매를 제한했다.",
-  "quote": {
-   "text": "걱정을 기념품으로 바꿔 보자는 생각이었어요.",
-   "who": "도로랜드 운영실 관계자"
-  },
-  "stats": [
-   {
-    "label": "엽서",
-    "value": "하루 1,200장"
-   },
-   {
-    "label": "줄 길이",
-    "value": "200m"
-   },
-   {
-    "label": "구매 제한",
-    "value": "1인 2개"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 항구 광장",
-  "postedAt": "3일 전",
-  "editedAt": "",
-  "photoTakenAt": "3일 전",
-  "views": "4.0만",
-  "commentCount": 512,
-  "comments": [
-   {
-    "name": "오픈런러",
-    "text": "새벽 5시 20분에 갔는데 앞에 40명 있었음",
-    "likes": 330,
-    "time": "3일 전"
-   },
-   {
-    "name": "키링못삼",
-    "text": "2시간 만에 동났다는 거 실화… 리셀 5배 미쳤다",
-    "likes": 410,
-    "time": "3일 전"
-   }
-  ],
-  "images": {
-   "main": "long line of people outside a small pop-up store tent at a harbor plaza in the early morning, postcards display, no faces"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "엽서 1,200장(소문 기사와 같은 숫자), 팝업 운영시간 10~20시, 1인 2개 제한이 자료실 최근 소식과 맞습니다.",
-   "clueCriterion": "cross"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜 기사입니다. 엽서 하루 1,200장은 다른 진짜 기사와 같은 숫자이고, 팝업스토어 시간과 구매 제한이 자료실 최근 소식과 맞습니다."
-  }
- },
- {
-  "id": "n-ad",
-  "format": "news",
-  "author": {
-   "name": "바다경제",
-   "handle": "@sea_economy",
-   "kind": "press",
-   "verified": false,
-   "joined": "2개월 전",
-   "followers": "1,560",
-   "posts": "23",
-   "bio": "경제 전문 매체",
-   "color": "#4b5563",
-   "reporter": ""
-  },
-  "title": "[단독] 도로랜드, 유튜버 30명에게 몰래 광고비… '뒷광고'로 좋은 후기만 샀다",
-  "subhead": "롤러코스터·사파리 극찬 영상 대부분이 광고… 한 편에 300만 원",
-  "body": "도로랜드가 유튜버 30명에게 광고비를 주고 '광고' 표시 없는 후기 영상을 올리게 한 것으로 드러났다. 본지가 확인한 바에 따르면 영상 한 편에 300만 원이 지급됐다.\n\n최근 인기를 끈 롤러코스터 맨 앞자리 영상, 사파리 기린 영상도 모두 이 뒷광고에 포함된 것으로 보인다. 한 유튜버는 \"운영실에서 먼저 연락이 왔다\"고 말했다.\n\n운영실은 이에 대해 답하지 않았다.",
-  "quote": {
-   "text": "운영실에서 먼저 연락이 왔다.",
-   "who": "한 유튜버"
-  },
-  "stats": [
-   {
-    "label": "유튜버",
-    "value": "30명"
-   },
-   {
-    "label": "한 편",
-    "value": "300만 원"
-   }
-  ],
-  "tags": "",
-  "place": "",
-  "postedAt": "6시간 전",
-  "editedAt": "",
-  "photoTakenAt": "6시간 전",
-  "views": "8.9만",
-  "commentCount": 640,
-  "comments": [
-   {
-    "name": "롤코타는남자",
-    "text": "제 영상은 제 돈으로 입장권 사서 찍었습니다. 영상 설명에 적혀 있어요",
-    "likes": 2600,
-    "time": "5시간 전"
-   },
-   {
-    "name": "구독자",
-    "text": "기자 이름이 없는데요?",
-    "likes": 700,
-    "time": "5시간 전"
-   },
-   {
-    "name": "헐",
-    "text": "그래서 다들 극찬이었구나",
-    "likes": 90,
-    "time": "6시간 전"
-   }
-  ],
-  "images": {
-   "main": "stack of cash envelopes next to a smartphone showing a video app, dramatic lighting, no faces"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "사칭",
-   "clue": "바다경제는 자료실에 없는 매체(가입 2개월, 기자 이름 없음). 자료실 운영실 입장에 '협찬 콘텐츠는 모두 광고 표시'가 있고, 유튜버 이름이 하나도 없습니다.",
-   "clueCriterion": "who"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 바다경제는 등록되지 않은 매체이고 기자 이름도, 유튜버 이름도 없습니다. 자료실 운영실 입장에는 '협찬 콘텐츠는 모두 광고 표시'가 있습니다. 진짜 뒷광고 기사라면 누가 받았는지 구체적으로 씁니다."
-  }
- },
- {
-  "id": "n-baby",
-  "format": "news",
-  "author": {
-   "name": "서해바다신문",
-   "handle": "@seohaenews",
-   "kind": "press",
-   "verified": true,
-   "joined": "2011.03",
-   "followers": "4.2만",
-   "posts": "18,204",
-   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
-   "color": "#1d4ed8",
-   "reporter": "정해솔"
-  },
-  "title": "도로랜드 사파리에 아기 기린 탄생… 이름 공모에 사흘 만에 4,800건",
-  "subhead": "지난주 토요일 새벽 태어나 키 1.8m… 운영실 \"이달 말까지 @doroland에서 공모, 지프 투어에서 볼 수 있어\"",
-  "body": "도로랜드 사파리에서 지난주 토요일 새벽 아기 기린이 태어났다. 태어날 때 키는 1.8m, 몸무게는 62kg이었다. 어미와 새끼 모두 건강하다고 사파리 사육팀은 밝혔다.\n\n운영실이 공식 계정(@doroland)에서 이름 공모를 시작하자 사흘 만에 4,800건이 들어왔다. 공모는 이달 말까지이며, 뽑힌 이름을 낸 사람에게는 연간회원권을 준다.\n\n아기 기린은 지프 투어 코스에서 볼 수 있다. 사육팀은 \"지프 창문 밖으로 손을 내밀거나 먹이를 주면 안 된다\"고 당부했다. 사파리 동물은 38종이며, 기린은 이번 탄생으로 5마리가 됐다.",
+  "title": "도로랜드 사파리에 아기 기린 탄생… 이름 공모 사흘 만에 4,800건",
+  "subhead": "4일 새벽 태어나 키 1.8m·62kg… 공모는 @doroland 댓글로 이달 31일까지, 당첨 1명에 연간회원권",
+  "body": "도로랜드 사파리에서 4일 토요일 새벽 3시 40분 아기 기린이 태어났다. 태어날 때 키는 1.8m, 몸무게는 62kg이었다. 어미 「하늘」과 새끼 모두 건강하다고 사파리 사육팀은 밝혔다.\n\n운영실이 공식 계정 @doroland 게시물 댓글로 이름 공모를 시작하자 사흘 만에 4,800건이 들어왔다. 공모는 31일까지이고 당첨자 1명에게 연간회원권 1장을 준다. 이름은 11월 초에 발표한다.\n\n아기 기린은 지프 투어 코스에서 볼 수 있다. 사육팀은 \"창문 밖으로 손을 내밀거나 먹이를 주면 안 된다\"고 당부했다. 도로랜드 기린은 이번 탄생으로 5마리가 됐다.",
   "quote": {
    "text": "어미도 새끼도 건강합니다. 창문 밖으로 손을 내밀지만 말아 주세요.",
    "who": "사파리 사육팀"
@@ -2138,386 +334,1164 @@
    }
   ],
   "images": {
-   "main": "baby giraffe standing next to its mother in a safari park, morning light, seen from a jeep"
+   "main": "baby giraffe standing next to its mother in a safari park, morning light, seen from a jeep window"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "아기 기린 탄생(지난주 토요일, 1.8m), 이름 공모 @doroland, 기린 5마리가 자료실 최근 소식과 맞습니다.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜 기사입니다. 아기 기린 탄생과 이름 공모(@doroland, 이달 말까지), 기린 5마리가 자료실 최근 소식과 맞고 등록 언론사입니다."
+   "explain": "진짜 기사입니다. 출생일(10월 4일 새벽), 키 1.8m·62kg, 공모 4,800건(6~8일), 당첨 1명, 기린 5마리가 아기 기린 보도자료와 맞습니다.",
+   "doc": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지"
   }
  },
  {
-  "id": "n-price",
+  "id": "n-giraffe-name",
+  "format": "news",
+  "author": {
+   "name": "바다경제",
+   "handle": "@sea_economy",
+   "kind": "press",
+   "verified": false,
+   "joined": "2026.08",
+   "followers": "3,410",
+   "posts": "58",
+   "bio": "서해안 경제 뉴스",
+   "color": "#7c3aed",
+   "reporter": ""
+  },
+  "title": "도로랜드 아기 기린 이름 「도도」로 확정… 공모 1만 건 넘자 조기 마감",
+  "subhead": "운영실 \"너무 많이 들어와 8일에 마감\"… 당첨자 10명에게 연간회원권",
+  "body": "도로랜드 사파리 아기 기린의 이름이 「도도」로 정해졌다. 운영실은 이름 공모에 1만 2천 건이 들어오자 예정보다 일찍 8일에 공모를 마감하고 가장 많이 나온 이름을 골랐다고 밝혔다.\n\n「도도」를 낸 사람 가운데 10명을 뽑아 연간회원권을 준다. 당첨자는 이번 주 안에 발표된다.\n\n아기 기린은 4일 새벽 태어났으며 키 1.8m, 몸무게 62kg이다.",
+  "quote": null,
+  "stats": [
+   {
+    "label": "공모 접수",
+    "value": "1만 2천 건"
+   },
+   {
+    "label": "당첨",
+    "value": "10명"
+   }
+  ],
+  "tags": "",
+  "place": "사파리",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "4일 전",
+  "views": "3.9만",
+  "commentCount": 260,
+  "comments": [],
+  "images": {
+   "main": "a baby giraffe close up with a small wooden name sign hanging on a fence, blurred, no readable text"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "숫자 부풀리기",
+   "clue": "공모가 31일까지 진행 중인데 「도도로 확정·조기 마감」으로 씀. 접수 4,800건을 1만 2천 건, 당첨 1명을 10명으로.",
+   "clueCriterion": "cross",
+   "clueKind": "title",
+   "fact": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 아기 기린 보도자료에 공모는 10월 31일까지, 접수는 사흘 4,800건, 당첨 1명, 이름 발표는 11월 초라고 되어 있습니다. 바다경제는 등록 계정부에 없는 매체입니다.",
+   "doc": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지",
+   "part": "제목"
+  }
+ },
+ {
+  "id": "n-popup",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "서하늘"
+  },
+  "title": "항구에 15주년 굿즈 팝업… 새벽 5시 20분부터 줄, 키링은 11시 5분에 매진",
+  "subhead": "엽서 세트 하루 1,200개 매진 행진, 키링은 1인 2개 제한… 31일까지 매일 10시~20시",
+  "body": "도로랜드 운영실이 항구 광장에 연 15주년 굿즈 팝업스토어가 사흘째 매진을 이어가고 있다. 관람차 엽서 세트(3,000원)는 하루 1,200세트가 매일 다 팔렸고, 관람차 키링(8,000원)은 하루 400개가 첫날 낮 12시 10분, 둘째 날 오전 11시 40분, 셋째 날 오전 11시 5분에 동났다.\n\n첫날은 새벽 5시 20분부터 줄이 섰고 문을 연 오전 10시에는 줄 길이가 약 200m였다. 키링은 1인 2개까지만 살 수 있다.\n\n팝업스토어는 31일까지 매일 오전 10시부터 오후 8시까지 열며 입장권이 없어도 살 수 있다.",
+  "quote": {
+   "text": "키링 사려고 새벽 5시에 왔어요. 2개 제한이라 친구 것까지는 못 샀어요.",
+   "who": "방문객 (고등학생)"
+  },
+  "stats": [
+   {
+    "label": "엽서 세트",
+    "value": "하루 1,200"
+   },
+   {
+    "label": "키링",
+    "value": "하루 400"
+   },
+   {
+    "label": "첫날 줄",
+    "value": "약 200m"
+   }
+  ],
+  "tags": "",
+  "place": "항구 광장",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "2일 전",
+  "views": "5.5만",
+  "commentCount": 410,
+  "comments": [],
+  "images": {
+   "main": "long morning queue of young people in front of a white pop-up store tent at a harbor plaza, ferris wheel across the sea"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 엽서 하루 1,200세트, 키링 하루 400개와 매진 시각(12:10·11:40·11:05), 1인 2개 제한, 첫날 새벽 5시 20분·줄 200m가 팝업스토어 보도자료 표와 맞습니다.",
+   "doc": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
+  }
+ },
+ {
+  "id": "n-popup-fake",
   "format": "news",
   "author": {
    "name": "도로일보",
    "handle": "@doroilbo_news",
    "kind": "press",
    "verified": false,
-   "joined": "2주 전",
-   "followers": "890",
-   "posts": "5",
-   "bio": "도로일보 속보 계정",
+   "joined": "2026.09",
+   "followers": "640",
+   "posts": "12",
+   "bio": "도로랜드 소식 속보 채널",
    "color": "#0f766e",
    "reporter": "한바다"
   },
-  "title": "도로랜드 입장권 내년 9만 원으로 인상… 어린이도 7만 원",
-  "subhead": "운영실 \"드론쇼·조명 쇼 비용 때문\"… 연간회원권은 35만 원",
-  "body": "도로랜드 입장권이 내년 1월 1일부터 어른 9만 원, 어린이 7만 원으로 오른다. 지금(어른 5만 4천 원, 어린이 4만 2천 원)보다 67% 오르는 것이다. 연간회원권도 18만 9천 원에서 35만 원이 된다.\n\n운영실은 15주년 드론쇼와 관람차 조명 쇼에 든 비용 때문이라고 설명했다. 연간회원권을 지금 가격에 사려면 이달 안에 아래 링크로 신청해야 한다.\n\n인상 소식에 방문객들은 \"너무 비싸다\"며 반발하고 있다.",
+  "title": "[단독] 팝업 키링 하루 3,000개씩 팔려… 사흘 매출 7,200만 원",
+  "subhead": "엽서는 하루 1,200세트… 운영실 \"키링 생산 라인 두 배로\"",
+  "body": "항구 광장 15주년 굿즈 팝업스토어의 관람차 키링이 하루 3,000개씩 팔리고 있다. 8,000원짜리 키링이 사흘 동안 9,000개 팔려 매출만 7,200만 원이다.\n\n엽서 세트는 하루 1,200세트가 매진됐다. 운영실 관계자는 \"키링 생산 라인을 두 배로 늘렸다\"고 밝혔다.\n\n팝업스토어는 31일까지 매일 오전 10시부터 오후 8시까지 연다.",
   "quote": {
-   "text": "드론쇼와 조명 쇼에 든 비용 때문이다.",
-   "who": "운영실"
+   "text": "키링 생산 라인을 두 배로 늘렸습니다.",
+   "who": "운영실 관계자"
   },
   "stats": [
    {
-    "label": "어른",
-    "value": "9만 원"
+    "label": "키링 하루 판매",
+    "value": "3,000개"
    },
    {
-    "label": "인상률",
-    "value": "67%"
+    "label": "사흘 매출",
+    "value": "7,200만 원"
    }
   ],
   "tags": "",
-  "place": "",
-  "postedAt": "3시간 전",
+  "place": "항구 광장",
+  "postedAt": "어제",
   "editedAt": "",
-  "photoTakenAt": "3시간 전",
-  "views": "12만",
-  "commentCount": 1500,
+  "photoTakenAt": "2일 전",
+  "views": "8.1만",
+  "commentCount": 330,
   "comments": [
    {
-    "name": "연간회원",
-    "text": "운영실이 지난달에 내년 요금 동결 발표했는데요?",
-    "likes": 2100,
-    "time": "2시간 전"
-   },
-   {
-    "name": "도로일보구독자",
-    "text": "도로일보 계정은 @doroilbo 하나예요. _news 붙은 건 처음 봄",
-    "likes": 1700,
-    "time": "2시간 전"
-   },
-   {
-    "name": "급함",
-    "text": "링크 눌러서 신청했는데 괜찮겠죠?",
-    "likes": 60,
-    "time": "3시간 전"
+    "name": "굿즈수집러",
+    "text": "400개 한정이라 11시면 끝나는데 3,000개가 어디서 나와요",
+    "likes": 540,
+    "time": "어제"
    }
   ],
   "images": {
-   "main": "ticket booth of an amusement park with a price board, blurred numbers, cloudy day"
+   "main": "display table full of small ferris wheel keyrings in a pop-up store, close up, soft light"
   },
   "secret": {
    "truth": "fake",
    "tactic": "사칭",
-   "clue": "진짜 도로일보는 @doroilbo(인증). 이 계정은 @doroilbo_news, 가입 2주, 인증 없음. 자료실 운영실 입장에 '내년 입장권 요금 동결'이 있고, 지금 가격(54,000·42,000·189,000)은 맞게 써서 그럴듯합니다. 링크로 신청하라는 것도 수상합니다.",
-   "clueCriterion": "who"
+   "clue": "키링 하루 400개 한정을 3,000개로 부풀림. 계정도 도로일보 사칭.",
+   "clueCriterion": "cross",
+   "clueKind": "stats",
+   "fact": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 도로일보 진짜 계정은 @doroilbo인데 이 글은 @doroilbo_news(가입 2주, 인증 없음)입니다. 자료실에는 운영실이 내년 요금 동결을 발표했다고 나옵니다. 지금 가격은 정확히 써서 그럴듯하게 만들었고, '이달 안에 링크로 신청'은 개인정보를 모으려는 수법입니다."
+   "explain": "가짜입니다. 팝업스토어 보도자료 표에 키링은 하루 400개 한정이고 1인 2개 제한입니다. 엽서 1,200세트 같은 맞는 숫자를 섞었고, 계정 @doroilbo_news는 등록 계정부의 사칭 신고 계정입니다(진짜 도로일보는 @doroilbo).",
+   "doc": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지",
+   "part": "숫자 상자"
   }
  },
  {
-  "id": "s-drone",
-  "format": "shorts",
+  "id": "n-ferry-guide",
+  "format": "news",
   "author": {
-   "name": "밤하늘기록",
-   "handle": "@night_sky_log",
+   "name": "섬여행 노트",
+   "handle": "@island_note",
    "kind": "person",
    "verified": false,
-   "joined": "2022.10",
-   "followers": "640",
-   "posts": "118",
-   "bio": "밤에만 찍는 사람 🌙",
-   "color": "#4b5563"
+   "joined": "2021.05",
+   "followers": "2,140",
+   "posts": "318",
+   "bio": "주말마다 섬 하나씩. 배 시간표 정리 전문",
+   "color": "#0369a1"
   },
-  "title": "도로랜드 드론쇼 직캠, 관람차가 하늘에 하나 더 떴다",
-  "body": "2일 전 저녁 8시, 항구에서 기다린 지 40분\n\n드론 500대가 한 번에 떠오름… 소리가 벌 떼 같음\n\n관람차가 하늘에 하나 더!! 진짜 관람차랑 겹쳐 보이는 순간\n\n15분 끝. 다들 박수. 본 공연은 내년 5월 5일이래요",
-  "scenes": [
+  "title": "도로랜드 가는 배 시간표 총정리: 매시 정각 출발, 25분, 막배는 7시 30분",
+  "subhead": "처음 가는 사람이 가장 많이 묻는 것… 주말은 30분 간격, 배 요금은 입장권에 포함",
+  "body": "도로랜드에 처음 가는 사람이 가장 많이 묻는 게 배 시간이다. 항구에서 섬으로 가는 배는 오전 9시부터 오후 6시까지 매시 정각에 출발하고 주말에는 30분 간격으로 늘어난다.\n\n섬에서 항구로 돌아오는 배는 오전 10시 30분부터 매시 30분에 있고 막배는 오후 7시 30분이다. 도로1호와 도로2호 두 척이 번갈아 다니며 한 번에 520명이 타고 25분 걸린다.\n\n배 요금은 따로 없다. 입장권에 포함되어 있다. 항구 주차장은 1,200면이고 하루 5,000원이다.",
+  "quote": null,
+  "stats": [
    {
-    "img": "main",
-    "text": "2일 전 저녁 8시, 항구에서 기다린 지 40분"
+    "label": "항구 → 섬",
+    "value": "매시 정각"
    },
    {
-    "img": "main",
-    "text": "드론 500대가 한 번에 떠오름… 소리가 벌 떼 같음"
+    "label": "막배",
+    "value": "오후 7시 30분"
    },
    {
-    "img": "b",
-    "text": "관람차가 하늘에 하나 더!! 진짜 관람차랑 겹쳐 보이는 순간"
-   },
-   {
-    "img": "b",
-    "text": "15분 끝. 다들 박수. 본 공연은 내년 5월 5일이래요"
+    "label": "소요",
+    "value": "25분"
    }
   ],
-  "tags": "#도로랜드 #드론쇼 #직캠",
-  "place": "도로랜드 항구",
-  "postedAt": "2일 전",
-  "photoTakenAt": "2일 전",
-  "likes": "3,120",
-  "views": "4.1만",
-  "commentCount": 204,
-  "music": "원본 오디오 - 밤하늘기록",
-  "comments": [
-   {
-    "name": "같이봄",
-    "text": "저 옆에 있었어요 벌 떼 소리 ㅋㅋㅋ 맞음",
-    "likes": 180,
-    "time": "2일 전"
-   },
-   {
-    "name": "질문",
-    "text": "섬 안에서는 안 보였나요?",
-    "likes": 40,
-    "time": "어제"
-   }
-  ],
+  "tags": "",
+  "place": "항구",
+  "postedAt": "5일 전",
+  "editedAt": "",
+  "photoTakenAt": "5일 전",
+  "views": "2.7만",
+  "commentCount": 96,
+  "comments": [],
   "images": {
-   "main": "crowd at a harbor at night watching hundreds of drones rising over the sea, vertical smartphone video frame",
-   "b": "drones forming a glowing ferris wheel shape in the night sky above a real ferris wheel, vertical"
+   "main": "white passenger ferry leaving a harbor pier on a calm sunny morning, island with ferris wheel in the distance"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "직접 본 일. 저녁 8시·500대·15분·본 공연 내년 5월 5일이 자료실 최근 소식과 맞고, 팔로워 640명에 조회 4.1만으로 큰 행사치고 자연스럽습니다.",
-   "clueCriterion": "witness"
+   "clue": "운영 시간과 배 시간표",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "운영 시간과 배 시간표"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜입니다. 직접 찍은 직캠이고 시간·드론 수·15분·본 공연 날짜가 자료실 최근 소식과 맞습니다."
+   "explain": "진짜입니다. 배 시간(매시 정각·30분, 주말 30분 간격), 막배 7시 30분, 520명·25분이 운영 시간과 배 시간표 문서와 맞습니다. 인증 배지 없는 개인 블로그 계정이지만 내용이 자료실과 맞으면 진짜입니다.",
+   "doc": "운영 시간과 배 시간표"
   }
  },
  {
-  "id": "s-dronefake",
-  "format": "shorts",
+  "id": "n-nightopen",
+  "format": "news",
   "author": {
-   "name": "충격영상모음",
-   "handle": "@shock_clips",
-   "kind": "creator",
+   "name": "꿀팁생활",
+   "handle": "@honeytip_life",
+   "kind": "press",
    "verified": false,
-   "joined": "1개월 전",
-   "followers": "1,210",
-   "posts": "28",
-   "bio": "세상의 충격 영상 매일 업로드",
-   "color": "#b91c1c"
+   "joined": "2026.07",
+   "followers": "9,870",
+   "posts": "210",
+   "bio": "생활 꿀팁·할인 정보",
+   "color": "#ea580c",
+   "reporter": ""
   },
-  "title": "드론쇼 중 드론들이 갑자기 '폐장' 글자를 만들었다 (소름)",
-  "body": "도로랜드 드론쇼 중 드론들이 갑자기…\n\n'폐 장' 두 글자를 만들었습니다. 운영실도 당황\n\n해킹? 예고? 지워지기 전에 저장하세요",
-  "scenes": [
+  "title": "도로랜드 11월부터 야간 개장… 막배 밤 9시로 연장",
+  "subhead": "폐장 오후 9시로 두 시간 늘려, 관람차 야간 조명도 미리 점등… \"가을 밤바다 보러 오세요\"",
+  "body": "도로랜드가 11월 1일부터 야간 개장을 시작한다. 폐장 시간이 오후 7시에서 9시로 두 시간 늘고 섬에서 나오는 막배도 밤 9시 30분으로 바뀐다.\n\n관람차에 설치 중인 조명 1만 2천 개도 11월부터 미리 켠다. 운영실은 \"가을 밤바다를 관람차에서 보라\"고 홍보할 계획이다.\n\n야간 입장권은 어른 3만 원으로 따로 판다.",
+  "quote": null,
+  "stats": [
    {
-    "img": "main",
-    "text": "도로랜드 드론쇼 중 드론들이 갑자기…"
+    "label": "폐장",
+    "value": "오후 9시"
    },
    {
-    "img": "main",
-    "text": "'폐 장' 두 글자를 만들었습니다. 운영실도 당황"
-   },
-   {
-    "img": "main",
-    "text": "해킹? 예고? 지워지기 전에 저장하세요"
+    "label": "막배",
+    "value": "밤 9시 30분"
    }
   ],
-  "tags": "#도로랜드 #드론쇼 #충격 #해킹",
-  "place": "도로랜드 항구",
+  "tags": "",
+  "place": "도로랜드",
   "postedAt": "어제",
-  "photoTakenAt": "",
-  "likes": "8,900",
-  "views": "52만",
-  "commentCount": 2300,
-  "music": "Suspense Hit - 무료 음원",
-  "comments": [
-   {
-    "name": "한글좋아",
-    "text": "글자 자세히 보면 '폐'가 깨져 있음… AI 합성 티남",
-    "likes": 1800,
-    "time": "어제"
-   },
-   {
-    "name": "그날직캠올린사람",
-    "text": "제가 처음부터 끝까지 찍었는데 글자 없었어요. 관람차·배·기린 모양이었음",
-    "likes": 2400,
-    "time": "어제"
-   },
-   {
-    "name": "소름",
-    "text": "해킹이면 진짜 큰일",
-    "likes": 300,
-    "time": "어제"
-   }
-  ],
+  "editedAt": "",
+  "photoTakenAt": "3일 전",
+  "views": "6.6만",
+  "commentCount": 410,
+  "comments": [],
   "images": {
-   "main": "glowing drones in the night sky forming distorted unreadable glyphs over the sea, slightly artificial look, vertical"
+   "main": "seaside ferris wheel lit at dusk with warm lights, calm sea, long exposure"
   },
   "secret": {
    "truth": "fake",
-   "tactic": "사진 바꿔치기",
-   "clue": "자료실 최근 소식에 드론쇼 연출은 관람차·배·기린 모양뿐. 가입 1개월 채널, 구독자 1,210명에 조회 52만. 댓글에 글자가 깨져 있다는 지적(AI 합성 판별법).",
-   "clueCriterion": "cross"
+   "tactic": "없는 혜택",
+   "clue": "야간 개장 없음·막배 7시 30분을 「폐장 9시·막배 9시 30분」으로 바꿈.",
+   "clueCriterion": "when",
+   "clueKind": "time",
+   "fact": "운영 시간과 배 시간표"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 자료실 최근 소식에 드론쇼 연출은 관람차·배·기린 모양뿐이고 '폐장' 글자는 없습니다. AI로 합성한 영상이라 글자가 깨져 있고(판별법: 글자), 가입 1개월 채널이 조회 52만인 것도 수상합니다. '지워지기 전에 저장'은 감정 자극입니다."
+   "explain": "가짜입니다. 운영 시간 문서에 「야간 개장은 하지 않는다, 막배 오후 7시 30분」이 있고, 관람차 조명 보도자료에 점등식은 내년 5월 5일이라고 되어 있습니다. 운영실 공지에도 야간 개장 없음이 정리되어 있습니다. 꿀팁생활은 등록 계정부에 없는 매체입니다.",
+   "doc": "운영 시간과 배 시간표",
+   "part": "시간·날짜"
   }
  },
  {
-  "id": "s-run",
-  "format": "shorts",
+  "id": "n-pets",
+  "format": "news",
   "author": {
-   "name": "달리는직장인",
-   "handle": "@run_after_work",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2021.03",
-   "followers": "12.4만",
-   "posts": "610",
-   "bio": "퇴근 후 러닝. 전국 러닝 코스 리뷰 🏃",
-   "color": "#0f766e"
+   "name": "서해바다신문",
+   "handle": "@seohaenews",
+   "kind": "press",
+   "verified": true,
+   "joined": "2011.03",
+   "followers": "4.2만",
+   "posts": "18,204",
+   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
+   "color": "#1d4ed8",
+   "reporter": "정해솔"
   },
-  "title": "바다 위 놀이공원을 달린다? 도로랜드 섬 둘레길 5.2km 러닝 크루 체험",
-  "body": "토요일 아침 9시, 도로랜드 섬 둘레길 러닝 크루 합류\n\n한 바퀴 5.2km, 왼쪽은 바다 오른쪽은 롤러코스터\n\n사파리 울타리 옆 구간에서 기린이 같이 뜀 (진짜)\n\n32분 완주. 크루는 매주 토 9시, 운영실 주관 무료",
-  "scenes": [
+  "title": "도로랜드, 반려견 동반 입장 시범 운영… 10kg 이하·유모차 태우면 하루 50마리",
+  "subhead": "11월 30일까지 두 달… 사파리·공연장·놀이기구는 제외, 동반 요금 없음",
+  "body": "도로랜드가 1일부터 11월 30일까지 반려견 동반 입장을 시범 운영한다. 10kg 이하 반려견을 반려견 유모차나 가방에 태운 경우에만 되고, 하루 50마리까지 항구 매표소에서 접수한다. 동반 요금은 없다.\n\n사파리 지프 투어와 하모니아 공연장에는 들어갈 수 없고 놀이기구에도 함께 탈 수 없다. 운영실은 \"동물들이 놀라지 않도록 사파리는 제외했다\"고 설명했다.\n\n첫 주에는 하루 평균 31마리가 들어왔고 가장 많이 온 견종은 말티즈였다.",
+  "quote": {
+   "text": "동물들이 놀라지 않도록 사파리는 제외했습니다.",
+   "who": "도로랜드 운영실"
+  },
+  "stats": [
    {
-    "img": "main",
-    "text": "토요일 아침 9시, 도로랜드 섬 둘레길 러닝 크루 합류"
+    "label": "조건",
+    "value": "10kg 이하"
    },
    {
-    "img": "main",
-    "text": "한 바퀴 5.2km, 왼쪽은 바다 오른쪽은 롤러코스터"
-   },
-   {
-    "img": "b",
-    "text": "사파리 울타리 옆 구간에서 기린이 같이 뜀 (진짜)"
-   },
-   {
-    "img": "b",
-    "text": "32분 완주. 크루는 매주 토 9시, 운영실 주관 무료"
+    "label": "하루 접수",
+    "value": "50마리"
    }
   ],
-  "tags": "#도로랜드 #러닝크루 #섬러닝 #5km",
-  "place": "도로랜드 섬 둘레길",
-  "postedAt": "3일 전",
-  "photoTakenAt": "3일 전",
-  "likes": "9,400",
-  "views": "18만",
-  "commentCount": 420,
-  "music": "Morning Run - 무료 음원",
-  "comments": [
-   {
-    "name": "러너",
-    "text": "기린이랑 같이 뛰는 구간 미쳤다",
-    "likes": 700,
-    "time": "3일 전"
-   },
-   {
-    "name": "초보",
-    "text": "개장 전인데 들어갈 수 있어요?",
-    "likes": 120,
-    "time": "3일 전"
-   },
-   {
-    "name": "달리는직장인",
-    "text": "크루 신청하면 8시 30분 배로 들어갑니다!",
-    "likes": 260,
-    "time": "3일 전"
-   }
-  ],
+  "tags": "",
+  "place": "중앙 광장",
+  "postedAt": "6일 전",
+  "editedAt": "",
+  "photoTakenAt": "6일 전",
+  "views": "4.4만",
+  "commentCount": 380,
+  "comments": [],
   "images": {
-   "main": "runners on a seaside path with a roller coaster in the background, early morning, vertical",
-   "b": "giraffe behind a fence running alongside a jogging path in a park, vertical"
+   "main": "small white dog sitting in a pet stroller in front of a carousel at an amusement park, sunny day"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "둘레길 5.2km, 매주 토 9시 운영실 주관 러닝 크루가 자료실 최근 소식과 맞습니다. 2021년부터 활동한 러닝 채널, 구독자 12.4만에 조회 18만.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜입니다. 섬 둘레길 5.2km와 매주 토요일 9시 러닝 크루가 자료실 최근 소식과 맞고, 오래된 러닝 채널에 숫자도 자연스럽습니다."
+   "explain": "진짜 기사입니다. 기간, 10kg 이하·유모차, 하루 50마리, 요금 없음, 사파리·공연장·놀이기구 제외가 반려견 동반 보도자료와 맞습니다.",
+   "doc": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)"
   }
  },
  {
-  "id": "s-challenge",
-  "format": "shorts",
+  "id": "n-pets-safari",
+  "format": "news",
   "author": {
-   "name": "도로랜드챌린지",
-   "handle": "@doroland_challenge",
-   "kind": "official",
-   "verified": false,
-   "joined": "1주 전",
-   "followers": "3,400",
-   "posts": "6",
-   "bio": "도로랜드 공식 챌린지 계정 🎁 연간회원권 매주 추첨",
-   "color": "#7c3aed"
+   "name": "서해바다신문",
+   "handle": "@seohaenews",
+   "kind": "press",
+   "verified": true,
+   "joined": "2011.03",
+   "followers": "4.2만",
+   "posts": "18,204",
+   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
+   "color": "#1d4ed8",
+   "reporter": "정해솔"
   },
-  "title": "#섬사라짐챌린지 참여하면 연간회원권 추첨!! (이번 주 100명)",
-  "body": "섬이 사라지는 척 사진 찍고 #섬사라짐챌린지 올리면 끝!\n\n매주 100명에게 연간회원권(18만 9천 원) 추첨 🎁\n\n아래 링크에 이름·학교·전화번호 등록해야 추첨 대상!",
-  "scenes": [
+  "title": "도로랜드 사파리 지프에도 반려견 동반 허용… \"기린과 강아지가 눈 맞춰\"",
+  "subhead": "반려견 시범 운영 범위 넓혀… 10kg 이하 가방에 태우면 지프 투어 가능",
+  "body": "도로랜드가 반려견 동반 시범 운영 범위를 사파리 지프 투어까지 넓혔다. 10kg 이하 반려견을 가방에 태우면 40분 지프 투어에 함께 탈 수 있다.\n\n운영실은 \"첫 주 반응이 좋아 범위를 넓혔다\"고 밝혔다. 하루 접수는 50마리 그대로이고 동반 요금은 없다.\n\n하모니아 공연장과 놀이기구 탑승은 여전히 안 된다.",
+  "quote": {
+   "text": "첫 주 반응이 좋아 범위를 넓혔습니다.",
+   "who": "도로랜드 운영실"
+  },
+  "stats": [
    {
-    "img": "main",
-    "text": "섬이 사라지는 척 사진 찍고 #섬사라짐챌린지 올리면 끝!"
+    "label": "지프 투어",
+    "value": "동반 가능"
    },
    {
-    "img": "main",
-    "text": "매주 100명에게 연간회원권(18만 9천 원) 추첨 🎁"
-   },
-   {
-    "img": "main",
-    "text": "아래 링크에 이름·학교·전화번호 등록해야 추첨 대상!"
+    "label": "하루 접수",
+    "value": "50마리"
    }
   ],
-  "tags": "#섬사라짐챌린지 #도로랜드 #연간회원권",
-  "place": "",
-  "postedAt": "4시간 전",
-  "photoTakenAt": "",
-  "likes": "1.5만",
-  "views": "61만",
-  "commentCount": 3100,
-  "music": "Trending Dance - 무료 음원",
+  "tags": "",
+  "place": "사파리",
+  "postedAt": "3일 전",
+  "editedAt": "",
+  "photoTakenAt": "6일 전",
+  "views": "5.1만",
+  "commentCount": 290,
+  "comments": [],
+  "images": {
+   "main": "safari jeep driving past zebras, a small dog carrier bag visible on the seat, afternoon light"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "가짜 전문가",
+   "clue": "사파리 지프 투어 출입 불가인데 「허용」으로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 반려견 동반 보도자료에 사파리 지프 투어는 「출입 불가」로 되어 있고 범위를 넓혔다는 문서는 없습니다. 인증 배지가 있는 등록 언론사가 낸 오보라서 계정만 보면 못 찾고, 문서와 대조해야 찾습니다. 정정 보도가 따로 나왔습니다.",
+   "doc": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "n-pets-correction",
+  "format": "news",
+  "author": {
+   "name": "서해바다신문",
+   "handle": "@seohaenews",
+   "kind": "press",
+   "verified": true,
+   "joined": "2011.03",
+   "followers": "4.2만",
+   "posts": "18,204",
+   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
+   "color": "#1d4ed8",
+   "reporter": "정해솔"
+  },
+  "title": "[정정] 「사파리 지프에도 반려견 동반 허용」 기사는 사실과 다릅니다",
+  "subhead": "반려견은 사파리·공연장·놀이기구에 들어갈 수 없음… 운영실 확인 없이 보도한 점 사과",
+  "body": "본지는 3일 전 기사에서 도로랜드가 반려견 동반 범위를 사파리 지프 투어까지 넓혔다고 보도했습니다. 확인 결과 반려견은 사파리 지프 투어, 하모니아 공연장, 놀이기구에 들어갈 수 없으며 운영실에 범위를 넓힐 계획도 없었습니다.\n\n해당 기사는 운영실 확인을 거치지 않고 제보 내용을 그대로 실은 것입니다. 독자 여러분께 사과드립니다.\n\n반려견 동반 시범 운영은 11월 30일까지이며 10kg 이하, 유모차나 가방, 하루 50마리 조건은 그대로입니다.",
+  "quote": null,
+  "stats": [
+   {
+    "label": "출입 불가",
+    "value": "사파리·공연장·놀이기구"
+   },
+   {
+    "label": "조건",
+    "value": "10kg 이하"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "어제",
+  "editedAt": "",
+  "photoTakenAt": "어제",
+  "views": "2.2만",
+  "commentCount": 140,
+  "comments": [],
+  "images": {
+   "main": "newspaper correction notice concept, safari park entrance gate with a no-pets pictogram sign, no readable text"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 정정 내용(사파리·공연장·놀이기구 출입 불가, 10kg 이하·하루 50마리)이 반려견 동반 보도자료와 맞습니다. 등록 언론사는 틀린 기사를 내면 정정 보도를 냅니다.",
+   "doc": "[보도자료] 반려견 동반 입장 시범 운영 (10월 1일 ~ 11월 30일)"
+  }
+ },
+ {
+  "id": "n-lostfound",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "한바다"
+  },
+  "title": "도로랜드 분실물 센터 상반기 3,412건… 선글라스 412개, 틀니 3점, 거북이 1마리",
+  "subhead": "주인 찾은 비율 61%… 거북이는 바이킹 앞 벤치에서 발견돼 당일 저녁 집으로",
+  "body": "도로랜드 분실물 센터에 올해 상반기 들어온 물건은 3,412건이고 그중 61%인 2,081건이 주인에게 돌아갔다. 가장 많이 잃어버리는 물건은 선글라스(412건)였고 모자(388건), 우산(240건)이 뒤를 이었다.\n\n눈에 띄는 분실물도 있었다. 틀니 3점 가운데 2점은 주인을 찾았고, 반려 거북이 1마리는 바이킹 앞 벤치에서 발견돼 당일 저녁 주인에게 돌아갔다. 아동 신발 한 짝은 64건이었다.\n\n분실물 센터는 중앙 광장 안내소 안에 있고 3개월 동안 보관한다.",
+  "quote": {
+   "text": "거북이는 벤치 밑에서 아주 천천히 걷고 있었어요. 주인분이 울면서 데려가셨어요.",
+   "who": "고객지원팀 분실물 담당"
+  },
+  "stats": [
+   {
+    "label": "상반기 분실물",
+    "value": "3,412건"
+   },
+   {
+    "label": "주인 찾음",
+    "value": "61%"
+   },
+   {
+    "label": "선글라스",
+    "value": "412건"
+   }
+  ],
+  "tags": "",
+  "place": "중앙 광장 안내소",
+  "postedAt": "4일 전",
+  "editedAt": "",
+  "photoTakenAt": "4일 전",
+  "views": "11.3만",
+  "commentCount": 1500,
   "comments": [
    {
-    "name": "참여함",
-    "text": "링크 등록했어요! 당첨되면 좋겠다",
-    "likes": 420,
-    "time": "4시간 전"
+    "name": "ㅋㅋㅋ",
+    "text": "틀니를 어떻게 잃어버리지",
+    "likes": 3100,
+    "time": "4일 전"
    },
    {
-    "name": "의심",
-    "text": "운영실 계정은 @doroland 하나라고 자료실에 있는데 챌린지 계정이 따로 있어요?",
-    "likes": 2800,
-    "time": "3시간 전"
-   },
-   {
-    "name": "학교까지?",
-    "text": "학교 이름은 왜 적으라는 거지",
-    "likes": 1500,
-    "time": "3시간 전"
+    "name": "거북이주인",
+    "text": "저희 거북이예요… 바이킹 타는 동안 가방에서 나갔어요 감사합니다",
+    "likes": 5400,
+    "time": "3일 전"
    }
   ],
   "images": {
-   "main": "teenagers jumping on a beach pretending something disappeared behind them, playful, vertical, no faces"
+   "main": "lost and found counter shelf with many sunglasses and caps neatly arranged, a small turtle terrarium on the side, bright indoor light"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 3,412건, 61%, 선글라스 412·모자 388·우산 240, 틀니 3점(2점 반환), 거북이 1마리가 분실물 보도자료 표와 맞습니다. 황당해 보여도 자료실에 있으면 진짜입니다.",
+   "doc": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다"
+  }
+ },
+ {
+  "id": "n-crocodile",
+  "format": "news",
+  "author": {
+   "name": "세상에이런일이",
+   "handle": "@wow_news_kr",
+   "kind": "press",
+   "verified": false,
+   "joined": "2026.06",
+   "followers": "2.4만",
+   "posts": "512",
+   "bio": "세상의 신기한 소식을 전합니다",
+   "color": "#b45309",
+   "reporter": ""
+  },
+  "title": "도로랜드 분실물 센터에 새끼 악어 신고… 주인 안 나타나 사파리로",
+  "subhead": "선글라스·모자 다음으로 많은 분실물은 \"반려동물\"… 올해만 거북이 1마리, 악어 1마리",
+  "body": "도로랜드 분실물 센터에 지난달 새끼 악어가 들어왔다. 길이 40cm의 새끼 악어는 바이킹 앞 벤치에서 발견됐고 주인이 나타나지 않아 사파리에서 키우기로 했다.\n\n센터 관계자는 \"올해 상반기에만 반려동물이 두 마리 들어왔다\"고 말했다. 거북이는 당일 주인을 찾았다.\n\n분실물 센터는 중앙 광장 안내소 안에 있다.",
+  "quote": {
+   "text": "올해 상반기에만 반려동물이 두 마리 들어왔습니다.",
+   "who": "센터 관계자"
+  },
+  "stats": [
+   {
+    "label": "새끼 악어",
+    "value": "40cm"
+   },
+   {
+    "label": "반려동물 분실",
+    "value": "2마리"
+   }
+  ],
+  "tags": "",
+  "place": "중앙 광장 안내소",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "2일 전",
+  "views": "15.2만",
+  "commentCount": 900,
+  "comments": [],
+  "images": {
+   "main": "small baby crocodile on a wooden bench in a park, blurry background, sensational framing"
   },
   "secret": {
    "truth": "fake",
    "tactic": "감정 자극",
-   "clue": "공식 계정은 @doroland 하나뿐. @doroland_challenge는 가입 1주, 인증 없음. 이름·학교·전화번호를 모읍니다. 운영실 공지에 챌린지 없음.",
-   "clueCriterion": "who"
+   "clue": "분실물 표에 없는 「새끼 악어」를 넣음. 거북이 1마리는 진짜.",
+   "clueCriterion": "cross",
+   "clueKind": "title",
+   "fact": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 자료실에 공식 계정은 @doroland 하나뿐이고 '챌린지 계정'은 없습니다. 가입 1주, 인증 배지 없음에 이름·학교·전화번호를 모으는 사칭 글입니다. 유행하는 챌린지 형식을 빌려 확인할 틈을 주지 않습니다."
+   "explain": "가짜입니다. 분실물 보도자료 상위 10 표에 반려 거북이 1마리는 있지만 악어는 없고, 사파리 동물 현황 문서에 악어는 「0, 없음」입니다. 거북이·바이킹 앞 벤치 같은 진짜 세부를 섞었습니다.",
+   "doc": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다",
+   "part": "제목"
   }
  },
  {
-  "id": "s-food",
+  "id": "n-wheel-stop",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "서하늘"
+  },
+  "title": "도로랜드 관람차 11분 정지… 탑승객 48명 전원 안전하게 하차",
+  "subhead": "7일 오후 2시 14분 캐빈 문 센서 오류, 부상자 없어… 재탑승권 지급 후 오후 4시 정상 운행",
+  "body": "도로랜드 관람차가 7일 오후 2시 14분 멈췄다가 11분 만에 다시 움직였다. 운영실은 캐빈 문 센서 한 개가 오류를 일으켜 안전장치가 작동했다고 밝혔다.\n\n정지 당시 캐빈에 타고 있던 48명은 2시 25분 재가동 뒤 모두 안전하게 내렸고 다친 사람은 없다. 운영실은 48명에게 재탑승권을 줬다.\n\n센서를 교체한 뒤 당일 오후 4시부터 정상 운행했다. 관람차는 높이 88m, 캐빈 36개로 한 바퀴 도는 데 14분이 걸린다.",
+  "quote": {
+   "text": "센서가 먼저 멈추도록 되어 있어서 멈춘 겁니다. 안전장치가 제대로 일한 거예요.",
+   "who": "시설안전팀장"
+  },
+  "stats": [
+   {
+    "label": "정지 시간",
+    "value": "11분"
+   },
+   {
+    "label": "탑승객",
+    "value": "48명"
+   },
+   {
+    "label": "부상",
+    "value": "0명"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "4일 전",
+  "editedAt": "",
+  "photoTakenAt": "4일 전",
+  "views": "6.9만",
+  "commentCount": 450,
+  "comments": [],
+  "images": {
+   "main": "white ferris wheel against a cloudy sky with a maintenance worker in a safety vest at the base platform, seen from a distance"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[운영 기록] 10월 7일 관람차 11분 정지 점검 결과",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[운영 기록] 10월 7일 관람차 11분 정지 점검 결과"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 7일 오후 2시 14분, 11분, 센서 오류, 48명·부상 0, 재탑승권, 오후 4시 재개가 관람차 정지 운영 기록과 맞습니다.",
+   "doc": "[운영 기록] 10월 7일 관람차 11분 정지 점검 결과"
+  }
+ },
+ {
+  "id": "n-wheel-stop-fake",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "한바다"
+  },
+  "title": "도로랜드 관람차 공중에 2시간 멈춰… 승객 120명 사다리차로 구조",
+  "subhead": "7일 오후 전기 계통 고장, 어린이 3명 탈진… 운영실 \"원인 조사 중\"",
+  "body": "도로랜드 관람차가 7일 오후 2시 14분 멈춰 2시간 동안 움직이지 않았다. 캐빈 36개에 나눠 타고 있던 승객 120명은 소방 사다리차로 한 명씩 내려왔고 어린이 3명이 탈진 증세를 보였다.\n\n운영실은 전기 계통 고장으로 보고 원인을 조사 중이라고 밝혔다. 관람차는 이번 주말까지 운행하지 않는다.\n\n관람차는 높이 88m로 한 바퀴 도는 데 14분이 걸린다.",
+  "quote": null,
+  "stats": [
+   {
+    "label": "정지 시간",
+    "value": "2시간"
+   },
+   {
+    "label": "구조 승객",
+    "value": "120명"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "4일 전",
+  "editedAt": "",
+  "photoTakenAt": "4일 전",
+  "views": "18.6만",
+  "commentCount": 2100,
+  "comments": [
+   {
+    "name": "그날탄사람",
+    "text": "저 그 캐빈에 있었는데 11분 멈추고 바로 내렸어요 사다리차 같은 거 없었음",
+    "likes": 4300,
+    "time": "3일 전"
+   }
+  ],
+  "images": {
+   "main": "fire truck ladder extended toward a ferris wheel cabin, overcast sky, dramatic angle"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "숫자 부풀리기",
+   "clue": "11분·48명을 2시간·120명으로 부풀림. 사다리차 구조·탈진은 기록에 없음.",
+   "clueCriterion": "cross",
+   "clueKind": "stats",
+   "fact": "[운영 기록] 10월 7일 관람차 11분 정지 점검 결과"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 관람차 정지 운영 기록에 정지 11분, 탑승객 48명, 부상 0명, 당일 오후 4시 운행 재개라고 되어 있습니다. 높이 88m·14분 같은 맞는 숫자를 섞은 등록 언론사의 오보입니다.",
+   "doc": "[운영 기록] 10월 7일 관람차 11분 정지 점검 결과",
+   "part": "숫자 상자"
+  }
+ },
+ {
+  "id": "n-halloween",
+  "format": "news",
+  "author": {
+   "name": "서해바다신문",
+   "handle": "@seohaenews",
+   "kind": "press",
+   "verified": true,
+   "joined": "2011.03",
+   "followers": "4.2만",
+   "posts": "18,204",
+   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
+   "color": "#1d4ed8",
+   "reporter": "정해솔"
+  },
+  "title": "도로랜드 할로윈 축제 17일부터… 코스튬 입고 오면 입장권 20% 할인",
+  "subhead": "퍼레이드는 할로윈 버전, 중앙 광장에 호박 포토존… 야간 개장은 없어 오후 7시 폐장 그대로",
+  "body": "도로랜드가 17일부터 31일까지 할로윈 축제를 연다. 머리부터 발끝까지 코스튬을 입고 매표소에 오면 입장권을 20% 깎아 준다. 어른 54,000원이 43,200원이 되는 셈이다.\n\n매일 오후 3시 퍼레이드는 할로윈 버전으로 바뀌고 중앙 광장에는 호박 포토존이 생긴다.\n\n운영 시간은 평소와 같이 오전 10시부터 오후 7시까지다. 운영실은 \"야간 개장 문의가 많은데 올해는 하지 않는다\"고 밝혔다.",
+  "quote": {
+   "text": "야간 개장 문의가 많은데 올해는 하지 않습니다.",
+   "who": "도로랜드 운영실"
+  },
+  "stats": [
+   {
+    "label": "기간",
+    "value": "17 ~ 31일"
+   },
+   {
+    "label": "코스튬 할인",
+    "value": "20%"
+   }
+  ],
+  "tags": "",
+  "place": "중앙 광장",
+  "postedAt": "5일 전",
+  "editedAt": "",
+  "photoTakenAt": "5일 전",
+  "views": "5.0만",
+  "commentCount": 360,
+  "comments": [],
+  "images": {
+   "main": "amusement park plaza decorated with many orange pumpkins and autumn garlands, carousel behind, daytime"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "할로윈 축제 안내 (10월 17일 ~ 31일)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "할로윈 축제 안내 (10월 17일 ~ 31일)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 기간 17~31일, 코스튬 20% 할인, 3시 퍼레이드 할로윈 버전, 호박 포토존, 야간 개장 없음이 할로윈 축제 안내와 맞습니다.",
+   "doc": "할로윈 축제 안내 (10월 17일 ~ 31일)"
+  }
+ },
+ {
+  "id": "n-halloween-night",
+  "format": "news",
+  "author": {
+   "name": "도로랜드 공식",
+   "handle": "@doroland_official_kr",
+   "kind": "official",
+   "verified": false,
+   "joined": "2026.10",
+   "followers": "1,120",
+   "posts": "4",
+   "bio": "도로랜드 공식 안내 계정",
+   "color": "#0e4a84"
+  },
+  "title": "[안내] 할로윈 기간 야간 개장… 밤 10시까지 운영, 어린이 무료 입장",
+  "subhead": "17일부터 31일까지 폐장 밤 10시로 연장, 12세 이하 무료… 막배 밤 10시 30분",
+  "body": "도로랜드 운영실에서 안내드립니다. 할로윈 축제 기간인 17일부터 31일까지 야간 개장을 합니다. 폐장 시간은 밤 10시로 늘어나고 섬에서 나오는 막배는 밤 10시 30분입니다.\n\n같은 기간 12세 이하 어린이는 무료로 입장합니다. 코스튬을 입은 어른은 20% 할인입니다.\n\n자세한 내용은 이 계정의 다음 게시물을 확인해 주세요.",
+  "quote": null,
+  "stats": [
+   {
+    "label": "폐장",
+    "value": "밤 10시"
+   },
+   {
+    "label": "어린이",
+    "value": "무료"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "2일 전",
+  "views": "9.7만",
+  "commentCount": 620,
+  "comments": [
+   {
+    "name": "의심많은사람",
+    "text": "공식 계정은 @doroland 아닌가요? 이건 팔로워가 천 명인데",
+    "likes": 880,
+    "time": "2일 전"
+   }
+  ],
+  "images": {
+   "main": "amusement park entrance gate at night with orange and purple lights, pumpkins, no people, no text"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "사칭",
+   "clue": "공식 계정 @doroland 대신 사칭 계정 @doroland_official_kr로 씀. 야간 개장·어린이 무료도 안내 문서와 어긋남.",
+   "clueCriterion": "who",
+   "clueKind": "account",
+   "fact": "등록 계정부: 공식 계정, 등록 언론사, 등록 크리에이터, 사칭 신고 계정"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 등록 계정부에 공식 계정은 @doroland 하나뿐이고 @doroland_official_kr은 사칭 신고 계정입니다. 할로윈 안내 문서에도 야간 개장 없음, 어린이 무료 없음(코스튬 20% 할인만)이라고 되어 있습니다.",
+   "doc": "등록 계정부: 공식 계정, 등록 언론사, 등록 크리에이터, 사칭 신고 계정",
+   "part": "계정"
+  }
+ },
+ {
+  "id": "n-coaster-why",
+  "format": "news",
+  "author": {
+   "name": "놀이기구 리뷰어",
+   "handle": "@ride_review",
+   "kind": "person",
+   "verified": false,
+   "joined": "2019.11",
+   "followers": "5,230",
+   "posts": "402",
+   "bio": "전국 놀이기구 제원 정리. 숫자로 말합니다",
+   "color": "#4f46e5"
+  },
+  "title": "도로랜드 롤러코스터 정점에서 바다가 보이는 이유… 최고 높이 42m, 시속 92km",
+  "subhead": "길이 1,180m, 2분 10초… 섬 가장자리에 세워 꼭대기에서 수평선까지 트여",
+  "body": "도로랜드 롤러코스터 「블루웨이브」는 최고 높이 42m, 최고 속도 시속 92km, 길이 1,180m다. 숫자만 보면 국내 다른 코스터와 비슷하지만 정점에서 바다가 보인다는 점이 다르다.\n\n이유는 위치다. 코스터가 섬 가장자리에 세워져 있어 꼭대기에 올라가면 가리는 건물 없이 수평선까지 트인다. 한 번 타는 데 2분 10초가 걸리고 키 130cm부터 탈 수 있다.\n\n지난해 방문객 설문에서 가장 좋았던 시설 1위(38%)로 뽑혔다.",
+  "quote": null,
+  "stats": [
+   {
+    "label": "최고 높이",
+    "value": "42m"
+   },
+   {
+    "label": "최고 속도",
+    "value": "92km/h"
+   },
+   {
+    "label": "길이",
+    "value": "1,180m"
+   }
+  ],
+  "tags": "",
+  "place": "롤러코스터",
+  "postedAt": "6일 전",
+  "editedAt": "",
+  "photoTakenAt": "6일 전",
+  "views": "3.3만",
+  "commentCount": 180,
+  "comments": [],
+  "images": {
+   "main": "blue roller coaster track rising over a sea cliff edge, ocean horizon behind, bright day, wide angle"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "시설 제원표 (놀이기구·공연장·사파리)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "시설 제원표 (놀이기구·공연장·사파리)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 42m, 92km, 1,180m, 2분 10초, 키 130cm가 시설 제원표와 맞고, 설문 1위 38%는 방문객 설문 문서와 맞습니다. 배지 없는 개인 계정이지만 내용이 자료실과 맞습니다.",
+   "doc": "시설 제원표 (놀이기구·공연장·사파리)"
+  }
+ },
+ {
+  "id": "n-coaster-65",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "한바다"
+  },
+  "title": "[단독] 도로랜드 롤러코스터 2층 코스 증설… 최고 높이 65m로 국내 최고",
+  "subhead": "내년 15주년 맞춰 공사, 시속 110km… 운영실 \"내부 결정 끝났다\"",
+  "body": "도로랜드가 롤러코스터 「블루웨이브」에 2층 코스를 증설해 최고 높이를 42m에서 65m로 올리는 것으로 확인됐다. 최고 속도도 시속 92km에서 110km로 빨라진다.\n\n도로랜드 사정에 밝은 관계자는 \"내부 결정은 끝났고 발표만 남았다\"고 전했다. 공사는 내년 15주년에 맞춰 마무리된다.\n\n현재 블루웨이브는 길이 1,180m로 한 번 타는 데 2분 10초가 걸린다.",
+  "quote": {
+   "text": "내부 결정은 끝났고 발표만 남았습니다.",
+   "who": "도로랜드 사정에 밝은 관계자"
+  },
+  "stats": [
+   {
+    "label": "증설 후 높이",
+    "value": "65m"
+   },
+   {
+    "label": "증설 후 속도",
+    "value": "110km/h"
+   }
+  ],
+  "tags": "",
+  "place": "롤러코스터",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "6일 전",
+  "views": "7.3만",
+  "commentCount": 540,
+  "comments": [],
+  "images": {
+   "main": "construction cranes next to a tall roller coaster structure by the sea, blueprint style mood, daytime"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "가짜 전문가",
+   "clue": "증축 계획 없음인데 「관계자: 내부 결정 끝났다」로 씀. 65m·110km는 자료실 어디에도 없음.",
+   "clueCriterion": "cross",
+   "clueKind": "quote",
+   "fact": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 운영실 공지에 「관람차·롤러코스터 증축 계획 없음(높이 88m·42m 그대로)」가 있고, 시설 제원표에도 증설 계획이 없다고 되어 있습니다. 이름 없는 「관계자」 말뿐인 등록 언론사의 오보입니다.",
+   "doc": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)",
+   "part": "인용"
+  }
+ },
+ {
+  "id": "n-lights",
+  "format": "news",
+  "author": {
+   "name": "도로일보",
+   "handle": "@doroilbo",
+   "kind": "press",
+   "verified": true,
+   "joined": "2009.07",
+   "followers": "8.7만",
+   "posts": "41,230",
+   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
+   "color": "#0f766e",
+   "reporter": "서하늘"
+  },
+  "title": "15주년 앞둔 도로랜드, 관람차에 조명 1만 2천 개… 13일부터 밤에만 공사",
+  "subhead": "11월 30일까지 오후 7시 30분~오전 6시 작업, 낮 운행은 그대로… 점등식은 내년 5월 5일",
+  "body": "도로랜드가 내년 5월 5일 개장 15주년을 앞두고 관람차 야간 조명 쇼를 준비한다. 높이 88m, 캐빈 36개 관람차 바퀴 전체에 조명 1만 2천 개를 단다.\n\n공사는 13일부터 11월 30일까지 영업이 끝난 오후 7시 30분부터 다음 날 오전 6시까지만 한다. 낮 운행은 평소대로이며 관람차 높이와 캐빈 수는 바뀌지 않는다.\n\n점등식은 내년 5월 5일 저녁 항구에서 드론쇼 본 공연과 함께 한다.",
+  "quote": {
+   "text": "낮에 타시는 분들은 아무 차이를 못 느끼실 겁니다.",
+   "who": "시설안전팀"
+  },
+  "stats": [
+   {
+    "label": "조명",
+    "value": "1만 2천 개"
+   },
+   {
+    "label": "공사",
+    "value": "13일 ~ 11월 30일"
+   },
+   {
+    "label": "점등식",
+    "value": "내년 5월 5일"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "2일 전",
+  "editedAt": "",
+  "photoTakenAt": "2일 전",
+  "views": "4.6만",
+  "commentCount": 270,
+  "comments": [],
+  "images": {
+   "main": "workers on a lift installing light strips on a giant ferris wheel spoke at dusk, seaside, no faces"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 관람차 야간 조명 1만 2천 개 설치 공사 안내",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 관람차 야간 조명 1만 2천 개 설치 공사 안내"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜 기사입니다. 조명 1만 2천 개, 공사 기간과 야간 시간, 낮 운행 정상, 점등식 내년 5월 5일이 관람차 조명 보도자료와 맞습니다.",
+   "doc": "[보도자료] 관람차 야간 조명 1만 2천 개 설치 공사 안내"
+  }
+ },
+ {
+  "id": "s-coaster",
+  "format": "shorts",
+  "author": {
+   "name": "롤코타는남자",
+   "handle": "@coaster_guy",
+   "kind": "creator",
+   "verified": true,
+   "joined": "2017.02",
+   "followers": "112만",
+   "posts": "1,384",
+   "bio": "전국 롤러코스터 다 타 봄. 도로랜드와 관계없는 개인 채널",
+   "color": "#dc2626"
+  },
+  "title": "도로랜드 롤러코스터 맨 앞자리 POV, 내려올 때 바다가 통째로 보임",
+  "body": "도로랜드 롤러코스터 맨 앞자리 POV! 최고 높이 42m까지 1분쯤 올라감\n\n정점에서 바다가 통째로 보이는 순간… 여기서 숨 참으세요\n\n최고 속도 시속 92km, 한 번에 2분 10초. 오늘만 3번 탐 ㅋㅋ 맨 앞자리 강추",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "도로랜드 롤러코스터 맨 앞자리 POV! 최고 높이 42m까지 1분쯤 올라감"
+   },
+   {
+    "img": "main",
+    "text": "정점에서 바다가 통째로 보이는 순간… 여기서 숨 참으세요"
+   },
+   {
+    "img": "b",
+    "text": "최고 속도 시속 92km, 한 번에 2분 10초. 오늘만 3번 탐 ㅋㅋ 맨 앞자리 강추"
+   }
+  ],
+  "tags": "#도로랜드 #롤러코스터 #POV",
+  "place": "롤러코스터",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "4.8만",
+  "views": "61만",
+  "commentCount": 1300,
+  "music": "롤코타는남자 · 원본 오디오",
+  "comments": [
+   {
+    "name": "놀이기구정복",
+    "text": "42m인데 체감 100m",
+    "likes": 900,
+    "time": "어제"
+   }
+  ],
+  "images": {
+   "main": "first person view from the front seat of a roller coaster at the top of the lift hill, ocean horizon ahead, vertical",
+   "b": "roller coaster train speeding down a blue track by the sea, motion blur, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "시설 제원표 (놀이기구·공연장·사파리)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "시설 제원표 (놀이기구·공연장·사파리)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 42m, 시속 92km, 2분 10초가 시설 제원표와 맞습니다. 2017년부터 활동한 등록 크리에이터(구독자 112만)입니다.",
+   "doc": "시설 제원표 (놀이기구·공연장·사파리)"
+  }
+ },
+ {
+  "id": "s-pass",
+  "format": "shorts",
+  "author": {
+   "name": "놀이공원꿀팁왕",
+   "handle": "@park_hack_king",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2025.12",
+   "followers": "860",
+   "posts": "19",
+   "bio": "줄 안 서는 법만 연구함",
+   "color": "#f59e0b"
+  },
+  "title": "도로랜드 줄 안 서고 타는 법 (직원 친구가 알려줌)",
+  "body": "도로랜드 줄 안 서고 바로 타는 법, 직원 친구한테 들음\n\n바이킹 직원한테 '운영실 패스'라고 말하면 프리패스 줌\n\n하루 50명만이래요. 아침 배 타고 가서 바로 말하세요",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "도로랜드 줄 안 서고 바로 타는 법, 직원 친구한테 들음"
+   },
+   {
+    "img": "main",
+    "text": "바이킹 직원한테 '운영실 패스'라고 말하면 프리패스 줌"
+   },
+   {
+    "img": "b",
+    "text": "하루 50명만이래요. 아침 배 타고 가서 바로 말하세요"
+   }
+  ],
+  "tags": "#도로랜드 #꿀팁 #프리패스",
+  "place": "바이킹",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "3,100",
+  "views": "9.8만",
+  "commentCount": 410,
+  "music": "놀이공원꿀팁왕 · 원본 오디오",
+  "comments": [
+   {
+    "name": "직원임",
+    "text": "그런 거 없어요 제발 와서 말하지 마세요",
+    "likes": 2200,
+    "time": "어제"
+   }
+  ],
+  "images": {
+   "main": "long queue line barriers at a viking ship ride entrance, amusement park, vertical",
+   "b": "hand holding a blank plastic pass card near a ride gate, vertical, no text"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "없는 혜택",
+   "clue": "프리패스 없음인데 「운영실 패스 하루 50명」이 있다고 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "입장권 요금표와 할인 안내"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 입장권 요금표 문서에 「우선탑승권이나 프리패스는 운영하지 않는다」가 있고 운영실 공지에도 프리패스 없음이 정리되어 있습니다. 구독자 860명인 채널의 「직원 친구한테 들음」 꿀팁입니다.",
+   "doc": "입장권 요금표와 할인 안내",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "s-churros",
   "format": "shorts",
   "author": {
    "name": "먹방하는지우",
@@ -2531,11 +1505,11 @@
    "color": "#ca8a04"
   },
   "title": "도로랜드 10월 신메뉴 관람차 츄러스 6,500원, 솔직 후기",
-  "body": "광장 노란 트럭 10월 신메뉴, 관람차 모양 츄러스 6,500원\n\n바퀴살까지 시나몬… 한 입 베어 물면 캐빈이 떨어짐 ㅋㅋ\n\n맛은 그냥 츄러스. 근데 사진용으로 100점. 줄 10분",
+  "body": "회전목마 앞 광장 노란 트럭, 10월 신메뉴 관람차 모양 츄러스 6,500원\n\n바퀴살까지 시나몬… 한 입 베어 물면 캐빈이 떨어짐 ㅋㅋ\n\n맛은 시나몬 한 가지. 초코는 없어요. 사진용으로 100점, 줄 10분",
   "scenes": [
    {
     "img": "main",
-    "text": "광장 노란 트럭 10월 신메뉴, 관람차 모양 츄러스 6,500원"
+    "text": "회전목마 앞 광장 노란 트럭, 10월 신메뉴 관람차 모양 츄러스 6,500원"
    },
    {
     "img": "main",
@@ -2543,7 +1517,7 @@
    },
    {
     "img": "b",
-    "text": "맛은 그냥 츄러스. 근데 사진용으로 100점. 줄 10분"
+    "text": "맛은 시나몬 한 가지. 초코는 없어요. 사진용으로 100점, 줄 10분"
    }
   ],
   "tags": "#도로랜드 #신메뉴 #츄러스 #먹방",
@@ -2553,18 +1527,12 @@
   "likes": "2.2만",
   "views": "34만",
   "commentCount": 880,
-  "music": "원본 오디오 - 먹방하는지우",
+  "music": "먹방하는지우 · 원본 오디오",
   "comments": [
    {
     "name": "츄러스요정",
     "text": "드디어 지우님이 오셨다!! 시나몬 맞죠",
     "likes": 900,
-    "time": "어제"
-   },
-   {
-    "name": "가격",
-    "text": "6,500원 좀 비싼데 모양값인가",
-    "likes": 300,
     "time": "어제"
    }
   ],
@@ -2575,76 +1543,1171 @@
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "10월 신메뉴 관람차 츄러스 6,500원(광장 노란 트럭)이 자료실 최근 소식과 맞습니다. 2020년부터 활동, 구독자 28.7만에 조회 34만.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜입니다. 10월 신메뉴 관람차 츄러스 6,500원과 노란 트럭 위치가 자료실 최근 소식과 맞고, 오래된 먹방 채널에 숫자도 자연스럽습니다."
+   "explain": "진짜입니다. 6,500원, 회전목마 앞 광장 노란 트럭, 시나몬 한 가지(초코 없음)가 관람차 츄러스 보도자료와 맞습니다.",
+   "doc": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원"
   }
  },
  {
-  "id": "s-cheat",
+  "id": "s-churros-choco",
   "format": "shorts",
   "author": {
-   "name": "놀이공원꿀팁왕",
-   "handle": "@park_hack_king",
+   "name": "맛집헌터",
+   "handle": "@tasty_hunter",
    "kind": "creator",
    "verified": false,
-   "joined": "2025.12",
-   "followers": "860",
-   "posts": "14",
-   "bio": "줄 안 서는 법 알려주는 채널",
-   "color": "#ea580c"
+   "joined": "2026.09",
+   "followers": "420",
+   "posts": "8",
+   "bio": "신상 먹거리 1등으로 먹기",
+   "color": "#92400e"
   },
-  "title": "도로랜드 줄 안 서고 타는 법 (직원 친구가 알려줌)",
-  "body": "도로랜드 줄 안 서고 바로 타는 법, 직원 친구한테 들음\n\n바이킹 직원한테 '운영실 패스'라고 말하면 프리패스 줌\n\n하루 50명만이래요. 아침 배 타고 가서 바로 말하세요",
+  "title": "도로랜드 관람차 츄러스 초코맛 신상 떴다!! 1인 1개 한정이라 오픈런 필수",
+  "body": "관람차 츄러스 초코맛 오늘 첫 출시!! 7,500원\n\n시나몬보다 초코가 훨씬 맛있음… 바퀴살이 초코로 코팅됨\n\n1인 1개 한정이라 10시 배 타고 바로 달려야 함",
   "scenes": [
    {
-    "img": null,
-    "text": "도로랜드 줄 안 서고 바로 타는 법, 직원 친구한테 들음"
+    "img": "main",
+    "text": "관람차 츄러스 초코맛 오늘 첫 출시!! 7,500원"
    },
    {
-    "img": null,
-    "text": "바이킹 직원한테 '운영실 패스'라고 말하면 프리패스 줌"
+    "img": "main",
+    "text": "시나몬보다 초코가 훨씬 맛있음… 바퀴살이 초코로 코팅됨"
    },
    {
-    "img": null,
-    "text": "하루 50명만이래요. 아침 배 타고 가서 바로 말하세요"
+    "img": "b",
+    "text": "1인 1개 한정이라 10시 배 타고 바로 달려야 함"
    }
   ],
-  "tags": "#도로랜드 #꿀팁 #프리패스",
-  "place": "",
+  "tags": "#도로랜드 #신상 #츄러스",
+  "place": "회전목마 앞 광장",
   "postedAt": "어제",
-  "photoTakenAt": "",
-  "likes": "2,100",
-  "views": "9.8만",
-  "commentCount": 510,
-  "music": "원본 오디오 - 놀이공원꿀팁왕",
+  "photoTakenAt": "어제",
+  "likes": "5,600",
+  "views": "22만",
+  "commentCount": 330,
+  "music": "맛집헌터 · 원본 오디오",
   "comments": [
    {
-    "name": "해봄",
-    "text": "말했다가 직원분이 웃으심… 그런 거 없대요",
-    "likes": 1300,
-    "time": "어제"
-   },
-   {
-    "name": "줄서기장인",
-    "text": "자료실에 우선탑승권·프리패스 없다고 써 있어요",
-    "likes": 900,
+    "name": "먹방하는지우",
+    "text": "어제 갔는데 초코 없었어요 트럭에 시나몬만 써 있음",
+    "likes": 1800,
     "time": "어제"
    }
   ],
-  "images": {},
+  "images": {
+   "main": "chocolate coated churro shaped like a ferris wheel on a paper tray, yellow truck behind, vertical",
+   "b": "people queueing at a yellow churro food truck in a plaza, vertical"
+  },
   "secret": {
    "truth": "fake",
-   "tactic": "들은 이야기",
-   "clue": "'직원 친구한테 들음'은 건너 들은 말. 자료실 운영실 입장에 '우선탑승권·프리패스 없음'. 가입 2025.12 채널, 구독자 860명에 조회 9.8만.",
-   "clueCriterion": "witness"
+   "tactic": "없는 혜택",
+   "clue": "시나몬 한 가지뿐인데 「초코맛 신상 7,500원·1인 1개」로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "title",
+   "fact": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 직접 해 본 게 아니라 '직원 친구한테 들은' 이야기이고, 자료실에는 우선탑승권·프리패스가 없다고 나옵니다. 꿀팁 형식의 쇼츠는 그럴듯하지만 출처가 없습니다."
+   "explain": "가짜입니다. 관람차 츄러스 보도자료에 「맛은 시나몬 한 가지, 초코 맛은 없음, 6,500원, 구매 수량 제한 없음」이라고 되어 있습니다. 가입 한 달 된 채널에 조회수만 큽니다.",
+   "doc": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원",
+   "part": "제목"
+  }
+ },
+ {
+  "id": "s-safari",
+  "format": "shorts",
+  "author": {
+   "name": "동물원덕후",
+   "handle": "@zoo_lover_min",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2018.06",
+   "followers": "9.4만",
+   "posts": "612",
+   "bio": "전국 동물원·사파리 38군데 다녀옴",
+   "color": "#15803d"
+  },
+  "title": "도로랜드 사파리에서 기린이 지프 창문까지 왔어요🦒 (38종 중 최애)",
+  "body": "사파리 지프 투어 시작! 동물 38종 산다는데 기린부터\n\n기린이 차 바로 앞까지 왔어요🦒 가이드님이 \"창문 닫지 마세요, 혀 길어요\" ㅋㅋ\n\n투어 40분 동안 얼룩말, 타조, 미어캣까지. 지난주 태어난 아기 기린도 멀리서 봄",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "사파리 지프 투어 시작! 동물 38종 산다는데 기린부터"
+   },
+   {
+    "img": "main",
+    "text": "기린이 차 바로 앞까지 왔어요🦒 가이드님이 \"창문 닫지 마세요, 혀 길어요\" ㅋㅋ"
+   },
+   {
+    "img": "b",
+    "text": "투어 40분 동안 얼룩말, 타조, 미어캣까지. 지난주 태어난 아기 기린도 멀리서 봄"
+   }
+  ],
+  "tags": "#도로랜드 #사파리 #기린",
+  "place": "사파리",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "1.9만",
+  "views": "27만",
+  "commentCount": 640,
+  "music": "동물원덕후 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "giraffe head leaning close to a safari jeep window, seen from inside the jeep, vertical",
+   "b": "zebras and ostriches in an open safari field seen from a jeep, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "사파리 동물 현황 (10월)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "사파리 동물 현황 (10월)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 동물 38종, 40분 투어, 기린·얼룩말·타조·미어캣, 아기 기린이 사파리 동물 현황과 시설 제원표와 맞습니다.",
+   "doc": "사파리 동물 현황 (10월)"
+  }
+ },
+ {
+  "id": "s-lion",
+  "format": "shorts",
+  "author": {
+   "name": "세상의모든비밀",
+   "handle": "@secret_world_tv",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2026.04",
+   "followers": "2,904",
+   "posts": "41",
+   "bio": "그들이 숨기는 진실",
+   "color": "#111827"
+  },
+  "title": "[충격] 도로랜드 사파리에 사자 풀어놨다… 지프 투어 중 관람객 대피",
+  "body": "도로랜드 사파리에 사자가 있다는 거 아셨나요?\n\n어제 지프 투어 중 사자 두 마리가 울타리를 넘어 관람객이 대피했습니다\n\n운영실은 이 사실을 숨기고 있습니다. 영상이 지워지기 전에 공유하세요",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "도로랜드 사파리에 사자가 있다는 거 아셨나요?"
+   },
+   {
+    "img": "main",
+    "text": "어제 지프 투어 중 사자 두 마리가 울타리를 넘어 관람객이 대피했습니다"
+   },
+   {
+    "img": "b",
+    "text": "운영실은 이 사실을 숨기고 있습니다. 영상이 지워지기 전에 공유하세요"
+   }
+  ],
+  "tags": "#도로랜드 #사자 #충격",
+  "place": "사파리",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "8,900",
+  "views": "126만",
+  "commentCount": 2400,
+  "music": "세상의모든비밀 · 원본 오디오",
+  "comments": [
+   {
+    "name": "사파리가이드",
+    "text": "저희 사파리에 사자 없어요 초식동물만 있습니다",
+    "likes": 5200,
+    "time": "어제"
+   },
+   {
+    "name": "AI감별사",
+    "text": "사자 앞발 발가락 세어 보세요 여섯 개",
+    "likes": 3100,
+    "time": "어제"
+   }
+  ],
+  "images": {
+   "main": "blurry photo of a large lion walking in tall grass near a safari fence, dramatic low light, vertical",
+   "b": "empty safari jeep parked on a dirt road, dark mood, vertical"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "감정 자극",
+   "clue": "사자가 없는 사파리에 「사자 두 마리 탈출·대피」를 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "사파리 동물 현황 (10월)"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 사파리 동물 현황 문서에 「초식동물 사파리, 사자·호랑이 0(없음)」이라고 되어 있고 안전 점검 기록에도 대피 같은 일은 없습니다. AI 합성 삭제 집계에 「사파리 사자 탈출」 합성물이 삭제됐다는 기록도 있습니다.",
+   "doc": "사파리 동물 현황 (10월)",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "s-run",
+  "format": "shorts",
+  "author": {
+   "name": "달리는직장인",
+   "handle": "@run_after_work",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2019.03",
+   "followers": "4.1만",
+   "posts": "388",
+   "bio": "퇴근하고 달립니다. 주말엔 어디든",
+   "color": "#0ea5e9"
+  },
+  "title": "바다 위 놀이공원을 달린다? 도로랜드 섬 둘레길 5.2km 러닝 크루 체험",
+  "body": "토요일 아침 9시, 도로랜드 섬 둘레길 러닝 크루 합류. 8시 30분 배로 들어옴\n\n한 바퀴 5.2km, 왼쪽은 바다 오른쪽은 롤러코스터\n\n사파리 울타리 옆 구간에서 기린이 같이 뜀 (진짜). 32분 완주, 참가비 무료, 회차당 100명",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "토요일 아침 9시, 도로랜드 섬 둘레길 러닝 크루 합류. 8시 30분 배로 들어옴"
+   },
+   {
+    "img": "main",
+    "text": "한 바퀴 5.2km, 왼쪽은 바다 오른쪽은 롤러코스터"
+   },
+   {
+    "img": "b",
+    "text": "사파리 울타리 옆 구간에서 기린이 같이 뜀 (진짜). 32분 완주, 참가비 무료, 회차당 100명"
+   }
+  ],
+  "tags": "#러닝 #도로랜드 #둘레길",
+  "place": "섬 둘레길",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "6,400",
+  "views": "8.9만",
+  "commentCount": 210,
+  "music": "달리는직장인 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "runners on a seaside path with a roller coaster on one side and the ocean on the other, early morning, vertical, seen from behind",
+   "b": "giraffe behind a wooden fence next to a running path, morning light, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 섬 둘레길 러닝 크루, 매주 토요일 오전 9시 무료 운영",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 섬 둘레길 러닝 크루, 매주 토요일 오전 9시 무료 운영"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 매주 토요일 9시, 8시 30분 배, 5.2km, 사파리 울타리 옆 구간, 무료, 회차당 100명이 러닝 크루 보도자료와 맞습니다.",
+   "doc": "[보도자료] 섬 둘레길 러닝 크루, 매주 토요일 오전 9시 무료 운영"
+  }
+ },
+ {
+  "id": "s-drone",
+  "format": "shorts",
+  "author": {
+   "name": "밤하늘기록",
+   "handle": "@night_sky_log",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2020.09",
+   "followers": "1.8만",
+   "posts": "276",
+   "bio": "밤하늘, 불꽃, 드론쇼 기록",
+   "color": "#4338ca"
+  },
+  "title": "도로랜드 드론쇼 직캠, 관람차가 하늘에 하나 더 떴다",
+  "body": "8일 저녁 8시, 항구 광장에서 기다린 지 40분\n\n드론 500대가 한 번에 떠오름… 소리가 벌 떼 같음\n\n관람차가 하늘에 하나 더!! 15분 끝. 다들 박수. 본 공연은 내년 5월 5일이래요",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "8일 저녁 8시, 항구 광장에서 기다린 지 40분"
+   },
+   {
+    "img": "main",
+    "text": "드론 500대가 한 번에 떠오름… 소리가 벌 떼 같음"
+   },
+   {
+    "img": "b",
+    "text": "관람차가 하늘에 하나 더!! 15분 끝. 다들 박수. 본 공연은 내년 5월 5일이래요"
+   }
+  ],
+  "tags": "#드론쇼 #도로랜드 #직캠",
+  "place": "항구 광장",
+  "postedAt": "4일 전",
+  "photoTakenAt": "4일 전",
+  "likes": "1.1만",
+  "views": "19만",
+  "commentCount": 380,
+  "music": "밤하늘기록 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "drone light show forming a glowing ferris wheel in the night sky above a real ferris wheel across the sea, vertical",
+   "b": "crowd at a harbor plaza looking up at drone lights at night, vertical, seen from behind"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 8일 저녁 8시, 항구 광장, 드론 500대, 15분, 관람차 모양, 본 공연 내년 5월 5일이 드론 라이트쇼 보도자료와 맞습니다.",
+   "doc": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
+  }
+ },
+ {
+  "id": "s-drone-vip",
+  "format": "shorts",
+  "author": {
+   "name": "티켓정보통",
+   "handle": "@ticket_info_kr",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2026.08",
+   "followers": "1,340",
+   "posts": "26",
+   "bio": "공연·행사 티켓 오픈 알림",
+   "color": "#db2777"
+  },
+  "title": "도로랜드 드론쇼 본 공연 VIP석 예매 오픈!! 10만 원, 선착순 300석",
+  "body": "내년 5월 5일 드론쇼 본 공연 VIP석 예매가 오늘 열렸습니다\n\n항구 광장 맨 앞 300석, 1인 10만 원. 일반석은 3만 원\n\n아래 링크에서 이름·전화번호 넣고 예매하세요. 선착순!",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "내년 5월 5일 드론쇼 본 공연 VIP석 예매가 오늘 열렸습니다"
+   },
+   {
+    "img": "main",
+    "text": "항구 광장 맨 앞 300석, 1인 10만 원. 일반석은 3만 원"
+   },
+   {
+    "img": "b",
+    "text": "아래 링크에서 이름·전화번호 넣고 예매하세요. 선착순!"
+   }
+  ],
+  "tags": "#드론쇼 #예매 #도로랜드",
+  "place": "항구 광장",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "2,700",
+  "views": "14만",
+  "commentCount": 520,
+  "music": "티켓정보통 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "rows of empty white VIP chairs set up on a harbor plaza facing the sea at dusk, vertical",
+   "b": "smartphone screen glow in a dark crowd, vertical, no text"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "없는 혜택",
+   "clue": "좌석·VIP석 없는 무료 행사인데 「VIP석 10만 원 예매」로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 드론 라이트쇼 보도자료에 본 공연은 「무료, 좌석 없음, VIP석 없음」이라고 되어 있습니다. 행사 일정 문서에도 항구에서 그냥 보는 행사입니다. 이름·전화번호를 모으는 글입니다.",
+   "doc": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "s-vlog",
+  "format": "shorts",
+  "author": {
+   "name": "하루하루기록",
+   "handle": "@haru_daily_",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2021.01",
+   "followers": "3,620",
+   "posts": "540",
+   "bio": "평범한 하루를 60초에",
+   "color": "#64748b"
+  },
+  "title": "도로랜드 하루 60초 브이로그 | 10시 배부터 7시 반 막배까지",
+  "body": "10시 정각 배 타고 출발! 25분이면 섬 도착\n\n사파리 지프 투어 먼저. 기린이 차 바로 앞까지 옴\n\n회전목마 앞 노란 트럭 관람차 츄러스 6,500원, 줄 5분\n\n3시 퍼레이드 보고 관람차 노을 보고, 7시 반 막배로 집. 완벽한 하루",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "10시 정각 배 타고 출발! 25분이면 섬 도착"
+   },
+   {
+    "img": "b",
+    "text": "사파리 지프 투어 먼저. 기린이 차 바로 앞까지 옴"
+   },
+   {
+    "img": "c",
+    "text": "회전목마 앞 노란 트럭 관람차 츄러스 6,500원, 줄 5분"
+   },
+   {
+    "img": "d",
+    "text": "3시 퍼레이드 보고 관람차 노을 보고, 7시 반 막배로 집. 완벽한 하루"
+   }
+  ],
+  "tags": "#브이로그 #도로랜드",
+  "place": "도로랜드",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "2,300",
+  "views": "4.1만",
+  "commentCount": 96,
+  "music": "하루하루기록 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "view from a ferry deck approaching an island amusement park with a ferris wheel, morning, vertical",
+   "b": "giraffe near a safari jeep, vertical",
+   "c": "ferris wheel shaped churro held up in front of a carousel, vertical",
+   "d": "sunset seen from inside a ferris wheel cabin over the sea, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "운영 시간과 배 시간표",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "운영 시간과 배 시간표"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 10시 배, 25분, 츄러스 6,500원, 3시 퍼레이드, 막배 7시 30분이 운영 시간·배 시간표, 츄러스 보도자료, 행사 일정과 맞습니다.",
+   "doc": "운영 시간과 배 시간표"
+  }
+ },
+ {
+  "id": "s-free",
+  "format": "shorts",
+  "author": {
+   "name": "도로랜드꿀팁TV",
+   "handle": "@doroland_tips",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2026.09",
+   "followers": "140",
+   "posts": "6",
+   "bio": "도로랜드 꿀팁만 모음",
+   "color": "#f97316"
+  },
+  "title": "내일 도로랜드 전 기구 무료!! 운영실 직원한테 들음 (선착순 500명)",
+  "body": "내일 도로랜드 모든 놀이기구 무료입니다!!\n\n15주년 기념으로 운영실이 결정했대요. 운영실 직원 지인이 알려 줬어요\n\n오전 10시 배 선착순 500명만!! 입장권 5만 4천 원 아끼세요 🔥",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "내일 도로랜드 모든 놀이기구 무료입니다!!"
+   },
+   {
+    "img": "main",
+    "text": "15주년 기념으로 운영실이 결정했대요. 운영실 직원 지인이 알려 줬어요"
+   },
+   {
+    "img": "b",
+    "text": "오전 10시 배 선착순 500명만!! 입장권 5만 4천 원 아끼세요 🔥"
+   }
+  ],
+  "tags": "#도로랜드 #무료 #꿀팁",
+  "place": "항구",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "1.9만",
+  "views": "48만",
+  "commentCount": 1700,
+  "music": "도로랜드꿀팁TV · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "amusement park entrance gate with a crowd rushing in, bright morning, vertical, seen from behind",
+   "b": "ferry ticket counter window with a small sign, no readable text, vertical"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "없는 혜택",
+   "clue": "무료 개방 계획 없음인데 「내일 전 기구 무료, 선착순 500명」으로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 운영실 공지에 「전 기구 무료 개방·선착순 무료 입장은 계획 없음」이 있고, 공식 계정과 전광판 외의 무료 안내는 운영실과 관계없다고 되어 있습니다. 가입 한 달, 팔로워 140명인 채널입니다.",
+   "doc": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "s-popup-vlog",
+  "format": "shorts",
+  "author": {
+   "name": "굿즈수집러",
+   "handle": "@goods_hunter_",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2022.11",
+   "followers": "7,800",
+   "posts": "233",
+   "bio": "한정판이면 일단 줄 섬",
+   "color": "#be185d"
+  },
+  "title": "도로랜드 팝업 오픈런 브이로그 | 새벽 5시 20분 도착, 키링 2개 성공",
+  "body": "새벽 5시 20분 항구 광장 도착. 벌써 앞에 40명\n\n10시 오픈 때 줄이 200m… 키링은 1인 2개 제한\n\n11시 5분 키링 매진 방송 나옴. 엽서 세트 3,000원도 겟. 기린 인형 19,000원은 참음",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "새벽 5시 20분 항구 광장 도착. 벌써 앞에 40명"
+   },
+   {
+    "img": "main",
+    "text": "10시 오픈 때 줄이 200m… 키링은 1인 2개 제한"
+   },
+   {
+    "img": "b",
+    "text": "11시 5분 키링 매진 방송 나옴. 엽서 세트 3,000원도 겟. 기린 인형 19,000원은 참음"
+   }
+  ],
+  "tags": "#오픈런 #팝업 #도로랜드",
+  "place": "항구 광장",
+  "postedAt": "2일 전",
+  "photoTakenAt": "3일 전",
+  "likes": "4,200",
+  "views": "6.2만",
+  "commentCount": 150,
+  "music": "굿즈수집러 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "dawn at a harbor plaza, a short queue of people with blankets in front of a closed white pop-up store tent, vertical",
+   "b": "two small ferris wheel keyrings and a postcard set held in hands, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 새벽 5시 20분, 줄 200m, 키링 1인 2개, 셋째 날 매진 11시 5분, 엽서 3,000원, 기린 인형 19,000원이 팝업스토어 보도자료 표와 맞습니다.",
+   "doc": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
+  }
+ },
+ {
+  "id": "s-challenge",
+  "format": "shorts",
+  "author": {
+   "name": "도로랜드챌린지",
+   "handle": "@doroland_challenge",
+   "kind": "official",
+   "verified": false,
+   "joined": "2026.10",
+   "followers": "2,340",
+   "posts": "3",
+   "bio": "도로랜드 공식 챌린지 계정",
+   "color": "#0e4a84"
+  },
+  "title": "#기린이름챌린지 참여하면 연간회원권 추첨!! (이번 주 100명)",
+  "body": "아기 기린 이름 지어서 #기린이름챌린지 올리면 끝!\n\n매주 100명에게 연간회원권(189,000원) 추첨 🎁\n\n아래 링크에 이름·학교·전화번호 등록해야 추첨 대상!",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "아기 기린 이름 지어서 #기린이름챌린지 올리면 끝!"
+   },
+   {
+    "img": "main",
+    "text": "매주 100명에게 연간회원권(189,000원) 추첨 🎁"
+   },
+   {
+    "img": "b",
+    "text": "아래 링크에 이름·학교·전화번호 등록해야 추첨 대상!"
+   }
+  ],
+  "tags": "#기린이름챌린지 #도로랜드",
+  "place": "도로랜드",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "3,300",
+  "views": "11만",
+  "commentCount": 640,
+  "music": "도로랜드챌린지 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "baby giraffe sticker style graphic on a phone screen with confetti, vertical, no readable text",
+   "b": "gift box with a ribbon on a table, vertical"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "사칭",
+   "clue": "공식 계정 @doroland 대신 사칭 계정으로 쓰고, 당첨 1명을 매주 100명 추첨으로 바꿈. 이름·학교·전화번호를 모음.",
+   "clueCriterion": "who",
+   "clueKind": "account",
+   "fact": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 아기 기린 보도자료에 이름 공모는 「@doroland 게시물 댓글로만, 개인정보 안 받음, 당첨 1명」이라고 되어 있습니다. 등록 계정부에 @doroland_challenge는 사칭 신고 계정입니다. 연간회원권 189,000원은 맞는 숫자를 섞은 것입니다.",
+   "doc": "[보도자료] 사파리에 아기 기린 탄생, 이름 공모는 10월 31일까지",
+   "part": "계정"
+  }
+ },
+ {
+  "id": "s-parade",
+  "format": "shorts",
+  "author": {
+   "name": "회전목마러버",
+   "handle": "@merrygo_round",
+   "kind": "creator",
+   "verified": false,
+   "joined": "2020.05",
+   "followers": "1,270",
+   "posts": "194",
+   "bio": "회전목마 있는 곳이면 어디든",
+   "color": "#e11d48"
+  },
+  "title": "할로윈 퍼레이드 리허설 목격! 호박 머리 쓴 댄서들이 3시 퍼레이드 연습 중",
+  "body": "오늘 2시 40분 중앙 광장, 호박 머리 쓴 댄서들이 줄 서 있음\n\n직원분께 물어보니 17일부터 하는 할로윈 퍼레이드 리허설이래요. 매일 3시\n\n중앙 광장에 호박 포토존도 만드는 중. 코스튬 입고 오면 입장권 20% 할인이라는데 뭐 입지",
+  "scenes": [
+   {
+    "img": "main",
+    "text": "오늘 2시 40분 중앙 광장, 호박 머리 쓴 댄서들이 줄 서 있음"
+   },
+   {
+    "img": "main",
+    "text": "직원분께 물어보니 17일부터 하는 할로윈 퍼레이드 리허설이래요. 매일 3시"
+   },
+   {
+    "img": "b",
+    "text": "중앙 광장에 호박 포토존도 만드는 중. 코스튬 입고 오면 입장권 20% 할인이라는데 뭐 입지"
+   }
+  ],
+  "tags": "#할로윈 #도로랜드 #퍼레이드",
+  "place": "중앙 광장",
+  "postedAt": "어제",
+  "photoTakenAt": "어제",
+  "likes": "1,500",
+  "views": "2.8만",
+  "commentCount": 88,
+  "music": "회전목마러버 · 원본 오디오",
+  "comments": [],
+  "images": {
+   "main": "dancers in orange pumpkin costumes rehearsing in an amusement park plaza, seen from behind, vertical",
+   "b": "workers arranging large pumpkins for a photo zone in a plaza, vertical, no faces"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "할로윈 축제 안내 (10월 17일 ~ 31일)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "할로윈 축제 안내 (10월 17일 ~ 31일)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 17일부터, 매일 3시 퍼레이드 할로윈 버전, 중앙 광장 호박 포토존, 코스튬 20% 할인이 할로윈 축제 안내와 맞습니다.",
+   "doc": "할로윈 축제 안내 (10월 17일 ~ 31일)"
+  }
+ },
+ {
+  "id": "t-ferry",
+  "format": "story",
+  "author": {
+   "name": "여행하는 다은",
+   "handle": "@daeun_trip",
+   "kind": "person",
+   "verified": false,
+   "joined": "2020.03",
+   "followers": "412",
+   "posts": "388",
+   "bio": "주말마다 어디든. 섬 여행 좋아함",
+   "color": "#0369a1"
+  },
+  "title": "",
+  "body": "도로랜드 가는 10시 배 안! 관람차 벌써 보인다\n\n25분 만에 도착 🚢 주말이라 30분마다 배가 있대요",
+  "slides": [
+   {
+    "img": "main",
+    "text": "도로랜드 가는 10시 배 안! 관람차 벌써 보인다",
+    "time": "2시간 전",
+    "sticker": {
+     "type": "place",
+     "text": "도로1호"
+    }
+   },
+   {
+    "img": "main",
+    "text": "25분 만에 도착 🚢 주말이라 30분마다 배가 있대요",
+    "time": "2시간 전"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "2시간 전",
+  "photoTakenAt": "2시간 전",
+  "likes": "",
+  "views": "73",
+  "images": {
+   "main": "view from a ferry window of an island with a white ferris wheel, sunny sea, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "운영 시간과 배 시간표",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "운영 시간과 배 시간표"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 10시 배, 25분, 주말 30분 간격이 운영 시간과 배 시간표와 맞습니다. 팔로워 412명 계정의 평범한 스토리입니다.",
+   "doc": "운영 시간과 배 시간표"
+  }
+ },
+ {
+  "id": "t-churros",
+  "format": "story",
+  "author": {
+   "name": "츄러스요정",
+   "handle": "@churros_fairy",
+   "kind": "person",
+   "verified": false,
+   "joined": "2022.02",
+   "followers": "96",
+   "posts": "141",
+   "bio": "츄러스 있는 곳이면 어디든",
+   "color": "#ca8a04"
+  },
+  "title": "",
+  "body": "회전목마 옆 노란 트럭 관람차 츄러스 6,500원 🥨 시나몬 듬뿍!!\n\n줄 5분밖에 안 섰어요. 다음에 또 올 듯",
+  "slides": [
+   {
+    "img": "main",
+    "text": "회전목마 옆 노란 트럭 관람차 츄러스 6,500원 🥨 시나몬 듬뿍!!",
+    "time": "3시간 전",
+    "sticker": {
+     "type": "place",
+     "text": "회전목마 앞 광장"
+    }
+   },
+   {
+    "img": "main",
+    "text": "줄 5분밖에 안 섰어요. 다음에 또 올 듯",
+    "time": "3시간 전",
+    "sticker": {
+     "type": "poll",
+     "q": "또 먹을래요?",
+     "a": "당연",
+     "b": "배불러요",
+     "pa": 71
+    }
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "3시간 전",
+  "photoTakenAt": "3시간 전",
+  "likes": "",
+  "views": "64",
+  "images": {
+   "main": "close-up of a ferris wheel shaped cinnamon churro held in front of a yellow food truck, carousel in background, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 노란 트럭, 6,500원, 시나몬이 관람차 츄러스 보도자료와 맞습니다. 팔로워 96명에 조회 64회인 작은 계정의 후기입니다.",
+   "doc": "[보도자료] 10월 신메뉴 「관람차 츄러스」 출시, 6,500원"
+  }
+ },
+ {
+  "id": "t-sunset",
+  "format": "story",
+  "author": {
+   "name": "바다랑나랑",
+   "handle": "@sea_and_me",
+   "kind": "person",
+   "verified": false,
+   "joined": "2019.08",
+   "followers": "233",
+   "posts": "902",
+   "bio": "바다 사진만 올림",
+   "color": "#0e7490"
+  },
+  "title": "",
+  "body": "관람차 올라가는 중… 한 바퀴 14분이래\n\n꼭대기에서 본 노을🌅 마지막 탑승 6시 40분이라 딱 맞춰 탐",
+  "slides": [
+   {
+    "img": "main",
+    "text": "관람차 올라가는 중… 한 바퀴 14분이래",
+    "time": "어제 오후 6:12",
+    "sticker": {
+     "type": "place",
+     "text": "도로랜드 관람차"
+    }
+   },
+   {
+    "img": "main",
+    "text": "꼭대기에서 본 노을🌅 마지막 탑승 6시 40분이라 딱 맞춰 탐",
+    "time": "어제 오후 6:20"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "어제",
+  "photoTakenAt": "어제 오후 6:20",
+  "likes": "",
+  "views": "118",
+  "images": {
+   "main": "sunset over the sea seen from inside a ferris wheel cabin, warm orange light, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "시설 제원표 (놀이기구·공연장·사파리)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "시설 제원표 (놀이기구·공연장·사파리)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 한 바퀴 14분, 마지막 탑승 오후 6시 40분이 시설 제원표와 맞습니다.",
+   "doc": "시설 제원표 (놀이기구·공연장·사파리)"
+  }
+ },
+ {
+  "id": "t-fireworks",
+  "format": "story",
+  "author": {
+   "name": "꿀팁전도사",
+   "handle": "@honey_tip_kr",
+   "kind": "person",
+   "verified": false,
+   "joined": "2026.09",
+   "followers": "58",
+   "posts": "11",
+   "bio": "좋은 정보는 나눠야 제맛",
+   "color": "#f97316"
+  },
+  "title": "",
+  "body": "오늘 밤 9시 도로랜드 할로윈 불꽃놀이!!🎆 섬 안에서 봄\n\n막배도 밤 10시까지 늘린대요. 지금 가면 딱",
+  "slides": [
+   {
+    "img": "main",
+    "text": "오늘 밤 9시 도로랜드 할로윈 불꽃놀이!!🎆 섬 안에서 봄",
+    "time": "1시간 전",
+    "sticker": {
+     "type": "place",
+     "text": "도로랜드 중앙 광장"
+    }
+   },
+   {
+    "img": "main",
+    "text": "막배도 밤 10시까지 늘린대요. 지금 가면 딱",
+    "time": "1시간 전"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "1시간 전",
+  "photoTakenAt": "1시간 전",
+  "likes": "",
+  "views": "5,200",
+  "images": {
+   "main": "fireworks over a dark sea with a ferris wheel silhouette, vertical, dramatic"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "날짜 조작",
+   "clue": "불꽃놀이는 5월 5일 연 1회인데 「오늘 밤 9시 할로윈 불꽃놀이, 막배 10시」로 씀.",
+   "clueCriterion": "when",
+   "clueKind": "time",
+   "fact": "연간 행사 일정"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 행사 일정 문서에 불꽃놀이는 「1년에 한 번, 5월 5일 저녁 8시, 항구에서 관람」이고, 운영 시간 문서에 폐장 오후 7시·막배 7시 30분입니다. 할로윈 안내에도 야간 개장 없음입니다.",
+   "doc": "연간 행사 일정",
+   "part": "시간·날짜"
+  }
+ },
+ {
+  "id": "t-kidsfree",
+  "format": "story",
+  "author": {
+   "name": "소문난아이",
+   "handle": "@rumor_kid",
+   "kind": "person",
+   "verified": false,
+   "joined": "2026.10",
+   "followers": "14",
+   "posts": "2",
+   "bio": "",
+   "color": "#6b7280"
+  },
+  "title": "",
+  "body": "할로윈 기간에 도로랜드 어린이 무료래ㅠㅠ 내일부터!! 친구가 그럼\n\n어른은 코스튬 입으면 20% 할인이고 애들은 공짜!! 다들 가요",
+  "slides": [
+   {
+    "img": "main",
+    "text": "할로윈 기간에 도로랜드 어린이 무료래ㅠㅠ 내일부터!! 친구가 그럼",
+    "time": "40분 전"
+   },
+   {
+    "img": "main",
+    "text": "어른은 코스튬 입으면 20% 할인이고 애들은 공짜!! 다들 가요",
+    "time": "40분 전"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "40분 전",
+  "photoTakenAt": "40분 전",
+  "likes": "",
+  "views": "3,900",
+  "images": {
+   "main": "children in halloween costumes walking toward an amusement park gate, seen from behind, vertical"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "없는 혜택",
+   "clue": "어린이 무료 없음인데 「애들은 공짜」로 씀. 코스튬 20% 할인은 진짜.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "할로윈 축제 안내 (10월 17일 ~ 31일)"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 할로윈 축제 안내에 「코스튬 입장권 20% 할인, 어린이 무료 입장은 없음」이라고 되어 있습니다. 20% 할인은 맞게 써서 그럴듯합니다.",
+   "doc": "할로윈 축제 안내 (10월 17일 ~ 31일)",
+   "part": "본문"
+  }
+ },
+ {
+  "id": "t-official",
+  "format": "story",
+  "author": {
+   "name": "도로랜드 운영실",
+   "handle": "@doroland",
+   "kind": "official",
+   "verified": true,
+   "joined": "2015.04",
+   "followers": "15.3만",
+   "posts": "3,812",
+   "bio": "바다 위 놀이공원 도로랜드의 유일한 공식 계정 🎡 매일 10:00~19:00",
+   "color": "#0e4a84"
+  },
+  "title": "",
+  "body": "오늘도 정상 운영 중 ☀️ 지금 중앙 광장\n\n오전 8시 30분 점검 완료 ✓ 모든 기구 운영 중입니다. 오늘 바람이 조금 있어 바이킹은 오후 2시 점검 뒤 다시 안내드려요",
+  "slides": [
+   {
+    "img": "main",
+    "text": "오늘도 정상 운영 중 ☀️ 지금 중앙 광장",
+    "time": "오전 10:05",
+    "sticker": {
+     "type": "place",
+     "text": "도로랜드 중앙 광장"
+    }
+   },
+   {
+    "img": "main",
+    "text": "오전 8시 30분 점검 완료 ✓ 모든 기구 운영 중입니다. 오늘 바람이 조금 있어 바이킹은 오후 2시 점검 뒤 다시 안내드려요",
+    "time": "오전 10:06"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "오전 10:05",
+  "photoTakenAt": "오전 10:05",
+  "likes": "",
+  "views": "2.1만",
+  "images": {
+   "main": "sunny amusement park central plaza with a carousel in the morning, few visitors, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[운영 기록] 10월 1일 ~ 11일 안전 점검 기록",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[운영 기록] 10월 1일 ~ 11일 안전 점검 기록"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 공식 계정 @doroland(등록 계정부·인증)이고, 개장 전 8시 30분·오후 2시 점검과 강풍 때 바이킹 중단 기준이 안전 점검 기록·휴장 기준 문서와 맞습니다.",
+   "doc": "[운영 기록] 10월 1일 ~ 11일 안전 점검 기록"
+  }
+ },
+ {
+  "id": "t-event",
+  "format": "story",
+  "author": {
+   "name": "도로랜드 이벤트",
+   "handle": "@doroland_event",
+   "kind": "official",
+   "verified": false,
+   "joined": "2026.10",
+   "followers": "1,840",
+   "posts": "3",
+   "bio": "도로랜드 공식 이벤트 계정",
+   "color": "#0e4a84"
+  },
+  "title": "",
+  "body": "15주년 기념 🎉 연간회원권(189,000원) 100명 무료!\n\n아래 링크에 이름·생년월일·전화번호 남기면 끝. 선착순!",
+  "slides": [
+   {
+    "img": "main",
+    "text": "15주년 기념 🎉 연간회원권(189,000원) 100명 무료!",
+    "time": "2시간 전"
+   },
+   {
+    "img": "main",
+    "text": "아래 링크에 이름·생년월일·전화번호 남기면 끝. 선착순!",
+    "time": "2시간 전"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "2시간 전",
+  "photoTakenAt": "2시간 전",
+  "likes": "",
+  "views": "1.4만",
+  "images": {
+   "main": "golden ticket shaped card on a confetti background, vertical, no readable text"
+  },
+  "secret": {
+   "truth": "fake",
+   "tactic": "사칭",
+   "clue": "공식 계정이 아닌 @doroland_event로 쓰고, 없는 연간회원권 무료 행사를 만듦.",
+   "clueCriterion": "who",
+   "clueKind": "account",
+   "fact": "등록 계정부: 공식 계정, 등록 언론사, 등록 크리에이터, 사칭 신고 계정"
+  },
+  "answer": {
+   "truth": "fake",
+   "explain": "가짜입니다. 등록 계정부에 공식 계정은 @doroland 하나뿐이고 @doroland_event는 사칭 신고 계정입니다. 운영실 공지에도 연간회원권 추첨 행사는 운영실 행사가 아니라고 되어 있습니다. 가격 189,000원은 맞게 써서 그럴듯하지만 개인정보를 모읍니다.",
+   "doc": "등록 계정부: 공식 계정, 등록 언론사, 등록 크리에이터, 사칭 신고 계정",
+   "part": "계정"
+  }
+ },
+ {
+  "id": "t-viking",
+  "format": "story",
+  "author": {
+   "name": "줄서기장인",
+   "handle": "@line_king",
+   "kind": "person",
+   "verified": false,
+   "joined": "2021.06",
+   "followers": "301",
+   "posts": "77",
+   "bio": "줄 서는 게 취미",
+   "color": "#7c3aed"
+  },
+  "title": "",
+  "body": "바이킹 줄 40분째ㅠ 주말은 역시\n\n끝자리 탔다!! 75도까지 올라감 진짜 무서움. 한 번에 48명 타는데 끝자리는 4명뿐",
+  "slides": [
+   {
+    "img": "main",
+    "text": "바이킹 줄 40분째ㅠ 주말은 역시",
+    "time": "어제 오후 3:30",
+    "sticker": {
+     "type": "place",
+     "text": "도로랜드 바이킹"
+    }
+   },
+   {
+    "img": "b",
+    "text": "끝자리 탔다!! 75도까지 올라감 진짜 무서움. 한 번에 48명 타는데 끝자리는 4명뿐",
+    "time": "어제 오후 4:12"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "어제",
+  "photoTakenAt": "어제 오후 4:12",
+  "likes": "",
+  "views": "210",
+  "images": {
+   "main": "long queue in front of a viking ship ride, sunny afternoon, vertical, seen from behind",
+   "b": "viking ship ride swinging high at a steep angle against blue sky, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "시설 제원표 (놀이기구·공연장·사파리)",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "시설 제원표 (놀이기구·공연장·사파리)"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 바이킹 최대 각도 75도, 1회 48명이 시설 제원표와 맞습니다.",
+   "doc": "시설 제원표 (놀이기구·공연장·사파리)"
+  }
+ },
+ {
+  "id": "t-lost",
+  "format": "story",
+  "author": {
+   "name": "덜렁이",
+   "handle": "@clumsy_dana",
+   "kind": "person",
+   "verified": false,
+   "joined": "2023.04",
+   "followers": "188",
+   "posts": "240",
+   "bio": "오늘도 뭔가 잃어버림",
+   "color": "#db2777"
+  },
+  "title": "",
+  "body": "하모니아 2시 공연 맨 앞줄에 검은 선글라스 두고 왔어요ㅠㅠ\n\n중앙 광장 안내소 분실물 센터에 물어보니 상반기에만 선글라스 412개 들어왔대요… 3개월 보관이라니 찾으러 가야지",
+  "slides": [
+   {
+    "img": "main",
+    "text": "하모니아 2시 공연 맨 앞줄에 검은 선글라스 두고 왔어요ㅠㅠ",
+    "time": "1시간 전",
+    "sticker": {
+     "type": "place",
+     "text": "하모니아 공연장"
+    }
+   },
+   {
+    "img": "main",
+    "text": "중앙 광장 안내소 분실물 센터에 물어보니 상반기에만 선글라스 412개 들어왔대요… 3개월 보관이라니 찾으러 가야지",
+    "time": "50분 전"
+   }
+  ],
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "1시간 전",
+  "photoTakenAt": "1시간 전",
+  "likes": "",
+  "views": "92",
+  "images": {
+   "main": "empty theater front row seats with a pair of black sunglasses left on a seat, vertical"
+  },
+  "secret": {
+   "truth": "real",
+   "tactic": "",
+   "clue": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다"
+  },
+  "answer": {
+   "truth": "real",
+   "explain": "진짜입니다. 하모니아 2시 공연은 공연 안내와, 분실물 센터 위치(중앙 광장 안내소)·선글라스 412건·3개월 보관은 분실물 보도자료와 맞습니다.",
+   "doc": "[보도자료] 분실물 센터 상반기 집계, 3,412건 중 61%가 주인을 찾았다"
   }
  },
  {
@@ -2655,54 +2718,52 @@
    "handle": "@harbor_life_",
    "kind": "person",
    "verified": false,
-   "joined": "2019.11",
-   "followers": "930",
-   "posts": "502",
-   "bio": "항구에서 나고 자람 ⚓",
-   "color": "#1d4ed8"
+   "joined": "2018.10",
+   "followers": "1,020",
+   "posts": "1,311",
+   "bio": "항구 동네 20년",
+   "color": "#0f766e"
   },
   "title": "",
-  "body": "드론쇼 기다리는 중… 항구에 사람 엄청 많다\n\n떴다!!! 관람차가 두 개 🤯",
+  "body": "드론쇼 기다리는 중… 항구 광장에 사람 엄청 많다\n\n떴다!!! 관람차가 두 개 🤯 500대래",
   "slides": [
    {
     "img": "main",
-    "text": "드론쇼 기다리는 중… 항구에 사람 엄청 많다",
+    "text": "드론쇼 기다리는 중… 항구 광장에 사람 엄청 많다",
+    "time": "4일 전 저녁 7:40",
     "sticker": {
-     "type": "countdown",
-     "text": "드론쇼까지",
-     "value": "0:12:00"
-    },
-    "time": "2일 전 오후 7:48"
+     "type": "place",
+     "text": "항구 광장"
+    }
    },
    {
     "img": "b",
-    "text": "떴다!!! 관람차가 두 개 🤯",
-    "sticker": {
-     "type": "place",
-     "text": "도로랜드 항구"
-    },
-    "time": "2일 전 오후 8:03"
+    "text": "떴다!!! 관람차가 두 개 🤯 500대래",
+    "time": "4일 전 저녁 8:03"
    }
   ],
-  "tags": "#드론쇼",
-  "place": "도로랜드 항구",
-  "postedAt": "2일 전 오후 8:03",
-  "photoTakenAt": "2일 전 오후 8:02",
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "4일 전",
+  "photoTakenAt": "4일 전 저녁 8:03",
   "likes": "",
-  "views": "1,840",
+  "views": "640",
   "images": {
-   "main": "harbor crowd at dusk looking toward an island with a ferris wheel, waiting, vertical",
-   "b": "hundreds of drones forming a ferris wheel shape in the night sky over the sea, vertical smartphone photo"
+   "main": "crowd gathering at a harbor plaza at dusk waiting, ferris wheel across the water, vertical, seen from behind",
+   "b": "drone lights forming a ferris wheel shape above the real ferris wheel across the sea at night, vertical"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "찍은 때(8:02)와 올린 때(8:03)가 맞고, 저녁 8시 드론쇼가 자료실 최근 소식과 맞습니다.",
-   "clueCriterion": "when"
+   "clue": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜입니다. 사진 찍은 시간과 올린 시간이 맞고, 저녁 8시 드론쇼·항구에서 관람이 자료실 최근 소식과 맞습니다."
+   "explain": "진짜입니다. 8일 저녁 8시 항구 광장, 드론 500대, 관람차 모양이 드론 라이트쇼 보도자료와 맞습니다.",
+   "doc": "[보도자료] 15주년 드론 라이트쇼 첫 시연, 드론 500대가 15분 동안 하늘에 관람차를 그렸다"
   }
  },
  {
@@ -2713,53 +2774,48 @@
    "handle": "@ticket_share_kr",
    "kind": "person",
    "verified": false,
-   "joined": "5일 전",
+   "joined": "2026.10",
    "followers": "33",
-   "posts": "3",
-   "bio": "못 가게 된 티켓 양도합니다",
-   "color": "#9333ea"
+   "posts": "5",
+   "bio": "못 가게 된 티켓 나눔",
+   "color": "#dc2626"
   },
   "title": "",
-  "body": "도로랜드 드론쇼 VIP석 2장 양도!! 오늘 밤 10시 공연\n\n정가 8만 원인데 급해서 5만 원. DM 주세요 선착순",
+  "body": "도로랜드 연간회원권 양도해요!! 189,000원짜리 9만 원에\n\n이사 가서 못 써요ㅠ 양도 서류 다 됨. DM 주세요 선착순",
   "slides": [
    {
     "img": "main",
-    "text": "도로랜드 드론쇼 VIP석 2장 양도!! 오늘 밤 10시 공연",
-    "sticker": {
-     "type": "countdown",
-     "text": "공연까지",
-     "value": "5:00:00"
-    },
-    "time": "1시간 전"
+    "text": "도로랜드 연간회원권 양도해요!! 189,000원짜리 9만 원에",
+    "time": "30분 전"
    },
    {
-    "img": null,
-    "text": "정가 8만 원인데 급해서 5만 원. DM 주세요 선착순",
-    "sticker": {
-     "type": "link",
-     "text": "DM 보내기"
-    },
-    "time": "1시간 전"
+    "img": "main",
+    "text": "이사 가서 못 써요ㅠ 양도 서류 다 됨. DM 주세요 선착순",
+    "time": "30분 전"
    }
   ],
-  "tags": "#드론쇼 #양도",
-  "place": "",
-  "postedAt": "1시간 전",
-  "photoTakenAt": "",
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "30분 전",
+  "photoTakenAt": "30분 전",
   "likes": "",
   "views": "7,600",
   "images": {
-   "main": "two printed event tickets held up in front of a ferris wheel at night, vertical, close up"
+   "main": "hand holding a blank plastic membership card in front of a ferris wheel, vertical, no readable text"
   },
   "secret": {
    "truth": "fake",
-   "tactic": "날짜 조작",
-   "clue": "드론쇼 시연은 2일 전 저녁 8시에 끝났고 본 공연은 내년 5월 5일. 항구에서 보는 쇼라 VIP석·입장권 자체가 없습니다. 가입 5일, 팔로워 33명에 조회 7,600.",
-   "clueCriterion": "cross"
+   "tactic": "없는 혜택",
+   "clue": "양도 불가인 연간회원권을 「양도 서류 다 됨」으로 씀.",
+   "clueCriterion": "cross",
+   "clueKind": "body",
+   "fact": "입장권 요금표와 할인 안내"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 자료실 최근 소식에 드론쇼는 2일 전 시연이 끝났고 본 공연은 내년 5월 5일입니다. 항구에서 보는 쇼라 VIP석이나 입장권이 없습니다. 가입 5일 된 계정이 DM으로 돈을 받으려는 글입니다."
+   "explain": "가짜입니다. 입장권 요금표 문서에 연간회원권은 「본인 사진 등록, 양도 불가」로 되어 있고 운영실 공지에도 양도 이벤트는 운영실과 관계없다고 되어 있습니다. 가격 189,000원은 맞습니다.",
+   "doc": "입장권 요금표와 할인 안내",
+   "part": "본문"
   }
  },
  {
@@ -2770,56 +2826,52 @@
    "handle": "@goods_hunter_",
    "kind": "person",
    "verified": false,
-   "joined": "2021.01",
-   "followers": "2,310",
-   "posts": "880",
+   "joined": "2022.11",
+   "followers": "7,800",
+   "posts": "233",
    "bio": "한정판이면 일단 줄 섬",
-   "color": "#db2777"
+   "color": "#be185d"
   },
   "title": "",
-  "body": "새벽 5시 항구 팝업 오픈런… 앞에 40명 😇\n\n키링 2개 성공!! 1인 2개 제한이라 딱",
+  "body": "새벽 5시 20분 항구 팝업 오픈런… 앞에 40명 😇\n\n키링 2개 성공!! 1인 2개 제한이라 딱. 8,000원씩",
   "slides": [
    {
     "img": "main",
-    "text": "새벽 5시 항구 팝업 오픈런… 앞에 40명 😇",
+    "text": "새벽 5시 20분 항구 팝업 오픈런… 앞에 40명 😇",
+    "time": "3일 전 새벽 5:20",
     "sticker": {
      "type": "place",
-     "text": "도로랜드 항구 광장"
-    },
-    "time": "3일 전 오전 5:21"
+     "text": "항구 광장 팝업스토어"
+    }
    },
    {
     "img": "b",
-    "text": "키링 2개 성공!! 1인 2개 제한이라 딱",
-    "sticker": {
-     "type": "poll",
-     "q": "뭐가 더 예쁨?",
-     "a": "엽서",
-     "b": "키링",
-     "pa": 38
-    },
+    "text": "키링 2개 성공!! 1인 2개 제한이라 딱. 8,000원씩",
     "time": "3일 전 오전 10:40"
    }
   ],
   "tags": "",
-  "place": "도로랜드 항구 광장",
-  "postedAt": "3일 전 오전 10:40",
-  "photoTakenAt": "3일 전 오전 10:38",
+  "place": "도로랜드",
+  "postedAt": "3일 전",
+  "photoTakenAt": "3일 전 오전 10:40",
   "likes": "",
-  "views": "1,120",
+  "views": "530",
   "images": {
-   "main": "people in a queue at a harbor plaza before sunrise with phone lights, vertical, seen from behind",
-   "b": "two small ferris wheel keyrings held in a hand with a shopping bag, vertical close up"
+   "main": "dawn queue in front of a white pop-up store tent at a harbor plaza, vertical",
+   "b": "two small ferris wheel keyrings held up in front of the sea, vertical"
   },
   "secret": {
    "truth": "real",
    "tactic": "",
-   "clue": "팝업스토어 새벽 오픈런, 1인 2개 제한이 자료실 최근 소식·기사와 맞고, 찍은 때와 올린 때가 맞습니다.",
-   "clueCriterion": "cross"
+   "clue": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지",
+   "clueCriterion": "cross",
+   "clueKind": "",
+   "fact": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
   },
   "answer": {
    "truth": "real",
-   "explain": "진짜입니다. 팝업스토어 오픈런과 1인 2개 제한이 자료실 최근 소식과 맞고, 2021년부터 쓴 계정입니다."
+   "explain": "진짜입니다. 새벽 5시 20분, 1인 2개 제한, 키링 8,000원이 팝업스토어 보도자료와 맞습니다.",
+   "doc": "[보도자료] 항구 광장 15주년 굿즈 팝업스토어, 10월 7일부터 31일까지"
   }
  },
  {
@@ -2830,374 +2882,52 @@
    "handle": "@doroland_live",
    "kind": "official",
    "verified": false,
-   "joined": "4일 전",
-   "followers": "512",
+   "joined": "2026.10",
+   "followers": "2,210",
    "posts": "2",
-   "bio": "도로랜드 운영실 공식 라이브 채널",
+   "bio": "도로랜드 공식 라이브 채널",
    "color": "#0e4a84"
   },
   "title": "",
-  "body": "오늘 밤 9시 운영실장 긴급 라이브 🔴 폐장 소식 직접 전합니다\n\n알림 설정하고 아래 링크로 사전 질문 남겨 주세요 (이름·전화번호 필수)",
+  "body": "오늘 밤 9시 운영실장 긴급 라이브 🔴 입장권 요금 인상 직접 설명합니다\n\n알림 설정하고 아래 링크로 사전 질문 남겨 주세요 (이름·전화번호 필수)",
   "slides": [
    {
     "img": "main",
-    "text": "오늘 밤 9시 운영실장 긴급 라이브 🔴 폐장 소식 직접 전합니다",
-    "sticker": {
-     "type": "countdown",
-     "text": "라이브까지",
-     "value": "3:30:00"
-    },
-    "time": "2시간 전"
+    "text": "오늘 밤 9시 운영실장 긴급 라이브 🔴 입장권 요금 인상 직접 설명합니다",
+    "time": "1시간 전"
    },
    {
-    "img": null,
+    "img": "main",
     "text": "알림 설정하고 아래 링크로 사전 질문 남겨 주세요 (이름·전화번호 필수)",
-    "sticker": {
-     "type": "link",
-     "text": "사전 질문 남기기"
-    },
-    "time": "2시간 전"
+    "time": "1시간 전"
    }
   ],
-  "tags": "#도로랜드 #라이브",
-  "place": "",
-  "postedAt": "2시간 전",
-  "photoTakenAt": "",
+  "tags": "",
+  "place": "도로랜드",
+  "postedAt": "1시간 전",
+  "photoTakenAt": "1시간 전",
   "likes": "",
-  "views": "4.3만",
+  "views": "8,100",
   "images": {
-   "main": "empty live streaming studio setup with a red on-air light and a ferris wheel poster, vertical"
+   "main": "dark studio with a red on-air style lamp glowing and an empty chair, vertical, no readable text"
   },
   "secret": {
    "truth": "fake",
    "tactic": "사칭",
-   "clue": "공식 계정은 @doroland 하나뿐이고 자료실 운영실 입장에 '라이브 방송은 @doroland에서만'. @doroland_live는 가입 4일, 인증 없음, 전화번호를 모읍니다.",
-   "clueCriterion": "who"
+   "clue": "라이브는 @doroland에서만 하는데 사칭 계정 @doroland_live로 쓰고, 요금 동결인데 인상 설명 라이브라고 함.",
+   "clueCriterion": "who",
+   "clueKind": "account",
+   "fact": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)"
   },
   "answer": {
    "truth": "fake",
-   "explain": "가짜입니다. 자료실에 라이브 방송은 @doroland에서만 한다고 나옵니다. @doroland_live는 가입 4일, 인증 배지 없음이고, 전화번호를 모으는 사칭 글입니다. '폐장 소식'은 운영실 안내와도 맞지 않습니다."
+   "explain": "가짜입니다. 운영실 공지에 「라이브 방송은 @doroland에서만, 사전 질문·전화번호 안 받음」과 「내년 요금 동결」이 있고, 등록 계정부에 @doroland_live는 사칭 신고 계정입니다.",
+   "doc": "[운영실 공지] 최근 떠도는 이야기에 대한 운영실의 입장 (10월 10일)",
+   "part": "계정"
   }
  },
  {
-  "id": "n-wheel120",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,208",
-   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
-   "color": "#0f766e",
-   "reporter": "서하늘"
-  },
-  "title": "도로랜드 관람차 120m로 증축 완료… 국내 최고 높이 등극",
-  "subhead": "캐빈 48개로 늘려 한 바퀴 20분… 운영실 \"15주년 선물\"",
-  "body": "도로랜드의 상징인 관람차가 높이 120m로 증축을 마치고 이번 주말 다시 문을 연다. 기존보다 32m 높아져 국내에서 가장 높은 관람차가 됐다.\n\n캐빈도 36개에서 48개로 늘었고, 한 바퀴 도는 시간은 20분으로 길어졌다. 운영실은 \"내년 15주년을 앞둔 선물\"이라고 설명했다.\n\n야간 조명 1만 2천 개는 예정대로 내년 5월 5일에 켜진다.",
-  "quote": {
-   "text": "꼭대기에서는 항구 너머 산까지 보입니다.",
-   "who": "도로랜드 운영실"
-  },
-  "stats": [
-   {
-    "label": "관람차 높이",
-    "value": "120m"
-   },
-   {
-    "label": "캐빈",
-    "value": "48개"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드",
-  "postedAt": "4시간 전",
-  "editedAt": "",
-  "photoTakenAt": "어제",
-  "views": "6.4만",
-  "commentCount": 318,
-  "comments": [
-   {
-    "name": "관람차덕후",
-    "text": "88m 아니었어요? 언제 공사했지",
-    "likes": 210,
-    "time": "3시간 전"
-   },
-   {
-    "name": "항구주민",
-    "text": "공사하는 거 본 적 없는데…",
-    "likes": 142,
-    "time": "2시간 전"
-   }
-  ],
-  "images": {
-   "main": "ferris wheel at an amusement park by the sea, daytime, tall structure, photo"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "숫자 부풀리기",
-   "clue": "자료실에 관람차는 높이 88m, 캐빈 36개, 한 바퀴 14분. 증축 소식은 자료실 어디에도 없음.",
-   "clueCriterion": "cross",
-   "clueKind": "cross",
-   "fact": "관람차: 높이 88m, 캐빈 36개, 한 바퀴 14분. 밤 8시 이후 운행 안 함"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 도로일보의 진짜 계정(@doroilbo, 인증 배지)이 맞지만, 자료실에 관람차는 높이 88m·캐빈 36개·한 바퀴 14분으로 나와 있고 증축 소식은 어디에도 없습니다. 진짜 언론사도 확인 없이 제보를 받아쓰면 이렇게 틀립니다. 도로일보는 그제 정정 보도를 냈습니다(자료실 최근 소식). 인증 배지만 믿지 말고 숫자는 자료실과 대조해야 합니다."
-  }
- },
- {
-  "id": "n-anniv-now",
-  "format": "news",
-  "author": {
-   "name": "서해바다신문",
-   "handle": "@seohaenews",
-   "kind": "press",
-   "verified": true,
-   "joined": "2011.03",
-   "followers": "4.2만",
-   "posts": "18,210",
-   "bio": "서해안 항구 도시의 지역 신문. 바다·항구·섬 소식을 전합니다.",
-   "color": "#1d4ed8",
-   "reporter": "정해솔"
-  },
-  "title": "도로랜드 개장 15주년 기념식 내일 오전 10시 항구 광장서… 관람차 조명 쇼도 첫 점등",
-  "subhead": "시장·운영실장 참석, 시민 1,000명 초청",
-  "body": "도로랜드 개장 15주년 기념식이 내일 오전 10시 항구 광장에서 열린다. 운영실은 시민 1,000명을 초청해 기념 공연과 관람차 조명 쇼 첫 점등을 함께 진행한다고 밝혔다.\n\n기념식 뒤에는 15주년 기념 입장권 할인도 시작된다. 어른 54,000원인 입장권을 당일 한정 반값에 판다.",
-  "quote": {
-   "text": "15년을 함께한 시민들께 감사하는 자리입니다.",
-   "who": "도로랜드 운영실장"
-  },
-  "stats": [
-   {
-    "label": "기념식",
-    "value": "내일 10시"
-   },
-   {
-    "label": "초청",
-    "value": "1,000명"
-   }
-  ],
-  "tags": "",
-  "place": "항구 광장",
-  "postedAt": "어제",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "2.8만",
-  "commentCount": 96,
-  "comments": [
-   {
-    "name": "달력보는사람",
-    "text": "15주년 내년 5월 아니에요?",
-    "likes": 188,
-    "time": "어제"
-   }
-  ],
-  "images": {
-   "main": "festival stage being set up at a harbour square, bunting, morning light, photo"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "날짜 조작",
-   "clue": "자료실: 개장은 5월 5일, 내년 5월 5일이 15주년. 지금은 10월이라 15주년 기념식이 내일일 수 없음. 조명 쇼도 내년 5월 5일 예정.",
-   "clueCriterion": "when",
-   "clueKind": "when-archive",
-   "fact": "개장: 5월 5일 개장. 내년 5월 5일이 개장 15주년"
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 서해바다신문의 진짜 계정이지만 날짜가 틀렸습니다. 자료실에 개장일은 5월 5일이고 15주년은 내년 5월 5일인데, 지금은 10월입니다. 관람차 조명 쇼도 운영실 입장에 내년 5월 5일 예정이라고 되어 있습니다. 진짜 언론사도 날짜를 잘못 보고 쓸 수 있고, 이런 기사는 나중에 정정됩니다. 인증 배지가 있어도 날짜는 자료실 연표와 맞춰 봐야 합니다."
-  }
- },
- {
-  "id": "n-fastpass",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,211",
-   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
-   "color": "#0f766e",
-   "reporter": "한바다"
-  },
-  "title": "[단독] 도로랜드, 다음 달부터 '프리패스' 도입… 관계자 \"내부 결정 끝났다\"",
-  "subhead": "3만 원 더 내면 모든 기구 줄 안 서… 일반 관람객 대기 시간 늘어날 듯",
-  "body": "도로랜드가 다음 달부터 줄을 서지 않고 놀이기구를 타는 '프리패스'를 도입하는 것으로 알려졌다. 도로랜드 사정에 밝은 한 관계자는 \"내부 결정은 이미 끝났고 발표만 남았다\"고 전했다.\n\n프리패스는 입장권에 3만 원을 더 내면 모든 기구의 우선 탑승 줄을 이용하는 방식이다. 일반 관람객의 대기 시간은 지금보다 길어질 전망이다.",
-  "quote": {
-   "text": "내부 결정은 이미 끝났고 발표만 남았다.",
-   "who": "도로랜드 사정에 밝은 관계자"
-  },
-  "stats": [
-   {
-    "label": "추가 요금",
-    "value": "3만 원"
-   }
-  ],
-  "tags": "",
-  "place": "",
-  "postedAt": "6시간 전",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "9.1만",
-  "commentCount": 540,
-  "comments": [
-   {
-    "name": "줄서는아빠",
-    "text": "이러면 일반 줄은 더 길어지는 거 아님?",
-    "likes": 420,
-    "time": "5시간 전"
-   },
-   {
-    "name": "운영실",
-    "text": "우선탑승권·프리패스 도입 계획은 없습니다.",
-    "likes": 610,
-    "time": "4시간 전"
-   }
-  ],
-  "images": {
-   "main": "long queue of visitors at an amusement park ride entrance, overcast day, photo"
-  },
-  "secret": {
-   "truth": "fake",
-   "tactic": "가짜 전문가",
-   "clue": "이름 없는 '관계자' 말뿐이고, 자료실 운영실 입장에 '우선탑승권·프리패스 같은 줄 안 서는 제도는 없음'이라고 되어 있음.",
-   "clueCriterion": "cross",
-   "clueKind": "cross",
-   "fact": "운영실 입장: 내년 입장권 요금은 동결(지난달 발표). 우선탑승권·프리패스 같은 줄 안 서는 제도는 없음."
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "가짜입니다. 등록 언론사 도로일보의 기사이지만 근거가 이름도 소속도 없는 '관계자' 한 사람뿐입니다. 자료실 운영실 입장에는 우선탑승권·프리패스 같은 줄 안 서는 제도는 없다고 분명히 적혀 있습니다. 진짜 언론사도 [단독]을 서두르다 확인 없이 쓰면 오보를 냅니다. 인증 배지와 [단독]이 붙어도 출처 없는 말은 사실이 아닐 수 있습니다."
-  }
- },
- {
-  "id": "n-ferry-guide",
-  "format": "news",
-  "author": {
-   "name": "섬여행 노트",
-   "handle": "@island_note",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2018.05",
-   "followers": "8,400",
-   "posts": "612",
-   "bio": "섬 여행 정보를 정리하는 개인 채널. 도로랜드는 1년에 열 번쯤 갑니다.",
-   "color": "#7c3aed",
-   "reporter": ""
-  },
-  "title": "도로랜드 가는 배 시간표 총정리: 매시 정각 출발, 25분, 막배는 7시 30분",
-  "subhead": "주말은 30분 간격… 섬에서 나오는 배는 매시 30분",
-  "body": "도로랜드에 처음 가는 분들이 가장 많이 묻는 게 배 시간이다. 항구에서 섬으로 가는 배는 오전 9시부터 오후 6시까지 매시 정각에 출발하고, 주말에는 30분 간격으로 늘어난다.\n\n섬에서 항구로 돌아오는 배는 오전 10시 30분부터 매시 30분에 있고, 막배는 오후 7시 30분이다. 배는 도로1호와 도로2호 두 척이 번갈아 다니며 한 번에 520명이 타고 25분 걸린다.\n\n막배를 놓치면 섬에서 나올 방법이 없으니 7시쯤에는 선착장 쪽으로 움직이는 게 좋다.",
-  "quote": null,
-  "stats": [
-   {
-    "label": "소요 시간",
-    "value": "25분"
-   },
-   {
-    "label": "막배",
-    "value": "7시 30분"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드 선착장",
-  "postedAt": "3일 전",
-  "editedAt": "",
-  "photoTakenAt": "지난 주말",
-  "views": "1.9만",
-  "commentCount": 73,
-  "comments": [
-   {
-    "name": "첫방문",
-    "text": "정리 감사해요 주말 30분 간격 몰랐음",
-    "likes": 95,
-    "time": "3일 전"
-   }
-  ],
-  "images": {
-   "main": "white passenger ferry leaving a small harbour toward an island, clear sky, photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "배 시간·소요 시간·막배·척수·정원이 자료실 배 정보와 모두 맞음. 오래된 개인 채널.",
-   "clueCriterion": "cross",
-   "clueKind": "",
-   "fact": "배 섬 → 항구: 오전 10시 30분 ~ 오후 7시 30분, 매시 30분. 막배 7시 30분"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 인증 배지가 없는 개인 채널이지만 2018년부터 꾸준히 쓴 계정이고, 배 출발 시간·주말 간격·소요 시간 25분·막배 7시 30분·배 2척 520명이 자료실 배 정보와 모두 맞습니다. 배지가 없다고 가짜인 것은 아닙니다. 내용을 자료실과 대조하면 됩니다."
-  }
- },
- {
-  "id": "n-coaster-why",
-  "format": "news",
-  "author": {
-   "name": "놀이기구 리뷰어",
-   "handle": "@ride_review",
-   "kind": "creator",
-   "verified": false,
-   "joined": "2017.09",
-   "followers": "2.3만",
-   "posts": "1,048",
-   "bio": "전국 놀이기구를 타 보고 기록합니다.",
-   "color": "#ea580c",
-   "reporter": ""
-  },
-  "title": "도로랜드 롤러코스터 정점에서 바다가 보이는 이유… 최고 높이 42m, 시속 92km",
-  "subhead": "섬 가장자리에 세운 덕에 꼭대기에서 수평선이 보인다",
-  "body": "도로랜드 롤러코스터는 최고 높이 42m, 최고 속도 시속 92km다. 숫자만 보면 국내 다른 코스터와 비슷하지만, 정점에서 바다가 보인다는 점이 다르다.\n\n이유는 위치다. 코스터가 섬 가장자리에 세워져 있어 꼭대기에 올라가면 가리는 건물 없이 수평선이 보인다. 내려올 때는 바다 쪽으로 떨어지는 느낌이 나서 체감 속도가 더 빠르다.\n\n맨 앞자리는 대기 줄이 따로 있으니 시간이 넉넉할 때 타는 걸 추천한다.",
-  "quote": null,
-  "stats": [
-   {
-    "label": "최고 높이",
-    "value": "42m"
-   },
-   {
-    "label": "최고 속도",
-    "value": "시속 92km"
-   }
-  ],
-  "tags": "",
-  "place": "도로랜드",
-  "postedAt": "5일 전",
-  "editedAt": "",
-  "photoTakenAt": "지난달",
-  "views": "3.3만",
-  "commentCount": 120,
-  "comments": [
-   {
-    "name": "앞자리파",
-    "text": "앞자리 줄 따로 있는 거 꿀팁",
-    "likes": 77,
-    "time": "5일 전"
-   }
-  ],
-  "images": {
-   "main": "roller coaster track on a cliff edge above the sea, riders at the top, sunny day, photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "최고 높이 42m·시속 92km·정점에서 바다가 보임이 자료실 놀이기구 정보와 맞음.",
-   "clueCriterion": "cross",
-   "clueKind": "",
-   "fact": "롤러코스터: 최고 높이 42m, 최고 속도 시속 92km, 정점에서 바다가 보임"
-  },
-  "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 배지 없는 개인 채널이지만 2017년부터 활동했고, 최고 높이 42m·시속 92km·정점에서 바다가 보인다는 내용이 자료실 놀이기구 정보와 맞습니다. 숫자가 자료실과 맞으면 배지가 없어도 믿을 수 있습니다."
-  }
- },
- {
-  "id": "t-guy-free",
+  "id": "t-elephant",
   "format": "story",
   "author": {
    "name": "롤코타는남자",
@@ -3206,117 +2936,46 @@
    "verified": true,
    "joined": "2017.02",
    "followers": "112만",
-   "posts": "2,310",
-   "bio": "놀이기구 리뷰 채널",
+   "posts": "1,384",
+   "bio": "전국 롤러코스터 다 타 봄. 도로랜드와 관계없는 개인 채널",
    "color": "#dc2626"
   },
   "title": "",
-  "body": "친구가 그러는데 내일 사파리 기린 투어 무료래요 🦒\n\n저도 들은 얘기라 확실하진 않은데 일단 공유!! 내일 가서 확인해 볼게요",
+  "body": "친구가 그러는데 도로랜드 사파리에 코끼리 투어 새로 생긴대요 🐘 다음 주부터\n\n저도 들은 얘기라 확실하진 않은데 일단 공유!! 다음 주 가서 확인해 볼게요",
   "slides": [
    {
     "img": "main",
-    "text": "친구가 그러는데 내일 사파리 기린 투어 무료래요 🦒",
-    "time": "40분 전"
+    "text": "친구가 그러는데 도로랜드 사파리에 코끼리 투어 새로 생긴대요 🐘 다음 주부터",
+    "time": "2시간 전"
    },
    {
-    "img": null,
-    "text": "저도 들은 얘기라 확실하진 않은데 일단 공유!! 내일 가서 확인해 볼게요",
-    "sticker": {
-     "type": "question",
-     "text": "아는 사람?"
-    },
-    "time": "39분 전"
+    "img": "main",
+    "text": "저도 들은 얘기라 확실하진 않은데 일단 공유!! 다음 주 가서 확인해 볼게요",
+    "time": "2시간 전"
    }
   ],
   "tags": "",
-  "place": "",
-  "postedAt": "40분 전",
-  "photoTakenAt": "지난달",
+  "place": "도로랜드",
+  "postedAt": "2시간 전",
+  "photoTakenAt": "2시간 전",
   "likes": "",
-  "views": "21만",
+  "views": "3.4만",
   "images": {
-   "main": "giraffe leaning toward a safari jeep window at a zoo park, vertical photo"
+   "main": "safari jeep on a dirt road at golden hour with no animals visible, vertical"
   },
   "secret": {
    "truth": "fake",
-   "tactic": "들은 이야기",
-   "clue": "'친구가 그러는데', '들은 얘기'라고 본인이 밝힘. 자료실 운영실 입장에 @doroland 외의 무료 개방 안내는 운영실과 관계없다고 되어 있음.",
-   "clueCriterion": "witness",
-   "clueKind": "witness-hear",
-   "fact": ""
-  },
-  "answer": {
-   "truth": "fake",
-   "explain": "믿을 수 없습니다. 인증 배지가 있는 유명 크리에이터지만 본인이 '친구가 그러는데', '들은 얘기'라고 쓴 건너 들은 말입니다. 자료실 운영실 입장에는 @doroland 밖에서 전해지는 무료 개방 안내는 운영실과 관계없다고 되어 있습니다. 인증 배지는 그 사람이 진짜라는 뜻이지, 그 사람이 들은 소문이 사실이라는 뜻은 아닙니다."
-  }
- },
- {
-  "id": "n-correction",
-  "format": "news",
-  "author": {
-   "name": "도로일보",
-   "handle": "@doroilbo",
-   "kind": "press",
-   "verified": true,
-   "joined": "2009.07",
-   "followers": "8.7만",
-   "posts": "41,215",
-   "bio": "도로랜드와 항구 도시 소식을 가장 빠르게.",
-   "color": "#0f766e",
-   "reporter": "서하늘"
-  },
-  "title": "[정정] 「도로랜드 관람차 120m 증축 완료」 기사는 사실과 다릅니다",
-  "subhead": "관람차는 높이 88m·캐빈 36개 그대로… 확인 없이 보도한 점 사과드립니다",
-  "body": "본지는 지난 기사에서 도로랜드 관람차가 120m로 증축을 마쳤다고 보도했습니다. 확인 결과 관람차는 높이 88m, 캐빈 36개, 한 바퀴 14분으로 변함이 없고, 운영실에 증축 계획도 없었습니다.\n\n해당 기사는 운영실 확인을 거치지 않고 제보 내용을 그대로 실은 것이었습니다. 독자 여러분께 혼란을 드린 점 사과드리며, 기사는 삭제하고 이 정정 보도로 대신합니다.\n\n도로일보는 앞으로 도로랜드 관련 숫자는 운영실 자료와 대조한 뒤 보도하겠습니다.",
-  "quote": {
-   "text": "확인 없이 보도한 것은 본지의 잘못입니다.",
-   "who": "도로일보 편집국"
-  },
-  "stats": [
-   {
-    "label": "관람차 높이",
-    "value": "88m"
-   },
-   {
-    "label": "캐빈",
-    "value": "36개"
-   }
-  ],
-  "tags": "",
-  "place": "",
-  "postedAt": "그제",
-  "editedAt": "",
-  "photoTakenAt": "",
-  "views": "1.7만",
-  "commentCount": 84,
-  "comments": [
-   {
-    "name": "관람차덕후",
-    "text": "그럴 줄 알았다 공사하는 거 본 적 없음",
-    "likes": 120,
-    "time": "그제"
-   },
-   {
-    "name": "항구주민",
-    "text": "그래도 정정하니까 믿을 만하네",
-    "likes": 96,
-    "time": "그제"
-   }
-  ],
-  "images": {
-   "main": "ferris wheel at an amusement park by the sea, daytime, photo"
-  },
-  "secret": {
-   "truth": "real",
-   "tactic": "",
-   "clue": "정정 내용(88m·36개·14분)이 자료실과 맞고, 자료실 최근 소식에 도로일보 정정 보도가 있음.",
+   "tactic": "가짜 전문가",
+   "clue": "코끼리가 없는 사파리에 「코끼리 투어 신설」을 씀.",
    "clueCriterion": "cross",
-   "clueKind": "",
-   "fact": "관람차: 높이 88m, 캐빈 36개, 한 바퀴 14분. 밤 8시 이후 운행 안 함"
+   "clueKind": "body",
+   "fact": "사파리 동물 현황 (10월)"
   },
   "answer": {
-   "truth": "real",
-   "explain": "진짜입니다. 정정 보도의 숫자(88m·36개·14분)가 자료실과 맞고, 자료실 최근 소식에도 도로일보가 관람차 기사를 정정했다는 기록이 있습니다. 진짜 언론사는 틀리면 이렇게 고칩니다. 사칭 계정(@doro_ilbo 같은)은 틀려도 정정하지 않고 사라집니다. 그래서 어느 계정이 정정 보도를 내는지도 진짜를 가르는 단서가 됩니다."
+   "truth": "fake",
+   "explain": "가짜입니다. 사파리 동물 현황 문서에 코끼리는 「0, 없음」이고 초식동물 사파리 38종에 코끼리 투어 계획도 없습니다. 인증 크리에이터(구독자 112만)가 「친구가 그러는데」라며 올린 글이라 배지만 보면 못 찾습니다.",
+   "doc": "사파리 동물 현황 (10월)",
+   "part": "본문"
   }
  }
 ]

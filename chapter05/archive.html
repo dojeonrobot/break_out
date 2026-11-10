@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>도로랜드 자료실</title>
+  <!-- 도로그램(feed.html)에서 새 탭으로 여는 자료실. 문서는 archive-data.js 한 곳에 있다.
+       주소: archive.html?q=검색어 (검색 상태로 열림), archive.html#doc=문서id (문서 바로 열기) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="archive-data.js"></script>
+  <style>
+    :root {
+      --bg: #f4f6f9; --surface: #ffffff; --surface-2: #eceff4; --line: #dde2ea; --ink: #16213a; --muted: #5b6473;
+      --navy: #1f4e8c; --navy-ink: #ffffff; --navy-soft: #e3ecf8; --mark: #fff1a8; --focus: #1f4e8c;
+      --sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0f1420; --surface: #161c2b; --surface-2: #1f2737; --line: #2b3447; --ink: #eef2f8; --muted: #9aa5b8; --navy: #6ea2e6; --navy-ink: #0f1420; --navy-soft: #1c2a42; --mark: #5a4b00; }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--ink); word-break: keep-all; -webkit-font-smoothing: antialiased; line-height: 1.6; min-height: 100dvh; }
+    a { color: var(--navy); }
+    button { font: inherit; cursor: pointer; }
+    .icon { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
+    mark { background: var(--mark); color: inherit; padding: 0 1px; border-radius: 2px; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+    /* 머리: 기관 이름 + 검색 */
+    .top { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+    .top-in { max-width: 1180px; margin: 0 auto; padding: 12px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+    .brand .mark-box { width: 36px; height: 36px; border-radius: 9px; background: var(--navy); color: var(--navy-ink); display: grid; place-items: center; } .brand .mark-box .icon { width: 20px; height: 20px; }
+    .brand b { font-size: 17px; font-weight: 900; letter-spacing: -.01em; display: block; line-height: 1.2; } .brand small { font-size: 11.5px; color: var(--muted); display: block; }
+    .search { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 8px 0 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); max-width: 640px; width: 100%; justify-self: center; }
+    .search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 3px color-mix(in srgb, var(--navy) 18%, transparent); }
+    .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: var(--ink); outline: none; }
+    .search input::-webkit-search-cancel-button { display: none; }
+    .search .clear { border: 0; background: none; color: var(--muted); padding: 6px; border-radius: 8px; display: none; } .search.has .clear { display: grid; }
+    .search .go { border: 0; background: var(--navy); color: var(--navy-ink); font-weight: 700; padding: 0 14px; height: 34px; border-radius: 8px; }
+    .top-meta { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+    @media (max-width: 760px) { .top-in { grid-template-columns: 1fr; gap: 10px; } .top-meta { display: none; } .brand small { display: none; } }
+
+    /* 본문: 왼쪽 목록 + 오른쪽 문서 */
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 18px 16px 60px; display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; }
+    @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } .wrap.reading .list-col { display: none; } .wrap:not(.reading) .doc-col { display: none; } }
+    .list-col { position: sticky; top: 76px; display: grid; gap: 12px; max-height: calc(100dvh - 92px); overflow: auto; padding-right: 2px; }
+    @media (max-width: 960px) { .list-col { position: static; max-height: none; overflow: visible; } }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+    .chip .icon { width: 14px; height: 14px; } .chip[aria-pressed="true"] { background: var(--navy); color: var(--navy-ink); border-color: var(--navy); }
+    .list-h { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--muted); padding: 2px 2px 0; } .list-h b { color: var(--ink); font-size: 15px; }
+    .rows { display: grid; gap: 8px; }
+    .row { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; color: var(--ink); transition: border-color .15s, transform .15s; }
+    .row:hover { border-color: var(--navy); } .row[aria-current="true"] { border-color: var(--navy); box-shadow: inset 3px 0 0 var(--navy); }
+    .row .meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); } .row .meta .tag { font-weight: 700; color: var(--navy); background: var(--navy-soft); padding: 1px 7px; border-radius: 5px; }
+    .row .t { font-weight: 700; font-size: 14.5px; line-height: 1.4; } .row .snip { font-size: 13px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; border: 1px dashed var(--line); border-radius: 12px; }
+
+    .doc-col { min-width: 0; }
+    .doc { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 32px 32px; }
+    @media (max-width: 640px) { .doc { padding: 20px 16px 24px; border-radius: 12px; } }
+    .back { display: none; border: 0; background: var(--surface-2); color: var(--ink); border-radius: 8px; padding: 8px 12px; font-weight: 700; margin-bottom: 12px; align-items: center; gap: 6px; }
+    @media (max-width: 960px) { .back { display: inline-flex; } }
+    .doc-top { display: flex; gap: 8px; align-items: center; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; } .doc-top .tag { font-weight: 700; color: var(--navy); background: var(--navy-soft); padding: 2px 8px; border-radius: 6px; font-size: 12px; }
+    .doc h1 { margin: 8px 0 6px; font-size: clamp(20px, 2.2vw, 26px); line-height: 1.35; font-weight: 900; letter-spacing: -.01em; }
+    .doc .by { font-size: 13px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; } .doc .by span { display: inline-flex; align-items: center; gap: 5px; } .doc .by .icon { width: 14px; height: 14px; }
+    .summary { background: var(--navy-soft); border-left: 3px solid var(--navy); padding: 12px 16px; border-radius: 0 10px 10px 0; font-size: 15px; font-weight: 500; margin: 0 0 18px; }
+    .doc p { margin: 0 0 12px; font-size: 15px; max-width: 72ch; }
+    .tbl { margin: 18px 0 6px; } .tbl h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; } .tbl h3 .icon { width: 14px; height: 14px; }
+    .tbl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 420px; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; } th { background: var(--surface-2); font-size: 12.5px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; } td:first-child { font-weight: 700; } td.num { font-variant-numeric: tabular-nums; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; } .tags button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; }
+    .tags button:hover { color: var(--navy); border-color: var(--navy); }
+    .related { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; } .related h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); } .related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .related button { border: 0; background: none; color: var(--navy); font-weight: 700; text-align: left; padding: 2px 0; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; } .related .icon { width: 14px; height: 14px; }
+    .doc-foot { margin-top: 24px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+    /* 첫 화면 (검색 전) */
+    .home { display: grid; gap: 18px; }
+    .home-hero { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px; display: grid; gap: 8px; }
+    .home-hero h1 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: -.01em; } .home-hero p { margin: 0; color: var(--muted); font-size: 14.5px; max-width: 60ch; }
+    .home-ex { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; } .home-ex button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--ink); display: inline-flex; gap: 6px; align-items: center; } .home-ex .icon { width: 14px; height: 14px; color: var(--muted); }
+    .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+    .cat { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; color: var(--ink); }
+    .cat:hover { border-color: var(--navy); } .cat b { display: flex; align-items: center; gap: 8px; font-size: 15px; } .cat b .icon { color: var(--navy); } .cat span { font-size: 12.5px; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media print { .top, .list-col, .back, .tags, .related { display: none !important; } .wrap { display: block; } .doc { border: 0; padding: 0; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-in">
+      <a class="brand" href="archive.html" id="brand"><span class="mark-box"><i data-lucide="library-big" class="icon"></i></span><span><b>도로랜드 자료실</b><small>도로랜드 운영실 공개 문서</small></span></a>
+      <form class="search" id="searchForm" role="search">
+        <i data-lucide="search" class="icon" style="color:var(--muted)"></i>
+        <label class="sr" for="q">자료실 검색</label>
+        <input id="q" type="search" placeholder="숫자, 가격, 시간, 계정 아이디를 그대로 검색 (예: 키링 400, 막배, @doroilbo)" autocomplete="off">
+        <button type="button" class="clear" id="clearBtn" aria-label="지우기"><i data-lucide="x" class="icon"></i></button>
+        <button type="submit" class="go">검색</button>
+      </form>
+      <div class="top-meta" id="topMeta"></div>
+    </div>
+  </header>
+
+  <main class="wrap" id="wrap">
+    <aside class="list-col" id="listCol" aria-label="문서 목록"></aside>
+    <section class="doc-col" id="docCol" aria-live="polite"></section>
+  </main>
+
+<script>
+(function () {
+  const D = window.DORO_ARCHIVE, docs = D.docs, TYPES = D.types;
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const ic = (n, cls = '') => `<i data-lucide="${n}" class="icon ${cls}"></i>`;
+  const icons = () => lucide.createIcons({ attrs: { class: 'icon' } });
+  const fmtDate = d => { const [y, m, dd] = d.split('-'); return `${y}년 ${+m}월 ${+dd}일`; };
+  const S = { q: '', type: 'all', doc: null };
+
+  // ---------- 검색 ----------
+  // 숫자는 쉼표·공백을 지우고 비교한다 (1,200 == 1200). 한글은 그대로 포함 검색.
+  const norm = s => String(s || '').toLowerCase().replace(/[,\s]/g, '');
+  const docText = d => [d.title, d.summary, (d.body || []).join(' '), (d.tables || []).map(t => [t.title, (t.cols || []).join(' '), (t.rows || []).map(r => r.join(' ')).join(' ')].join(' ')).join(' '), (d.tags || []).join(' '), d.dept].join(' ');
+  const tokens = q => q.trim().split(/\s+/).filter(Boolean).map(t => t.replace(/^@/, '').toLowerCase());
+  function score(d, toks) {
+    const title = d.title.toLowerCase(), full = docText(d).toLowerCase(), fullN = norm(full), titleN = norm(title), tags = (d.tags || []).map(t => t.toLowerCase());
+    let sc = 0;
+    for (const t of toks) {
+      const tn = norm(t); if (!tn) continue;
+      const inTitle = title.includes(t) || titleN.includes(tn), inTags = tags.some(x => x.includes(t) || norm(x).includes(tn)), inFull = full.includes(t) || fullN.includes(tn);
+      if (!inFull && !inTitle && !inTags) return 0;   // 모든 낱말이 들어 있어야 한다
+      sc += inTitle ? 6 : 0; sc += inTags ? 4 : 0; sc += inFull ? 1 : 0;
+    }
+    return sc;
+  }
+  function search(q, type) {
+    const toks = tokens(q);
+    let list = docs.filter(d => type === 'all' || d.type === type);
+    if (toks.length) list = list.map(d => ({ d, s: score(d, toks) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || b.d.date.localeCompare(a.d.date)).map(x => x.d);
+    else list = list.slice().sort((a, b) => b.date.localeCompare(a.date));
+    return list;
+  }
+  // 검색어 표시: 본문에서 첫 낱말이 나오는 문장 근처를 잘라 노랗게
+  function hl(text, toks) {
+    let out = esc(text);
+    toks.forEach(t => { if (!t) return; const re = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'); out = out.replace(re, m => `<mark>${m}</mark>`);
+      const tn = norm(t); if (/^\d+$/.test(tn) && tn.length >= 3) { const re2 = new RegExp(tn.split('').join('[,\\s]?'), 'g'); out = out.replace(re2, m => m.includes('<mark>') ? m : `<mark>${m}</mark>`); } });
+    return out;
+  }
+  function snippet(d, toks) {
+    if (!toks.length) return d.summary;
+    const parts = [d.summary, ...(d.body || []), ...(d.tables || []).flatMap(t => (t.rows || []).map(r => r.join(' · ')))];
+    for (const p of parts) { const pn = norm(p); if (toks.some(t => p.toLowerCase().includes(t) || pn.includes(norm(t)))) return p; }
+    return d.summary;
+  }
+
+  // ---------- 그리기 ----------
+  function render() {
+    const toks = tokens(S.q), list = search(S.q, S.type), wrap = $('#wrap');
+    $('#q').value = S.q; $('#searchForm').classList.toggle('has', !!S.q);
+    $('#topMeta').textContent = `문서 ${docs.length}건 · ${fmtDate(D.today)} 기준`;
+    const chips = [['all', '전체', 'layers']].concat(Object.entries(TYPES).map(([k, v]) => [k, v.label, v.icon]));
+    const counts = Object.fromEntries(chips.map(([k]) => [k, search(S.q, k).length]));
+    $('#listCol').innerHTML = `<div class="chips" role="group" aria-label="문서 종류">${chips.map(([k, l, i]) => `<button type="button" class="chip" data-type="${k}" aria-pressed="${S.type === k}">${ic(i)}${l}<span style="opacity:.7">${counts[k]}</span></button>`).join('')}</div>
+      <div class="list-h">${S.q ? `<b>「${esc(S.q)}」</b> 검색 결과 ${list.length}건` : `<b>${S.type === 'all' ? '전체 문서' : TYPES[S.type].label}</b> ${list.length}건 · 최근 등록 순`}</div>
+      <div class="rows">${list.length ? list.map(d => `<button type="button" class="row" data-doc="${d.id}" aria-current="${S.doc === d.id}"><span class="meta"><span class="tag">${TYPES[d.type].label}</span><span>${fmtDate(d.date)}</span><span>${esc(d.dept)}</span></span><span class="t">${hl(d.title, toks)}</span><span class="snip">${hl(snippet(d, toks), toks)}</span></button>`).join('') : `<div class="empty">「${esc(S.q)}」이(가) 들어간 문서가 없습니다.<br>다른 말이나 숫자로 다시 찾아보세요. 자료실 어디에도 없는 내용이면 그 글은 자료실로 확인되지 않는 글입니다.</div>`}</div>`;
+    const d = docs.find(x => x.id === S.doc);
+    wrap.classList.toggle('reading', !!d);
+    $('#docCol').innerHTML = d ? docHTML(d, toks) : homeHTML(list);
+    icons();
+    document.title = d ? `${d.title} · 도로랜드 자료실` : S.q ? `「${S.q}」 검색 · 도로랜드 자료실` : '도로랜드 자료실';
+  }
+  function homeHTML(list) {
+    const ex = ['키링 400', '막배', '입장권', '@doroilbo', '기린', '분실물', '100만', '야간 개장'];
+    return `<div class="home">
+      <div class="home-hero"><h1>도로랜드 운영실이 공개한 문서를 찾아봅니다</h1><p>보도자료, 운영 기록, 통계, 시설·요금, 행사, 등록 계정부, 공지·정정 ${docs.length}건. 게시물에 나온 숫자·시간·계정이 여기 문서와 맞는지 대조합니다.</p>
+        <div class="home-ex">${ex.map(x => `<button type="button" data-q="${esc(x)}">${ic('search')}${esc(x)}</button>`).join('')}</div></div>
+      <div class="home-grid">${Object.entries(TYPES).map(([k, v]) => { const n = docs.filter(d => d.type === k).length, latest = docs.filter(d => d.type === k).sort((a, b) => b.date.localeCompare(a.date))[0]; return `<button type="button" class="cat" data-type="${k}"><b>${ic(v.icon)}${v.label} <span style="color:var(--muted);font-weight:500">${n}</span></b><span>최근: ${esc(latest ? latest.title : '')}</span></button>`; }).join('')}</div>
+      <div class="list-h" style="margin-top:4px"><b>최근 등록 문서</b></div>
+      <div class="rows">${list.slice(0, 5).map(d => `<button type="button" class="row" data-doc="${d.id}"><span class="meta"><span class="tag">${TYPES[d.type].label}</span><span>${fmtDate(d.date)}</span><span>${esc(d.dept)}</span></span><span class="t">${esc(d.title)}</span><span class="snip">${esc(d.summary)}</span></button>`).join('')}</div></div>`;
+  }
+  function docHTML(d, toks) {
+    const isNum = v => /^[\d,.\s%~+-]+(?:만|천|억|명|개|원|장|대|건|분|시간|m|km|kg|석|마리|세트|면|종)?[\s\S]{0,4}$/.test(String(v));
+    const tables = (d.tables || []).map(t => `<div class="tbl">${t.title ? `<h3>${ic('table-2')}${esc(t.title)}</h3>` : ''}<div class="tbl-scroll"><table><thead><tr>${t.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i > 0 && isNum(c) ? 'num' : ''}">${hl(c, toks)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('');
+    const rel = docs.filter(x => x.id !== d.id).map(x => ({ x, n: (x.tags || []).filter(t => (d.tags || []).includes(t)).length })).filter(o => o.n > 0).sort((a, b) => b.n - a.n).slice(0, 4).map(o => o.x);
+    return `<article class="doc">
+      <button type="button" class="back" id="backBtn">${ic('chevron-left')}목록으로</button>
+      <div class="doc-top"><span class="tag">${TYPES[d.type].label}</span><span>문서 번호 ${esc(d.id.toUpperCase())}</span></div>
+      <h1>${hl(d.title, toks)}</h1>
+      <div class="by"><span>${ic('calendar')}등록 ${fmtDate(d.date)}</span><span>${ic('building-2')}${esc(D.org)} ${esc(d.dept)}</span></div>
+      <p class="summary">${hl(d.summary, toks)}</p>
+      ${(d.body || []).map(p => `<p>${hl(p, toks)}</p>`).join('')}
+      ${tables}
+      ${(d.tags || []).length ? `<div class="tags">${d.tags.map(t => `<button type="button" data-q="${esc(t)}">#${esc(t)}</button>`).join('')}</div>` : ''}
+      ${rel.length ? `<div class="related"><h3>관련 문서</h3><ul>${rel.map(x => `<li><button type="button" data-doc="${x.id}">${ic('file-text')}${esc(x.title)}</button></li>`).join('')}</ul></div>` : ''}
+      <div class="doc-foot"><span>ⓒ ${esc(D.org)} · 이 문서의 숫자는 ${fmtDate(d.date)} 기준입니다.</span><span>archive.html#doc=${esc(d.id)}</span></div>
+    </article>`;
+  }
+
+  // ---------- 주소 ----------
+  function readUrl() {
+    const q = new URLSearchParams(location.search).get('q') || '', m = location.hash.match(/doc=([\w-]+)/);
+    S.q = q; S.doc = m && docs.some(d => d.id === m[1]) ? m[1] : null;
+    if (!S.doc && q) { const first = search(q, 'all'); if (first.length === 1) S.doc = first[0].id; }   // 하나만 맞으면 바로 연다
+  }
+  function pushUrl() {
+    const u = new URL(location.href); if (S.q) u.searchParams.set('q', S.q); else u.searchParams.delete('q'); u.hash = S.doc ? 'doc=' + S.doc : '';
+    history.pushState(null, '', u);
+  }
+  // ---------- 이벤트 ----------
+  $('#searchForm').addEventListener('submit', e => { e.preventDefault(); S.q = $('#q').value.trim(); S.doc = null; render(); pushUrl(); });
+  $('#q').addEventListener('input', e => { S.q = e.target.value.trim(); S.doc = null; render(); });
+  $('#clearBtn').onclick = () => { S.q = ''; S.doc = null; render(); pushUrl(); $('#q').focus(); };
+  $('#brand').onclick = e => { e.preventDefault(); S.q = ''; S.type = 'all'; S.doc = null; render(); pushUrl(); };
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-type]'); if (t) { S.type = t.dataset.type; if (t.classList.contains('cat')) S.doc = null; render(); return; }
+    const d = e.target.closest('[data-doc]'); if (d) { S.doc = d.dataset.doc; render(); pushUrl(); $('#docCol').scrollIntoView({ block: 'start' }); return; }
+    const q = e.target.closest('[data-q]'); if (q) { S.q = q.dataset.q; S.doc = null; render(); pushUrl(); window.scrollTo({ top: 0 }); return; }
+    if (e.target.closest('#backBtn')) { S.doc = null; render(); pushUrl(); }
+  });
+  window.addEventListener('popstate', () => { readUrl(); render(); });
+  readUrl(); render();
+  if (!S.doc) setTimeout(() => $('#q').focus(), 50);
+})();
+</script>
+</body>
+</html>
