@@ -4,131 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#1e3a8a">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)">
   <title>도로랜드 자료실</title>
   <!-- 도로그램(feed.html)에서 새 탭으로 여는 자료실. 문서는 archive-data.js 한 곳에 있다.
-       주소: archive.html?q=검색어 (검색 상태로 열림), archive.html#doc=문서id (문서 바로 열기) -->
+       주소: archive.html?q=검색어 (검색 결과), archive.html#doc=문서id (문서 바로 열기)
+       2026-11-10 v3: 색을 빼고 문서처럼. 한 화면에 한 가지(목록 또는 문서), 본문 17px, 한 줄 68자 안팎. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="archive-data.js"></script>
   <style>
     :root {
-      --bg: #f3f5fa; --surface: #ffffff; --surface-2: #eef1f7; --line: #e1e6ef; --ink: #141c2e; --muted: #5d6779;
-      --brand: #1e3a8a; --brand-2: #2563eb; --brand-ink: #ffffff; --mark: #ffe66d; --focus: #2563eb;
-      --sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
-      /* 문서 종류 색: 글자색(--tc) / 바탕색(--tb) */
-      --c-press: #1d4ed8; --b-press: #e3ecff; --c-record: #0f766e; --b-record: #dcf5ef; --c-stat: #6d28d9; --b-stat: #ede7fe;
-      --c-facility: #c2410c; --b-facility: #ffe9db; --c-event: #be185d; --b-event: #fde5ef; --c-account: #15803d; --b-account: #def5e3; --c-notice: #b91c1c; --b-notice: #fde4e4;
+      --bg: #ffffff; --surface: #ffffff; --surface-2: #f5f6f8; --line: #e6e8ec; --line-2: #d4d7dd; --ink: #16181d; --ink-2: #3d434d; --muted: #6b7280;
+      --accent: #1f3f8f; --accent-soft: #eef2fb; --mark: #fff3a3; --focus: #1f3f8f;
+      --sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --mono: ui-monospace, "SF Mono", Consolas, monospace;
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #0e1320; --surface: #161d2d; --surface-2: #1e2738; --line: #2a3448; --ink: #eef2f8; --muted: #9ba6ba; --brand: #15275e; --brand-2: #3b82f6; --mark: #6b5a00; --focus: #60a5fa;
-        --c-press: #8ab4ff; --b-press: #1a2a52; --c-record: #5fd3c0; --b-record: #11362f; --c-stat: #c4a8ff; --b-stat: #2c2150; --c-facility: #ffb08a; --b-facility: #44261a; --c-event: #ff9ac5; --b-event: #46182d; --c-account: #7fe09a; --b-account: #173923; --c-notice: #ff9b9b; --b-notice: #4a1d1d; }
+      :root { --bg: #111318; --surface: #111318; --surface-2: #1a1d24; --line: #262a33; --line-2: #343a46; --ink: #eceef2; --ink-2: #c7ccd6; --muted: #8b93a3; --accent: #8db0ff; --accent-soft: #1a2238; --mark: #5d5000; }
     }
-    [data-type="press"] { --tc: var(--c-press); --tb: var(--b-press); } [data-type="record"] { --tc: var(--c-record); --tb: var(--b-record); } [data-type="stat"] { --tc: var(--c-stat); --tb: var(--b-stat); }
-    [data-type="facility"] { --tc: var(--c-facility); --tb: var(--b-facility); } [data-type="event"] { --tc: var(--c-event); --tb: var(--b-event); } [data-type="account"] { --tc: var(--c-account); --tb: var(--b-account); } [data-type="notice"] { --tc: var(--c-notice); --tb: var(--b-notice); }
-    [data-type="all"] { --tc: var(--brand-2); --tb: var(--surface-2); }
-
     * { box-sizing: border-box; }
     html { color-scheme: light dark; }
     html, body { margin: 0; }
-    body { font-family: var(--sans); background: var(--bg); color: var(--ink); word-break: keep-all; -webkit-font-smoothing: antialiased; line-height: 1.65; min-height: 100dvh; font-size: 15px; }
-    a { color: var(--brand-2); }
-    button { font: inherit; cursor: pointer; color: inherit; }
-    button, a, [role="button"] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--ink); word-break: keep-all; -webkit-font-smoothing: antialiased; line-height: 1.7; font-size: 17px; min-height: 100dvh; }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    button { font: inherit; cursor: pointer; color: inherit; background: none; border: 0; padding: 0; }
+    button, a { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .icon { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
-    mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 700; }
-    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 2px; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-    .skip { position: absolute; left: 12px; top: -60px; z-index: 20; background: var(--brand); color: var(--brand-ink); padding: 10px 14px; border-radius: 8px; font-weight: 700; text-decoration: none; } .skip:focus-visible { top: 12px; }
+    .skip { position: absolute; left: 12px; top: -60px; z-index: 20; background: var(--accent); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; } .skip:focus-visible { top: 12px; }
 
-    /* 머리: 기관 띠 + 검색 */
-    .top { background: linear-gradient(100deg, var(--brand), var(--brand-2)); color: var(--brand-ink); position: sticky; top: 0; z-index: 10; box-shadow: 0 6px 24px -14px rgba(30, 58, 138, .6); }
-    .top-in { max-width: 1200px; margin: 0 auto; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; }
-    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; white-space: nowrap; }
-    .brand .mark-box { width: 40px; height: 40px; border-radius: 11px; background: rgba(255,255,255,.16); display: grid; place-items: center; } .brand .mark-box .icon { width: 22px; height: 22px; }
-    .brand b { font-size: 18px; font-weight: 900; letter-spacing: -.01em; display: block; line-height: 1.2; } .brand small { font-size: 12px; opacity: .8; display: block; }
-    .search { display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 8px 0 16px; border-radius: 14px; background: var(--surface); color: var(--ink); max-width: 680px; width: 100%; justify-self: center; box-shadow: 0 2px 0 rgba(0,0,0,.08); }
-    .search:focus-within { box-shadow: 0 0 0 4px rgba(255,255,255,.35); }
-    .search .icon { color: var(--muted); }
-    .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 16px; color: var(--ink); outline: none; }
+    /* 머리 */
+    .top { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
+    .top-in { max-width: 1040px; margin: 0 auto; padding: 12px 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; }
+    .brand { display: flex; align-items: baseline; gap: 10px; color: var(--ink); white-space: nowrap; } .brand:hover { text-decoration: none; }
+    .brand b { font-size: 18px; font-weight: 800; letter-spacing: -.01em; } .brand small { font-size: 12.5px; color: var(--muted); }
+    .search { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 6px 0 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--surface); max-width: 560px; width: 100%; justify-self: center; }
+    .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .search .icon { color: var(--muted); width: 17px; height: 17px; }
+    .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15.5px; color: var(--ink); outline: none; }
     .search input::-webkit-search-cancel-button { display: none; }
-    .search .clear { border: 0; background: none; color: var(--muted); padding: 6px; border-radius: 8px; display: none; } .search.has .clear { display: grid; }
-    .search .go { border: 0; background: var(--brand-2); color: #fff; font-weight: 800; padding: 0 16px; height: 36px; border-radius: 10px; transition: filter .15s; } .search .go:hover { filter: brightness(1.1); }
-    .top-meta { font-size: 12.5px; opacity: .85; white-space: nowrap; text-align: right; line-height: 1.4; }
-    @media (max-width: 760px) { .top-in { grid-template-columns: 1fr; gap: 10px; } .top-meta { display: none; } .brand small { display: none; } }
+    .search .clear { color: var(--muted); padding: 6px; border-radius: 8px; display: none; } .search.has .clear { display: grid; }
+    .search .go { background: var(--ink); color: var(--bg); font-weight: 700; font-size: 14px; padding: 0 14px; height: 32px; border-radius: 7px; }
+    .top-meta { font-size: 12.5px; color: var(--muted); white-space: nowrap; text-align: right; line-height: 1.45; }
+    @media (max-width: 760px) { .top-in { grid-template-columns: 1fr; gap: 10px; padding: 10px 16px; } .top-meta, .brand small { display: none; } }
 
-    /* 본문 */
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 20px 18px 60px; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 22px; align-items: start; }
-    @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; } .wrap.reading .list-col { display: none; } .wrap:not(.reading) .doc-col { display: none; } }
-    .list-col { position: sticky; top: 84px; display: grid; gap: 12px; max-height: calc(100dvh - 100px); overflow: auto; padding: 2px; }
-    @media (max-width: 960px) { .list-col { position: static; max-height: none; overflow: visible; } }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip { border: 1.5px solid transparent; background: var(--tb); color: var(--tc); border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: border-color .15s, transform .15s; }
-    .chip .icon { width: 15px; height: 15px; } .chip span { opacity: .75; font-family: var(--mono); font-size: 12px; }
-    .chip:hover { border-color: var(--tc); } .chip[aria-pressed="true"] { background: var(--tc); color: #fff; } .chip[aria-pressed="true"] span { opacity: .9; }
-    .list-h { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--muted); padding: 4px 2px 0; } .list-h b { color: var(--ink); font-size: 15px; }
-    .rows { display: grid; gap: 8px; }
-    .row { scroll-margin-top: 96px; text-align: left; width: 100%; border: 1px solid var(--line); border-left: 5px solid var(--tc); background: var(--surface); border-radius: 12px; padding: 12px 14px 12px 14px; display: grid; gap: 5px; transition: transform .15s, box-shadow .15s, border-color .15s; }
-    .row:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -14px rgba(20, 28, 46, .5); } .row[aria-current="true"] { background: var(--tb); border-color: var(--tc); }
-    .row .meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; } .row .meta .tag { font-weight: 800; color: var(--tc); background: var(--tb); padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; } .row .meta .tag .icon { width: 12px; height: 12px; }
-    .row[aria-current="true"] .meta .tag { background: var(--surface); }
-    .row .t { font-weight: 800; font-size: 15px; line-height: 1.4; } .row .snip { font-size: 13px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .empty { padding: 30px 18px; text-align: center; color: var(--muted); font-size: 14px; border: 1.5px dashed var(--line); border-radius: 14px; background: var(--surface); } .empty b { display: block; color: var(--ink); font-size: 16px; margin-bottom: 6px; }
+    /* 본문: 한 화면에 한 가지 */
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 28px 20px 80px; }
+    .page { max-width: 720px; margin: 0 auto; }
+    .page.wide { max-width: 860px; }
+    h1 { font-size: 28px; line-height: 1.35; font-weight: 800; letter-spacing: -.015em; margin: 0 0 8px; text-wrap: balance; }
+    .lead { margin: 0; color: var(--ink-2); font-size: 16.5px; }
+
+    /* 종류 필터: 글자 탭 */
+    .types { display: flex; flex-wrap: wrap; gap: 2px 18px; margin: 26px 0 6px; border-bottom: 1px solid var(--line); }
+    .types button { padding: 8px 0 10px; font-size: 14.5px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 6px; align-items: baseline; }
+    .types button span { font-size: 12px; color: var(--muted); } .types button:hover { color: var(--ink); }
+    .types button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+    .list-h { display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--muted); margin: 18px 0 2px; } .list-h b { color: var(--ink); font-size: 15px; }
+
+    /* 문서 목록: 줄 */
+    .rows { display: grid; }
+    .row { text-align: left; width: 100%; padding: 18px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; color: var(--ink); }
+    .row:hover .t { color: var(--accent); }
+    .row .meta { font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; } .row .meta b { color: var(--ink-2); font-weight: 600; }
+    .row .t { font-weight: 700; font-size: 17.5px; line-height: 1.45; }
+    .row .snip { font-size: 15px; color: var(--ink-2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .empty { padding: 48px 0; text-align: center; color: var(--muted); font-size: 15.5px; } .empty b { display: block; color: var(--ink); font-size: 18px; margin-bottom: 8px; }
+    .ex { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 14px; font-size: 14.5px; color: var(--muted); } .ex button { color: var(--accent); font-weight: 600; } .ex button:hover { text-decoration: underline; }
 
     /* 문서 */
-    .doc-col { min-width: 0; }
-    .doc { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; scroll-margin-top: 84px; }
-    .doc-band { background: var(--tb); padding: 22px 32px 20px; border-bottom: 1px solid color-mix(in srgb, var(--tc) 18%, transparent); }
-    .doc-main { padding: 22px 32px 30px; }
-    @media (max-width: 640px) { .doc-band, .doc-main { padding-left: 16px; padding-right: 16px; } .doc { border-radius: 12px; } }
-    .back { display: none; border: 0; background: var(--surface); color: var(--ink); border-radius: 8px; padding: 8px 12px; font-weight: 700; margin-bottom: 12px; align-items: center; gap: 6px; }
-    @media (max-width: 960px) { .back { display: inline-flex; } }
-    .doc-top { display: flex; gap: 10px; align-items: center; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
-    .doc-top .tag { font-weight: 800; color: #fff; background: var(--tc); padding: 3px 10px; border-radius: 7px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 5px; } .doc-top .tag .icon { width: 13px; height: 13px; }
-    .doc-top .no { font-family: var(--mono); }
-    .doc h1 { margin: 10px 0 8px; font-size: clamp(21px, 2.3vw, 28px); line-height: 1.35; font-weight: 900; letter-spacing: -.015em; text-wrap: balance; color: var(--ink); }
-    .doc .by { font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; } .doc .by span { display: inline-flex; align-items: center; gap: 6px; } .doc .by .icon { width: 15px; height: 15px; color: var(--tc); }
-    .summary { background: var(--surface); border: 1.5px solid color-mix(in srgb, var(--tc) 35%, transparent); border-left: 5px solid var(--tc); padding: 14px 18px; border-radius: 12px; font-size: 16px; font-weight: 600; margin: 0 0 20px; line-height: 1.6; }
-    .doc p { margin: 0 0 12px; font-size: 15.5px; max-width: 72ch; }
-    .tbl { margin: 22px 0 8px; } .tbl h2 { margin: 0 0 10px; font-size: 14.5px; color: var(--tc); font-weight: 800; display: flex; align-items: center; gap: 7px; } .tbl h2 .icon { width: 16px; height: 16px; }
-    .tbl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
-    table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 440px; }
-    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { background: var(--tb); color: var(--tc); font-size: 12.5px; font-weight: 800; white-space: nowrap; letter-spacing: .01em; }
-    tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
-    tr:last-child td { border-bottom: 0; } td:first-child { font-weight: 700; } td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 24px; } .tags button { border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 5px 11px; font-size: 12.5px; font-weight: 600; }
-    .tags button:hover { color: var(--tc); border-color: var(--tc); background: var(--tb); }
-    .related { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 18px; } .related h2 { margin: 0 0 10px; font-size: 14px; color: var(--muted); } .related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-    .related button { border: 1px solid var(--line); border-left: 4px solid var(--tc); background: var(--surface); color: var(--ink); font-weight: 700; text-align: left; padding: 9px 12px; font-size: 14px; display: flex; gap: 8px; align-items: center; border-radius: 9px; width: 100%; } .related button:hover { background: var(--tb); }
-    .related .icon { width: 15px; height: 15px; color: var(--tc); }
-    .doc-foot { margin-top: 26px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; } .doc-foot code { font-family: var(--mono); }
-
-    /* 첫 화면 */
-    .home { display: grid; gap: 18px; }
-    .home-hero { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 26px 30px; display: grid; gap: 10px; }
-    .home-hero h1 { margin: 0; font-size: 23px; font-weight: 900; letter-spacing: -.015em; text-wrap: balance; } .home-hero p { margin: 0; color: var(--muted); font-size: 15px; max-width: 60ch; }
-    .home-ex { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; } .home-ex button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 7px 13px; font-size: 13.5px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; } .home-ex button:hover { border-color: var(--brand-2); color: var(--brand-2); } .home-ex .icon { width: 14px; height: 14px; color: var(--muted); }
-    .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-    .cat { text-align: left; border: 1px solid var(--line); border-top: 5px solid var(--tc); background: var(--surface); border-radius: 14px; padding: 16px 18px; display: grid; gap: 6px; transition: transform .15s, box-shadow .15s; }
-    .cat:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -18px rgba(20, 28, 46, .6); }
-    .cat .ic { width: 40px; height: 40px; border-radius: 11px; background: var(--tb); color: var(--tc); display: grid; place-items: center; } .cat .ic .icon { width: 22px; height: 22px; }
-    .cat b { font-size: 16px; display: flex; align-items: center; gap: 8px; } .cat b span { font-family: var(--mono); font-size: 13px; color: var(--tc); background: var(--tb); padding: 1px 8px; border-radius: 6px; } .cat small { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .row:hover, .cat:hover { transform: none; } }
-    @media print { .top, .list-col, .back, .tags, .related { display: none !important; } .wrap { display: block; } .doc { border: 0; } }
+    .back { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: var(--muted); margin-bottom: 22px; } .back:hover { color: var(--ink); } .back .icon { width: 16px; height: 16px; }
+    .doc-top { font-size: 13.5px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; } .doc-top b { color: var(--accent); font-weight: 700; }
+    .doc h1 { font-size: 30px; margin-bottom: 12px; }
+    .by { font-size: 14px; color: var(--muted); margin: 0 0 26px; padding-bottom: 22px; border-bottom: 1px solid var(--line); display: flex; gap: 18px; flex-wrap: wrap; }
+    .summary { margin: 0 0 26px; padding: 0 0 0 18px; border-left: 3px solid var(--ink); font-size: 18.5px; font-weight: 600; line-height: 1.65; color: var(--ink); }
+    .complete { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 5px; margin-left: 6px; vertical-align: 2px; }
+    .doc p { margin: 0 0 16px; font-size: 17px; line-height: 1.8; color: var(--ink); }
+    .tbl { margin: 32px 0 10px; } .tbl h2 { margin: 0 0 10px; font-size: 16px; font-weight: 800; color: var(--ink); }
+    .tbl-scroll { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 1.55; min-width: 480px; }
+    th, td { text-align: left; padding: 11px 12px 11px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 12.5px; color: var(--muted); font-weight: 700; border-bottom: 1.5px solid var(--line-2); white-space: nowrap; padding-bottom: 8px; }
+    td:first-child { font-weight: 700; } td.num { font-variant-numeric: tabular-nums; }
+    tr:last-child td { border-bottom: 1px solid var(--line-2); }
+    .tags { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 30px; font-size: 14px; } .tags button { color: var(--muted); } .tags button:hover { color: var(--accent); text-decoration: underline; }
+    .related { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); } .related h2 { margin: 0 0 10px; font-size: 14px; color: var(--muted); font-weight: 700; }
+    .related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; } .related button { text-align: left; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.45; } .related button:hover { color: var(--accent); }
+    .doc-foot { margin-top: 36px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; } .doc-foot code { font-family: var(--mono); font-size: 12px; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media print { .top, .back, .tags, .related, .types { display: none !important; } body { font-size: 12pt; } }
   </style>
 </head>
 <body>
-  <a class="skip" href="#docCol">본문으로 건너뛰기</a>
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
   <header class="top">
     <div class="top-in">
-      <a class="brand" href="archive.html" id="brand"><span class="mark-box"><i data-lucide="library-big" class="icon"></i></span><span><b>도로랜드 자료실</b><small>도로랜드 운영실 공개 문서</small></span></a>
+      <a class="brand" href="archive.html" id="brand"><b>도로랜드 자료실</b><small>운영실 공개 문서</small></a>
       <form class="search" id="searchForm" role="search">
         <i data-lucide="search" class="icon"></i>
         <label class="sr" for="q">자료실 검색</label>
-        <input id="q" name="q" type="search" spellcheck="false" placeholder="숫자, 가격, 시간, 계정을 그대로 검색 (예: 키링 400, 막배, @doroilbo)" autocomplete="off">
+        <input id="q" name="q" type="search" spellcheck="false" placeholder="숫자, 시간, 계정을 그대로 검색 (예: 키링 400, 막배, 사자)" autocomplete="off">
         <button type="button" class="clear" id="clearBtn" aria-label="지우기"><i data-lucide="x" class="icon"></i></button>
         <button type="submit" class="go">검색</button>
       </form>
@@ -136,23 +115,19 @@
     </div>
   </header>
 
-  <main class="wrap" id="wrap">
-    <aside class="list-col" id="listCol" aria-label="문서 목록"></aside>
-    <section class="doc-col" id="docCol" aria-live="polite"></section>
-  </main>
+  <main class="wrap" id="main"><div id="page" class="page" aria-live="polite"></div></main>
 
 <script>
 (function () {
   const D = window.DORO_ARCHIVE, docs = D.docs, TYPES = D.types;
   const $ = (s, el = document) => el.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-  const ic = (n, cls = '') => `<i data-lucide="${n}" class="icon ${cls}"></i>`;
+  const ic = (n) => `<i data-lucide="${n}" class="icon"></i>`;
   const icons = () => lucide.createIcons({ attrs: { class: 'icon', 'aria-hidden': 'true' } });
   const fmtDate = d => { const [y, m, dd] = d.split('-'); return `${y}년 ${+m}월 ${+dd}일`; };
   const S = { q: '', type: 'all', doc: null };
 
   // ---------- 검색 ----------
-  // 숫자는 쉼표·공백을 지우고 비교한다 (1,200 == 1200). 한글은 그대로 포함 검색.
   const norm = s => String(s || '').toLowerCase().replace(/[,\s]/g, '');
   const docText = d => [d.title, d.summary, (d.body || []).join(' '), (d.tables || []).map(t => [t.title, (t.cols || []).join(' '), (t.rows || []).map(r => r.join(' ')).join(' ')].join(' ')).join(' '), (d.tags || []).join(' '), d.dept].join(' ');
   const tokens = q => q.trim().split(/\s+/).filter(Boolean).map(t => t.replace(/^@/, '').toLowerCase());
@@ -162,7 +137,7 @@
     for (const t of toks) {
       const tn = norm(t); if (!tn) continue;
       const inTitle = title.includes(t) || titleN.includes(tn), inTags = tags.some(x => x.includes(t) || norm(x).includes(tn)), inFull = full.includes(t) || fullN.includes(tn);
-      if (!inFull && !inTitle && !inTags) return 0;   // 모든 낱말이 들어 있어야 한다
+      if (!inFull && !inTitle && !inTags) return 0;
       sc += inTitle ? 6 : 0; sc += inTags ? 4 : 0; sc += inFull ? 1 : 0;
     }
     return sc;
@@ -186,53 +161,46 @@
     for (const p of parts) { const pn = norm(p); if (toks.some(t => p.toLowerCase().includes(t) || pn.includes(norm(t)))) return p; }
     return d.summary;
   }
-  const tag = d => `<span class="tag">${ic(TYPES[d.type].icon)}${TYPES[d.type].label}</span>`;
-  const rowHTML = (d, toks) => `<button type="button" class="row" data-type="${d.type}" data-doc="${d.id}" aria-current="${S.doc === d.id}"><span class="meta">${tag(d)}<span>${fmtDate(d.date)}</span><span>${esc(d.dept)}</span></span><span class="t">${hl(d.title, toks)}</span><span class="snip">${hl(snippet(d, toks), toks)}</span></button>`;
+  const rowHTML = (d, toks) => `<button type="button" class="row" data-doc="${d.id}"><span class="meta"><b>${TYPES[d.type].label}</b><span>${fmtDate(d.date)}</span><span>${esc(d.dept)}</span>${d.complete ? '<span>전수</span>' : ''}</span><span class="t">${hl(d.title, toks)}</span><span class="snip">${hl(snippet(d, toks), toks)}</span></button>`;
 
   // ---------- 그리기 ----------
   function render() {
-    const toks = tokens(S.q), list = search(S.q, S.type), wrap = $('#wrap');
+    const toks = tokens(S.q), list = search(S.q, S.type), page = $('#page');
     $('#q').value = S.q; $('#searchForm').classList.toggle('has', !!S.q);
     $('#topMeta').innerHTML = `문서 ${docs.length}건<br>${fmtDate(D.today)} 기준`;
-    const chips = [['all', '전체', 'layers']].concat(Object.entries(TYPES).map(([k, v]) => [k, v.label, v.icon]));
-    const counts = Object.fromEntries(chips.map(([k]) => [k, search(S.q, k).length]));
-    $('#listCol').innerHTML = `<div class="chips" role="group" aria-label="문서 종류">${chips.map(([k, l, i]) => `<button type="button" class="chip" data-type="${k}" data-filter="1" aria-pressed="${S.type === k}">${ic(i)}${l}<span>${counts[k]}</span></button>`).join('')}</div>
-      <div class="list-h">${S.q ? `<b>「${esc(S.q)}」</b> 검색 결과 ${list.length}건` : `<b>${S.type === 'all' ? '전체 문서' : TYPES[S.type].label}</b> ${list.length}건 · 최근 등록 순`}</div>
-      <div class="rows">${list.length ? list.map(d => rowHTML(d, toks)).join('') : `<div class="empty"><b>「${esc(S.q)}」이(가) 들어간 문서가 없습니다</b>다른 말이나 숫자로 다시 찾아보세요. 자료실 어디에도 없는 내용이면 그 글은 자료실로 확인되지 않는 글입니다.</div>`}</div>`;
     const d = docs.find(x => x.id === S.doc);
-    wrap.classList.toggle('reading', !!d);
-    $('#docCol').innerHTML = d ? docHTML(d, toks) : homeHTML(list);
+    page.className = 'page' + (d ? ' wide' : '');
+    page.innerHTML = d ? docHTML(d, toks) : listHTML(list, toks);
     icons();
     document.title = d ? `${d.title} · 도로랜드 자료실` : S.q ? `「${S.q}」 검색 · 도로랜드 자료실` : '도로랜드 자료실';
+    window.scrollTo({ top: 0 });
   }
-  function homeHTML(list) {
-    const ex = ['키링 400', '막배', '입장권', '@doroilbo', '기린', '분실물', '100만', '야간 개장'];
-    return `<div class="home">
-      <div class="home-hero"><h1>도로랜드 운영실이 공개한 문서를 찾아봅니다</h1><p>게시물에 나온 숫자, 시간, 계정이 여기 문서와 맞는지 대조합니다. 자료실 어디에도 없는 내용은 확인되지 않은 내용입니다.</p>
-        <div class="home-ex">${ex.map(x => `<button type="button" data-q="${esc(x)}">${ic('search')}${esc(x)}</button>`).join('')}</div></div>
-      <div class="home-grid">${Object.entries(TYPES).map(([k, v]) => { const ds = docs.filter(d => d.type === k), latest = ds.slice().sort((a, b) => b.date.localeCompare(a.date))[0]; return `<button type="button" class="cat" data-type="${k}" data-filter="1"><span class="ic">${ic(v.icon)}</span><b>${v.label} <span>${ds.length}</span></b><small>최근: ${esc(latest ? latest.title : '')}</small></button>`; }).join('')}</div>
-      <div class="list-h" style="margin-top:4px"><b>최근 등록 문서</b></div>
-      <div class="rows">${list.slice(0, 5).map(d => rowHTML(d, [])).join('')}</div></div>`;
+  function listHTML(list, toks) {
+    const chips = [['all', '전체']].concat(Object.entries(TYPES).map(([k, v]) => [k, v.label]));
+    const counts = Object.fromEntries(chips.map(([k]) => [k, search(S.q, k).length]));
+    const ex = ['키링 400', '막배', '사자', '블루웨이브', '입장권', '분실물', '100만', '야간개장', '@doroilbo'];
+    const head = S.q ? `<h1>「${esc(S.q)}」 검색 결과</h1><p class="lead">${list.length}건. 글에 나온 숫자나 시간이 문서 안에서 노랗게 표시됩니다.</p>`
+      : `<h1>도로랜드 자료실</h1><p class="lead">도로랜드 운영실이 공개한 기록부, 보도자료, 통계, 시설 목록입니다. 게시물에 나온 사건과 숫자가 여기 있는지, 있다면 똑같은지 확인합니다.</p><div class="ex">예시 ${ex.map(x => `<button type="button" data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
+    return `${head}
+      <div class="types" role="group" aria-label="문서 종류">${chips.map(([k, l]) => `<button type="button" data-type="${k}" aria-pressed="${S.type === k}">${l}<span>${counts[k]}</span></button>`).join('')}</div>
+      <div class="list-h">${S.q ? '' : `<b>${S.type === 'all' ? '전체 문서' : TYPES[S.type].label}</b> 최근 등록 순`}</div>
+      <div class="rows">${list.length ? list.map(x => rowHTML(x, toks)).join('') : `<div class="empty"><b>「${esc(S.q)}」이(가) 들어간 문서가 없습니다</b>다른 말이나 숫자로 다시 찾아보세요. 전수 문서 어디에도 없는 사건·시설·동물은 세계에 없는 것입니다.</div>`}</div>`;
   }
   function docHTML(d, toks) {
     const isNum = v => /^[\d,.\s%~+-]+(?:만|천|억|명|개|원|장|대|건|분|시간|m|km|kg|석|마리|세트|면|종)?[\s\S]{0,4}$/.test(String(v));
-    const tables = (d.tables || []).map(t => `<div class="tbl">${t.title ? `<h2>${ic('table-2')}${esc(t.title)}</h2>` : ''}<div class="tbl-scroll"><table><thead><tr>${t.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i > 0 && isNum(c) ? 'num' : ''}">${hl(c, toks)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('');
+    const tables = (d.tables || []).map(t => `<div class="tbl">${t.title ? `<h2>${esc(t.title)}</h2>` : ''}<div class="tbl-scroll"><table><thead><tr>${t.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i > 0 && isNum(c) ? 'num' : ''}">${hl(c, toks)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('');
     const rel = docs.filter(x => x.id !== d.id).map(x => ({ x, n: (x.tags || []).filter(t => (d.tags || []).includes(t)).length })).filter(o => o.n > 0).sort((a, b) => b.n - a.n).slice(0, 4).map(o => o.x);
-    return `<article class="doc" data-type="${d.type}">
-      <div class="doc-band">
-        <button type="button" class="back" id="backBtn">${ic('chevron-left')}목록으로</button>
-        <div class="doc-top">${tag(d)}<span class="no">문서 번호 ${esc(d.id.toUpperCase())}</span></div>
-        <h1>${hl(d.title, toks)}</h1>
-        <div class="by"><span>${ic('calendar')}등록 ${fmtDate(d.date)}</span><span>${ic('building-2')}${esc(D.org)} ${esc(d.dept)}</span></div>
-      </div>
-      <div class="doc-main">
-        <p class="summary">${hl(d.summary, toks)}</p>
-        ${(d.body || []).map(p => `<p>${hl(p, toks)}</p>`).join('')}
-        ${tables}
-        ${(d.tags || []).length ? `<div class="tags">${d.tags.map(t => `<button type="button" data-q="${esc(t)}">#${esc(t)}</button>`).join('')}</div>` : ''}
-        ${rel.length ? `<div class="related"><h2>관련 문서</h2><ul>${rel.map(x => `<li><button type="button" data-type="${x.type}" data-doc="${x.id}">${ic('file-text')}${esc(x.title)}</button></li>`).join('')}</ul></div>` : ''}
-        <div class="doc-foot"><span>ⓒ ${esc(D.org)} · 이 문서의 숫자는 ${fmtDate(d.date)} 기준입니다.</span><code>archive.html#doc=${esc(d.id)}</code></div>
-      </div>
+    return `<article class="doc">
+      <button type="button" class="back" id="backBtn">${ic('arrow-left')}${S.q ? `「${esc(S.q)}」 검색 결과로` : '문서 목록으로'}</button>
+      <div class="doc-top"><b>${TYPES[d.type].label}</b><span>문서 번호 ${esc(d.id.toUpperCase())}</span>${d.complete ? '<span class="complete">전수 목록 · 여기 없으면 없는 것</span>' : ''}</div>
+      <h1>${hl(d.title, toks)}</h1>
+      <p class="by"><span>등록 ${fmtDate(d.date)}</span><span>${esc(D.org)} ${esc(d.dept)}</span></p>
+      <p class="summary">${hl(d.summary, toks)}</p>
+      ${(d.body || []).map(p => `<p>${hl(p, toks)}</p>`).join('')}
+      ${tables}
+      ${(d.tags || []).length ? `<div class="tags">${d.tags.map(t => `<button type="button" data-q="${esc(t)}">#${esc(t)}</button>`).join('')}</div>` : ''}
+      ${rel.length ? `<div class="related"><h2>관련 문서</h2><ul>${rel.map(x => `<li><button type="button" data-doc="${x.id}">${esc(x.title)}</button></li>`).join('')}</ul></div>` : ''}
+      <div class="doc-foot"><span>ⓒ ${esc(D.org)} · 이 문서의 숫자는 ${fmtDate(d.date)} 기준입니다.</span><code>archive.html#doc=${esc(d.id)}</code></div>
     </article>`;
   }
 
@@ -246,15 +214,14 @@
     const u = new URL(location.href); if (S.q) u.searchParams.set('q', S.q); else u.searchParams.delete('q'); u.hash = S.doc ? 'doc=' + S.doc : '';
     history.pushState(null, '', u);
   }
-  // ---------- 이벤트 ----------
   $('#searchForm').addEventListener('submit', e => { e.preventDefault(); S.q = $('#q').value.trim(); S.doc = null; render(); pushUrl(); });
-  $('#q').addEventListener('input', e => { S.q = e.target.value.trim(); S.doc = null; render(); });
+  $('#q').addEventListener('input', e => { S.q = e.target.value.trim(); S.doc = null; render(); $('#q').focus(); });
   $('#clearBtn').onclick = () => { S.q = ''; S.doc = null; render(); pushUrl(); $('#q').focus(); };
   $('#brand').onclick = e => { e.preventDefault(); S.q = ''; S.type = 'all'; S.doc = null; render(); pushUrl(); };
   document.addEventListener('click', e => {
-    const d = e.target.closest('[data-doc]'); if (d) { S.doc = d.dataset.doc; render(); pushUrl(); $('#docCol').scrollIntoView({ block: 'start' }); return; }
-    const t = e.target.closest('[data-filter]'); if (t) { S.type = t.dataset.type; if (t.classList.contains('cat')) S.doc = null; render(); return; }
-    const q = e.target.closest('[data-q]'); if (q) { S.q = q.dataset.q; S.doc = null; render(); pushUrl(); window.scrollTo({ top: 0 }); return; }
+    const d = e.target.closest('[data-doc]'); if (d) { S.doc = d.dataset.doc; render(); pushUrl(); return; }
+    const t = e.target.closest('[data-type]'); if (t) { S.type = t.dataset.type; render(); return; }
+    const q = e.target.closest('[data-q]'); if (q) { S.q = q.dataset.q; S.doc = null; render(); pushUrl(); return; }
     if (e.target.closest('#backBtn')) { S.doc = null; render(); pushUrl(); }
   });
   window.addEventListener('popstate', () => { readUrl(); render(); });
