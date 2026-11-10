@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
   <title>도로랜드 자료실</title>
   <!-- 도로그램(feed.html)에서 새 탭으로 여는 자료실. 문서는 archive-data.js 한 곳에 있다.
        주소: archive.html?q=검색어 (검색 상태로 열림), archive.html#doc=문서id (문서 바로 열기) -->
@@ -22,7 +24,10 @@
       :root { --bg: #0f1420; --surface: #161c2b; --surface-2: #1f2737; --line: #2b3447; --ink: #eef2f8; --muted: #9aa5b8; --navy: #6ea2e6; --navy-ink: #0f1420; --navy-soft: #1c2a42; --mark: #5a4b00; }
     }
     * { box-sizing: border-box; }
+    html { color-scheme: light dark; }
     html, body { margin: 0; }
+    button, a, [role="button"] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    .skip { position: absolute; left: 12px; top: -60px; z-index: 20; background: var(--navy); color: var(--navy-ink); padding: 10px 14px; border-radius: 8px; font-weight: 700; text-decoration: none; } .skip:focus-visible { top: 12px; }
     body { font-family: var(--sans); background: var(--bg); color: var(--ink); word-break: keep-all; -webkit-font-smoothing: antialiased; line-height: 1.6; min-height: 100dvh; }
     a { color: var(--navy); }
     button { font: inherit; cursor: pointer; }
@@ -42,7 +47,7 @@
     .search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: var(--ink); outline: none; }
     .search input::-webkit-search-cancel-button { display: none; }
     .search .clear { border: 0; background: none; color: var(--muted); padding: 6px; border-radius: 8px; display: none; } .search.has .clear { display: grid; }
-    .search .go { border: 0; background: var(--navy); color: var(--navy-ink); font-weight: 700; padding: 0 14px; height: 34px; border-radius: 8px; }
+    .search .go { border: 0; background: var(--navy); color: var(--navy-ink); font-weight: 700; padding: 0 14px; height: 34px; border-radius: 8px; transition: filter .15s; } .search .go:hover { filter: brightness(1.12); }
     .top-meta { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
     @media (max-width: 760px) { .top-in { grid-template-columns: 1fr; gap: 10px; } .top-meta { display: none; } .brand small { display: none; } }
 
@@ -56,7 +61,7 @@
     .chip .icon { width: 14px; height: 14px; } .chip[aria-pressed="true"] { background: var(--navy); color: var(--navy-ink); border-color: var(--navy); }
     .list-h { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--muted); padding: 2px 2px 0; } .list-h b { color: var(--ink); font-size: 15px; }
     .rows { display: grid; gap: 8px; }
-    .row { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; color: var(--ink); transition: border-color .15s, transform .15s; }
+    .row { scroll-margin-top: 90px; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; color: var(--ink); transition: border-color .15s, transform .15s; }
     .row:hover { border-color: var(--navy); } .row[aria-current="true"] { border-color: var(--navy); box-shadow: inset 3px 0 0 var(--navy); }
     .row .meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); } .row .meta .tag { font-weight: 700; color: var(--navy); background: var(--navy-soft); padding: 1px 7px; border-radius: 5px; }
     .row .t { font-weight: 700; font-size: 14.5px; line-height: 1.4; } .row .snip { font-size: 13px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -68,25 +73,26 @@
     .back { display: none; border: 0; background: var(--surface-2); color: var(--ink); border-radius: 8px; padding: 8px 12px; font-weight: 700; margin-bottom: 12px; align-items: center; gap: 6px; }
     @media (max-width: 960px) { .back { display: inline-flex; } }
     .doc-top { display: flex; gap: 8px; align-items: center; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; } .doc-top .tag { font-weight: 700; color: var(--navy); background: var(--navy-soft); padding: 2px 8px; border-radius: 6px; font-size: 12px; }
-    .doc h1 { margin: 8px 0 6px; font-size: clamp(20px, 2.2vw, 26px); line-height: 1.35; font-weight: 900; letter-spacing: -.01em; }
+    .doc h1 { margin: 8px 0 6px; font-size: clamp(20px, 2.2vw, 26px); line-height: 1.35; font-weight: 900; letter-spacing: -.01em; text-wrap: balance; }
+    .doc { scroll-margin-top: 80px; }
     .doc .by { font-size: 13px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; } .doc .by span { display: inline-flex; align-items: center; gap: 5px; } .doc .by .icon { width: 14px; height: 14px; }
     .summary { background: var(--navy-soft); border-left: 3px solid var(--navy); padding: 12px 16px; border-radius: 0 10px 10px 0; font-size: 15px; font-weight: 500; margin: 0 0 18px; }
     .doc p { margin: 0 0 12px; font-size: 15px; max-width: 72ch; }
-    .tbl { margin: 18px 0 6px; } .tbl h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; } .tbl h3 .icon { width: 14px; height: 14px; }
+    .tbl { margin: 18px 0 6px; } .tbl h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; } .tbl h2 .icon { width: 14px; height: 14px; }
     .tbl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
     table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 420px; }
     th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; } th { background: var(--surface-2); font-size: 12.5px; color: var(--muted); font-weight: 700; white-space: nowrap; }
     tr:last-child td { border-bottom: 0; } td:first-child { font-weight: 700; } td.num { font-variant-numeric: tabular-nums; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; } .tags button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; }
     .tags button:hover { color: var(--navy); border-color: var(--navy); }
-    .related { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; } .related h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); } .related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .related { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; } .related h2 { margin: 0 0 8px; font-size: 14px; color: var(--muted); } .related ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
     .related button { border: 0; background: none; color: var(--navy); font-weight: 700; text-align: left; padding: 2px 0; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; } .related .icon { width: 14px; height: 14px; }
     .doc-foot { margin-top: 24px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 
     /* 첫 화면 (검색 전) */
     .home { display: grid; gap: 18px; }
     .home-hero { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px; display: grid; gap: 8px; }
-    .home-hero h1 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: -.01em; } .home-hero p { margin: 0; color: var(--muted); font-size: 14.5px; max-width: 60ch; }
+    .home-hero h1 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: -.01em; text-wrap: balance; } .home-hero p { margin: 0; color: var(--muted); font-size: 14.5px; max-width: 60ch; }
     .home-ex { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; } .home-ex button { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--ink); display: inline-flex; gap: 6px; align-items: center; } .home-ex .icon { width: 14px; height: 14px; color: var(--muted); }
     .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
     .cat { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; color: var(--ink); }
@@ -96,13 +102,14 @@
   </style>
 </head>
 <body>
+  <a class="skip" href="#docCol">본문으로 건너뛰기</a>
   <header class="top">
     <div class="top-in">
       <a class="brand" href="archive.html" id="brand"><span class="mark-box"><i data-lucide="library-big" class="icon"></i></span><span><b>도로랜드 자료실</b><small>도로랜드 운영실 공개 문서</small></span></a>
       <form class="search" id="searchForm" role="search">
         <i data-lucide="search" class="icon" style="color:var(--muted)"></i>
         <label class="sr" for="q">자료실 검색</label>
-        <input id="q" type="search" placeholder="숫자, 가격, 시간, 계정 아이디를 그대로 검색 (예: 키링 400, 막배, @doroilbo)" autocomplete="off">
+        <input id="q" name="q" type="search" spellcheck="false" placeholder="숫자, 가격, 시간, 계정 아이디를 그대로 검색 (예: 키링 400, 막배, @doroilbo)" autocomplete="off">
         <button type="button" class="clear" id="clearBtn" aria-label="지우기"><i data-lucide="x" class="icon"></i></button>
         <button type="submit" class="go">검색</button>
       </form>
@@ -121,7 +128,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const ic = (n, cls = '') => `<i data-lucide="${n}" class="icon ${cls}"></i>`;
-  const icons = () => lucide.createIcons({ attrs: { class: 'icon' } });
+  const icons = () => lucide.createIcons({ attrs: { class: 'icon', 'aria-hidden': 'true' } });
   const fmtDate = d => { const [y, m, dd] = d.split('-'); return `${y}년 ${+m}월 ${+dd}일`; };
   const S = { q: '', type: 'all', doc: null };
 
@@ -189,7 +196,7 @@
   }
   function docHTML(d, toks) {
     const isNum = v => /^[\d,.\s%~+-]+(?:만|천|억|명|개|원|장|대|건|분|시간|m|km|kg|석|마리|세트|면|종)?[\s\S]{0,4}$/.test(String(v));
-    const tables = (d.tables || []).map(t => `<div class="tbl">${t.title ? `<h3>${ic('table-2')}${esc(t.title)}</h3>` : ''}<div class="tbl-scroll"><table><thead><tr>${t.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i > 0 && isNum(c) ? 'num' : ''}">${hl(c, toks)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('');
+    const tables = (d.tables || []).map(t => `<div class="tbl">${t.title ? `<h2>${ic('table-2')}${esc(t.title)}</h2>` : ''}<div class="tbl-scroll"><table><thead><tr>${t.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i > 0 && isNum(c) ? 'num' : ''}">${hl(c, toks)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('');
     const rel = docs.filter(x => x.id !== d.id).map(x => ({ x, n: (x.tags || []).filter(t => (d.tags || []).includes(t)).length })).filter(o => o.n > 0).sort((a, b) => b.n - a.n).slice(0, 4).map(o => o.x);
     return `<article class="doc">
       <button type="button" class="back" id="backBtn">${ic('chevron-left')}목록으로</button>
@@ -200,7 +207,7 @@
       ${(d.body || []).map(p => `<p>${hl(p, toks)}</p>`).join('')}
       ${tables}
       ${(d.tags || []).length ? `<div class="tags">${d.tags.map(t => `<button type="button" data-q="${esc(t)}">#${esc(t)}</button>`).join('')}</div>` : ''}
-      ${rel.length ? `<div class="related"><h3>관련 문서</h3><ul>${rel.map(x => `<li><button type="button" data-doc="${x.id}">${ic('file-text')}${esc(x.title)}</button></li>`).join('')}</ul></div>` : ''}
+      ${rel.length ? `<div class="related"><h2>관련 문서</h2><ul>${rel.map(x => `<li><button type="button" data-doc="${x.id}">${ic('file-text')}${esc(x.title)}</button></li>`).join('')}</ul></div>` : ''}
       <div class="doc-foot"><span>ⓒ ${esc(D.org)} · 이 문서의 숫자는 ${fmtDate(d.date)} 기준입니다.</span><span>archive.html#doc=${esc(d.id)}</span></div>
     </article>`;
   }
@@ -228,7 +235,7 @@
   });
   window.addEventListener('popstate', () => { readUrl(); render(); });
   readUrl(); render();
-  if (!S.doc) setTimeout(() => $('#q').focus(), 50);
+  if (!S.doc && matchMedia('(pointer: fine)').matches) setTimeout(() => $('#q').focus(), 50);
 })();
 </script>
 </body>
