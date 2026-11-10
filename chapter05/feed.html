@@ -138,10 +138,7 @@
     .rt-num { position: absolute; top: 16px; left: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.94); color: #262626; }
     .rt-num .icon { width: 14px; height: 14px; }
     .rt-state { position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; backdrop-filter: blur(6px); }
-    .rt-state .dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
-    .round-tile.now .rt-state { background: #d62976; } .round-tile.now .rt-state .dot { animation: rtPulse 1.5s ease-out infinite; box-shadow: 0 0 0 0 rgba(255,255,255,.7); }
     .round-tile.past .rt-state { background: var(--real); } .round-tile.past .rt-state .icon { width: 14px; height: 14px; }
-    @keyframes rtPulse { to { box-shadow: 0 0 0 8px transparent; } }
     .rt-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: grid; gap: 6px; padding: 20px 22px 22px; background: rgba(0,0,0,.62); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,.1); }
     .rt-body b { font-size: clamp(30px, 3.2vw, 40px); line-height: 1.05; letter-spacing: -0.02em; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
     .rt-body small { font-size: 14px; line-height: 1.45; color: rgba(255,255,255,.85); word-break: keep-all; }
@@ -150,7 +147,7 @@
     .round-tile:disabled .rt-photo { filter: grayscale(1) brightness(.55); } .round-tile:disabled .rt-rings { top: 14%; opacity: .7; } .round-tile:has(.rt-photo.story):disabled .rt-lock { top: 56%; }
     .round-tile:disabled .rt-body small, .round-tile:disabled .rt-body b { color: rgba(255,255,255,.75); }
     .rt-lock { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 2; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; backdrop-filter: blur(6px); } .rt-lock .icon { width: 30px; height: 30px; }
-    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active, .round-tile.now { transform: none; } .round-tile.now .rt-state .dot { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .round-tile { transition: none; } .round-tile:hover, .round-tile:active, .round-tile.now { transform: none; } }
     /* 첫 화면 SNS 프로필 머리 (2026-11-09 사용자: SNS 콘텐츠라는 느낌) */
     .me-prof { display: grid; grid-template-columns: auto 1fr; gap: 12px 18px; align-items: center; max-width: 1180px; margin: 0 16px 22px; padding: 14px 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
     @media (min-width: 1024px) { .me-prof { margin: 0 0 28px; grid-template-columns: auto 1fr auto; } }
@@ -678,7 +675,6 @@
     .tp-team .ring { width: clamp(72px, 9.5vw, 96px); aspect-ratio: 1; border-radius: 50%; padding: 3px; background: var(--ig-grad); }
     .tp-team .ring span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--surface); border: 3px solid var(--surface); font-size: clamp(20px, 2.6vw, 26px); font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; white-space: nowrap; }
     .tp-team b { font-size: 15px; }
-    .tp-team em { position: absolute; top: 8px; right: 8px; font-style: normal; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
     .tp-team:hover { transform: translateY(-3px); border-color: transparent; box-shadow: 0 10px 28px color-mix(in srgb, #d62976 18%, transparent); }
     .tp-team:active { transform: translateY(0) scale(.98); }
     .tp-team:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -1013,8 +1009,7 @@ async function api(path, body) {
 
 // ---------- 조 선택 ----------
 function renderTeamGrid(n) {
-  const last = +load('dorogram-team') || 0;
-  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => i + 1).map(t => `<button type="button" class="tp-team" style="--i:${t}" aria-label="${t}조" data-team="${t}">${t === last ? '<em>최근</em>' : ''}<span class="ring"><span>${t}조</span></span></button>`).join('');
+  $('#teamGrid').innerHTML = Array.from({ length: n }, (_, i) => i + 1).map(t => `<button type="button" class="tp-team" style="--i:${t}" aria-label="${t}조" data-team="${t}"><span class="ring"><span>${t}조</span></span></button>`).join('');
 }
 /* 관리자: 조 없이 모든 라운드·게시물·정답을 본다 */
 function enterAdmin(silent) {
@@ -1046,7 +1041,6 @@ async function initTeam() {
 }
 function setTeam(t, silent) {
   S.team = t || null; S.screen = t === 0; document.body.classList.remove('admin');
-  store('dorogram-team', String(t));
   document.body.classList.toggle('screen', S.screen);
   $('#teamChipTxt').textContent = S.screen ? '화면' : t;
   $('#sbTeamAv').textContent = S.screen ? '화면' : t; $('#sbTeamTxt').textContent = S.screen ? '진행 화면' : t + '조';
@@ -1217,7 +1211,7 @@ function renderRounds() {
       : `<span class="rt-photo story">${im(cvo[0])}</span><span class="rt-rings">${cvo.slice(1, 4).map(x => `<span>${im(x)}</span>`).join('')}</span>`;
     const sub = { news: '언론사가 기자 이름을 걸고 쓰는 기사', shorts: '60초 세로 영상, 썸네일과 자막', story: '24시간 뒤 사라지는 한 장과 한 줄' }[f];
     const cta = now ? { read: '예시 보기', make: adm ? '조 게시물 보기' : '우리 조 만들기', judge: adm ? '게시물 보기' : '판별하기', reveal: '정답 보기' }[S.data.phase] : past ? '다시 보기' : peek ? '관리자 미리 보기' : '';
-    const state = now ? `<i class="dot"></i>${STEP_LABEL[S.data.phase]} 중` : past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
+    const state = past ? `${ic('check')}끝남 · 게시물 ${n}개` : '';
     return `<button type="button" class="round-tile${now ? ' now' : past ? ' past' : peek ? ' adm-peek' : ''}" data-round="${f}" ${open || peek ? '' : 'disabled'} aria-label="${i + 1}라운드 ${ROUND_LABEL[f]}${open ? '' : ' (잠김)'}">
       ${art}<span class="rt-shade"></span>
       <span class="rt-num">${ic(ROUND_ICON[f])}${i + 1}라운드</span>${state ? `<span class="rt-state">${state}</span>` : ''}
