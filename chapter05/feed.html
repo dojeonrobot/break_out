@@ -543,20 +543,29 @@
     .wiz-steps li i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface); color: var(--ink); font-style: normal; font-size: 12px; font-weight: 800; flex: none; }
     .wiz-steps li[aria-current="step"] { background: var(--ink); color: var(--surface); } .wiz-steps li[aria-current="step"] i { background: var(--surface); color: var(--ink); }
     .wiz-steps li.done i { background: var(--real); color: #fff; }
-    .mk-body.wiz { display: block; }
-    .mk-body.wiz .mk-col { display: none; border-left: 0; max-width: 760px; margin: 0 auto; padding: 18px 20px 8px; gap: 14px; }
+    /* 마법사(2026-11-10): 왼쪽은 지금 단계 입력, 오른쪽은 쓰는 대로 바뀌는 미리보기(모든 단계에서 보임) */
+    .mk-body.wiz { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .mk-body.wiz .mk-col { display: none; border-left: 0; max-width: 760px; width: 100%; margin: 0 auto; padding: 18px 20px 8px; gap: 14px; }
     .mk-body.wiz .mk-col[data-on="1"] { display: flex; }
-    .mk-body.wiz .mk-col.mk-check { max-width: 1040px; display: none; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; } .mk-body.wiz .mk-col.mk-check[data-on="1"] { display: grid; }
+    .mk-live { display: flex; flex-direction: column; gap: 10px; padding: 14px 18px 18px; min-height: 0; background: var(--bg); border-top: 1px solid var(--line); }
+    .mk-live .mk-h { border-bottom: 0; padding-bottom: 0; }
+    .mk-live .igc-steps { margin: 0; }
+    .mk-live .mk-prev-area { flex: none; }
+    .mk-live .thumb-prev .nc { max-width: 300px; } .mk-live .thumb-prev .tile { width: 220px; }
+    @media (min-width: 1024px) {
+      .mk-body.wiz { grid-template-columns: minmax(0, 1fr) 420px; overflow: hidden; }
+      .mk-live { border-top: 0; border-left: 1px solid var(--line); overflow: auto; }
+    }
     .mk-body.wiz .mk-h { font-size: 16px; }
     .mk-more { border: 1px dashed var(--line); border-radius: 12px; padding: 0 14px; } .mk-more > summary { cursor: pointer; padding: 12px 0; font-weight: 700; font-size: 14px; color: var(--muted); list-style: none; display: flex; align-items: center; gap: 8px; } .mk-more > summary::-webkit-details-marker { display: none; }
     .mk-more > summary .chev { margin-left: auto; transition: transform .2s; } .mk-more[open] > summary .chev { transform: rotate(180deg); }
     .mk-more > .inner { display: grid; gap: 10px; padding: 0 0 14px; }
     .mk-more.need { border-color: var(--blue); } .mk-more.need > summary { color: var(--blue); }
     .wiz-nav { display: flex; justify-content: space-between; gap: 10px; padding: 14px 20px 18px; border-top: 1px solid var(--line); background: var(--surface); }
-    .mk-body.wiz { overflow: auto; min-height: 0; } .mk-body.wiz .mk-col { overflow: visible; min-height: 0; }
+    .mk-body.wiz { min-height: 0; } .mk-body.wiz .mk-col { min-height: 0; }
     .wiz-nav .btn { min-height: 46px; padding: 0 22px; font-size: 15px; border-radius: 12px; }
     .wiz-nav .grow { flex: 1; }
-    @media (max-width: 760px) { .wiz-steps { grid-template-columns: repeat(2, 1fr); } .mk-body.wiz .mk-col.mk-check[data-on="1"] { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) { .wiz-steps { grid-template-columns: repeat(2, 1fr); } }
     .igc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .igc-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--line); }
     .igc-head h2 { margin: 0; font-size: 16px; font-weight: 700; text-align: center; }
@@ -607,7 +616,7 @@
     .igc-step b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--surface-2); color: var(--ink); font-size: 11px; }
     .igc-step[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); } .igc-step[aria-selected="true"] b { background: var(--ink); color: var(--surface); }
     .mk-prev-area { flex: 1; min-height: 0; overflow: auto; }
-    .thumb-prev { display: grid; justify-items: center; gap: 8px; padding: 4px 0; } .thumb-prev .cap { font-size: 12px; color: var(--muted); text-align: center; } .thumb-prev .tile { width: 200px; pointer-events: none; } .thumb-prev .nc { width: 100%; pointer-events: none; border: 1px solid var(--line); border-radius: 12px; } .thumb-prev .st { pointer-events: none; }
+    .thumb-prev { display: grid; justify-items: center; gap: 8px; padding: 4px 0; } .thumb-prev .cap { font-size: 12px; color: var(--muted); text-align: center; } .thumb-prev .tile { width: 240px; pointer-events: none; } .thumb-prev .nc { width: 100%; pointer-events: none; border: 1px solid var(--line); border-radius: 12px; } .thumb-prev .st { pointer-events: none; }
     #preview .post { font-size: 12px; } #preview .cap { font-size: 12px; color: var(--muted); text-align: center; padding: 6px 0; }
     .my-posts { display: grid; gap: 6px; }
     .mp-row { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
@@ -1642,11 +1651,15 @@ function resetForm() {
   S.editing = null; S.wstep = 'secret';
 }
 /* 만들기 단계 (2026-11-09): 정하기 → 글 → 계정 → 확인·올리기. 선택 항목은 「더 채우기」로 접고, 단서가 그 항목을 쓰면 자동으로 펼친다 */
-const WIZ = [['secret', '정하기'], ['write', '글 쓰기'], ['account', '계정'], ['check', '확인하고 올리기']];
+const WIZ = [['secret', '정하기'], ['write', '글 쓰기'], ['account', '계정'], ['check', '썸네일·올리기']];
 function wizInit() {
   if (wizInit.done) return; wizInit.done = true;
   const cols = $$('.mk-body .mk-col'); if (cols.length < 4) return;
-  cols[0].dataset.wstep = 'check'; cols[0].classList.add('mk-check'); cols[1].dataset.wstep = 'write'; cols[2].dataset.wstep = 'account'; cols[3].dataset.wstep = 'secret';
+  cols[0].dataset.wstep = 'check'; cols[1].dataset.wstep = 'write'; cols[2].dataset.wstep = 'account'; cols[3].dataset.wstep = 'secret';
+  // 미리보기는 단계와 상관없이 오른쪽에 항상 둔다 (2026-11-10)
+  const live = document.createElement('div'); live.className = 'mk-live';
+  live.innerHTML = `<div class="mk-h">${ic('eye')}미리보기 <span class="small muted" style="font-weight:400">쓰는 대로 바로 바뀝니다</span></div>`;
+  live.appendChild($('.igc-steps', cols[0])); live.appendChild($('.mk-prev-area', cols[0])); $('.mk-body.wiz').appendChild(live);
   const more = (host, id, title, ids) => { const d = document.createElement('details'); d.className = 'mk-more'; d.id = id;
     d.innerHTML = `<summary>${ic('plus')}${title}${ic('chevron-down', 'chev')}</summary><div class="inner"></div>`; const inner = d.querySelector('.inner');
     ids.forEach(sel => { const el = typeof sel === 'string' ? $(sel) : sel; if (el) inner.appendChild(el); }); host.appendChild(d); };
@@ -1695,6 +1708,7 @@ function renderWiz() {
   if (ma) { ma.classList.toggle('need', !!needA); if (needA) ma.open = true; }
   const tip = S.wstep === 'write' && needW ? '이 단서는 「더 채우기」의 올린 때·찍은 때를 둘 다 적어야 합니다.' : S.wstep === 'account' && needA ? '이 단서는 「더 채우기」의 가입한 때·팔로워·조회수를 적어야 합니다.' : S.wstep === 'write' && k && k.check === 'hear' ? '본문에 "들었는데", "~래요", "친구가" 같은 말을 넣으세요.' : S.wstep === 'account' && k && k.check === 'unreg' ? '계정 종류를 공식 계정이나 언론사로 두고, 등록 계정과 다른 아이디를 쓰세요.' : '';
   $('#wizNav').innerHTML = `${i > 0 ? `<button type="button" class="btn btn-ghost" data-wnav="prev">${ic('chevron-left')}이전</button>` : '<span></span>'}<span class="grow small muted" style="align-self:center;text-align:center">${esc(tip)}</span>${i < WIZ.length - 1 ? `<button type="button" class="btn btn-primary" data-wnav="next">다음: ${WIZ[i + 1][1]}${ic('chevron-right')}</button>` : `<button type="submit" class="btn btn-primary">${ic('send')}${S.editing ? '고친 내용 올리기' : '올리기'}</button>`}`;
+  icons();
 }
 function renderMake() {
   if (S.screen || !S.team) return;
