@@ -14,6 +14,7 @@
     <div class="container nav">
       <div class="logo">DOROLAND</div>
       <nav class="menu" aria-label="이동">
+        <button class="nav-btn icon-btn" id="fullscreenBtn" type="button" aria-label="전체 화면" title="전체 화면" hidden><span class="ico ico-full" aria-hidden="true"></span></button>
         <a class="nav-btn nav-link" href="../index.html">메인 화면</a>
       </nav>
     </div>
@@ -53,6 +54,32 @@
 
   <script>
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ================= 전체 화면 (시그널 브레이크 화면과 같은 버튼) ================= */
+    (() => {
+      const btn = document.getElementById('fullscreenBtn');
+      const root = document.documentElement;
+      const request = root.requestFullscreen || root.webkitRequestFullscreen;
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (!request || !exit) return;                 // 지원하지 않는 기기(아이폰 등)에서는 버튼을 숨긴 채 둔다
+      const current = () => document.fullscreenElement || document.webkitFullscreenElement;
+      function sync(){
+        const on = !!current();
+        btn.classList.toggle('is-full', on);
+        btn.setAttribute('aria-label', on ? '전체 화면 끝내기' : '전체 화면');
+        btn.title = on ? '전체 화면 끝내기' : '전체 화면';
+      }
+      btn.hidden = false;
+      btn.addEventListener('click', () => {
+        try {
+          const r = current() ? exit.call(document) : request.call(root);
+          if (r && r.catch) r.catch(() => {});
+        } catch(e){}
+      });
+      document.addEventListener('fullscreenchange', sync);
+      document.addEventListener('webkitfullscreenchange', sync);
+      sync();
+    })();
 
     /* ================= QR 크게 보기 =================
        누른 QR이 제자리에서 화면 가운데로 커지며 올라오고, 닫으면 제자리로 돌아간다. */
