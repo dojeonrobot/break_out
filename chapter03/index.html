@@ -163,8 +163,8 @@
         <button id="qrClose" class="modal-close" type="button">닫기</button>
       </div>
       <div class="modal-body">
-        <img id="qrImage" class="qr-plate" src="./images/qr/qr-1.png" alt="QR 코드">
-        <p>QR 코드를 스캔해<br>다음 기억을 확인하세요.</p>
+        <img id="qrImage" class="qr-plate qr-zoom" src="./images/qr/qr-1.png" alt="QR 코드" tabindex="0" role="button" title="누르면 크게 보기">
+        <p>QR 코드를 스캔해 다음 기억을 확인하세요.<br>QR을 누르면 크게 볼 수 있어요.</p>
         <button id="qrConfirmBtn" class="btn" type="button">확인</button>
       </div>
     </div>
@@ -903,7 +903,8 @@
     function closeDiaryModal(){ hideModal(diaryModal); }
     bindClose(diaryModal, closeDiaryModal);
 
-    function openDiaryFullscreen(src, alt){
+    function openDiaryFullscreen(src, alt, isQr = false){
+      diaryFullscreenImage.classList.toggle('is-qr', isQr);   // QR은 흰 판 위에 크게
       diaryFullscreenImage.src = src;
       diaryFullscreenImage.alt = alt || '';
       diaryFullscreenOverlay.classList.add('show');
@@ -915,7 +916,21 @@
       diaryFullscreenOverlay.setAttribute('aria-hidden', 'true');
     }
     $('diaryFullscreenClose').addEventListener('click', closeDiaryFullscreen);
-    diaryFullscreenOverlay.addEventListener('click', e => { if (e.target === diaryFullscreenOverlay) closeDiaryFullscreen(); });
+    diaryFullscreenOverlay.addEventListener('click', e => {
+      if (e.target === diaryFullscreenOverlay || diaryFullscreenImage.classList.contains('is-qr')) closeDiaryFullscreen();
+    });
+
+    // QR을 누르면 크게 본다 (다시 누르면 닫힘)
+    document.addEventListener('click', e => {
+      const q = e.target.closest('.qr-zoom');
+      if (q) openDiaryFullscreen(q.src, q.alt, true);
+    });
+    document.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('qr-zoom')) {
+        e.preventDefault();
+        openDiaryFullscreen(e.target.src, e.target.alt, true);
+      }
+    });
 
     const PASS_ATTRS = 'type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"';
 
@@ -1288,7 +1303,7 @@
       const qrCards = qrs.map(n => `
         <div class="solved-qr">
           <strong>${MEMORY_NAME[n]} QR</strong>
-          <img src="${QR_SRC[n]}" alt="${MEMORY_NAME[n]} QR 코드">
+          <img class="qr-zoom" src="${QR_SRC[n]}" alt="${MEMORY_NAME[n]} QR 코드" tabindex="0" role="button" title="누르면 크게 보기">
         </div>`).join('');
 
       modalTitle.textContent = MEMORY_NAME[step];

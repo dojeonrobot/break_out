@@ -392,6 +392,9 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 .diary-fullscreen-overlay.show{ display:flex; }
 .diary-fullscreen-overlay img{ max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; }
 .diary-fullscreen-close{ position:absolute; top:14px; right:14px; }
+.diary-fullscreen-overlay img.is-qr{ width:min(86vmin, 760px); height:auto; padding:clamp(16px,4vmin,40px); background:#fff; border-radius:20px; cursor:zoom-out; }
+.qr-zoom{ cursor:zoom-in; transition:transform .15s ease; }
+.qr-zoom:hover{ transform:scale(1.03); }
 
 /* ---------- 세 번째 기억: KEY ---------- */
 .key-puzzle{ display:flex; flex-direction:column; gap:14px; }
