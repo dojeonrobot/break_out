@@ -143,11 +143,14 @@
     <img id="diaryFullscreenImage" src="" alt="">
   </div>
 
-  <div id="completeModal" class="modal webtoon-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="completeModal" class="modal webtoon-modal complete-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">미션 완료</div>
-        <button id="completeCloseBtn" class="modal-close" type="button">닫기</button>
+        <div class="modal-actions">
+          <button class="modal-close" id="cineReplayBtn" type="button" hidden>장면 다시 보기</button>
+          <button id="completeCloseBtn" class="modal-close" type="button">닫기</button>
+        </div>
       </div>
       <div class="modal-body">
         <div class="cine" id="rescueCine">
@@ -165,7 +168,6 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-ghost" id="cineReplayBtn" type="button" hidden>장면 다시 보기</button>
       </div>
     </div>
   </div>
@@ -846,7 +848,8 @@
     completeNotice.querySelectorAll('.cine-badge i').forEach((el, i) => { el.style.backgroundImage = `url('${patternForStep[i + 1]}')`; });
 
     function openCompleteModal(){ showModal(completeModal, $('completeCloseBtn')); playRescueCine(); }
-    bindClose(completeModal, () => hideModal(completeModal));
+    $('completeCloseBtn').addEventListener('click', () => hideModal(completeModal));
+    completeModal.addEventListener('click', e => { if (e.target === completeModal) hideModal(completeModal); });
     emblemBtn.addEventListener('click', openCompleteModal);
     cubeEl.addEventListener('click', () => { if (acquired.every(Boolean) && !fxBusy) openCompleteModal(); });
 
