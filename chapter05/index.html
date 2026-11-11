@@ -2665,7 +2665,7 @@ function rider(parent,x,y,z,i,s=1,rot=0){const g=new THREE.Group();g.position.se
   [-1,1].forEach(side=>{add(g,SPH(.11,7,5),skin,side*.44,2.02,0);add(g,SPH(.07,6,5),mat(0x25272b),side*.17,2.05,.415).scale.set(.9,1.3,.45);add(g,SPH(.085,6,4),mat(0xf2a39c),side*.29,1.9,.335).scale.set(1,.62,.3);
     const arm=new THREE.Group();arm.position.set(side*.48,1.48,0);arm.rotation.x=-.6;g.add(arm);g.userData[side<0?"armL":"armR"]=arm;add(arm,CYL(.12,.14,.61,7),shirt,0,-.61,0);add(arm,SPH(.13,7,5),skin,0,-.68,0);
     const leg=add(g,CYL(.15,.17,.72,7),trousers,side*.21,.22,.13);leg.rotation.x=-.12;add(g,SPH(.19,8,6),mat(0x333a43),side*.21,.16,.23).scale.set(1,.65,1.65);});
-  
+  g.traverse(o=>{o.castShadow=false;});   /* people cast no shadows (2026-11-11) */
   return g;}
 // ---------- missions ----------
 const MISSIONS_I = [
@@ -3024,7 +3024,7 @@ const bigTree = new THREE.Group();
     const p = add(holo, new THREE.PlaneGeometry(9, 6), glowMat(i%2 ? 0x7fd7ff : 0xff9fcf, 0.5, true), Math.cos(a)*r, y, Math.sin(a)*r, false);
     p.lookAt(Math.cos(a)*r*2, y, Math.sin(a)*r*2); p.material.side = THREE.DoubleSide;
   }
-  islAnim.push(t=>{ holo.rotation.y = t*0.06; holo.children.forEach((p,i)=> p.material.opacity = 0.35 + 0.25*Math.sin(t*1.5+i)); });
+  poweredAnim(t=>{ holo.visible = PARK_ON || RIDE_PROBE; holo.rotation.y = t*0.06; holo.children.forEach((p,i)=> p.material.opacity = 0.35 + 0.25*Math.sin(t*1.5+i)); });
 }
 place(bigTree, 60, -100);
 pickable(bigTree, {n:'홀로그램 고목', c:'place', sub:'공통', cx:60, cz:-100, h:66, r:30,
@@ -3177,7 +3177,7 @@ const lighthouse = new THREE.Group();
   add(lighthouse, CONE(4.4,4,12), mat(C.red), 0, 51.8, 0);
   const beam = new THREE.Mesh(new THREE.ConeGeometry(14, 120, 20, 1, true).rotateZ(Math.PI/2).translate(60,0,0), new THREE.MeshBasicMaterial({color:0xfff3b8, transparent:true, opacity:.16, depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide}));
   beam.position.y = 49.3; lighthouse.add(beam);
-  islAnim.push(t=>{ beam.rotation.y = t*0.6; });
+  poweredAnim(t=>{ beam.visible = PARK_ON || RIDE_PROBE; beam.rotation.y = t*0.6; });
 }
 { const a = -0.05, r = islR(a) + 12; lighthouse.position.set(Math.cos(a)*r, CLIFF_TOP + 1, Math.sin(a)*r); islRoot.add(lighthouse); lighthouse.scale.setScalar(0.55);
   pickable(lighthouse, {abs:true, n:'등대', c:'place', sub:'동쪽 곶', cx:lighthouse.position.x, cz:lighthouse.position.z, h:56, r:16,
@@ -3821,9 +3821,9 @@ const coaster = new THREE.Group();
       c.scale.setScalar(0.6); coaster.add(c); cars.push(c);
     }
     return {cars, off}; });
-  let u0 = 0;
+  let u0 = 0, u0t = null;
   islAnim.push(t=>{
-    const dt = 1/60; const sp = (u)=> (u > liftU[0] && u < liftU[1]) ? 0.009 : 0.045; u0 = (u0 + dt*sp(u0)) % 1;
+    const dt = Math.max(0, Math.min(0.1, t - (u0t ?? t))); u0t = t; const sp = (u)=> (u > liftU[0] && u < liftU[1]) ? 0.009 : 0.045; u0 = (u0 + dt*sp(u0)) % 1;
     trains.forEach(tr=>{ const base = (u0 + tr.off) % 1;
       tr.cars.forEach((c,k)=>{ const u = (base - k*0.0055 + 1) % 1, i = Math.floor(u*N) % N; c.position.copy(curve.getPointAt(u)).addScaledVector(U[i], 1.0); m4.makeBasis(S[i], U[i], T[i]); c.quaternion.setFromRotationMatrix(m4); }); });
     const head = Math.floor(u0*leds.length);
@@ -4237,8 +4237,9 @@ const flume = new THREE.Group();
   const uDrop = 11/14, uLift0 = 5/14, uLift1 = 7/14;
   const speedAt = u => (u > uLift0 && u < uLift1) ? 0.35 : (u > 10/14 && u < uDrop) ? 2.6 : 1;
   const prog = [0, 0.25, 0.5, 0.75];
+  let riverLogT = null;
   poweredAnim(t=>{
-    let sMax = 0; const dt = 1/60;
+    let sMax = 0; const dt = Math.max(0, Math.min(0.1, t - (riverLogT ?? t))); riverLogT = t;
     boatsF.forEach((b, i)=>{ prog[i] = (prog[i] + dt*0.02*speedAt(prog[i])) % 1; const u = prog[i], p = path.getPointAt(u), q = path.getPointAt((u + 0.004) % 1);
       b.position.copy(p).add(new THREE.Vector3(0, 1.0, 0)); b.lookAt(q.x, q.y + 1.0, q.z); b.rotateY(Math.PI);
       if(u > uDrop && u < uDrop + 0.04) sMax = Math.max(sMax, 1 - (u - uDrop)/0.04); });
@@ -4444,7 +4445,7 @@ function visitorBatch(parent,count,prefix){
   // wear: which visitors get this part (default everyone); colour: trait key painted per instance
   const part=(key,geo,{color=0xffffff,shadow=false,material=null,wear=null,paint=null}={})=>{
     const members=traits.map((t,i)=>i).filter(i=>!wear||wear(traits[i])),slot=new Int32Array(count).fill(-1);members.forEach((i,n)=>slot[i]=n);
-    const m=new THREE.InstancedMesh(geo,material||mat(color),Math.max(1,members.length));m.count=members.length;m.name=prefix+'-'+key;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.castShadow=!PHONE&&shadow;m.frustumCulled=false;
+    const m=new THREE.InstancedMesh(geo,material||mat(color),Math.max(1,members.length));m.count=members.length;m.name=prefix+'-'+key;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.castShadow=false;m.frustumCulled=false;
     if(paint){const c=new THREE.Color();members.forEach((i,n)=>m.setColorAt(n,c.setHex(paint(traits[i]))));}
     group.add(m);parts[key]=m;slots[key]=slot;return m;};
   const crown=()=>new THREE.SphereGeometry(.72,10,4,0,TAU,0,Math.PI*.56).scale(1,1.03,.98).rotateX(-.2).translate(0,3.86,-.05);
@@ -5278,7 +5279,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
   add(g, BOX(6, 4, 2), mat(0x16244a), 0, 0, 10.6); add(g, new THREE.PlaneGeometry(8, 1), new THREE.MeshBasicMaterial({map:signTex('범죄수사과 본부', {bg:'#ffffff', fg:'#16244a', size:56, w:512, h:70})}), 0, 4.6, 11.65, false);
   for(let i=0;i<4;i++) add(g, BOX(10, 0.4, 1.2), mat(0xd9d4c8), 0, i*0.4, 12 + i*1.2);
   const bar = []; [-1.2, 1.2].forEach((x,i)=> bar.push(add(g, BOX(2, 0.5, 0.8), new THREE.MeshBasicMaterial({color:i ? 0x3b6bff : 0xff3b30}), x, 17.2, 0, false)));
-  islAnim.push(t=>{ gear.rotation.z = t*0.4; const k = Math.floor(t*3) % 2; bar[0].visible = !!k; bar[1].visible = !k; });
+  poweredAnim(t=>{ gear.rotation.z = t*0.4; const k = Math.floor(t*3) % 2; bar[0].visible = !!k; bar[1].visible = !k; });
   pickable(g, {abs:true, n:'범죄수사과 본부', c:'place', sub:'챕터 2', cx:40, cz:-70, h:20, r:18,
     desc:'톱니 장식 위로 HARMONIA 글자가 푸르게 빛나는 건물. 챕터 2에서 신입사원들이 하모니아가 멈춘 사건을 조사하던 범죄수사과 본부입니다.', facts:[['챕터','2 · 멈춰버린 기계의 노래']]});
 }
@@ -6170,7 +6171,7 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
     for(let i=0;i<12;i++){const g=new THREE.Group();g.userData.dynamic=true;P.add(g);const s=.52;
       add(g,CAP(.45,.8).translate(0,1.1,0),mat(RC[i%RC.length]));add(g,SPH(.37,8,6),mat(0xe7bf99),0,2,0);
       const legs=[-.22,.22].map(x=>{const l=add(g,BOX(.23,.85,.28),mat(C.navy),x,0,0);l.userData.dynamic=true;return l;});
-      add(g,BOX(.5,.65,.25),mat(0x7f9c91),0,.65,-.4);g.scale.setScalar(s);guests.push({g,legs});parkPolish.passengers.push(g);
+      add(g,BOX(.5,.65,.25),mat(0x7f9c91),0,.65,-.4);g.scale.setScalar(s);g.traverse(o=>{o.castShadow=false;});guests.push({g,legs});parkPolish.passengers.push(g);
     }
     const smooth=u=>u*u*(3-2*u);
     const route=[new THREE.Vector3(19.7,2.3,150),new THREE.Vector3(15.5,3.85,150),new THREE.Vector3(0,3.85,144),new THREE.Vector3(0,3.85,0)];
@@ -7354,7 +7355,6 @@ const CHAR = [
   {g:XYLO, n:'자일로', desc:'은빛 머리에 네모난 안경을 쓴 도로랜드 총책임자. 롤러코스터와 바이킹을 사랑하는 낙천적인 기계 덕후지만, 섬의 비밀을 오랫동안 혼자 품어 왔습니다.', facts:[['역할','총책임자 · 출입증 X-404'],['좋아하는 것','롤러코스터, 바이킹']]},
   {g:CODEX, n:'코덱스', desc:'섬의 수호자. 나뭇잎 귀와 노란 눈, 눈 문양이 새겨진 초록 망토에 길고 무거운 지팡이를 듭니다. 초대장을 보낸 사람도 코덱스였습니다.', facts:[['역할','섬의 수호자'],['상징','눈 문양, 지팡이']]},
   {g:NATY, s:0.08, n:'네이티', desc:'감정에 따라 몸 색이 바뀌는 작은 불꽃 정령. 하늘색은 평온, 초록은 호기심, 노랑은 긴장, 빨강은 분노, 보라는 슬픔, 흰색은 조화.', facts:[['정체','작은 불꽃 정령'],['특징','감정 따라 색이 변함']]},
-  {g:VOID, s:0.15, n:'보이드', desc:'노아와 루나가 섬의 변화를 기록하라고 남긴 하얀 로봇. 섬사람들의 오해로 분해됐다가 제로와 자일로가 다시 조립했고, 몸속에 응축 이전 일루아의 분포 기록을 품고 있습니다. 이 지도의 이름도 보이드의 기록입니다.', facts:[['역할','섬의 기록자'],['특징','겁먹으면 공처럼 몸을 맒']]},
   {g:DARK, s:0.16, n:'그림자', desc:'광장 나무 뒤, 동굴, 전광판 화면에서 몰래 지켜보던 붉은 뿔의 검은 그림자. 정체를 숨긴 코덱스였습니다.', facts:[['등장','챕터 1~4'],['힌트','붉은 뿔, 붉은 눈']]}
 ];
 CHAR.forEach(c=>{ islRoot.add(c.g); charGroups.push(c.g); c.b = pickable(c.g, {n:c.n, c:'char', sub:'등장인물', desc:c.desc, facts:c.facts, cx:0, cz:0, h:2, r:1, s:c.s||0.15, keepSize:true}); prepGroup(c.b); c.g.scale.setScalar(c.s||0.15); });
@@ -7393,7 +7393,7 @@ const _c1 = new THREE.Color(), _c2 = new THREE.Color();
 const _bq = new THREE.Quaternion();
 const bend = (b, axis, a)=>{ if(!b) return; b.quaternion.copy(b.userData.rest).premultiply(_bq.setFromAxisAngle(b.userData[axis], a)); };   // rotate a bone about the character's side (ax) / up (ay) / front (az) axis
 function rigPose(p, t, speed, k){   // k: 0 standing … 1 full stride; the stride and the idle sway blend so a stop never snaps
-  const r = p.userData.rig, s = Math.sin(t*speed), c = Math.cos(t*speed), w = t*1.3;
+  const r = p.userData.rig, s = Math.sin(t*speed), c = Math.cos(t*speed), w = (p.userData.swayT ?? t)*1.3;
   bend(r['thigh.L'], 'ax', s*0.6*k + Math.sin(w)*0.02); bend(r['thigh.R'], 'ax', -s*0.6*k - Math.sin(w)*0.02);
   bend(r['shin.L'], 'ax', Math.max(0, -s)*0.7*k); bend(r['shin.R'], 'ax', Math.max(0, s)*0.7*k);   // the trailing leg folds at the knee
   bend(r['upperarm.L'], 'ax', -s*0.45*k + Math.sin(w + 1)*0.03); bend(r['upperarm.R'], 'ax', s*0.45*k - Math.sin(w + 1)*0.03);
@@ -7405,12 +7405,11 @@ function rigPose(p, t, speed, k){   // k: 0 standing … 1 full stride; the stri
 function walkPose(p, t, speed){ p.userData.walkedAt = islT; if(p.userData.rig){ p.userData.walkK = Math.min(1, (p.userData.walkK || 0) + 0.08); p.userData.walkT = t*speed; rigPose(p, t*speed, 1, p.userData.walkK); return; } const s = Math.sin(t*speed); p.userData.legL.rotation.x = s*0.55; p.userData.legR.rotation.x = -s*0.55; p.userData.armL.rotation.x = -s*0.5; p.userData.armR.rotation.x = s*0.5; p.userData.body.position.y = Math.abs(Math.cos(t*speed))*0.35; if(p.userData.model) p.userData.model.position.y = p.userData.model.userData.y0 + Math.abs(Math.cos(t*speed))*0.35; }
 let islT = 0;
 islAnim.push(t=>{ islT = t;
-  // Rico and Zero stroll round the plaza side by side, Void hovering just behind them
+  // Rico and Zero stroll round the plaza side by side (the Void robot no longer follows them: user, 2026-11-11)
   const sw = (t*0.018) % 2, fw = sw < 1 ? sw : 2 - sw, dirw = sw < 1 ? 1 : -1, zw = 196 + fw*124;
-  if(!STAGED) [[RICO, -6], [ZERO, -7.3]].forEach(([p, x])=>{ p.position.set(x, G, zw); p.rotation.y = dirw > 0 ? 0 : Math.PI; walkPose(p, t, 5); });
-  VOID.position.set(-6.6, G + 0.2 + Math.abs(Math.sin(t*5))*0.12, zw - dirw*1.8); VOID.rotation.y = dirw > 0 ? 0 : Math.PI; VOID.userData.legs.forEach((l,i)=> l.rotation.x = Math.sin(t*5 + i*Math.PI)*0.5);
-  VOID.userData.ring.material.opacity = 0.3 + 0.25*Math.sin(t*3);
-  const blink = (t % 4) < 0.12 ? 0.15 : 1; VOID.userData.eyes.forEach(e=> e.scale.y = blink);
+  const turnU = sw > 1.5 ? sw - 2 : sw, turnE = u=>{ const k = Math.max(0, Math.min(1, u/0.05 + 0.5)); return k*k*(3 - 2*k); };
+  const strollYaw = Math.abs(turnU) < 0.025 ? Math.PI + Math.PI*turnE(turnU) : Math.abs(sw - 1) < 0.025 ? Math.PI*turnE(sw - 1) : dirw > 0 ? 0 : Math.PI;
+  if(!STAGED) [[RICO, -6], [ZERO, -7.3]].forEach(([p, x], i)=>{ p.position.set(x, G, zw); p.rotation.y = strollYaw; p.userData.swayT = t + i*1.7; walkPose(p, t + i*0.35, 2.0); });
   // Xylo cheers the coaster on
   XYLO.userData.armR.rotation.z = 2.4 + Math.sin(t*4)*0.35; XYLO.userData.armL.rotation.z = -0.3; XYLO.userData.head.rotation.y = Math.sin(t*0.7)*0.3; if(XYLO.userData.rig){ XYLO.userData.rig.head.userData.hold = true; bend(XYLO.userData.rig.head, 'ay', Math.sin(t*0.7)*0.3); }
   // Codex keeps watch in the crystal space
@@ -7685,8 +7684,8 @@ const _em = new THREE.Color();
 function updateI(now, zoneK){
   const t = now/1000;
   const dtF = Math.min(1/20, Math.max(0, t - FX_T)); FX_T = t;   // effect time: a stalled frame plays on slower, it never jumps ahead
-  for(const id in RIDE){ const R = RIDE[id]; R.tau += R.s*dtF; }
   parkWakeTick(dtF);PARK_ON=parkPowerOn();if(PARK_ON)PARK_T+=dtF*(PARK_WAKE?PARK_WAKE.sp:1);else PARK_T=0;
+  for(const id in RIDE){ const R = RIDE[id]; R.tau += R.s*dtF*(id === 'dl-safari' ? 1 : PARK_ON ? (PARK_WAKE ? PARK_WAKE.sp : 1) : 0); }   /* no power, no ride: the zone clocks wait for the backup line too (2026-11-11) */
   fxStep(dtF);
   islAnim.forEach(f=> f(t));
   waterU.uTime.value = t; ghostU.uTime.value = t; waterU.uSun.value.copy(sun.position).sub(sun.target.position).normalize();
@@ -7865,6 +7864,7 @@ function walkTick(now){
   const fwd = ((k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0))*hold, turn = ((k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0))*hold, strafe = ((k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0))*hold;
   w.yaw += turn*1.8*dt;
   let mx = fwd - walkPad.dz*hold, mz = strafe + walkPad.dx*hold; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
+  { const ek = 1 - Math.exp(-dt*(len ? 9 : 13)); w.imx = (w.imx || 0) + (mx - (w.imx || 0))*ek; w.imz = (w.imz || 0) + (mz - (w.imz || 0))*ek; if(Math.hypot(w.imx, w.imz) < 0.02){ w.imx = 0; w.imz = 0; } mx = w.imx; mz = w.imz; }   /* ease in and out of a walk */
   const speed = (k.ShiftLeft || k.ShiftRight || walkPad.run ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
   const dx = (sy*mx - cy*mz)*speed*dt, dz = (cy*mx + sy*mz)*speed*dt;   // right = forward × up = (-cy, sy): pad right / E goes screen-right (2026-10-30, was mirrored)
   const oldX = w.x, oldZ = w.z;
@@ -7879,7 +7879,16 @@ function walkTick(now){
   const inMaze = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1); w.mazeCamera = inMaze;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
   w.mates.forEach((m, i)=>{ const k = i - (w.mates.length - 1)/2; let side = k*(inMaze ? 0.9 : 2.4), back = inMaze ? Math.abs(k)*1.6 : 0;
     let px = w.x + cy*side - sy*back, pz = w.z - sy*side - cy*back; if(inMaze && mazeBlocked(px, pz)){ px = w.x; pz = w.z; }
-    m.g.position.set(px, characterGroundY(px, pz) + lift, pz); m.g.rotation.y = w.yaw; if(m.g.userData.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
+    const u = m.g.userData, far = u.fx == null || w.snap || Math.hypot(px - u.fx, pz - u.fz) > 6 || dt <= 0;
+    if(far){ u.fx = px; u.fz = pz; u.fyaw = w.yaw; u.fv = 0; }
+    else { const fk = 1 - Math.exp(-dt*(inMaze ? 20 : 11)), ox = u.fx, oz = u.fz; u.fx += (px - u.fx)*fk; u.fz += (pz - u.fz)*fk;
+      if(inMaze && mazeBlocked(u.fx, u.fz)){ u.fx = px; u.fz = pz; }
+      const vx = (u.fx - ox)/dt, vz = (u.fz - oz)/dt, v = Math.hypot(vx, vz); u.fv += (v - u.fv)*(1 - Math.exp(-dt*10));
+      const want = v > 0.9 ? Math.atan2(vx, vz) : w.yaw; u.fyaw += Math.atan2(Math.sin(want - u.fyaw), Math.cos(want - u.fyaw))*(1 - Math.exp(-dt*(v > 0.9 ? 7 : 5)));
+      u.fph = (u.fph || 0) + v*dt*0.9; }
+    m.g.position.set(u.fx, characterGroundY(u.fx, u.fz) + lift, u.fz); m.g.rotation.y = u.fyaw;
+    if(u.rig && !w.fly){ u.walkedAt = islT; u.swayT = now/1000 + i*1.7; u.walkK = Math.min(1.2, u.fv/5); u.walkT = u.fph || 0; rigPose(m.g, u.walkT, 1, u.walkK); }
+    else if(u.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
   const cpi = inMaze ? -0.4 : w.pitch;   // a fixed raised view keeps the pair and the next corridor visible beside a hedge
   const ease = 1 - Math.pow(0.002, dt);
   if(inMaze || w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }

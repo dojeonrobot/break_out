@@ -6,7 +6,7 @@ OUT = sys.argv[1] if len(sys.argv) > 1 else 'adm_before'
 SEED = '--seed' in sys.argv
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(args=['--use-angle=swiftshader','--ignore-gpu-blocklist'])
+        b = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
         ctx = await b.new_context(viewport={'width':1366,'height':800})
         async def route(r):
             req=r.request; url=req.url.replace(STATIC,API)

@@ -6,7 +6,7 @@ async def main():
  source=(REPO/'chapter05/index.html').read_text(encoding='utf8')
  source=re.sub(r'const wait = ms => .*?;\nlet actBusy','const wait=ms=>new Promise(r=>setTimeout(r,Math.min(ms,60)));\nlet actBusy',source)
  async with async_playwright() as p:
-  br=await p.chromium.launch(args=['--enable-gpu']);ctx=await br.new_context(viewport={'width':1280,'height':800},device_scale_factor=.75,reduced_motion='reduce')
+  br=await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist']);ctx=await br.new_context(viewport={'width':1280,'height':800},device_scale_factor=.75,reduced_motion='reduce')
   await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','firsttablet');localStorage.setItem('void-mini-12',JSON.stringify({q:'q1',step:'station',pos:[0,258,0]}));")
   async def post(path,data):return await ctx.request.post(API+'/api/void/'+path,data=data,headers={'X-Admin-Key':'0101'})
   await post('team_reset',{'team':12,'confirm':'AGAIN'});await post('admin/skip',{'team':12,'mission':'z1'})
