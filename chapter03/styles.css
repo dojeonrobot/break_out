@@ -673,13 +673,51 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 
 /* ---------- 기억의 틈 QR (gap.html) ---------- */
 .gap-main{ display:grid; align-content:center; justify-items:center; gap:clamp(18px,4vh,40px); padding:clamp(20px,4vh,44px) 0; text-align:center; }
-.gap-head .subtitle{ margin-bottom:0; }
-.gap-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:clamp(20px,5vw,72px); width:min(100%, 1040px); }
-.gap-item{ margin:0; }
-.gap-item .qr-plate{ width:min(100%, 54vh); height:auto; padding:clamp(12px,2vw,24px); border-radius:var(--radius); }
-.gap-item figcaption{ margin-top:clamp(12px,2.2vh,22px); font-weight:800; font-size:clamp(20px,3.2vh,32px); color:var(--text); word-break:keep-all; }
+.gap-head h1{ text-shadow:0 0 28px rgba(155,216,242,.45); }
+.gap-head .subtitle{ margin-bottom:0; color:var(--text); text-shadow:0 2px 10px rgba(5,10,24,.9); }
+/* 가운데 열은 배경의 빛나는 틈이 보이는 자리라 넓게 비워 둔다 */
+.gap-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:clamp(48px,11vw,180px); width:min(100%, 1100px); }
+.gap-item{ margin:0; display:grid; justify-items:center; }
+.gap-qr{
+  display:block; width:min(100%, 50vh); padding:clamp(12px,2vw,24px); border:0; border-radius:var(--radius);
+  background:#fff; cursor:zoom-in;
+  box-shadow:0 0 0 1px rgba(155,216,242,.55), 0 0 0 7px rgba(155,216,242,.12), 0 18px 44px rgba(4,8,20,.6), 0 0 54px rgba(120,200,255,.28);
+  animation:gapFloat 6s ease-in-out infinite;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease, opacity .12s ease;
+}
+.gap-item:nth-child(2) .gap-qr{
+  animation-delay:-3s;
+  box-shadow:0 0 0 1px rgba(226,150,240,.55), 0 0 0 7px rgba(226,150,240,.12), 0 18px 44px rgba(4,8,20,.6), 0 0 54px rgba(215,120,235,.28);
+}
+.gap-qr img{ display:block; width:100%; height:auto; }
+.gap-qr:hover{ transform:translateY(-6px) scale(1.03); }
+.gap-qr:active{ transform:scale(.98); }
+.gap-qr.is-lifted{ opacity:0; animation-play-state:paused; }
+@keyframes gapFloat{ 0%,100%{ translate:0 0; } 50%{ translate:0 -8px; } }
+.gap-item figcaption{ margin-top:clamp(14px,2.4vh,24px); font-weight:800; font-size:clamp(20px,3.2vh,32px); color:var(--text); word-break:keep-all; text-shadow:0 2px 12px rgba(5,10,24,.9); }
+
+/* 크게 보기: 누른 QR이 제자리에서 가운데로 커지며 올라온다 (움직임은 gap.html 스크립트) */
+.gap-zoom{ position:fixed; inset:0; z-index:200; display:none; place-content:center; justify-items:center; gap:clamp(12px,3vmin,26px); padding:16px; cursor:zoom-out; background:rgba(2,6,12,0); transition:background .3s ease; }
+.gap-zoom.show{ display:grid; }
+.gap-zoom.is-open{ background:rgba(2,6,12,.93); }
+.gap-zoom-plate{
+  width:min(78vmin, 720px); padding:clamp(16px,4vmin,40px); background:#fff; border-radius:20px;
+  box-shadow:0 0 0 1px rgba(155,216,242,.6), 0 0 90px rgba(120,200,255,.4);
+  transition:transform .3s cubic-bezier(.2,.9,.25,1); will-change:transform;
+}
+.gap-zoom-plate img{ display:block; width:100%; height:auto; }
+.gap-zoom-name{ font-weight:800; font-size:clamp(20px,4vmin,34px); color:var(--text); opacity:0; transition:opacity .2s ease; }
+.gap-zoom.is-open .gap-zoom-name{ opacity:1; transition-delay:.15s; }
+.gap-zoom-close{ position:absolute; top:14px; right:14px; opacity:0; transition:opacity .2s ease; }
+.gap-zoom.is-open .gap-zoom-close{ opacity:1; }
 @media (max-width:640px) and (orientation:portrait){
-  .gap-grid{ grid-template-columns:1fr; width:min(100%, 420px); }
+  .gap-grid{ grid-template-columns:1fr; gap:clamp(22px,4vh,40px); width:min(100%, 380px); }
+}
+@media (max-height:520px){
+  .gap-main{ gap:10px; padding:10px 0; }
+  .gap-qr{ width:min(100%, 44vh); padding:8px; }
+  .gap-item figcaption{ margin-top:8px; font-size:18px; }
+  .gap-zoom-plate{ width:min(70vmin, 720px); }
 }
 @media (max-width:400px){ .logo{ display:none; } .menu{ width:100%; justify-content:flex-end; } }
 

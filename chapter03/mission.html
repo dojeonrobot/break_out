@@ -393,6 +393,22 @@
     </div>
   </div>
 
+  <!-- ==================== 비밀번호 잠금 (운영자만 열 수 있게) ==================== -->
+  <div id="lock-screen" class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-[#02050D]/95 backdrop-blur-lg" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+    <form id="lock-form" onsubmit="return submitLock(event)" class="bg-[#0B1528] border-2 border-white/20 p-8 rounded-[2rem] shadow-2xl text-center w-full max-w-sm">
+      <i data-lucide="lock" class="w-12 h-12 text-teal-400 mx-auto mb-4"></i>
+      <h2 id="lock-title" class="text-white text-2xl font-black mb-2">미션 뽑기</h2>
+      <label for="lock-input" class="block text-white/60 text-sm font-bold mb-5">비밀번호를 입력하세요.</label>
+      <input id="lock-input" type="password" inputmode="numeric" autocomplete="off" maxlength="12"
+        class="w-full bg-[#040813]/60 border-2 border-white/20 focus:border-teal-400 rounded-xl px-4 py-3.5 text-white text-2xl font-black text-center tracking-[0.4em] focus:outline-none transition-colors">
+      <p id="lock-msg" role="alert" class="h-6 mt-3 text-rose-400 text-sm font-bold"></p>
+      <div class="flex gap-3 mt-3">
+        <button type="button" id="lock-cancel" onclick="closeEmbed()" class="hidden flex-1 py-3.5 bg-white/10 hover:bg-white/20 text-white font-black rounded-xl transition-colors">닫기</button>
+        <button type="submit" class="flex-[2] py-3.5 bg-teal-400 hover:bg-teal-300 text-[#040814] font-black rounded-xl transition-colors active:scale-95">확인</button>
+      </div>
+    </form>
+  </div>
+
   <!-- 알림 모달 -->
   <div id="alert-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeAlert()"></div>
@@ -423,6 +439,9 @@
        저장된 값이 없으면 항상 아래 목록이 뜨므로 다른 노트북에서도 바로 쓸 수 있다.
        아래 목록을 고친 뒤에는 MISSION_VERSION 을 1 올려야 이미 저장된 기기에도 반영된다.
        ========================================================================== */
+    // 미션 뽑기를 열 때 묻는 비밀번호 (운영자용)
+    const MISSION_PASSWORD = '0101';
+
     const MISSION_VERSION = 4;
 
     // 화면에 깔 카드 장수. 미션이 몇 개든 항상 이 장수로 채운다.
@@ -1283,9 +1302,46 @@
       c.classList.add('flex');
     }
 
+    // ==================== 비밀번호 잠금 ====================
+    // 미션 뽑기는 운영자가 열어 준다. 페이지를 열 때마다, 시그널 브레이크 안에서는 버튼을 누를 때마다 다시 묻는다.
+    const lockEls = {
+      screen: document.getElementById('lock-screen'),
+      input: document.getElementById('lock-input'),
+      msg: document.getElementById('lock-msg'),
+      cancel: document.getElementById('lock-cancel')
+    };
+    function isLocked() { return !lockEls.screen.classList.contains('hidden'); }
+    function showLock() {
+      lockEls.input.value = '';
+      lockEls.msg.textContent = '';
+      lockEls.screen.classList.remove('hidden');
+      lockEls.screen.classList.add('flex');
+      setTimeout(() => lockEls.input.focus(), 50);
+    }
+    function submitLock(e) {
+      e.preventDefault();
+      if (lockEls.input.value.trim() === MISSION_PASSWORD) {
+        lockEls.screen.classList.add('hidden');
+        lockEls.screen.classList.remove('flex');
+        layoutDeck();
+      } else {
+        lockEls.msg.textContent = '비밀번호가 다릅니다.';
+        lockEls.input.value = '';
+        lockEls.input.focus();
+      }
+      return false;
+    }
+    if (EMBED) lockEls.cancel.classList.remove('hidden');
+    // 시그널 브레이크 화면이 미션 뽑기를 다시 열 때마다 잠근다
+    window.addEventListener('message', e => {
+      if (EMBED && e.source === window.parent && e.data === 'doro-mission-lock') showLock();
+    });
+    showLock();
+
     // ==================== 단축키 ====================
     document.addEventListener('keydown', (e) => {
       // 미션 제목·설명을 입력하는 중에는 단축키가 글자를 가로채지 않도록 한다
+      if (isLocked()) { if (e.key === 'Escape' && EMBED) closeEmbed(); return; }
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.key === 'Escape') {

@@ -33,21 +33,7 @@ with sync_playwright() as p:
     print("hub modal name:", pg.inner_text("#modalChapterName"))
     pg.close()
 
-    for name, (w, h) in {"gap_1366": (1366, 768), "gap_tab_land": (1280, 800), "gap_tab_port": (800, 1280),
-                         "gap_phone": (390, 844), "gap_phone_land": (780, 360)}.items():
-        pg = new(w, h)
-        pg.goto(BASE + "/chapter03/gap.html")
-        pg.wait_for_timeout(500)
-        print(name, "overflowX:", pg.evaluate(OVERFLOW), "scrollH-clientH:",
-              pg.evaluate("() => document.documentElement.scrollHeight - innerHeight"))
-        pg.screenshot(path=f"{OUT}/{name}.png")
-        if name == "gap_1366":
-            pg.click(".gap-item .qr-zoom >> nth=1")
-            pg.wait_for_timeout(300)
-            pg.screenshot(path=f"{OUT}/gap_zoom.png")
-            pg.keyboard.press("Escape")
-            print("zoom closed:", not pg.evaluate("() => document.getElementById('zoomOverlay').classList.contains('show')"))
-        pg.close()
+    # gap.html 점검은 ch3_check_gap.py 가 맡는다
 
     for name, (w, h) in {"sb_1366": (1366, 768), "sb_tab_port": (800, 1280), "sb_phone": (390, 844)}.items():
         pg = new(w, h)
@@ -63,7 +49,15 @@ with sync_playwright() as p:
         pg.screenshot(path=f"{OUT}/{name}.png")
         pg.click("#missionBtn")
         fr = pg.frame_locator("#missionLayer iframe")
+        fr.locator("#lock-input").wait_for(state="visible", timeout=20000)
+        fr.locator("#lock-input").fill("9999")
+        fr.locator("#lock-form button[type=submit]").click()
+        print(name, "wrong pass msg:", fr.locator("#lock-msg").inner_text(), "| still locked:", fr.locator("#lock-screen").is_visible())
+        pg.screenshot(path=f"{OUT}/{name}_lock.png")
+        fr.locator("#lock-input").fill("0101")
+        fr.locator("#lock-input").press("Enter")
         fr.locator("#embed-close").wait_for(state="visible", timeout=20000)
+        print(name, "unlocked:", not fr.locator("#lock-screen").is_visible())
         fr.locator(".card").first.wait_for(state="visible", timeout=20000)
         pg.wait_for_timeout(1800)
         print(name, "home hidden:", not fr.locator("#home-link").is_visible(), "cards:", fr.locator(".card").count())
@@ -76,6 +70,11 @@ with sync_playwright() as p:
             pg.wait_for_timeout(400)
         fr.locator("#embed-close").click()
         pg.wait_for_timeout(300)
+        pg.click("#missionBtn")
+        pg.wait_for_timeout(400)
+        print(name, "locked again on reopen:", fr.locator("#lock-screen").is_visible())
+        fr.locator("#lock-cancel").click()
+        pg.wait_for_timeout(300)
         print(name, "layer closed:", not pg.evaluate("() => document.getElementById('missionLayer').classList.contains('show')"),
               "focus:", pg.evaluate("() => document.activeElement.id"))
         pg.close()
@@ -84,6 +83,7 @@ with sync_playwright() as p:
     pg = new(1366, 768)
     pg.goto(BASE + "/chapter03/mission.html")
     pg.wait_for_timeout(1500)
+    print("standalone locked:", pg.locator("#lock-screen").is_visible(), "cancel hidden:", not pg.locator("#lock-cancel").is_visible())
     print("standalone home visible:", pg.locator("#home-link").is_visible(), "close visible:", pg.locator("#embed-close").is_visible())
     pg.close()
     b.close()

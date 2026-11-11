@@ -1802,6 +1802,7 @@
     let missionFrame = null;
     function openMission(){
       if (fxBusy) return;
+      if (missionFrame) missionFrame.contentWindow.postMessage('doro-mission-lock', '*');   // 열 때마다 비밀번호를 다시 묻는다
       if (!missionFrame) {
         missionFrame = document.createElement('iframe');
         missionFrame.title = '미션 뽑기';

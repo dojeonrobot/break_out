@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body class="gap-page">
+  <!-- 배경: 밤하늘 한가운데가 갈라져 빛이 새어 나오는 틈 (아래 스크립트가 그린다) -->
+  <canvas id="gapCanvas" class="bg-canvas" aria-hidden="true"></canvas>
+
   <header>
     <div class="container nav">
       <div class="logo">DOROLAND</div>
@@ -20,55 +23,238 @@
     <div class="gap-head">
       <div class="eyebrow">CHAPTER 3</div>
       <h1 id="title">기억의 틈</h1>
-      <p class="subtitle">Delightex 앱에서 QR 코드를 스캔하세요.</p>
+      <p class="subtitle">Delightex 앱에서 QR 코드를 스캔하세요.<br>QR을 누르면 크게 볼 수 있어요.</p>
     </div>
 
     <!-- QR 그림을 바꾸려면 images/qr/gap-1.png, gap-2.png 를 같은 이름으로 덮어쓴다 -->
     <div class="gap-grid">
       <figure class="gap-item">
-        <img class="qr-plate qr-zoom" src="./images/qr/gap-1.png" alt="첫번째 기억의 틈 QR 코드" width="801" height="801" tabindex="0" role="button" title="누르면 크게 보기">
+        <button class="gap-qr" type="button" aria-label="첫번째 기억의 틈 QR 크게 보기">
+          <img src="./images/qr/gap-1.png" alt="첫번째 기억의 틈 QR 코드" width="801" height="801">
+        </button>
         <figcaption>첫번째 기억의 틈</figcaption>
       </figure>
       <figure class="gap-item">
-        <img class="qr-plate qr-zoom" src="./images/qr/gap-2.png" alt="두번째 기억의 틈 QR 코드" width="801" height="801" tabindex="0" role="button" title="누르면 크게 보기">
+        <button class="gap-qr" type="button" aria-label="두번째 기억의 틈 QR 크게 보기">
+          <img src="./images/qr/gap-2.png" alt="두번째 기억의 틈 QR 코드" width="801" height="801">
+        </button>
         <figcaption>두번째 기억의 틈</figcaption>
       </figure>
     </div>
   </main>
 
-  <div id="zoomOverlay" class="diary-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="QR 크게 보기" aria-hidden="true">
-    <button id="zoomClose" class="modal-close diary-fullscreen-close" type="button">닫기</button>
-    <img id="zoomImage" class="is-qr" src="" alt="">
+  <div id="zoomOverlay" class="gap-zoom" role="dialog" aria-modal="true" aria-labelledby="zoomName" aria-hidden="true">
+    <button id="zoomClose" class="modal-close gap-zoom-close" type="button">닫기</button>
+    <div class="gap-zoom-plate" id="zoomPlate">
+      <img id="zoomImage" src="" alt="">
+    </div>
+    <div class="gap-zoom-name" id="zoomName"></div>
   </div>
 
   <script>
-    // QR을 누르면 크게 보고, 다시 누르거나 Esc 로 닫는다
-    const overlay = document.getElementById('zoomOverlay');
-    const zoomImage = document.getElementById('zoomImage');
-    let lastQr = null;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function openZoom(img){
-      lastQr = img;
+    /* ================= QR 크게 보기 =================
+       누른 QR이 제자리에서 화면 가운데로 커지며 올라오고, 닫으면 제자리로 돌아간다. */
+    const overlay = document.getElementById('zoomOverlay');
+    const plate = document.getElementById('zoomPlate');
+    const zoomImage = document.getElementById('zoomImage');
+    const zoomName = document.getElementById('zoomName');
+    const zoomClose = document.getElementById('zoomClose');
+    let source = null, closing = false;
+
+    // 누른 QR의 자리에서 출발하도록, 가운데 판을 그 자리·크기로 옮겨 놓는 변형값
+    function fromSource(){
+      const a = source.getBoundingClientRect(), b = plate.getBoundingClientRect();
+      const s = a.width / b.width;
+      const dx = (a.left + a.width / 2) - (b.left + b.width / 2);
+      const dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+      return `translate(${dx}px, ${dy}px) scale(${s})`;
+    }
+
+    function openZoom(btn){
+      source = btn;
+      closing = false;
+      const img = btn.querySelector('img');
       zoomImage.src = img.src;
       zoomImage.alt = img.alt;
+      zoomName.textContent = btn.closest('.gap-item').querySelector('figcaption').textContent;
+
       overlay.classList.add('show');
       overlay.setAttribute('aria-hidden', 'false');
-      document.getElementById('zoomClose').focus();
-    }
-    function closeZoom(){
-      overlay.classList.remove('show');
-      overlay.setAttribute('aria-hidden', 'true');
-      if (lastQr) lastQr.focus();
+      plate.style.transition = 'none';
+      plate.style.transform = '';
+      plate.style.transform = fromSource();
+      source.classList.add('is-lifted');
+      void plate.offsetWidth;                 // 출발 자리를 한 번 그리게 한 뒤 움직인다
+      plate.style.transition = '';
+      plate.style.transform = '';
+      overlay.classList.add('is-open');
+      zoomClose.focus();
     }
 
-    document.querySelectorAll('.gap-item .qr-zoom').forEach(img => {
-      img.addEventListener('click', () => openZoom(img));
-      img.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openZoom(img); }
-      });
-    });
+    function closeZoom(){
+      if (!overlay.classList.contains('show') || closing) return;
+      closing = true;
+      overlay.classList.remove('is-open');
+      plate.style.transform = fromSource();
+      const done = () => {
+        if (!closing) return;
+        closing = false;
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+        plate.style.transform = '';
+        source.classList.remove('is-lifted');
+        source.focus();
+      };
+      if (reduceMotion) done(); else setTimeout(done, 300);
+    }
+
+    document.querySelectorAll('.gap-qr').forEach(btn => btn.addEventListener('click', () => openZoom(btn)));
     overlay.addEventListener('click', closeZoom);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeZoom(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeZoom(); });
+
+    /* ================= 배경: 기억의 틈 =================
+       별, 가운데 세로로 갈라진 빛의 틈, 틈에서 흩어지는 얼음 조각, 내려앉는 얼음 가루, 아래쪽 격자 바닥. */
+    (() => {
+      const cv = document.getElementById('gapCanvas'), c = cv.getContext('2d');
+      let w = 0, h = 0, stars = [], dust = [], shards = [], crack = [], raf = 0;
+
+      function size(){
+        const d = Math.min(window.devicePixelRatio || 1, 1.5);
+        w = window.innerWidth; h = window.innerHeight;
+        cv.width = w * d; cv.height = h * d;
+        c.setTransform(d, 0, 0, d, 0, 0);
+
+        stars = Array.from({ length: Math.round(w * h / 7000) }, () => ({
+          x: Math.random() * w, y: Math.random() * h * 0.8, r: 0.4 + Math.random() * 1.3, ph: Math.random() * 6.28, sp: 0.4 + Math.random() * 1.6
+        }));
+        dust = Array.from({ length: Math.round(w / 16) }, () => ({
+          x: Math.random() * w, y: Math.random() * h, r: 0.6 + Math.random() * 1.8, vy: 0.12 + Math.random() * 0.4, ph: Math.random() * 6.28
+        }));
+        shards = Array.from({ length: Math.max(8, Math.round(w / 110)) }, () => {
+          const n = 3 + Math.floor(Math.random() * 3);
+          return {
+            x: w / 2 + (Math.random() - 0.5) * w * 0.9, y: Math.random() * h,
+            s: 7 + Math.random() * 16, rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.004,
+            vy: -(0.05 + Math.random() * 0.16), ph: Math.random() * 6.28,
+            pts: Array.from({ length: n }, (_, i) => { const a = i / n * 6.283 + Math.random() * 0.7, r = 0.55 + Math.random() * 0.45; return [Math.cos(a) * r, Math.sin(a) * r]; })
+          };
+        });
+
+        // 틈: 화면 가운데를 위에서 아래로 가르는 들쭉날쭉한 선. 가운데가 가장 넓게 벌어진다.
+        // 제목과 안내 글을 가리지 않도록 글 아래에서 시작한다.
+        const top = Math.min(h * 0.6, document.querySelector('.gap-head').getBoundingClientRect().bottom + 10);
+        const steps = Math.max(10, Math.round((h - top) / 46)), amp = Math.min(34, w * 0.03);
+        crack = Array.from({ length: steps + 1 }, (_, i) => {
+          const t = i / steps;
+          return { x: w / 2 + (i ? (Math.random() - 0.5) * 2 * amp : 0), y: top + t * (h - top), open: Math.sin(t * Math.PI) };
+        });
+        if (reduceMotion) draw(0);
+      }
+
+      function crackPath(side, widen){
+        c.beginPath();
+        crack.forEach((p, i) => { const x = p.x + side * widen * p.open; i ? c.lineTo(x, p.y) : c.moveTo(x, p.y); });
+      }
+
+      function draw(t){
+        c.clearRect(0, 0, w, h);
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.0012);
+        const hz = h * 0.8, fh = h - hz;
+
+        // 틈에서 양옆으로 번지는 빛 (왼쪽은 얼음색, 오른쪽은 분홍: QR의 두 색)
+        let g = c.createLinearGradient(w / 2 - w * 0.34, 0, w / 2 + w * 0.34, 0);
+        g.addColorStop(0, 'rgba(120,200,255,0)');
+        g.addColorStop(0.46, `rgba(120,200,255,${0.10 + 0.05 * pulse})`);
+        g.addColorStop(0.54, `rgba(215,120,235,${0.10 + 0.05 * pulse})`);
+        g.addColorStop(1, 'rgba(215,120,235,0)');
+        c.fillStyle = g;
+        c.fillRect(0, 0, w, h);
+
+        // 별
+        for (const s of stars) {
+          const a = 0.2 + 0.65 * (0.5 + 0.5 * Math.sin(t * 0.001 * s.sp + s.ph));
+          c.fillStyle = `rgba(230,242,255,${a})`;
+          c.beginPath(); c.arc(s.x, s.y, s.r, 0, 6.283); c.fill();
+        }
+
+        // 격자 바닥: 틈 쪽으로 모이는 선
+        c.lineWidth = 1;
+        for (let i = 0; i <= 8; i++) {
+          const y = hz + fh * Math.pow(i / 8, 1.8);
+          c.strokeStyle = `rgba(155,216,242,${0.05 + 0.10 * i / 8})`;
+          c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke();
+        }
+        c.strokeStyle = 'rgba(155,216,242,.09)';
+        for (let i = -12; i <= 12; i++) {
+          c.beginPath(); c.moveTo(w / 2 + i * w * 0.018, hz); c.lineTo(w / 2 + i * w * 0.11, h); c.stroke();
+        }
+
+        // 틈: 벌어진 안쪽은 밝게, 가장자리는 번지는 빛으로
+        const open = Math.min(15, w * 0.014) * (0.8 + 0.2 * pulse);
+        c.save();
+        c.lineJoin = 'round';
+        c.shadowColor = 'rgba(160,215,255,.9)';
+        c.shadowBlur = 34 + 14 * pulse;
+        c.beginPath();
+        crack.forEach((p, i) => { const x = p.x - open * p.open; i ? c.lineTo(x, p.y) : c.moveTo(x, p.y); });
+        for (let i = crack.length - 1; i >= 0; i--) c.lineTo(crack[i].x + open * crack[i].open, crack[i].y);
+        c.closePath();
+        g = c.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, 'rgba(155,216,242,.55)');
+        g.addColorStop(0.5, 'rgba(255,255,255,.95)');
+        g.addColorStop(1, 'rgba(226,150,240,.55)');
+        c.fillStyle = g;
+        c.fill();
+        c.shadowBlur = 0;
+        c.lineWidth = 1.2;
+        c.strokeStyle = 'rgba(255,255,255,.75)';
+        crackPath(-1, open); c.stroke();
+        crackPath(1, open); c.stroke();
+        c.restore();
+
+        // 틈에서 흩어진 얼음 조각
+        for (const s of shards) {
+          if (!reduceMotion) {
+            s.y += s.vy; s.rot += s.vr; s.x += Math.sin(t * 0.0004 + s.ph) * 0.12;
+            if (s.y < -30) { s.y = h + 30; s.x = w / 2 + (Math.random() - 0.5) * w * 0.9; }
+          }
+          const a = 0.16 + 0.16 * (0.5 + 0.5 * Math.sin(t * 0.0009 + s.ph));
+          c.save();
+          c.translate(s.x, s.y); c.rotate(s.rot);
+          c.beginPath();
+          s.pts.forEach(([px, py], i) => i ? c.lineTo(px * s.s, py * s.s) : c.moveTo(px * s.s, py * s.s));
+          c.closePath();
+          c.fillStyle = `rgba(155,216,242,${a})`;
+          c.strokeStyle = `rgba(230,245,255,${a + 0.2})`;
+          c.lineWidth = 1;
+          c.fill(); c.stroke();
+          c.restore();
+        }
+
+        // 얼음 가루
+        for (const p of dust) {
+          if (!reduceMotion) {
+            p.y += p.vy; p.x += Math.sin(t * 0.0006 + p.ph) * 0.2;
+            if (p.y > h + 4) { p.y = -4; p.x = Math.random() * w; }
+          }
+          c.fillStyle = `rgba(200,232,250,${0.18 + 0.3 * (0.5 + 0.5 * Math.sin(t * 0.0015 + p.ph))})`;
+          c.beginPath(); c.arc(p.x, p.y, p.r, 0, 6.283); c.fill();
+        }
+      }
+
+      function loop(t){ draw(t); raf = requestAnimationFrame(loop); }
+
+      let resizeTimer = 0;
+      window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(size, 120); });
+      document.addEventListener('visibilitychange', () => {
+        cancelAnimationFrame(raf);
+        if (!document.hidden && !reduceMotion) raf = requestAnimationFrame(loop);
+      });
+      size();
+      if (!reduceMotion) raf = requestAnimationFrame(loop);
+    })();
   </script>
 </body>
 </html>
