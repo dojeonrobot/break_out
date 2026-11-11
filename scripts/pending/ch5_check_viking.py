@@ -38,7 +38,7 @@ async def wait_vik(pg, cond, t=20):
 
 async def main():
     async with async_playwright() as p:
-        br = await p.chromium.launch(args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+        br = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
         rq = (await br.new_context()).request
         for t in (10, 11):
             await rq.post(API + '/api/void/team_reset', data={'team': t, 'confirm': 'AGAIN'}, headers=ADM)

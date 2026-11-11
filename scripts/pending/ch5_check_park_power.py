@@ -10,7 +10,7 @@ async def wf(pg,expr,timeout=120000):
  raise AssertionError('timeout: '+expr)
 async def main():
  async with async_playwright() as p:
-  br=await p.chromium.launch(args=['--use-angle=swiftshader','--enable-unsafe-swiftshader']);ctx=await br.new_context(viewport={'width':1280,'height':800},device_scale_factor=.5,reduced_motion='no-preference')
+  br=await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist']);ctx=await br.new_context(viewport={'width':1280,'height':800},device_scale_factor=.5,reduced_motion='no-preference')
   await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','powercheck');")
   await ctx.request.post(API+'/api/void/team_reset',data={'team':12,'confirm':'AGAIN'},headers={'X-Admin-Key':'0101'})
   await ctx.request.post(API+'/api/void/admin/skip',data={'team':12,'mission':'z1'},headers={'X-Admin-Key':'0101'})
