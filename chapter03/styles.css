@@ -151,6 +151,24 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 }
 @keyframes shardFade{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes shardBob{ from{ translate:0 -3%; } to{ translate:0 3%; } }
+
+@keyframes spin{ from{ transform:rotateX(-18deg) rotateY(30deg); } to{ transform:rotateX(-18deg) rotateY(390deg); } }
+@keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+
+/* 조각이 들어온 순간 */
+.holo.hit .cube-wrap{ animation:cubeHit .6s cubic-bezier(.2,1.4,.3,1); }
+@keyframes cubeHit{ 0%{ transform:scale(1); } 35%{ transform:scale(1.14); } 100%{ transform:scale(1); } }
+
+/* 깨지기 직전 */
+.holo.is-breaking .cube-wrap{ animation:cubeShake .11s linear infinite; }
+.holo.is-breaking .face{ border-color:#fff; }
+.holo.is-breaking .face::before{ opacity:1; }
+@keyframes cubeShake{
+  0%{ transform:translate(-4px,2px); } 25%{ transform:translate(5px,-3px); }
+  50%{ transform:translate(-3px,-4px); } 75%{ transform:translate(4px,4px); } 100%{ transform:translate(-4px,2px); }
+}
+
+/* 해방 뒤 */
 .holo.is-freed #coreEmblem .shard{ transform:none; animation:none; translate:0 0; }
 
 .holo.is-freed .cube{ animation:none; transform:rotateX(0deg) rotateY(0deg); }
