@@ -93,8 +93,10 @@ async def main():
         q = await pg.evaluate("__dbg.quest().done"); assert 'q1' in q, q
         await arrive(pg, "__dbg.quest().vn()?.lines[0].text.includes('깜빡여')")
         ml = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')"); assert '빛이 보이는 쪽' not in ml, ml; await drain(pg)
-        await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "!!__dbg.quest().vn()")
-        fl = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')"); assert '캠퍼스 좌표를 찾았어' in fl and '미로 정원' not in fl, fl
+        await pg.evaluate('__dbg.walkTo(...__dbg.target())'); await wf(pg, "!!__dbg.quest().vn()"); await drain(pg)
+        await pg.evaluate("window.__chaseAuto = setInterval(()=>{ const c = window.__chase && __chase(); if(c && c.on) __dbg.walkTo(c.x, c.z); }, 150)")   # 2026-11-11: the chase to the carousel garden, followed on Naty's heels
+        await wf(pg, "!!__chase() && __chase().on", 30); await wf(pg, "!!__dbg.quest().vn()", 90)
+        fl = await pg.evaluate("__dbg.quest().vn().lines.map(l=>l.text).join(' / ')"); assert '캠퍼스 좌표도 찾았어' in fl and '회전목마' in fl, fl
         await drain(pg); await wf(pg, "!!document.querySelector('#qReward[data-on]')")
         t = await pg.evaluate("[document.getElementById('qrT').textContent, document.getElementById('qrList').textContent]")
         assert t[0] == '네이티 발견 · 두 번째 좌표 확보' and '37.' in t[1], t
