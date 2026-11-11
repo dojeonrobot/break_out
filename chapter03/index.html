@@ -1088,42 +1088,65 @@
       }
     }
 
-    /* ================= 세 번째 기억: KEY ================= */
+    /* ================= 세 번째 기억: KEY (감염된 보안 단말기) ================= */
     function vitalTemplateHTML(reviewMode = false){
+      const SIZE = VITAL_GRID.length;
       let qCount = 0;
-      const cells = VITAL_GRID.flat().map(v => {
-        if (v !== '?') return `<div class="key-cell">${v}</div>`;
+      const cells = VITAL_GRID.flat().map((v, i) => {
+        const pos = `data-r="${Math.floor(i / SIZE)}" data-c="${i % SIZE}"`;
+        if (v !== '?') return `<div class="key-cell" ${pos}>${v}</div>`;
         qCount += 1;
         const red = qCount === 1;
-        const shown = reviewMode ? (red ? VITAL_ANSWER.red : VITAL_ANSWER.yellow) : '?';
-        return `<div class="key-cell ${red ? 'q-red' : 'q-yellow'}">${shown}</div>`;
+        const answer = red ? VITAL_ANSWER.red : VITAL_ANSWER.yellow;
+        return `<div class="key-cell is-q ${red ? 'q-red' : 'q-yellow'}" ${pos} data-answer="${answer}">${reviewMode ? answer : '?'}</div>`;
       }).join('');
 
+      const pad = ['1','2','3','4','5','6','7','8','9'].map(k => `<button type="button" class="pad-key" data-k="${k}">${k}</button>`).join('');
+
       return `
-        <div class="key-puzzle">
+        <div class="key-puzzle${reviewMode ? ' is-clean' : ''}" id="vitalPuzzle">
           <div class="key-head">
             <div class="key-title">바이러스를 해결하는 <span class="key-accent">KEY</span>를 찾아 주세요.</div>
-            <div class="key-sub">아래 숫자판에서 물음표( ? )에 들어갈 숫자를 찾아, 같은 색 칸에 입력하세요.</div>
+            <div class="key-sub">숫자판에서 물음표( ? )에 들어갈 숫자를 찾아, 같은 색 칸에 입력하세요.</div>
           </div>
-          <div class="key-grid" aria-label="6x6 숫자판">${cells}</div>
-          <div class="key-input-area">
-            <div class="key-input-label">KEY 입력</div>
-            <div class="key-row">
-              <input id="vitalKeyInputYellow" class="key-input yellow-input" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="노란 칸 숫자">
-              <input id="vitalKeyInputRed" class="key-input red-input" type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="빨간 칸 숫자">
-              <button id="vitalKeyBtn" class="key-btn" type="button">확인</button>
+          <div class="key-layout">
+            <div class="terminal">
+              <div class="terminal-bar">
+                <span class="terminal-name">도로랜드 보안 단말기</span>
+                <span class="terminal-status" role="status"><i aria-hidden="true"></i><span id="vitalStatus">${reviewMode ? '바이러스 해제' : '바이러스 감염'}</span></span>
+              </div>
+              <div class="terminal-screen">
+                <div class="key-grid" aria-label="6x6 숫자판">${cells}</div>
+              </div>
             </div>
-            <div id="vitalKeyMsg" class="result-message" role="alert"></div>
+            <div class="key-panel">
+              <div class="key-input-label">KEY 입력</div>
+              <div class="key-row">
+                <input id="vitalKeyInputYellow" class="key-input yellow-input" type="text" inputmode="none" maxlength="1" autocomplete="off" aria-label="노란 칸 숫자">
+                <input id="vitalKeyInputRed" class="key-input red-input" type="text" inputmode="none" maxlength="1" autocomplete="off" aria-label="빨간 칸 숫자">
+              </div>
+              <div class="keypad" id="vitalKeypad">
+                ${pad}
+                <button type="button" class="pad-key pad-wide" data-k="del">지우기</button>
+                <button type="button" class="pad-key" data-k="0">0</button>
+                <button type="button" class="pad-key pad-ok" id="vitalKeyBtn">확인</button>
+              </div>
+              <div id="vitalKeyMsg" class="result-message" role="alert"></div>
+            </div>
           </div>
         </div>`;
     }
 
     function initVitalKeyPuzzle(reviewMode = false){
+      const puzzle = $('vitalPuzzle');
       const redEl = $('vitalKeyInputRed');
       const yellowEl = $('vitalKeyInputYellow');
       const btn = $('vitalKeyBtn');
       const msg = $('vitalKeyMsg');
+      const keypad = $('vitalKeypad');
       const KEY_TEXT = `${VITAL_ANSWER.yellow}${VITAL_ANSWER.red}`;
+      let active = yellowEl;
+      let done = false;
 
       function setMsg(ok, text){
         msg.classList.add('show');
@@ -1131,7 +1154,15 @@
         msg.classList.toggle('incorrect', !ok);
         msg.textContent = text;
       }
-      function lockInputs(){ redEl.disabled = true; yellowEl.disabled = true; btn.disabled = true; }
+      function lockInputs(){
+        redEl.disabled = true; yellowEl.disabled = true;
+        keypad.querySelectorAll('button').forEach(b => { b.disabled = true; });
+      }
+      function setActive(el){
+        active = el;
+        yellowEl.classList.toggle('is-active', el === yellowEl);
+        redEl.classList.toggle('is-active', el === redEl);
+      }
 
       if (reviewMode) {
         redEl.value = VITAL_ANSWER.red;
@@ -1141,31 +1172,73 @@
         return;
       }
 
+      // 정답: 물음표 칸에서부터 초록으로 번져 나간다
+      function purify(){
+        const qs = Array.from(puzzle.querySelectorAll('.key-cell.is-q'));
+        const at = el => [parseInt(el.dataset.r, 10), parseInt(el.dataset.c, 10)];
+        qs.forEach(q => { q.textContent = q.dataset.answer; });
+        puzzle.querySelectorAll('.key-cell').forEach(cell => {
+          const [r, c] = at(cell);
+          const dist = Math.min(...qs.map(q => { const [qr, qc] = at(q); return Math.abs(qr - r) + Math.abs(qc - c); }));
+          cell.style.transitionDelay = `${dist * 90}ms`;
+        });
+        puzzle.classList.add('is-clean');
+        $('vitalStatus').textContent = '바이러스 해제';
+      }
+
       function submitKey(){
+        if (done) return;
         const red = redEl.value.replace(/\D/g, '').slice(0, 1);
         const yellow = yellowEl.value.replace(/\D/g, '').slice(0, 1);
         if (yellow === VITAL_ANSWER.yellow && red === VITAL_ANSWER.red) {
+          done = true;
           markSolved(3);
           sfx('right');
-          setMsg(true, `KEY = ${KEY_TEXT}, 바이러스가 해제되었습니다!`);
           lockInputs();
-          setTimeout(() => { closeModal(); celebrate(3); }, 1300);
+          purify();
+          setMsg(true, `KEY = ${KEY_TEXT}, 바이러스가 해제되었습니다!`);
+          setTimeout(() => { closeModal(); celebrate(3); }, reduceMotion ? 1200 : 2100);
         } else {
           sfx('wrong');
-          setMsg(false, 'KEY가 아닙니다.');
+          setMsg(false, 'KEY가 아닙니다. 접근이 거부되었습니다.');
+          puzzle.classList.remove('is-denied');
+          void puzzle.offsetWidth;
+          puzzle.classList.add('is-denied');
+          setTimeout(() => puzzle.classList.remove('is-denied'), 600);
+          yellowEl.value = ''; redEl.value = '';
+          setActive(yellowEl);
           yellowEl.focus();
-          yellowEl.select();
         }
       }
 
       [yellowEl, redEl].forEach(el => {
+        el.addEventListener('focus', () => setActive(el));
         el.addEventListener('input', () => {
-          el.value = el.value.replace(/\D/g, '').slice(0, 1);
+          el.value = el.value.replace(/\D/g, '').slice(-1);
           if (el === yellowEl && el.value) redEl.focus();
         });
-        el.addEventListener('keydown', e => { if (e.key === 'Enter') submitKey(); });
+        el.addEventListener('keydown', e => {
+          if (e.key === 'Enter') submitKey();
+          if (e.key === 'Backspace' && !el.value && el === redEl) yellowEl.focus();
+        });
+      });
+
+      // 화면 숫자판 (태블릿에서는 기기 키보드가 뜨지 않는다)
+      keypad.addEventListener('click', e => {
+        const b = e.target.closest('.pad-key');
+        if (!b || b.disabled || b === btn) return;
+        const k = b.dataset.k;
+        sfx('select');
+        if (k === 'del') {
+          if (active.value) active.value = '';
+          else if (active === redEl) { setActive(yellowEl); yellowEl.value = ''; }
+        } else {
+          active.value = k;
+          if (active === yellowEl) setActive(redEl);
+        }
       });
       btn.addEventListener('click', submitKey);
+      setActive(yellowEl);
       yellowEl.focus();
     }
 
