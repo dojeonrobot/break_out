@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="stars" aria-hidden="true"></div>
+  <canvas id="bgCanvas" class="bg-canvas" aria-hidden="true"></canvas>
 
   <header>
     <div class="container nav">
@@ -210,9 +210,13 @@
 
   <!-- 연출 -->
   <div id="memoryFx" class="memory-fx" aria-hidden="true">
-    <div class="mfx-rays"></div>
     <div class="mfx-stack">
-      <div class="mfx-piece" id="mfxPiece"></div>
+      <div class="mfx-core">
+        <div class="mfx-ring r1"></div>
+        <div class="mfx-ring r2"></div>
+        <div class="mfx-streak"></div>
+        <div class="mfx-piece" id="mfxPiece"><div class="mfx-ice"></div></div>
+      </div>
       <div class="mfx-text">
         <div class="mfx-title" id="mfxTitle"></div>
         <div class="mfx-count" id="mfxCount"></div>
@@ -361,17 +365,54 @@
       o.start(t);
       o.stop(t + dur + 0.05);
     }
+    let noiseBuf = null;
+    function noise(at, dur, vol, freq, type, q){
+      const c = getCtx();
+      if (!c) return;
+      if (!noiseBuf) {
+        noiseBuf = c.createBuffer(1, Math.floor(c.sampleRate * 1.5), c.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + at;
+      src.buffer = noiseBuf;
+      f.type = type || 'bandpass'; f.frequency.value = freq; f.Q.value = q || 1;
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(f).connect(g).connect(c.destination);
+      src.start(t, Math.random() * 0.5);
+      src.stop(t + dur + 0.05);
+    }
+    // 유리 종: 배음 간격이 어긋난 사인파 넷
+    function bell(freq, at, dur, vol){
+      [[1, 1], [2.76, 0.5], [5.4, 0.25], [8.93, 0.12]].forEach(([r, a]) => tone(freq * r, at, dur / Math.sqrt(r), 'sine', vol * a));
+    }
+
     function sfx(name){
       if (!soundOn) return;
       try {
         if (name === 'select') tone(880, 0, 0.09, 'sine', 0.05);
         else if (name === 'wrong') { tone(196, 0, 0.18, 'square', 0.04); tone(165, 0.16, 0.26, 'square', 0.04); }
         else if (name === 'right') { tone(659, 0, 0.16, 'triangle', 0.08); tone(988, 0.12, 0.3, 'triangle', 0.08); }
-        else if (name === 'piece') {
-          [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.1, 0.55, 'triangle', 0.09));
-          tone(2093, 0.45, 0.7, 'sine', 0.04);
+        else if (name === 'frost') {
+          // 얼음에 금이 가는 소리
+          [0, 0.13, 0.22, 0.36, 0.44, 0.55, 0.61].forEach(t => noise(t, 0.05, 0.16, 5200 + Math.random() * 2500, 'highpass'));
+          tone(110, 0, 0.7, 'sine', 0.06, 240);
         }
-        else if (name === 'land') tone(330, 0, 0.35, 'sine', 0.1, 110);
+        else if (name === 'piece') {
+          // 얼음이 깨지며 유리 종이 울린다
+          noise(0, 0.32, 0.3, 3200, 'highpass');
+          noise(0.02, 0.5, 0.12, 900, 'bandpass', 0.8);
+          bell(880, 0.03, 2.4, 0.07);
+          bell(1318.5, 0.14, 2.1, 0.05);
+          bell(1760, 0.27, 1.8, 0.04);
+          [0.45, 0.62, 0.74, 0.93, 1.1].forEach(t => tone(2600 + Math.random() * 2200, t, 0.35, 'sine', 0.02));
+        }
+        else if (name === 'land') {
+          tone(160, 0, 0.45, 'sine', 0.13, 60);
+          noise(0, 0.25, 0.08, 500, 'lowpass');
+          bell(659, 0.02, 1.4, 0.05);
+        }
         else if (name === 'complete') {
           [523, 659, 784].forEach(f => tone(f, 0, 0.5, 'triangle', 0.07));
           [659, 784, 1047].forEach(f => tone(f, 0.28, 1.6, 'triangle', 0.08));
@@ -477,6 +518,116 @@
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }
 
+    /* ================= 배경: 큐브 속 얼어붙은 공간 =================
+       얼음 격자 바닥, 반짝이는 별, 떨어지는 얼음 가루, 큐브 뒤 빛기둥.
+       기억을 복원할수록 차가운 파랑에서 호박색으로 물든다 (bg.setProgress). */
+    const bg = (() => {
+      const cv = $('bgCanvas'), c = cv.getContext('2d');
+      let w = 0, h = 0, stars = [], dust = [], target = 0, cur = 0, ticks = 0;
+      let anchor = { x: 0, y: 0, s: 200 };
+
+      function locate(){
+        const r = holoEl.getBoundingClientRect();
+        anchor = { x: r.left + r.width / 2, y: r.top + r.height / 2, s: Math.max(110, cubeEl.offsetWidth) };
+      }
+      function size(){
+        const d = Math.min(window.devicePixelRatio || 1, 1.5);
+        w = window.innerWidth; h = window.innerHeight;
+        cv.width = w * d; cv.height = h * d;
+        c.setTransform(d, 0, 0, d, 0, 0);
+        stars = Array.from({ length: Math.round(w * h / 8000) }, () => ({
+          x: Math.random() * w, y: Math.random() * h * 0.72, r: 0.4 + Math.random() * 1.3, ph: Math.random() * 6.28, sp: 0.4 + Math.random() * 1.6
+        }));
+        dust = Array.from({ length: Math.round(w / 15) }, () => ({
+          x: Math.random() * w, y: Math.random() * h, r: 0.6 + Math.random() * 1.9, vy: 0.15 + Math.random() * 0.45, ph: Math.random() * 6.28
+        }));
+        locate();
+        if (reduceMotion) draw(0);
+      }
+
+      function draw(t){
+        cur += (target - cur) * (reduceMotion ? 1 : 0.02);
+        const col = [140 + 115 * cur, 210 - 40 * cur, 255 - 165 * cur].map(Math.round).join(',');
+        c.clearRect(0, 0, w, h);
+        const hz = Math.min(h * 0.8, anchor.y + anchor.s * 0.98);   // 지평선: 큐브 바로 아래
+        const fh = Math.max(40, h - hz);
+
+        // 큐브 뒤 빛기둥
+        const pw = anchor.s * 1.15;
+        let g = c.createLinearGradient(anchor.x - pw, 0, anchor.x + pw, 0);
+        g.addColorStop(0, `rgba(${col},0)`);
+        g.addColorStop(0.5, `rgba(${col},${0.11 + 0.11 * cur})`);
+        g.addColorStop(1, `rgba(${col},0)`);
+        c.fillStyle = g;
+        c.fillRect(anchor.x - pw, 0, pw * 2, hz);
+
+        // 별
+        for (const s of stars) {
+          if (s.y > hz - 6) continue;
+          const a = 0.2 + 0.65 * (0.5 + 0.5 * Math.sin(t * 0.001 * s.sp + s.ph));
+          c.fillStyle = `rgba(230,242,255,${a})`;
+          c.beginPath(); c.arc(s.x, s.y, s.r, 0, 6.283); c.fill();
+        }
+
+        // 바닥에 비친 빛
+        c.save();
+        c.translate(anchor.x, hz); c.scale(1, 0.26);
+        g = c.createRadialGradient(0, 0, 0, 0, 0, anchor.s * 3);
+        g.addColorStop(0, `rgba(${col},${0.28 + 0.14 * cur})`);
+        g.addColorStop(1, `rgba(${col},0)`);
+        c.fillStyle = g;
+        c.fillRect(-anchor.s * 3, 0, anchor.s * 6, anchor.s * 3);
+        c.restore();
+
+        // 얼음 격자 바닥
+        c.lineWidth = 1;
+        const lg = c.createLinearGradient(0, hz, 0, h);
+        lg.addColorStop(0, `rgba(${col},0)`);
+        lg.addColorStop(1, `rgba(${col},0.2)`);
+        c.strokeStyle = lg;
+        const step = Math.max(90, w / 10);
+        for (let i = -16; i <= 16; i++) {
+          c.beginPath();
+          c.moveTo(anchor.x + i * step * 0.12, hz);
+          c.lineTo(anchor.x + i * step * 1.5, h);
+          c.stroke();
+        }
+        const off = (t * 0.00005) % 1;
+        for (let k = 0; k < 11; k++) {
+          const z = (k + off) / 11;
+          const y = hz + fh * z * z;
+          c.strokeStyle = `rgba(${col},${0.03 + 0.17 * z})`;
+          c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke();
+        }
+        c.strokeStyle = `rgba(${col},0.22)`;
+        c.beginPath(); c.moveTo(0, hz); c.lineTo(w, hz); c.stroke();
+
+        // 떨어지는 얼음 가루
+        for (const d of dust) {
+          d.y += d.vy; d.x += Math.sin(t * 0.0006 + d.ph) * 0.25;
+          if (d.y > h + 4) { d.y = -4; d.x = Math.random() * w; }
+          c.fillStyle = `rgba(${col},${0.25 + 0.3 * (0.5 + 0.5 * Math.sin(t * 0.002 + d.ph))})`;
+          c.beginPath(); c.arc(d.x, d.y, d.r, 0, 6.283); c.fill();
+        }
+      }
+
+      function loop(t){
+        requestAnimationFrame(loop);
+        if (document.hidden) return;
+        if (++ticks % 45 === 0) locate();
+        draw(t);
+      }
+      window.addEventListener('resize', size);
+      window.addEventListener('scroll', locate, { passive: true });
+      size();
+      if (!reduceMotion) requestAnimationFrame(loop);
+
+      return {
+        setProgress(count){ target = Math.max(0, Math.min(1, count / 4)); if (reduceMotion) draw(0); },
+        refresh: locate
+      };
+    })();
+
     /* ================= 진행 상태 ================= */
     function isStepSolved(step){ return store.get(`${CHAPTER_KEY}_step_${step}_solved`) === '1'; }
 
@@ -525,6 +676,7 @@
 
       const count = acquired.filter(Boolean).length;
       holoEl.style.setProperty('--p', String(Math.min(count, 3)));
+      bg.setProgress(count);
       refreshCards(animate);
 
       if (animate) {
@@ -659,13 +811,21 @@
         mfxPiece.style.backgroundImage = `url('${patternForStep[step]}')`;
         $('mfxTitle').textContent = `${MEMORY_NAME[step]} 복원`;
         $('mfxCount').textContent = `문양 조각 ${acquired.filter(Boolean).length} / 4`;
-        memoryFx.classList.remove('fly');
+        memoryFx.classList.remove('fly', 'cracked');
         memoryFx.classList.add('show');
         syncScrollLock();
-        sfx('piece');
+        sfx('frost');
 
-        setTimeout(() => { const p = centerOf(mfxPiece); fx.burst(p.x, p.y, { n: 54, speed: 7 }); }, 260);
+        // 얼음이 깨지고 조각이 드러난다
+        setTimeout(() => {
+          memoryFx.classList.add('cracked');
+          sfx('piece');
+          const p = centerOf(mfxPiece);
+          fx.burst(p.x, p.y, { n: 46, kind: 'shard', speed: 9 });
+          fx.burst(p.x, p.y, { n: 40, speed: 6 });
+        }, 720);
 
+        // 큐브로 날아간다
         setTimeout(() => {
           const from = centerOf(mfxPiece), to = centerOf(cubeEl);
           memoryFx.classList.add('fly');
@@ -677,7 +837,7 @@
             { duration: 620, easing: 'cubic-bezier(.6,0,.85,.35)', fill: 'forwards' }
           );
           anim.onfinish = () => {
-            memoryFx.classList.remove('show', 'fly');
+            memoryFx.classList.remove('show', 'fly', 'cracked');
             anim.cancel();
             syncScrollLock();
             const c = centerOf(cubeEl);
@@ -685,7 +845,7 @@
             sfx('land');
             resolve();
           };
-        }, 2100);
+        }, 2500);
       });
     }
 
