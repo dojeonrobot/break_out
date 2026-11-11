@@ -214,20 +214,25 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
   position:absolute; left:16px; bottom:12px; padding:6px 12px; border-radius:999px;
   font-size:13px; font-weight:800; line-height:1.2;
 }
-/* 잠긴 기억: 빗금 봉인 + 자물쇠 (아이콘은 Phosphor lock-fill) */
+/* 잠긴 기억: 빗금 봉인 위에 큰 자물쇠와 "잠김"만 보인다 (아이콘은 Phosphor lock-fill) */
 .icon{ position:relative; }
 .card.is-locked{
   cursor:not-allowed; pointer-events:none; border-style:dashed; border-color:var(--line-strong);
-  background:repeating-linear-gradient(135deg, rgba(160,200,235,.07) 0 10px, transparent 10px 22px), rgba(8,13,26,.55);
+  background:repeating-linear-gradient(135deg, rgba(160,200,235,.08) 0 10px, transparent 10px 22px), rgba(6,10,20,.72);
 }
-.card.is-locked .icon{ background-image:none !important; border-radius:14px; background-color:rgba(160,200,235,.10); border:1px solid var(--line-strong); }
-.card.is-locked .icon::after, .card.just-unlocked .icon::after{
-  content:""; position:absolute; inset:9px; background:#c9dcef;
+.card.is-locked .icon{ filter:grayscale(1) brightness(.45); }
+.card.is-locked h3{ color:rgba(238,244,251,.42); }
+.card.is-locked p{ visibility:hidden; }
+.card.is-locked::after{
+  content:""; left:50%; top:54%; bottom:auto; width:clamp(52px,8vh,76px); height:clamp(52px,8vh,76px); padding:0; border-radius:0;
+  transform:translate(-50%,-50%); background:#dbe9f6;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm32-84H96V56a32,32,0,0,1,64,0Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm32-84H96V56a32,32,0,0,1,64,0Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-.card.is-locked h3{ color:rgba(238,244,251,.6); }
-.card.is-locked p{ color:rgba(163,181,203,.45); filter:blur(3.5px); user-select:none; }
-.card.is-locked::after{ content:"잠김 · 앞의 기억을 먼저 복원"; color:rgba(201,220,239,.85); border:1px solid var(--line-strong); background:rgba(8,13,26,.6); }
+.card.is-locked::before{
+  content:"잠김"; position:absolute; left:0; right:0; top:calc(54% + clamp(30px,4.6vh,44px)); text-align:center;
+  font-size:18px; font-weight:800; letter-spacing:.08em; color:#dbe9f6;
+}
+.card.just-unlocked .icon::after{ content:""; position:absolute; -webkit-mask:center / contain no-repeat; mask:center / contain no-repeat; }
 
 /* 자물쇠가 풀리는 순간 */
 .card.just-unlocked{ animation:unlockFlash 1s ease; }
@@ -239,9 +244,32 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 @keyframes lockOff{ 0%{ transform:scale(1) rotate(0); opacity:1; } 35%{ transform:scale(1.5) rotate(-14deg); opacity:1; } 100%{ transform:translateY(-34px) scale(1.1) rotate(18deg); opacity:0; } }
 @keyframes unlockFlash{ 0%{ box-shadow:0 0 0 0 rgba(255,157,60,.9); } 100%{ box-shadow:0 0 0 22px rgba(255,157,60,0); } }
 
-.card.is-next{ border-color:var(--amber); background:linear-gradient(180deg, rgba(255,157,60,.10), var(--surface) 60%); animation:nextPulse 2s ease-in-out infinite; }
-.card.is-next::after{ content:"지금 풀 차례"; color:var(--amber-ink); background:var(--amber); }
-@keyframes nextPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(255,157,60,.45); } 50%{ box-shadow:0 0 0 10px rgba(255,157,60,0); } }
+/* 지금 눌러야 하는 카드: 위로 떠오르고, 화살표가 가리키고, 아래에 큰 버튼이 붙는다 (화살표는 Phosphor arrow-fat-down-fill) */
+.card.is-next{
+  border:2px solid var(--amber); padding-bottom:70px; z-index:2;
+  background:linear-gradient(180deg, rgba(255,157,60,.26), #1b2236 62%);
+  animation:nextLift 1s ease-in-out infinite alternate;
+}
+.card.is-next h3{ color:#fff; }
+.card.is-next p{ color:#d5e0ee; }
+.card.is-next::after{
+  content:"여기를 눌러 열기"; left:14px; right:14px; bottom:14px; padding:0; height:44px;
+  display:grid; place-items:center; border-radius:12px;
+  color:var(--amber-ink); background:var(--amber); font-size:18px; font-weight:800;
+}
+.card.is-next::before{
+  content:""; position:absolute; left:50%; top:-34px; width:30px; height:30px; margin-left:-15px; background:var(--amber);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M229.66,141.66l-96,96a8,8,0,0,1-11.32,0l-96-96A8,8,0,0,1,32,128H72V48A16,16,0,0,1,88,32h80a16,16,0,0,1,16,16v80h40a8,8,0,0,1,5.66,13.66Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M229.66,141.66l-96,96a8,8,0,0,1-11.32,0l-96-96A8,8,0,0,1,32,128H72V48A16,16,0,0,1,88,32h80a16,16,0,0,1,16,16v80h40a8,8,0,0,1,5.66,13.66Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation:nextArrow .6s ease-in-out infinite alternate;
+}
+@keyframes nextLift{
+  from{ transform:translateY(-4px); box-shadow:0 10px 26px rgba(255,157,60,.28), 0 0 0 0 rgba(255,157,60,.55); }
+  to{ transform:translateY(-10px); box-shadow:0 18px 40px rgba(255,157,60,.42), 0 0 0 9px rgba(255,157,60,0); }
+}
+@keyframes nextArrow{ from{ transform:translateY(-7px); } to{ transform:translateY(3px); } }
+/* 눌러야 할 카드가 있는 동안, 이미 끝낸 카드는 한발 물러난다 */
+.cards:has(.is-next) .card.is-complete{ opacity:.62; }
+.cards:has(.is-next) .card.is-complete:hover{ opacity:1; }
 
 .card.is-complete{ border-color:rgba(98,214,162,.4); }
 .card.is-complete::after{ content:"복원 완료 · 다시 보기"; color:var(--ok); border:1px solid rgba(98,214,162,.45); }
@@ -637,4 +665,5 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 @media (prefers-reduced-motion:reduce){
   *, *::before, *::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
   .cube{ animation:none; transform:rotateX(-18deg) rotateY(30deg); }
+  .card.is-next{ transform:translateY(-8px); box-shadow:0 14px 34px rgba(255,157,60,.4); }
 }
