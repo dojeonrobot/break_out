@@ -150,8 +150,16 @@
         <button id="completeCloseBtn" class="modal-close" type="button">닫기</button>
       </div>
       <div class="modal-body">
-        <img src="./images/missions/mission_complete.jpg" alt="미션 완료 웹툰" class="webtoon-image" width="1536" height="1024">
-        <p class="start-notice">모든 문양을 획득했습니다!<br>미션 완료!</p>
+        <div class="cine" id="rescueCine">
+          <img id="cineImg" src="./images/missions/mission_complete.jpg" alt="리코를 구출해 안아 주는 장면" width="1536" height="1024">
+          <div class="cine-cold" id="cineCold"></div>
+          <div class="cine-warm" id="cineWarm"></div>
+          <canvas class="cine-canvas" id="cineCanvas" aria-hidden="true"></canvas>
+          <div class="cine-bar top"></div>
+          <div class="cine-bar bottom"></div>
+        </div>
+        <p class="start-notice" id="completeNotice">모든 문양을 획득했습니다!<br>미션 완료!</p>
+        <button class="btn btn-ghost" id="cineReplayBtn" type="button" hidden>장면 다시 보기</button>
       </div>
     </div>
   </div>
@@ -356,6 +364,11 @@
           tone(2093, 0.45, 0.7, 'sine', 0.04);
         }
         else if (name === 'land') tone(330, 0, 0.35, 'sine', 0.1, 110);
+        else if (name === 'rescue') {
+          tone(196, 0, 1.6, 'sine', 0.07);
+          [392, 494, 587, 784, 988].forEach((f, i) => tone(f, 1.3 + i * 0.42, 2.4, 'sine', 0.06));
+          tone(1568, 3.4, 1.8, 'sine', 0.03);
+        }
         else if (name === 'rumble') { tone(70, 0, 1.15, 'sawtooth', 0.06, 42); tone(110, 0, 1.15, 'triangle', 0.06, 330); }
         else if (name === 'free') {
           [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.07, 1.8, 'triangle', 0.07));
@@ -731,7 +744,85 @@
       setTimeout(() => openQRModal(MEMORY_NAME[1], QR_SRC[1]), 250);
     });
 
-    function openCompleteModal(){ showModal(completeModal, $('completeCloseBtn')); }
+    /* ---- 완료 장면: 완료 그림 한 장을 5초 장면처럼 보여 준다 ----
+       깨진 얼음을 가까이 비춘 차가운 화면에서 시작해, 카메라가 물러나며 두 사람이 드러나고 따뜻한 빛이 번진다. */
+    const CINE_MS = 5200;
+    const cineBox = $('rescueCine');
+    const cineImg = $('cineImg');
+    const cineCanvas = $('cineCanvas');
+    const completeNotice = $('completeNotice');
+    const cineReplayBtn = $('cineReplayBtn');
+    let cineAnims = [];
+    let cineRaf = 0;
+
+    function stopCine(){
+      cineAnims.forEach(a => a.cancel());
+      cineAnims = [];
+      if (cineRaf) cancelAnimationFrame(cineRaf);
+      cineRaf = 0;
+    }
+
+    function playRescueCine(){
+      stopCine();
+      if (reduceMotion) { completeNotice.classList.add('show'); cineReplayBtn.hidden = true; return; }
+      completeNotice.classList.remove('show');
+      cineReplayBtn.hidden = true;
+
+      const opt = { duration: CINE_MS, easing: 'cubic-bezier(.45,0,.2,1)', fill: 'both' };
+      const main = cineImg.animate([
+        { transform: 'scale(2.4) translate(29%,-28%)', filter: 'brightness(.2)' },
+        { offset: .2,  transform: 'scale(2.3) translate(28%,-27%)', filter: 'brightness(.85)' },
+        { offset: .74, transform: 'scale(1.1) translate(0%,0%)',    filter: 'brightness(1.08)' },
+        { transform: 'scale(1) translate(0%,0%)', filter: 'brightness(1)' }
+      ], opt);
+      cineAnims = [
+        main,
+        $('cineCold').animate([{ opacity: .95 }, { offset: .22, opacity: .8 }, { offset: .7, opacity: 0 }, { opacity: 0 }], opt),
+        $('cineWarm').animate([{ opacity: 0 }, { offset: .3, opacity: 0 }, { offset: .72, opacity: .85 }, { opacity: .3 }], opt)
+      ];
+      cineBox.querySelectorAll('.cine-bar').forEach(bar => {
+        cineAnims.push(bar.animate([{ transform: 'scaleY(1)' }, { offset: .68, transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], opt));
+      });
+      main.onfinish = () => { completeNotice.classList.add('show'); cineReplayBtn.hidden = false; };
+      sfx('rescue');
+
+      // 떠오르는 빛 알갱이 (장면이 끝난 뒤에도 창이 열려 있는 동안 천천히 이어진다)
+      const ctx = cineCanvas.getContext('2d');
+      const started = performance.now();
+      let motes = [];
+      function frame(now){
+        if (!completeModal.classList.contains('show')) { cineRaf = 0; return; }
+        const r = cineBox.getBoundingClientRect();
+        const w = Math.round(r.width), h = Math.round(r.height);
+        if (cineCanvas.width !== w || cineCanvas.height !== h) { cineCanvas.width = w; cineCanvas.height = h; }
+        const t = now - started;
+        const rate = t < 1300 ? 0 : (t < 4300 ? 3 : (Math.random() < 0.5 ? 1 : 0));
+        for (let i = 0; i < rate && motes.length < 150; i++) {
+          motes.push({
+            x: w * (0.2 + Math.random() * 0.65), y: h * (0.45 + Math.random() * 0.55),
+            vx: (Math.random() - 0.5) * 0.4, vy: -(0.3 + Math.random() * 0.9),
+            r: (1 + Math.random() * 2.4) * (w / 900), life: 0, max: 90 + Math.random() * 110,
+            color: Math.random() < 0.7 ? '255,200,130' : '190,225,255'
+          });
+        }
+        ctx.clearRect(0, 0, w, h);
+        ctx.globalCompositeOperation = 'lighter';
+        motes = motes.filter(m => m.life < m.max);
+        for (const m of motes) {
+          m.life++; m.x += m.vx + Math.sin((m.life + m.max) / 18) * 0.25; m.y += m.vy;
+          const a = Math.sin(Math.PI * m.life / m.max);
+          ctx.fillStyle = `rgba(${m.color},${a * 0.9})`;
+          ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = `rgba(${m.color},${a * 0.18})`;
+          ctx.beginPath(); ctx.arc(m.x, m.y, m.r * 3.2, 0, Math.PI * 2); ctx.fill();
+        }
+        cineRaf = requestAnimationFrame(frame);
+      }
+      cineRaf = requestAnimationFrame(frame);
+    }
+    cineReplayBtn.addEventListener('click', playRescueCine);
+
+    function openCompleteModal(){ showModal(completeModal, $('completeCloseBtn')); playRescueCine(); }
     bindClose(completeModal, () => hideModal(completeModal));
     emblemBtn.addEventListener('click', openCompleteModal);
     cubeEl.addEventListener('click', () => { if (acquired.every(Boolean) && !fxBusy) openCompleteModal(); });

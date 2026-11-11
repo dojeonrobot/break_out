@@ -281,6 +281,19 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 .webtoon-image{ width:100%; height:auto; max-height:calc(100dvh - 260px); object-fit:contain; border-radius:10px; }
 .start-notice{ color:var(--text); font-weight:700; font-size:19px; margin:14px 0 16px; line-height:1.6; }
 
+/* 완료 장면 */
+.cine{ position:relative; width:min(100%, calc((100dvh - 270px) * 1.5)); aspect-ratio:3/2; margin:0 auto; overflow:hidden; border-radius:10px; background:#000; }
+.cine img{ width:100%; height:100%; object-fit:cover; display:block; will-change:transform; }
+.cine-cold, .cine-warm, .cine-canvas{ position:absolute; inset:0; pointer-events:none; }
+.cine-cold{ background:linear-gradient(200deg, rgba(40,110,255,.6), rgba(10,30,90,.75)); mix-blend-mode:color; opacity:0; }
+.cine-warm{ background:radial-gradient(60% 55% at 58% 42%, rgba(255,190,110,.75), transparent 70%); mix-blend-mode:screen; opacity:0; }
+.cine-canvas{ width:100%; height:100%; }
+.cine-bar{ position:absolute; left:0; right:0; height:13%; background:#000; transform:scaleY(0); pointer-events:none; }
+.cine-bar.top{ top:0; transform-origin:top; }
+.cine-bar.bottom{ bottom:0; transform-origin:bottom; }
+#completeNotice{ opacity:0; transition:opacity .7s ease; margin-bottom:10px; }
+#completeNotice.show{ opacity:1; }
+
 .result-message{ margin-top:12px; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:16px; display:none; }
 .result-message.show{ display:block; animation:resultIn .25s ease; }
 .result-message.correct{ background:rgba(98,214,162,.14); color:var(--ok); border:1px solid rgba(98,214,162,.45); }
