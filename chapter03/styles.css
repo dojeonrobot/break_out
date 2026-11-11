@@ -291,8 +291,28 @@ h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2;
 .cine-bar{ position:absolute; left:0; right:0; height:13%; background:#000; transform:scaleY(0); pointer-events:none; }
 .cine-bar.top{ top:0; transform-origin:top; }
 .cine-bar.bottom{ bottom:0; transform-origin:bottom; }
-#completeNotice{ opacity:0; transition:opacity .7s ease; margin-bottom:10px; }
-#completeNotice.show{ opacity:1; }
+/* 장면 끝: 그림 아래쪽에 크게 찍히는 "미션 완료!" */
+.cine-end{
+  position:absolute; left:0; right:0; bottom:0; padding:18% 5% 5%;
+  display:flex; align-items:center; justify-content:center; gap:clamp(12px,2.4vmin,26px);
+  background:linear-gradient(to top, rgba(4,8,18,.94) 0%, rgba(4,8,18,.78) 42%, transparent 100%);
+  opacity:0; visibility:hidden; transition:opacity .35s ease;
+}
+.cine-end.show{ opacity:1; visibility:visible; }
+.cine-badge{
+  flex:none; width:clamp(56px,13vmin,112px); aspect-ratio:1/1; display:grid; grid-template-columns:1fr 1fr; overflow:hidden;
+  border-radius:16%; box-shadow:0 0 0 3px #ffc98a, 0 0 34px rgba(255,150,50,.75);
+}
+.cine-badge i{ background-size:100% 100%; }
+.cine-end-text{ text-align:left; }
+.cine-end-title{ font-size:clamp(34px,9vmin,84px); font-weight:800; line-height:1.1; letter-spacing:-.01em; color:#ffb45c; text-shadow:0 4px 0 rgba(90,40,0,.55), 0 0 36px rgba(255,150,50,.55); }
+.cine-end-sub{ margin-top:6px; font-size:clamp(14px,2.6vmin,22px); font-weight:700; color:#fff; }
+.cine-end.show .cine-badge{ animation:endBadge .7s cubic-bezier(.2,1.5,.3,1) both; }
+.cine-end.show .cine-end-title{ animation:endStamp .55s cubic-bezier(.2,1.4,.3,1) .12s both; }
+.cine-end.show .cine-end-sub{ animation:textUp .5s ease .5s both; }
+@keyframes endStamp{ 0%{ transform:scale(2.4); opacity:0; } 60%{ opacity:1; } 100%{ transform:scale(1); opacity:1; } }
+@keyframes endBadge{ 0%{ transform:scale(.2) rotate(-40deg); opacity:0; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+#cineReplayBtn{ margin-top:14px; }
 
 .result-message{ margin-top:12px; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:16px; display:none; }
 .result-message.show{ display:block; animation:resultIn .25s ease; }
