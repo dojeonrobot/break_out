@@ -56,7 +56,7 @@ async def shot(pg, name):
 
 async def main():
     async with async_playwright() as p:
-        br = await p.chromium.launch(args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+        br = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
         ctx = await br.new_context(viewport={'width': 1280, 'height': 800}, device_scale_factor=.6)
         await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','natycheck');localStorage.setItem('void-sound','0');")
         rq = ctx.request

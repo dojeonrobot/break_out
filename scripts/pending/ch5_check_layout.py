@@ -12,7 +12,7 @@ async def main():
         print(('OK ' if ok else 'FAIL ') + detail, flush=True)
         if not ok: failures.append(detail)
     async with async_playwright() as p:
-        browser = await p.chromium.launch(args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
+        browser = await p.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
         for name, w, h in [('tablet-landscape',1280,800),('tablet-portrait',800,1280),('phone-portrait',390,844),('phone-landscape',844,390)]:
             ctx = await browser.new_context(viewport={'width':w,'height':h},screen={'width':w,'height':h},has_touch=True,is_mobile=min(w,h)<=500,device_scale_factor=1)
             await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');")
@@ -57,8 +57,8 @@ async def main():
                     await pg.screenshot(path=str(OUT/(name+'-lab-'+state+'.png')))
                 await pg.evaluate("delete document.getElementById('labDlg').dataset.on")
             if name=='tablet-landscape':
-                bars=await pg.evaluate('''()=>{const d=__dbg,bars=[];d.islRoot.traverse(o=>{if(o.isMesh&&o.geometry.type==='CylinderGeometry'&&o.geometry.parameters.height===5.4&&o.material.color?.getHexString()==='3a3f4a')bars.push(o)});return {count:bars.length,dynamic:bars.every(b=>b.userData.dynamic),changed:bars.map(b=>{const rotations=[];for(let t=0;t<5;t+=.1){d.islAnim.forEach(f=>f(t));rotations.push(b.rotation.y)}return Math.max(...rotations)-Math.min(...rotations)>.1}),audit:d.bakedAudit()}}''')
-                check(bars['count']==5 and bars['dynamic'] and all(bars['changed']),'all 5 gate bars remain animated')
+                bars=await pg.evaluate('''()=>{const d=__dbg,bars=[];d.islRoot.traverse(o=>{if(/^entrance-barrier-[0-9]+$/.test(o.name))bars.push(o)});return {count:bars.length,dynamic:bars.every(b=>b.userData.dynamic),changed:bars.map(b=>{const rotations=[];for(let t=0;t<14;t+=.25){b.userData.animate(t);rotations.push(b.rotation.z)}return Math.max(...rotations)-Math.min(...rotations)>.1}),audit:d.bakedAudit()}}''')
+                check(bars['count']==10 and bars['dynamic'] and sum(bars['changed'])>=6,'10 entrance barriers stay dynamic and swing (a bar with a visitor frozen beside it stays open in this probe) '+str(sum(bars['changed'])))
                 check(not bars['audit'],'baked audit has no false gangway warning '+str(bars['audit']))
                 metrics['bars']=bars
                 # Check computed colors in both themes, including inverse marker badges.
