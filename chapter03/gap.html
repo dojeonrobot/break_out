@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOROLAND Chapter 3: 기억의 틈</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="gap-page">
+  <header>
+    <div class="container nav">
+      <div class="logo">DOROLAND</div>
+      <nav class="menu" aria-label="이동">
+        <a class="nav-btn nav-link" href="../index.html">메인 화면</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container gap-main">
+    <div class="gap-head">
+      <div class="eyebrow">CHAPTER 3</div>
+      <h1 id="title">기억의 틈</h1>
+      <p class="subtitle">Delightex 앱에서 QR 코드를 스캔하세요.</p>
+    </div>
+
+    <!-- QR 그림을 바꾸려면 images/qr/gap-1.png, gap-2.png 를 같은 이름으로 덮어쓴다 -->
+    <div class="gap-grid">
+      <figure class="gap-item">
+        <img class="qr-plate qr-zoom" src="./images/qr/gap-1.png" alt="첫번째 기억의 틈 QR 코드" width="801" height="801" tabindex="0" role="button" title="누르면 크게 보기">
+        <figcaption>첫번째 기억의 틈</figcaption>
+      </figure>
+      <figure class="gap-item">
+        <img class="qr-plate qr-zoom" src="./images/qr/gap-2.png" alt="두번째 기억의 틈 QR 코드" width="801" height="801" tabindex="0" role="button" title="누르면 크게 보기">
+        <figcaption>두번째 기억의 틈</figcaption>
+      </figure>
+    </div>
+  </main>
+
+  <div id="zoomOverlay" class="diary-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="QR 크게 보기" aria-hidden="true">
+    <button id="zoomClose" class="modal-close diary-fullscreen-close" type="button">닫기</button>
+    <img id="zoomImage" class="is-qr" src="" alt="">
+  </div>
+
+  <script>
+    // QR을 누르면 크게 보고, 다시 누르거나 Esc 로 닫는다
+    const overlay = document.getElementById('zoomOverlay');
+    const zoomImage = document.getElementById('zoomImage');
+    let lastQr = null;
+
+    function openZoom(img){
+      lastQr = img;
+      zoomImage.src = img.src;
+      zoomImage.alt = img.alt;
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.getElementById('zoomClose').focus();
+    }
+    function closeZoom(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+      if (lastQr) lastQr.focus();
+    }
+
+    document.querySelectorAll('.gap-item .qr-zoom').forEach(img => {
+      img.addEventListener('click', () => openZoom(img));
+      img.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openZoom(img); }
+      });
+    });
+    overlay.addEventListener('click', closeZoom);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeZoom(); });
+  </script>
+</body>
+</html>

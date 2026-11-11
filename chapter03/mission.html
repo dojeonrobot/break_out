@@ -226,9 +226,13 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <a href="../index.html" class="flex items-center text-white/50 hover:text-white transition-colors text-sm font-bold px-3 py-2 rounded-xl hover:bg-white/10" title="메인 대시보드">
+        <a href="../index.html" id="home-link" class="flex items-center text-white/50 hover:text-white transition-colors text-sm font-bold px-3 py-2 rounded-xl hover:bg-white/10" title="메인 대시보드">
           <i data-lucide="home" class="w-5 h-5"></i>
         </a>
+        <!-- 시그널 브레이크 화면 안에서 열렸을 때만 보이는 닫기 버튼 -->
+        <button id="embed-close" type="button" onclick="closeEmbed()" class="hidden items-center gap-1.5 text-white/80 hover:text-white transition-colors text-sm font-bold px-4 py-2 rounded-xl hover:bg-white/10 border border-white/20">
+          <i data-lucide="x" class="w-5 h-5"></i> 닫기
+        </button>
         <button onclick="openSettings()" class="flex items-center text-white/50 hover:text-white transition-colors text-sm font-bold px-3 py-2 rounded-xl hover:bg-white/10 border border-white/10" title="미션 설정 (행사 전 1회)">
           <i data-lucide="settings" class="w-5 h-5"></i>
         </button>
@@ -1267,6 +1271,18 @@
       els.alertModal.classList.remove('flex');
     }
 
+    // ==================== 시그널 브레이크 안에서 열렸을 때 ====================
+    // chapter03/index.html 이 이 페이지를 mission.html#embed 로 겹쳐 띄운다.
+    // 그때는 메인으로 가는 링크 대신 닫기 버튼을 보이고, 닫으면 하던 화면으로 돌아간다.
+    const EMBED = location.hash === '#embed' && window.parent !== window;
+    function closeEmbed() { window.parent.postMessage('doro-mission-close', '*'); }
+    if (EMBED) {
+      document.getElementById('home-link').classList.add('hidden');
+      const c = document.getElementById('embed-close');
+      c.classList.remove('hidden');
+      c.classList.add('flex');
+    }
+
     // ==================== 단축키 ====================
     document.addEventListener('keydown', (e) => {
       // 미션 제목·설명을 입력하는 중에는 단축키가 글자를 가로채지 않도록 한다
@@ -1276,6 +1292,7 @@
         if (!els.alertModal.classList.contains('hidden')) return closeAlert();
         if (!els.resultOverlay.classList.contains('hidden')) return closeResult();
         if (!els.settingsView.classList.contains('hidden')) return closeSettings();
+        if (EMBED) return closeEmbed();
         return;
       }
 

@@ -17,6 +17,7 @@
     <div class="container nav">
       <div class="logo">DOROLAND</div>
       <nav class="menu" aria-label="도구">
+        <button class="nav-btn" id="missionBtn" type="button" aria-haspopup="dialog">미션 뽑기</button>
         <button class="nav-btn icon-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="소리 끄기"><span class="ico ico-sound" aria-hidden="true"></span></button>
         <button class="nav-btn icon-btn" id="fullscreenBtn" type="button" aria-label="전체 화면" title="전체 화면" hidden><span class="ico ico-full" aria-hidden="true"></span></button>
         <button class="nav-btn icon-btn" id="adminBtn" type="button" aria-label="관리자 모드"><span class="ico ico-gear" aria-hidden="true"></span><span class="admin-tag" id="adminTag" hidden>관리자</span></button>
@@ -221,6 +222,9 @@
       </div>
     </div>
   </div>
+  <!-- 미션 뽑기: 처음 열 때 mission.html 을 불러와 화면 가득 띄운다 (진행 상태는 그대로) -->
+  <div id="missionLayer" class="mission-layer" role="dialog" aria-modal="true" aria-label="미션 뽑기" aria-hidden="true"></div>
+
   <div id="flashFx" class="flash-fx" aria-hidden="true"></div>
   <canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
 
@@ -1792,9 +1796,39 @@
       });
     });
 
+    /* ================= 미션 뽑기 ================= */
+    // 힌트가 필요할 때 뽑는 미션. mission.html 을 그대로 겹쳐 띄우고, 닫으면 하던 자리로 돌아온다.
+    const missionLayer = $('missionLayer');
+    let missionFrame = null;
+    function openMission(){
+      if (fxBusy) return;
+      if (!missionFrame) {
+        missionFrame = document.createElement('iframe');
+        missionFrame.title = '미션 뽑기';
+        missionFrame.src = './mission.html#embed';
+        missionLayer.appendChild(missionFrame);
+      }
+      missionLayer.classList.add('show');
+      missionLayer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      missionFrame.focus();
+    }
+    function closeMission(){
+      if (!missionLayer.classList.contains('show')) return;
+      missionLayer.classList.remove('show');
+      missionLayer.setAttribute('aria-hidden', 'true');
+      syncScrollLock();
+      $('missionBtn').focus();
+    }
+    $('missionBtn').addEventListener('click', openMission);
+    window.addEventListener('message', e => {
+      if (missionFrame && e.source === missionFrame.contentWindow && e.data === 'doro-mission-close') closeMission();
+    });
+
     // ESC: 가장 위에 뜬 창 하나만 닫는다 (시작 웹툰은 버튼으로만 넘어간다)
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
+      if (missionLayer.classList.contains('show')) { closeMission(); return; }
       if (diaryFullscreenOverlay.classList.contains('show')) { closeDiaryFullscreen(); return; }
       for (const m of [qrModal, completeModal, slideModal, diaryModal, glyphGridModal, modal]) {
         if (m.classList.contains('show')) { hideModal(m); return; }
