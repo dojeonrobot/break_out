@@ -28,13 +28,13 @@
       <div>
         <div class="eyebrow">CHAPTER 3</div>
         <h1 id="title">머지큐브 속 비밀</h1>
-        <p class="subtitle">머지큐브 속 비밀을 파헤치고 힌트를 모아 리코를 구출하자!</p>
+        <p class="subtitle">흩어진 문양 조각을 모아 문양을 완성해야<br>리코를 큐브에서 탈출시킬 수 있다!</p>
 
         <div id="glyphVault" class="vault" aria-label="획득한 문양 조각">
-          <div class="slot" data-step="1"><div class="glyph"></div><div class="slot-label">조각 1</div></div>
-          <div class="slot" data-step="2"><div class="glyph"></div><div class="slot-label">조각 2</div></div>
-          <div class="slot" data-step="3"><div class="glyph"></div><div class="slot-label">조각 3</div></div>
-          <div class="slot" data-step="4"><div class="glyph"></div><div class="slot-label">조각 4</div></div>
+          <div class="slot" data-step="1"><div class="glyph emblem"></div><div class="slot-label">조각 1</div></div>
+          <div class="slot" data-step="2"><div class="glyph emblem"></div><div class="slot-label">조각 2</div></div>
+          <div class="slot" data-step="3"><div class="glyph emblem"></div><div class="slot-label">조각 3</div></div>
+          <div class="slot" data-step="4"><div class="glyph emblem"></div><div class="slot-label">조각 4</div></div>
         </div>
       </div>
 
@@ -44,10 +44,7 @@
         <div class="cube-wrap" aria-hidden="true">
           <div class="cube" id="cube">
             <div class="core">
-              <div class="cube-cell cube-cell-1"></div>
-              <div class="cube-cell cube-cell-2"></div>
-              <div class="cube-cell cube-cell-3"></div>
-              <div class="cube-cell cube-cell-4"></div>
+              <div class="emblem" id="coreEmblem"></div>
             </div>
             <div class="face f-front"></div>
             <div class="face f-back"></div>
@@ -105,7 +102,7 @@
     <div class="modal-content">
       <div class="modal-body">
         <img src="./images/missions/mission_start.jpg" alt="미션 시작 웹툰" class="webtoon-image" width="1536" height="1024">
-        <p class="start-notice">리코를 구하기 위해<br>머지큐브 속의 비밀을 파헤쳐 봅시다!</p>
+        <p class="start-notice">문양을 완성해야 리코를 큐브에서 탈출시킬 수 있습니다.<br>기억 속에 흩어진 문양 조각을 모아 봅시다!</p>
         <button id="missionStartBtn" class="btn mission-start" type="button">미션 시작</button>
       </div>
     </div>
@@ -161,10 +158,10 @@
           <div class="cine-bar top"></div>
           <div class="cine-bar bottom"></div>
           <div class="cine-end" id="completeNotice">
-            <div class="cine-badge" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <div class="cine-badge" aria-hidden="true"></div>
             <div class="cine-end-text">
               <div class="cine-end-title">미션 완료!</div>
-              <div class="cine-end-sub">문양 조각 4개를 모두 모아 리코를 구출했습니다</div>
+              <div class="cine-end-sub">문양을 완성해 리코를 큐브에서 탈출시켰습니다</div>
             </div>
           </div>
         </div>
@@ -215,7 +212,7 @@
         <div class="mfx-ring r1"></div>
         <div class="mfx-ring r2"></div>
         <div class="mfx-streak"></div>
-        <div class="mfx-piece" id="mfxPiece"><div class="mfx-ice"></div></div>
+        <div class="mfx-piece" id="mfxPiece"><div class="emblem" id="mfxEmblem"></div><div class="mfx-ice"></div></div>
       </div>
       <div class="mfx-text">
         <div class="mfx-title" id="mfxTitle"></div>
@@ -242,12 +239,11 @@
     // 완료한 카드를 다시 열었을 때 보여 줄 QR 번호 (그 기억에 쓴 QR과 그다음 기억으로 가는 QR)
     const REVIEW_QRS = { 1: [1, 2], 2: [2, 3], 3: [3], 4: [] };
 
-    const patternForStep = {
-      1: './images/patterns/codex_pattern_1-1.png',
-      2: './images/patterns/codex_pattern_1-2.png',
-      3: './images/patterns/codex_pattern_2-1.png',
-      4: './images/patterns/codex_pattern_2-2.png'
-    };
+    // 문양 조각: 완성 문양 한 장을 불규칙한 파편 32개로 쪼개고, 기억 하나마다 흩어진 8개씩 얻는다.
+    // 어느 파편이 어느 기억에 붙는지는 플레이마다 무작위(처음부터를 누르면 다시 섞임).
+    const SHARD_GRID = 4;                  // 4x4 칸을 삼각형 둘씩으로 = 32 파편
+    const SHARDS_PER_MEMORY = 8;
+    const SHARD_KEY = `${CHAPTER_KEY}_shards`;
 
     // 첫 번째 기억
     const glyphImageList = [
@@ -308,7 +304,67 @@
     const cubeEl = $('cube');
     const emblemBtn = $('emblemBtn');
     const vault = $('glyphVault');
-    const cubeCells = [1, 2, 3, 4].map(n => document.querySelector(`.cube-cell-${n}`));
+    const coreEmblem = $('coreEmblem');
+
+    /* ================= 문양 파편 ================= */
+    // 파편 모양은 고정(씨앗 값이 같아 어느 기기에서나 같은 모양), 배정만 무작위
+    const SHARD_PATHS = (() => {
+      let seed = 20261111;
+      const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      const N = SHARD_GRID, pts = [];
+      for (let y = 0; y <= N; y++) {
+        pts.push([]);
+        for (let x = 0; x <= N; x++) {
+          const inner = v => (v > 0 && v < N) ? (rnd() - 0.5) * (100 / N) * 0.62 : 0;
+          pts[y].push([x * 100 / N + inner(x), y * 100 / N + inner(y)]);
+        }
+      }
+      const out = [];
+      const poly = tri => 'polygon(' + tri.map(q => `${q[0].toFixed(2)}% ${q[1].toFixed(2)}%`).join(',') + ')';
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        const a = pts[y][x], b = pts[y][x + 1], c = pts[y + 1][x + 1], d = pts[y + 1][x];
+        if (rnd() < 0.5) out.push(poly([a, b, c]), poly([a, c, d]));
+        else out.push(poly([a, b, d]), poly([b, c, d]));
+      }
+      return out;
+    })();
+
+    // 기억별 파편 번호 묶음 [[...8개], x4]
+    function shardGroups(){
+      const total = SHARD_PATHS.length;
+      try {
+        const saved = JSON.parse(store.get(SHARD_KEY) || 'null');
+        if (Array.isArray(saved) && saved.length === 4 && saved.flat().length === total && new Set(saved.flat()).size === total) return saved;
+      } catch(e){}
+      const idx = Array.from({ length: total }, (_, i) => i);
+      for (let i = idx.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [idx[i], idx[j]] = [idx[j], idx[i]];
+      }
+      const groups = [0, 1, 2, 3].map(g => idx.slice(g * SHARDS_PER_MEMORY, (g + 1) * SHARDS_PER_MEMORY));
+      store.set(SHARD_KEY, JSON.stringify(groups));
+      return groups;
+    }
+
+    // scatter=true 면 제자리가 아니라 흩어져 떠 있게 둔다 (큐브 속: 큐브가 깨질 때 한 번에 맞춰진다)
+    function addShards(el, indices, animate, scatter = false){
+      indices.forEach((i, n) => {
+        const sh = document.createElement('i');
+        sh.className = 'shard' + (animate ? ' shard-in' : '');
+        sh.style.clipPath = SHARD_PATHS[i];
+        if (animate) sh.style.animationDelay = `${n * 60}ms`;
+        if (scatter) {
+          // 파편 번호로 정해지는 값이라 새로고침해도 같은 자리에 떠 있다
+          const r = k => { const v = Math.sin((i + 1) * 12.9898 * k) * 43758.5453; return v - Math.floor(v); };
+          sh.style.setProperty('--tx', `${Math.round((r(1) - 0.5) * 56)}%`);
+          sh.style.setProperty('--ty', `${Math.round((r(2) - 0.5) * 56)}%`);
+          sh.style.setProperty('--rot', `${Math.round((r(3) - 0.5) * 140)}deg`);
+          sh.style.setProperty('--dur', `${(5 + r(4) * 4).toFixed(1)}s`);
+        }
+        el.appendChild(sh);
+      });
+    }
+    function setShards(el, indices){ el.innerHTML = ''; addShards(el, indices, false); }
 
     function syncScrollLock(){
       const open = document.querySelector('.modal.show, .memory-fx.show, .diary-fullscreen-overlay.show');
@@ -667,12 +723,11 @@
 
     // 화면에 조각을 채운다 (animate=false 는 저장된 진행을 되살릴 때)
     function applySolvedUI(step, animate){
-      const src = patternForStep[step];
+      const mine = shardGroups()[step - 1];
       const slot = vault.querySelector(`.slot[data-step="${step}"]`);
-      slot.querySelector('.glyph').style.backgroundImage = `url('${src}')`;
+      setShards(slot.querySelector('.glyph'), mine);
       slot.classList.add('is-found');
-      cubeCells[step - 1].style.backgroundImage = `url('${src}')`;
-      cubeCells[step - 1].classList.add('is-unlocked');
+      addShards(coreEmblem, mine, animate, true);
 
       const count = acquired.filter(Boolean).length;
       holoEl.style.setProperty('--p', String(Math.min(count, 3)));
@@ -701,6 +756,7 @@
       for (let step = 1; step <= 4; step++) store.del(`${CHAPTER_KEY}_step_${step}_solved`);
       store.del(DIARY_PROGRESS_KEY);
       store.del(DIARY_MAX_KEY);
+      store.del(SHARD_KEY);
       location.reload();
     }
 
@@ -808,7 +864,7 @@
       return new Promise(resolve => {
         if (reduceMotion) { resolve(); return; }
         window.scrollTo(0, 0);
-        mfxPiece.style.backgroundImage = `url('${patternForStep[step]}')`;
+        setShards($('mfxEmblem'), shardGroups()[step - 1]);
         $('mfxTitle').textContent = `${MEMORY_NAME[step]} 복원`;
         $('mfxCount').textContent = `문양 조각 ${acquired.filter(Boolean).length} / 4`;
         memoryFx.classList.remove('fly', 'cracked');
@@ -1005,7 +1061,6 @@
       cineRaf = requestAnimationFrame(frame);
     }
     cineReplayBtn.addEventListener('click', playRescueCine);
-    completeNotice.querySelectorAll('.cine-badge i').forEach((el, i) => { el.style.backgroundImage = `url('${patternForStep[i + 1]}')`; });
 
     function openCompleteModal(){ showModal(completeModal, $('completeCloseBtn')); playRescueCine(); }
     $('completeCloseBtn').addEventListener('click', () => hideModal(completeModal));
