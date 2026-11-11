@@ -1,7 +1,7 @@
 ﻿/* 챕터 3 머지큐브 속 비밀
    색: 밤하늘 남색 바탕, 얼음색(봉인된 큐브), 호박색(되찾은 기억과 문양). 값은 아래 :root 에서 바꾼다. */
 :root{
-  --bg:#070b16; --bg-2:#0c1426;
+  --bg:#0a0f1f; --bg-2:#0d1730;
   --surface:#111b30; --surface-2:#18263f;
   --line:rgba(160,200,235,.18); --line-strong:rgba(160,200,235,.36);
   --text:#eef4fb; --muted:#a3b5cb;
@@ -20,9 +20,9 @@ body{
   font-family:'Pretendard','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
   color:var(--text);
   background:
-    radial-gradient(1100px 700px at 78% -8%, rgba(155,216,242,.10), transparent 60%),
+    radial-gradient(1200px 800px at 70% -10%, rgba(41,216,255,.12), transparent 55%),
+    radial-gradient(1000px 700px at -10% 10%, rgba(226,107,255,.12), transparent 60%),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-  background-attachment:fixed;
   overflow-x:hidden;
   word-break:keep-all;
   -webkit-font-smoothing:antialiased;
@@ -41,7 +41,7 @@ button{ touch-action:manipulation; }
 .container{ width:min(1200px,92vw); margin:0 auto; }
 
 /* ---------- 머리 ---------- */
-header{ position:sticky; top:0; z-index:10; background:rgba(7,11,22,.92); border-bottom:1px solid var(--line); }
+header{ position:sticky; top:0; z-index:10; background:rgba(7,10,24,.88); border-bottom:1px solid var(--line); }
 .nav{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; }
 .logo{ font-weight:800; letter-spacing:.08em; font-size:22px; color:var(--text); }
 .menu{ display:flex; gap:8px; }
@@ -56,13 +56,13 @@ header{ position:sticky; top:0; z-index:10; background:rgba(7,11,22,.92); border
 :focus-visible{ outline:3px solid var(--ice); outline-offset:3px; }
 
 /* ---------- 첫 화면 ---------- */
-.hero{ display:grid; grid-template-columns:1.05fr .95fr; gap:36px; align-items:center; padding:40px 0 20px; }
+.hero{ display:grid; grid-template-columns:1.05fr .95fr; gap:36px; align-items:center; padding:8px 0; }
 .eyebrow{ color:var(--amber); font-weight:800; letter-spacing:.14em; font-size:14px; }
-h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-spacing:-.01em; }
-.subtitle{ color:var(--muted); margin:0 0 26px; font-size:18px; line-height:1.6; }
+h1{ font-size:clamp(32px,min(5vw,7vh),54px); margin:6px 0 10px; line-height:1.2; letter-spacing:-.01em; }
+.subtitle{ color:var(--muted); margin:0 0 18px; font-size:17px; line-height:1.55; }
 
 /* 문양 조각 보관함 */
-.vault{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:560px; }
+.vault{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; max-width:min(560px, 76vh); }
 .slot{
   position:relative; border-radius:var(--radius); padding:8px 8px 10px;
   background:var(--surface); border:1px solid var(--line);
@@ -86,19 +86,19 @@ h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-s
 
 /* ---------- 얼음 큐브 ---------- */
 .holo{
-  --cube:250px; --half:calc(var(--cube)/2); --p:0;
-  position:relative; aspect-ratio:1.15/1; display:grid; place-items:center;
+  --cube:clamp(130px, 25vh, 250px); --half:calc(var(--cube)/2); --p:0;
+  position:relative; height:calc(var(--cube) * 1.8 + 100px); display:grid; place-items:center;
   perspective:1000px; perspective-origin:50% 40%;
 }
 .holo-rays{
-  position:absolute; left:50%; top:46%; width:150%; aspect-ratio:1/1; translate:-50% -50%;
+  position:absolute; left:50%; top:50%; width:calc(var(--cube) * 3.4); aspect-ratio:1/1; translate:-50% -50%;
   background:repeating-conic-gradient(from 0deg, rgba(255,170,80,.22) 0 6deg, transparent 6deg 18deg);
   -webkit-mask-image:radial-gradient(circle, #000 8%, transparent 46%);
           mask-image:radial-gradient(circle, #000 8%, transparent 46%);
   opacity:0; transition:opacity 1s ease; pointer-events:none;
 }
 .ring{
-  position:absolute; bottom:9%; width:66%; height:16%; border-radius:50%;
+  position:absolute; top:calc(50% + var(--cube) * .52); width:calc(var(--cube) * 1.5); height:calc(var(--cube) * .32); border-radius:50%;
   border:2px solid rgba(155,216,242,.4);
   background:radial-gradient(closest-side, rgba(155,216,242,.16), transparent 70%);
   transition:border-color .8s ease, background .8s ease;
@@ -181,40 +181,57 @@ h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-s
 .holo.is-freed .cube{ cursor:pointer; }
 @keyframes raysSpin{ to{ rotate:360deg; } }
 
-.holo-caption{
-  position:absolute; left:0; right:0; bottom:-4px; margin:0; text-align:center;
-  font-weight:800; font-size:20px; color:var(--amber); min-height:28px;
-}
 .emblem-btn{
-  position:absolute; left:50%; bottom:-52px; translate:-50% 0; white-space:nowrap;
+  position:absolute; left:50%; top:calc(50% + var(--cube) * .9); translate:-50% 0; white-space:nowrap;
 }
 
 /* ---------- 기억 카드 ---------- */
-.cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:56px 0 40px; }
+.cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:8px 0 18px; }
 .card{
   position:relative; text-align:left; color:inherit; cursor:pointer;
   background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-  padding:18px 18px 54px; min-height:190px;
+  padding:14px 16px 50px;
+  display:grid; grid-template-columns:auto 1fr; column-gap:12px; row-gap:8px; align-items:center; align-content:start;
   transition:transform .18s ease, border-color .18s ease, background .18s ease;
 }
 .card:hover{ transform:translateY(-4px); border-color:var(--line-strong); }
 .card:active{ transform:scale(.98); }
-.card h3{ margin:12px 0 8px; font-size:21px; }
-.card p{ margin:0; color:var(--muted); font-size:15.5px; line-height:1.6; }
-.icon{ width:60px; height:60px; background-size:contain; background-position:center; background-repeat:no-repeat; }
+.card h3{ margin:0; font-size:20px; }
+.card p{ grid-column:1 / -1; margin:0; color:var(--muted); font-size:15px; line-height:1.55; }
+.icon{ width:48px; height:48px; background-size:contain; background-position:center; background-repeat:no-repeat; }
 #hud .icon{ background-image:url("images/cubes/cube1.png"); }
 #memory .icon{ background-image:url("images/cubes/cube2.png"); }
 #vital .icon{ background-image:url("images/cubes/cube3.png"); }
 #tracker .icon{ background-image:url("images/cubes/cube4.png"); }
 
 .card::after{
-  position:absolute; left:18px; bottom:16px; padding:6px 12px; border-radius:999px;
+  position:absolute; left:16px; bottom:12px; padding:6px 12px; border-radius:999px;
   font-size:13px; font-weight:800; line-height:1.2;
 }
-.card.is-locked{ cursor:not-allowed; pointer-events:none; background:transparent; }
-.card.is-locked .icon{ filter:grayscale(1) brightness(.55); }
-.card.is-locked h3, .card.is-locked p{ color:rgba(163,181,203,.5); }
-.card.is-locked::after{ content:"잠김"; color:rgba(163,181,203,.75); border:1px solid var(--line); }
+/* 잠긴 기억: 빗금 봉인 + 자물쇠 (아이콘은 Phosphor lock-fill) */
+.icon{ position:relative; }
+.card.is-locked{
+  cursor:not-allowed; pointer-events:none; border-style:dashed; border-color:var(--line-strong);
+  background:repeating-linear-gradient(135deg, rgba(160,200,235,.07) 0 10px, transparent 10px 22px), rgba(8,13,26,.55);
+}
+.card.is-locked .icon{ background-image:none !important; border-radius:14px; background-color:rgba(160,200,235,.10); border:1px solid var(--line-strong); }
+.card.is-locked .icon::after, .card.just-unlocked .icon::after{
+  content:""; position:absolute; inset:9px; background:#c9dcef;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm32-84H96V56a32,32,0,0,1,64,0Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm32-84H96V56a32,32,0,0,1,64,0Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.card.is-locked h3{ color:rgba(238,244,251,.6); }
+.card.is-locked p{ color:rgba(163,181,203,.45); filter:blur(3.5px); user-select:none; }
+.card.is-locked::after{ content:"잠김 · 앞의 기억을 먼저 복원"; color:rgba(201,220,239,.85); border:1px solid var(--line-strong); background:rgba(8,13,26,.6); }
+
+/* 자물쇠가 풀리는 순간 */
+.card.just-unlocked{ animation:unlockFlash 1s ease; }
+.card.just-unlocked .icon::after{
+  inset:4px; background:var(--amber);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H96V56a32,32,0,0,1,32-32c15.37,0,29.2,11,32.16,25.59a8,8,0,0,0,15.68-3.18C171.32,24.15,151.2,8,128,8A48.05,48.05,0,0,0,80,56V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Z'/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208,80H96V56a32,32,0,0,1,32-32c15.37,0,29.2,11,32.16,25.59a8,8,0,0,0,15.68-3.18C171.32,24.15,151.2,8,128,8A48.05,48.05,0,0,0,80,56V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Z'/%3E%3C/svg%3E");
+  animation:lockOff 1s cubic-bezier(.3,1.4,.4,1) forwards;
+}
+@keyframes lockOff{ 0%{ transform:scale(1) rotate(0); opacity:1; } 35%{ transform:scale(1.5) rotate(-14deg); opacity:1; } 100%{ transform:translateY(-34px) scale(1.1) rotate(18deg); opacity:0; } }
+@keyframes unlockFlash{ 0%{ box-shadow:0 0 0 0 rgba(255,157,60,.9); } 100%{ box-shadow:0 0 0 22px rgba(255,157,60,0); } }
 
 .card.is-next{ border-color:var(--amber); background:linear-gradient(180deg, rgba(255,157,60,.10), var(--surface) 60%); animation:nextPulse 2s ease-in-out infinite; }
 .card.is-next::after{ content:"지금 풀 차례"; color:var(--amber-ink); background:var(--amber); }
@@ -225,7 +242,7 @@ h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-s
 .card.reveal-icon .icon{ animation:iconPop .8s cubic-bezier(.2,1.4,.3,1); }
 @keyframes iconPop{ 0%{ transform:scale(.5) rotate(-12deg); } 100%{ transform:scale(1) rotate(0); } }
 
-.footer{ padding:10px 0 48px; color:rgba(163,181,203,.6); text-align:center; font-size:13px; letter-spacing:.1em; }
+.footer{ display:none; padding:10px 0 48px; color:rgba(163,181,203,.6); text-align:center; font-size:13px; letter-spacing:.1em; }
 
 /* ---------- 버튼 ---------- */
 .btn, .answer-btn, .diary-pass-btn, .key-btn{
@@ -271,11 +288,30 @@ h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-s
 @keyframes resultIn{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 @keyframes shake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
 
-/* 힌트 */
-.hint-box{ background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:22px 20px; text-align:center; }
-.hint-box p{ margin:0; font-size:17px; font-weight:600; line-height:1.7; color:var(--text); }
-.hint-box b{ color:var(--amber); }
-.hint-note{ margin:14px 0 0; text-align:center; font-weight:700; }
+/* 머리 아이콘 버튼 (아이콘은 Phosphor fill) */
+.icon-btn{ display:inline-flex; align-items:center; gap:8px; min-width:44px; justify-content:center; padding:0 10px; }
+.ico{ width:22px; height:22px; background:currentColor; }
+.ico-sound{ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M160,32.25V223.69a8.29,8.29,0,0,1-3.91,7.18,8,8,0,0,1-9-.56l-65.57-51A4,4,0,0,1,80,176.16V79.84a4,4,0,0,1,1.55-3.15l65.57-51a8,8,0,0,1,10,.16A8.27,8.27,0,0,1,160,32.25ZM60,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H60a4,4,0,0,0,4-4V84A4,4,0,0,0,60,80Zm126.77,20.84a8,8,0,0,0-.72,11.3,24,24,0,0,1,0,31.72,8,8,0,1,0,12,10.58,40,40,0,0,0,0-52.88A8,8,0,0,0,186.74,100.84Zm40.89-26.17a8,8,0,1,0-11.92,10.66,64,64,0,0,1,0,85.34,8,8,0,1,0,11.92,10.66,80,80,0,0,0,0-106.66Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M160,32.25V223.69a8.29,8.29,0,0,1-3.91,7.18,8,8,0,0,1-9-.56l-65.57-51A4,4,0,0,1,80,176.16V79.84a4,4,0,0,1,1.55-3.15l65.57-51a8,8,0,0,1,10,.16A8.27,8.27,0,0,1,160,32.25ZM60,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H60a4,4,0,0,0,4-4V84A4,4,0,0,0,60,80Zm126.77,20.84a8,8,0,0,0-.72,11.3,24,24,0,0,1,0,31.72,8,8,0,1,0,12,10.58,40,40,0,0,0,0-52.88A8,8,0,0,0,186.74,100.84Zm40.89-26.17a8,8,0,1,0-11.92,10.66,64,64,0,0,1,0,85.34,8,8,0,1,0,11.92,10.66,80,80,0,0,0,0-106.66Z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.is-off .ico-sound{ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M213.92,210.62a8,8,0,1,1-11.84,10.76L160,175.09v48.6a8.29,8.29,0,0,1-3.91,7.18,8,8,0,0,1-9-.56l-65.55-51A4,4,0,0,1,80,176.18V87.09L42.08,45.38A8,8,0,1,1,53.92,34.62Zm-27.21-55.46a8,8,0,0,0,11.29-.7,40,40,0,0,0,0-52.88,8,8,0,1,0-12,10.57,24,24,0,0,1,0,31.72A8,8,0,0,0,186.71,155.16Zm40.92-80.49a8,8,0,1,0-11.92,10.66,64,64,0,0,1,0,85.34,8,8,0,1,0,11.92,10.66,80,80,0,0,0,0-106.66ZM153,119.87a4,4,0,0,0,7-2.7V32.25a8.27,8.27,0,0,0-2.88-6.4,8,8,0,0,0-10-.16L103.83,59.33a4,4,0,0,0-.5,5.85ZM60,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H60a4,4,0,0,0,4-4V84A4,4,0,0,0,60,80Z'/%3E%3C/svg%3E"); mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M213.92,210.62a8,8,0,1,1-11.84,10.76L160,175.09v48.6a8.29,8.29,0,0,1-3.91,7.18,8,8,0,0,1-9-.56l-65.55-51A4,4,0,0,1,80,176.18V87.09L42.08,45.38A8,8,0,1,1,53.92,34.62Zm-27.21-55.46a8,8,0,0,0,11.29-.7,40,40,0,0,0,0-52.88,8,8,0,1,0-12,10.57,24,24,0,0,1,0,31.72A8,8,0,0,0,186.71,155.16Zm40.92-80.49a8,8,0,1,0-11.92,10.66,64,64,0,0,1,0,85.34,8,8,0,1,0,11.92,10.66,80,80,0,0,0,0-106.66ZM153,119.87a4,4,0,0,0,7-2.7V32.25a8.27,8.27,0,0,0-2.88-6.4,8,8,0,0,0-10-.16L103.83,59.33a4,4,0,0,0-.5,5.85ZM60,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H60a4,4,0,0,0,4-4V84A4,4,0,0,0,60,80Z'/%3E%3C/svg%3E"); }
+.ico-gear{ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M216,130.16q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M216,130.16q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.nav-btn.is-admin{ color:var(--amber); border-color:rgba(255,157,60,.6); }
+.admin-tag{ font-size:14px; font-weight:800; }
+
+/* 관리자 모드 */
+.admin-login{ text-align:center; }
+.admin-login label{ display:block; font-weight:700; color:var(--text); margin-bottom:10px; }
+.admin-panel p{ margin:0 0 14px; }
+.admin-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:60px; padding:6px 0; border-top:1px solid var(--line); color:var(--text); font-weight:700; }
+.admin-done{ color:var(--ok); }
+.admin-actions{ display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; padding-top:16px; border-top:1px solid var(--line); }
+.admin-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; width:100%;
+  margin-bottom:12px; padding:8px 8px 8px 14px; border-radius:var(--radius-sm);
+  background:var(--amber-soft); border:1px dashed rgba(255,157,60,.6);
+}
+.admin-answer{ color:var(--text); font-weight:700; }
+.admin-answer b{ color:var(--amber); margin-right:8px; }
+.admin-skip{ min-height:44px; }
 
 /* QR */
 .qr-modal .modal-content{ width:min(440px,100%); }
@@ -423,11 +459,17 @@ h1{ font-size:clamp(34px,5vw,54px); margin:8px 0 12px; line-height:1.2; letter-s
 .fx-canvas{ position:fixed; inset:0; width:100%; height:100%; z-index:95; pointer-events:none; }
 
 /* ---------- 화면 크기 ---------- */
+/* PC와 가로 태블릿: 스크롤 없이 한 화면 */
+@media (min-width:981px) and (min-height:600px){
+  body{ display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
+  main.container{ flex:1; min-height:0; display:grid; grid-template-rows:minmax(0,1fr) auto; }
+  .hero{ min-height:0; }
+}
 @media (max-width:980px){
   .hero{ grid-template-columns:1fr; padding-top:24px; }
-  .holo{ order:-1; --cube:200px; max-width:420px; width:100%; margin:0 auto; }
-  .holo.is-freed{ margin-bottom:64px; }
-  .holo.is-freed .core{ transform:scale(1.3); }
+  .holo{ order:-1; --cube:clamp(130px, 20vh, 200px); width:100%; margin:0 auto; }
+  .hero{ gap:8px; padding-top:16px; }
+  .cards{ padding-top:24px; }
   .cards{ grid-template-columns:1fr 1fr; }
 }
 @media (max-width:560px){

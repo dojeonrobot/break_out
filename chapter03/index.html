@@ -17,9 +17,8 @@
     <div class="container nav">
       <div class="logo">DOROLAND</div>
       <nav class="menu" aria-label="도구">
-        <button class="nav-btn" id="soundBtn" type="button" aria-pressed="true">소리 끄기</button>
-        <button class="nav-btn" id="hintBtn" type="button">힌트</button>
-        <button class="nav-btn" id="resetBtn" type="button">처음부터</button>
+        <button class="nav-btn icon-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="소리 끄기"><span class="ico ico-sound" aria-hidden="true"></span></button>
+        <button class="nav-btn icon-btn" id="adminBtn" type="button" aria-label="관리자 모드"><span class="ico ico-gear" aria-hidden="true"></span><span class="admin-tag" id="adminTag" hidden>관리자</span></button>
       </nav>
     </div>
   </header>
@@ -29,7 +28,7 @@
       <div>
         <div class="eyebrow">CHAPTER 3</div>
         <h1 id="title">머지큐브 속 비밀</h1>
-        <p class="subtitle">머지큐브 속 비밀을 파헤치고<br>힌트를 모아 리코를 구출하자!</p>
+        <p class="subtitle">머지큐브 속 비밀을 파헤치고 힌트를 모아 리코를 구출하자!</p>
 
         <div id="glyphVault" class="vault" aria-label="획득한 문양 조각">
           <div class="slot" data-step="1"><div class="glyph"></div><div class="slot-label">조각 1</div></div>
@@ -58,7 +57,6 @@
             <div class="face f-bottom"></div>
           </div>
         </div>
-        <p class="holo-caption" id="holoCaption" role="status"></p>
         <button class="btn btn-ghost emblem-btn" id="emblemBtn" type="button" hidden>완료 화면 다시 보기</button>
       </div>
     </section>
@@ -92,7 +90,7 @@
     <p class="footer">DOROLAND</p>
   </main>
 
-  <!-- 공용 창: 힌트, 세 번째 기억, 다시 보기 -->
+  <!-- 공용 창: 관리자, 세 번째 기억, 다시 보기 -->
   <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalTitle">
     <div class="modal-content">
       <div class="modal-header">
@@ -215,6 +213,10 @@
     const DIARY_MAX_KEY = `${CHAPTER_KEY}_diary_max`;         // 비밀번호를 풀어 열어 둔 마지막 쪽
     const SOUND_KEY = `${CHAPTER_KEY}_sound`;
 
+    // 관리자 모드 코드 (오른쪽 위 톱니 버튼). 바꾸려면 이 값만 고친다.
+    const ADMIN_CODE = '7142';
+    const ADMIN_KEY = `${CHAPTER_KEY}_admin`;   // 탭을 닫으면 꺼진다 (sessionStorage)
+
     const QR_SRC = { 1: './images/qr/qr-1.png', 2: './images/qr/qr-2.png', 3: './images/qr/qr-3.png' };
     const MEMORY_NAME = { 1: '첫 번째 기억', 2: '두 번째 기억', 3: '세 번째 기억', 4: '코덱스의 기억' };
     // 완료한 카드를 다시 열었을 때 보여 줄 QR 번호 (그 기억에 쓴 QR과 그다음 기억으로 가는 QR)
@@ -284,7 +286,6 @@
 
     const holoEl = $('holo');
     const cubeEl = $('cube');
-    const holoCaption = $('holoCaption');
     const emblemBtn = $('emblemBtn');
     const vault = $('glyphVault');
     const cubeCells = [1, 2, 3, 4].map(n => document.querySelector(`.cube-cell-${n}`));
@@ -364,7 +365,10 @@
       } catch(e){}
     }
     function updateSoundBtn(){
-      soundBtn.textContent = soundOn ? '소리 끄기' : '소리 켜기';
+      const label = soundOn ? '소리 끄기' : '소리 켜기';
+      soundBtn.classList.toggle('is-off', !soundOn);
+      soundBtn.setAttribute('aria-label', label);
+      soundBtn.title = label;
       soundBtn.setAttribute('aria-pressed', String(soundOn));
     }
     function startBgm(){ if (soundOn && bgmEl.paused) bgmEl.play().catch(() => {}); }
@@ -464,14 +468,20 @@
     }
 
     // 카드 잠금과 "지금 풀 차례" 표시를 진행 상태에 맞춘다
-    function refreshCards(){
+    function refreshCards(animate = false){
       let nextMarked = false;
       for (let step = 1; step <= 4; step++) {
         const el = $(idForStep[step]);
         const done = acquired[step - 1];
         const unlocked = step === 1 || acquired[step - 2];
+        const wasLocked = el.classList.contains('is-locked');
         el.classList.toggle('is-complete', done);
         setCardLocked(idForStep[step], !unlocked);
+        if (animate && wasLocked && unlocked) {
+          // 자물쇠가 풀리는 순간
+          el.classList.add('just-unlocked');
+          setTimeout(() => el.classList.remove('just-unlocked'), 1100);
+        }
         const isNext = !done && unlocked && !nextMarked;
         el.classList.toggle('is-next', isNext);
         if (isNext) nextMarked = true;
@@ -489,7 +499,7 @@
 
       const count = acquired.filter(Boolean).length;
       holoEl.style.setProperty('--p', String(Math.min(count, 3)));
-      refreshCards();
+      refreshCards(animate);
 
       if (animate) {
         slot.classList.add('slot-reveal');
@@ -515,9 +525,102 @@
       store.del(DIARY_MAX_KEY);
       location.reload();
     }
-    $('resetBtn').addEventListener('click', () => {
-      if (window.confirm('지금까지 찾은 기억이 모두 지워집니다.\n처음부터 다시 시작할까요?')) resetAllProgress();
-    });
+
+    /* ================= 관리자 모드 ================= */
+    let adminOn = false;
+    try { adminOn = sessionStorage.getItem(ADMIN_KEY) === '1'; } catch(e){}
+
+    function setAdmin(on){
+      adminOn = on;
+      try { on ? sessionStorage.setItem(ADMIN_KEY, '1') : sessionStorage.removeItem(ADMIN_KEY); } catch(e){}
+      $('adminTag').hidden = !on;
+      $('adminBtn').classList.toggle('is-admin', on);
+    }
+
+    // 문제 창 맨 위에 정답과 건너뛰기를 붙인다 (관리자 모드일 때만). 직접 입력은 그대로 된다.
+    function setAdminBar(container, answerText, onSkip){
+      const old = container.querySelector('.admin-bar');
+      if (old) old.remove();
+      if (!adminOn || !answerText) return;
+      const bar = document.createElement('div');
+      bar.className = 'admin-bar';
+      const txt = document.createElement('div');
+      txt.className = 'admin-answer';
+      txt.innerHTML = '<b>관리자</b>';
+      txt.appendChild(document.createTextNode(answerText));
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn admin-skip';
+      btn.textContent = '건너뛰기';
+      btn.addEventListener('click', onSkip);
+      bar.append(txt, btn);
+      container.prepend(bar);
+    }
+
+    // 연출 없이 그 기억까지 바로 완료 처리
+    function adminComplete(upTo){
+      for (let step = 1; step <= upTo; step++) {
+        if (acquired[step - 1]) continue;
+        markSolved(step);
+        applySolvedUI(step, false);
+      }
+      store.set(`${CHAPTER_KEY}_started`, '1');
+      if (acquired.every(Boolean)) setFreed(false);
+    }
+
+    function openAdminPanel(){
+      modalTitle.textContent = '관리자 모드';
+      if (!adminOn) {
+        modalBody.innerHTML = `
+          <div class="admin-login">
+            <label for="adminCodeInput">관리자 코드</label>
+            <div class="diary-gate-row">
+              <input id="adminCodeInput" class="diary-pass" type="password" inputmode="numeric" autocomplete="off">
+              <button id="adminCodeBtn" class="btn" type="button">확인</button>
+            </div>
+            <div id="adminCodeMsg" class="result-message" role="alert"></div>
+          </div>`;
+        const input = $('adminCodeInput');
+        const submit = () => {
+          if (input.value.trim() === ADMIN_CODE) { setAdmin(true); openAdminPanel(); }
+          else {
+            const msg = $('adminCodeMsg');
+            msg.classList.add('show', 'incorrect');
+            msg.textContent = '코드가 맞지 않습니다.';
+            input.select();
+          }
+        };
+        $('adminCodeBtn').addEventListener('click', submit);
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+        showModal(modal, input);
+        return;
+      }
+
+      const rows = [1, 2, 3, 4].map(step => `
+        <div class="admin-row">
+          <span>${MEMORY_NAME[step]}</span>
+          ${acquired[step - 1]
+            ? '<span class="admin-done">완료</span>'
+            : `<button class="btn btn-ghost" type="button" data-admin-complete="${step}">여기까지 바로 완료</button>`}
+        </div>`).join('');
+      modalBody.innerHTML = `
+        <div class="admin-panel">
+          <p>문제 창마다 정답과 「건너뛰기」가 보입니다. 직접 풀어도 됩니다.</p>
+          ${rows}
+          <div class="admin-actions">
+            <button class="btn btn-ghost" type="button" id="adminResetBtn">처음부터 (진행 지우기)</button>
+            <button class="btn btn-ghost" type="button" id="adminOffBtn">관리자 모드 끄기</button>
+          </div>
+        </div>`;
+      modalBody.querySelectorAll('[data-admin-complete]').forEach(b => {
+        b.addEventListener('click', () => { adminComplete(parseInt(b.dataset.adminComplete, 10)); openAdminPanel(); });
+      });
+      $('adminResetBtn').addEventListener('click', () => {
+        if (window.confirm('지금까지 찾은 기억이 모두 지워집니다.\n처음부터 다시 시작할까요?')) resetAllProgress();
+      });
+      $('adminOffBtn').addEventListener('click', () => { setAdmin(false); closeModal(); });
+      showModal(modal, $('modalClose'));
+    }
 
     /* ================= 기억 복원 연출 ================= */
     const memoryFx = $('memoryFx');
@@ -570,7 +673,6 @@
           { duration: 1200, easing: 'cubic-bezier(.2,.8,.2,1)' }
         );
       }
-      holoCaption.textContent = '문양 완성';
       emblemBtn.hidden = false;
     }
 
@@ -637,7 +739,7 @@
     window.addEventListener('load', () => {
       refreshCards();
       if (store.get(`${CHAPTER_KEY}_started`) === '1') {
-        // 새로고침하거나 탭을 다시 열어도 진행을 이어 간다. 지우려면 「처음부터」.
+        // 새로고침하거나 탭을 다시 열어도 진행을 이어 간다. 지우려면 관리자 모드의 「처음부터」.
         restoreProgressFromStorage();
         document.addEventListener('pointerdown', startBgm, { once: true });
       } else {
@@ -663,16 +765,8 @@
     function closeModal(){ hideModal(modal); }
     bindClose(modal, closeModal);
 
-    function openHintGate(){
-      modalTitle.textContent = '힌트';
-      modalBody.innerHTML = `
-        <div class="hint-box">
-          <p>아직 힌트를 확인할 수 없어요.<br><b>미션을 먼저 진행</b>해 주세요!</p>
-        </div>
-        <p class="hint-note">미션은 운영데스크에서 받을 수 있어요.</p>`;
-      showModal(modal, $('modalClose'));
-    }
-    $('hintBtn').addEventListener('click', e => { lastFocusedCard = e.currentTarget; openHintGate(); });
+    setAdmin(adminOn);
+    $('adminBtn').addEventListener('click', e => { if (fxBusy) return; lastFocusedCard = e.currentTarget; openAdminPanel(); });
 
     /* ================= 첫 번째 기억: 그림 고르기 ================= */
     const glyphGridModal = $('glyphGridModal');
@@ -722,6 +816,10 @@
         resultMessage.textContent = '정답 순서: ' + correctOrder.map((idx, i) => `${i + 1}. ${glyphImageList[idx].label}`).join('  →  ');
       }
       updateSelectionDisplay();
+
+      setAdminBar(glyphGridModal.querySelector('.modal-body'),
+        reviewMode ? '' : '정답: ' + correctOrder.map(i => glyphImageList[i].label).join(' → '),
+        () => { if (isAnswerPhase) return; isAnswerPhase = true; markSolved(1); closeGlyphModal(); celebrate(1); });
     }
 
     function selectGlyph(cardElement, index){
@@ -891,6 +989,10 @@
         passInput.value = '';
         if (g) gateTitle.textContent = g.title;
 
+        setAdminBar(document.querySelector('.diary-viewer'),
+          reviewMode ? '' : (g ? `이 쪽 비밀번호: ${g.final ? DIARY_FINAL_PASSWORD : DIARY_PAGE_PASSWORDS[currentPage]}` : '이 쪽은 비밀번호가 없습니다'),
+          () => { if (busy) return; busy = true; markSolved(2); closeDiaryModal(); celebrate(2); });
+
         // 다음 쪽 그림을 미리 받아 둔다
         if (currentPage < LAST) { const pre = new Image(); pre.src = DIARY_PAGES[currentPage + 1]; }
       }
@@ -911,8 +1013,8 @@
       nextBtn.addEventListener('click', () => {
         if (currentPage >= LAST) return;
         const g = gateFor(currentPage);
-        if (g) {
-          // 아직 안 연 쪽: 비밀번호 칸으로 안내
+        if (g && !adminOn) {
+          // 아직 안 연 쪽: 비밀번호 칸으로 안내 (관리자 모드는 그냥 넘어간다)
           passInput.focus();
           gateMsg.classList.remove('correct');
           gateMsg.classList.add('show', 'incorrect');
@@ -1166,6 +1268,8 @@
       } else {
         renderSlideBoard();
       }
+      setAdminBar(slideModal.querySelector('.modal-body'), reviewMode ? '' : '건너뛰기를 누르면 바로 완성됩니다',
+        () => { if (slideLocked) return; slideLocked = true; markSolved(4); closeSlideModal(); celebrate(4); });
       showModal(slideModal, slideModal.querySelector('.modal-close'));
     }
     function closeSlideModal(){ hideModal(slideModal); }
@@ -1228,6 +1332,8 @@
         modalBody.innerHTML = vitalTemplateHTML();
         showModal(modal, null);
         initVitalKeyPuzzle();
+        setAdminBar(modalBody, `정답: 노랑 ${VITAL_ANSWER.yellow}, 빨강 ${VITAL_ANSWER.red}`,
+          () => { markSolved(3); closeModal(); celebrate(3); });
       }
       else if (step === 4) openSlideModal();
     }
