@@ -19,7 +19,12 @@ swap('</style></head><body>', '''.vsen{display:block;width:max-content;max-width
 
 swap('function vnNext(){\n', r'''// ---- dialogue lines: one sentence per line and a sentence never wraps (user, 2026-11-11) ----
 const dlEsc = t=> t.replace(/[&<>]/g, c=> ({'&':'&amp;', '<':'&lt;', '>':'&gt;'}[c]));
-function dlSplit(text){ const out = []; let cur = ''; for(let i = 0; i < text.length; i++){ const ch = text[i]; cur += ch; if('.!?'.includes(ch) && /\s/.test(text[i + 1] || '')){ while(/\s/.test(text[i + 1] || '')) i++; out.push(cur); cur = ''; } } if(cur.trim()) out.push(cur); return out.length ? out : [text]; }
+function dlSplit(text){ const out = []; let cur = ''; for(let i = 0; i < text.length; i++){ const ch = text[i]; cur += ch; if('.!?'.includes(ch) && /\s/.test(text[i + 1] || '')){ while(/\s/.test(text[i + 1] || '')) i++; out.push(cur); cur = ''; } } if(cur.trim()) out.push(cur); if(!out.length) return [text];
+  // a very short sentence does not get a line of its own: it shares one with its neighbour (user, 2026-11-11: "안녕! 난 보이드." on one line)
+  const SHORT = 8, MAX = 34, lines = [];
+  for(const t of out){ const last = lines[lines.length - 1]; if(last !== undefined && last.length <= SHORT && (last + ' ' + t).length <= MAX) lines[lines.length - 1] = last + ' ' + t; else lines.push(t); }
+  if(lines.length > 1 && lines[lines.length - 1].length <= SHORT && (lines[lines.length - 2] + ' ' + lines[lines.length - 1]).length <= MAX){ const t = lines.pop(); lines[lines.length - 1] += ' ' + t; }
+  return lines; }
 function dlPlan(p, text){
   const key = text + '|' + innerWidth + 'x' + innerHeight + '|' + p.className; if(p._dl && p._dl.key === key) return p._dl;
   let parts = dlSplit(text), wrap = false; const draw = ()=>{ p.innerHTML = parts.map(t=> `<span class="vsen">${dlEsc(t)}</span>`).join(''); }, widest = ()=> Math.max(0, ...[...p.children].map(c=> c.offsetWidth));

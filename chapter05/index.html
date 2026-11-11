@@ -11,6 +11,19 @@ body.admin #sndBtn,body.screen #sndBtn{display:none}
 .vsen{display:block;width:max-content;max-width:none;white-space:nowrap}
 .vsen.vwrap{width:auto;white-space:normal}
 .vhid{visibility:hidden;font-style:inherit}
+#tutSpot{position:fixed;left:0;top:0;width:0;height:0;z-index:39;pointer-events:none;border-radius:16px;box-shadow:0 0 0 200vmax rgba(8,14,26,.62);opacity:0;transition:opacity .25s ease-out}
+#tutSpot::before{content:'';position:absolute;inset:-5px;border-radius:inherit;border:4px solid #ffd84a;animation:tutSpotIn .55s cubic-bezier(.16,1,.3,1) both,tutSpotPulse 1.5s ease-in-out .55s infinite}
+#tutSpot b{position:absolute;left:50%;bottom:calc(100% + 18px);transform:translateX(-50%);white-space:nowrap;padding:7px 14px;border-radius:999px;background:#ffd84a;color:#1b2333;font-size:15px;font-weight:800;line-height:1;animation:tutSpotBob 1.3s ease-in-out infinite}
+#tutSpot b::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#ffd84a;border-bottom:0}
+#tutSpot[data-below="1"] b{bottom:auto;top:calc(100% + 18px)}
+#tutSpot[data-below="1"] b::after{top:auto;bottom:100%;border:8px solid transparent;border-bottom-color:#ffd84a;border-top:0}
+.tut-zoom{scale:1.08;transition:scale .35s cubic-bezier(.16,1,.3,1)}
+#voidVn[data-top="1"]{align-items:flex-start;padding-top:8px;background:linear-gradient(to bottom,rgba(10,20,34,.55),rgba(10,20,34,.12) 45%,transparent 70%)}
+#voidVn[data-top="1"] img{height:min(150px,22vh)}
+@keyframes tutSpotIn{from{transform:scale(1.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes tutSpotPulse{50%{transform:scale(1.045);opacity:.75}}
+@keyframes tutSpotBob{50%{translate:0 -5px}}
+@media (prefers-reduced-motion:reduce){#tutSpot::before,#tutSpot b{animation:none}.tut-zoom{transition:none}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2118,7 +2131,8 @@ $('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); 
 setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2; if(flowHour > 21) flowHour = 6; $('hr').value = flowHour; updateSun(); }, 2000);
 function tgl(id, fn){ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; }
 let showLabels = true;   // building names sit on the 3D map itself (user, 2026-10-15); the toggle can hide them
-tgl('lLbl', v=>{ showLabels=v; });
+const LBL_ON = {erica:true, island:false};   // island place labels start hidden (user, 2026-11-11); each world keeps its own switch
+tgl('lLbl', v=>{ showLabels=v; LBL_ON[W.id]=v; labelsDirty=true; });
 // light / dark switch (campus): remembered on this device; with nothing saved the page follows the system setting
 function setTheme(t, save=true){ if(t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; if(save){ try{ t ? localStorage.setItem('void-theme', t) : localStorage.removeItem('void-theme'); }catch(e){} } syncThemeBtns(); }
 function syncThemeBtns(){ const dark = getComputedStyle(document.documentElement).colorScheme === 'dark'; $('tLight').setAttribute('aria-pressed', !dark); $('tDark').setAttribute('aria-pressed', dark); }
@@ -8086,7 +8100,12 @@ let vn = null, VN_CLOSED = 0;   // when the last dialogue line was dismissed: th
 function say(lines, done, opt={}){ if(ffOn()){ if(done) done(); return; } const el = $('vn'); if(vn && vn.typing) clearInterval(vn.typing); lines.forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; }); vn = {lines, i:-1, done, typing:null, full:''}; el.dataset.on = '1'; if(opt.dark) el.dataset.dark = '1'; else delete el.dataset.dark; vnNext(); }
 // ---- dialogue lines: one sentence per line and a sentence never wraps (user, 2026-11-11) ----
 const dlEsc = t=> t.replace(/[&<>]/g, c=> ({'&':'&amp;', '<':'&lt;', '>':'&gt;'}[c]));
-function dlSplit(text){ const out = []; let cur = ''; for(let i = 0; i < text.length; i++){ const ch = text[i]; cur += ch; if('.!?'.includes(ch) && /\s/.test(text[i + 1] || '')){ while(/\s/.test(text[i + 1] || '')) i++; out.push(cur); cur = ''; } } if(cur.trim()) out.push(cur); return out.length ? out : [text]; }
+function dlSplit(text){ const out = []; let cur = ''; for(let i = 0; i < text.length; i++){ const ch = text[i]; cur += ch; if('.!?'.includes(ch) && /\s/.test(text[i + 1] || '')){ while(/\s/.test(text[i + 1] || '')) i++; out.push(cur); cur = ''; } } if(cur.trim()) out.push(cur); if(!out.length) return [text];
+  // a very short sentence does not get a line of its own: it shares one with its neighbour (user, 2026-11-11: "안녕! 난 보이드." on one line)
+  const SHORT = 8, MAX = 34, lines = [];
+  for(const t of out){ const last = lines[lines.length - 1]; if(last !== undefined && last.length <= SHORT && (last + ' ' + t).length <= MAX) lines[lines.length - 1] = last + ' ' + t; else lines.push(t); }
+  if(lines.length > 1 && lines[lines.length - 1].length <= SHORT && (lines[lines.length - 2] + ' ' + lines[lines.length - 1]).length <= MAX){ const t = lines.pop(); lines[lines.length - 1] += ' ' + t; }
+  return lines; }
 function dlPlan(p, text){
   const key = text + '|' + innerWidth + 'x' + innerHeight + '|' + p.className; if(p._dl && p._dl.key === key) return p._dl;
   let parts = dlSplit(text), wrap = false; const draw = ()=>{ p.innerHTML = parts.map(t=> `<span class="vsen">${dlEsc(t)}</span>`).join(''); }, widest = ()=> Math.max(0, ...[...p.children].map(c=> c.offsetWidth));
@@ -8509,15 +8528,15 @@ const TUT = [
   {t:"누락된 다섯 기록 중 세 개는 캠퍼스에서, 두 개는 섬 안에서 채울 거야. 먼저 첫 번째 좌표부터 알려 줄게.",pose:'say',world:'island'},
   {t:"좌표에 도착하면 그곳의 기록을 직접 스캔해 줘. 기록을 채울 때마다 일루아의 흐름들이 조금씩 복구될거야.",pose:'say',world:'island'},
   {t:()=>{ const z = campusZone(1); return `첫 번째 좌표는 ${z && z.lat != null ? coordText(z) : '카드에 있는 좌표'}야. 지금 네가 있는 융합교육관이야.`; },pose:'say',world:'erica', do:()=>{ const m = MISSION_E.find(x=> x.id === 'z1'); TUT_SPOT = 'z1'; paint(); if(m && m.bi != null) select(m.bi, true); setTimeout(()=> qPop('융합교육관'), 900); }},
-  {t:"왼쪽 「보이드의 기록」 카드에 좌표가 있어. 좌표를 잘 확인하고 올바른 방향으로 가!",pose:'say',world:'erica', do:()=>{ setPanel(true); setTab('v'); setTimeout(()=>{ const c = document.querySelector('#list .coord'); if(c) c.classList.add('hl'); }, 60); }, undo:()=>{ document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); }},
+  {t:"왼쪽 「보이드의 기록」 카드에 좌표가 있어. 좌표를 잘 확인하고 올바른 방향으로 가!",pose:'say',world:'erica', do:()=>{ setPanel(true); setTab('v'); setTimeout(()=>{ const c = document.querySelector('#list .coord'); if(c) tutSpot(c); }, 60); }, undo:()=>{ document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); }},
   {t:"첫 번째 기록은 이 건물 어딘가에서 반응하고 있어.",pose:'say',world:'erica'},
   {t:"올바른 위치에 도착했다면 해당 정보를 Scaniverse로 한 바퀴 빙 돌면서 찍어. 어느 쪽도 빠지지 않게 꼼꼼하게.",pose:'say',world:'erica'},
   {t:"다 찍었으면 Scaniverse에서 「공유」를 누르고 「링크 복사」를 눌러.",pose:'say',world:'erica', card:'<ol class="how"><li><i>1</i>Scaniverse에서 스캔 열기</li><li><i>2</i>「공유」 누르기</li><li><i>3</i>「링크 복사」</li></ol>'},
-  {t:"다시 여기로 돌아와 「스캔 링크」 칸에 붙여 넣고 「제출」해 줘. 내가 트윈된 자리의 기록을 맞춰 볼게.",pose:'say',world:'erica', card:'<ol class="how"><li><i>4</i>이 앱으로 돌아오기</li><li><i>5</i>「스캔 링크」 칸에 붙여 넣기</li><li><i>6</i>「제출」</li></ol>', do:()=>{ setPanel(true); setTab('v'); $('panel').classList.add('hl'); const f = document.querySelector('.cardsub input'); if(f) f.classList.add('pulse'); }, undo:()=>{ $('panel').classList.remove('hl'); }},
+  {t:"다시 여기로 돌아와 「스캔 링크」 칸에 붙여 넣고 「제출」해 줘. 내가 트윈된 자리의 기록을 맞춰 볼게.",pose:'say',world:'erica', card:'<ol class="how"><li><i>4</i>이 앱으로 돌아오기</li><li><i>5</i>「스캔 링크」 칸에 붙여 넣기</li><li><i>6</i>「제출」</li></ol>', do:()=>{ setPanel(true); setTab('v'); setTimeout(()=>{ const f = document.querySelector('#list .cardsub'); if(f && tutStep === 17) tutSpot(f); }, 60); }, undo:()=>{ $('panel').classList.remove('hl'); }},
   {t:"기록이 채워지면 섬으로 가서 흐름을 확인하자.",pose:'joy',world:'erica'},
-  {t:"지금은 건물 안이라 네 위치가 잘 안 잡혀. 다음 기록을 찍으러 밖에 나가면 아래 「내 시점」을 켜 봐.",pose:'say',world:'erica', do:()=>{ $('lMe').classList.add('pulse'); }},
+  {t:"지금은 건물 안이라 네 위치가 잘 안 잡혀. 다음 기록을 찍으러 밖에 나가면 아래 「내 시점」을 켜 봐.",pose:'say',world:'erica', do:()=>{ tutSpot($('lMe')); }},
   {t:"파란 화살표가 너야. 아래에 네 좌표도 떠. 기록 카드의 좌표를 향해 걸어가면 돼.",pose:'say',world:'erica', do:()=> tutMePreview(true), undo:()=> tutMePreview(false)},
-  {t:"막히면 왼쪽 아래 「보이드」 버튼으로 나를 찾아. 자, 첫 번째 기록을 찍으러 가 보자!",pose:'joy',world:'erica', do:()=>{ $('lMe').classList.remove('pulse'); $('restoreBtn').classList.add('hl'); }, undo:()=>{ $('restoreBtn').classList.remove('hl'); }}];
+  {t:"막히면 왼쪽 아래 「보이드」 버튼으로 나를 찾아. 자, 첫 번째 기록을 찍으러 가 보자!",pose:'joy',world:'erica', do:()=>{ $('lMe').classList.remove('pulse'); tutSpot($('restoreBtn')); }, undo:()=>{ $('restoreBtn').classList.remove('hl'); }}];
 // a taste of 내 시점 during the tutorial: the arrow stands near the first record and the camera drops to street height; no GPS involved
 let tutMeOn = false;
 function tutMePreview(on){ const m = MISSION_E.find(x=> x.id === 'z1'); if(!m || !m.b) return; if(on === tutMeOn) return; tutMeOn = on;
@@ -8526,8 +8545,18 @@ function tutMePreview(on){ const m = MISSION_E.find(x=> x.id === 'z1'); if(!m ||
   else { if(!follow) meArrow.visible = false; flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1200); } }
 const tutDone = ()=> TUT_LOCAL || !!myEntry().tut;
 function maybeGuide(){ if(!TEAM || SCREEN || LOCAL || AUX || intro || tutStep >= 0 || tutDone() || $('teamPick').dataset.on || typeof MI === 'undefined') return; tutStep = 0; $('tutSkip').hidden = !ADMIN_KEY; tutShow(); }
-function tutShow(){ const st = TUT[tutStep]; TUT.forEach((x, i)=>{ if(i !== tutStep && x.undo && x._on){ x._on = false; try{ x.undo(); }catch(e){} } }); if(st.undo) st._on = true; if(TUT_SPOT && tutStep < 12){ TUT_SPOT = null; paint(); } if(st.world && W.id !== st.world) tutWorld(st.world); voidShow(typeof st.t === 'function' ? st.t() : st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
-function tutEnd(){ voidHide(); setTimeout(()=>{ try{ flowLockUI(); }catch(e){} }, 0); $('tutSkip').hidden = true; TUT_SPOT = null; try{ paint(); tutMePreview(false); $('panel').classList.remove('hl'); $('restoreBtn').classList.remove('hl'); document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); TUT.forEach(x=>{ x._on = false; }); }catch(e){} if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
+// ---- tutorial spotlight: the part of the page the void is talking about stays bright and grows a little, the rest dims (user, 2026-11-11) ----
+let tutSpotEl = null, tutSpotRaf = 0, tutSpotTarget = null;
+function tutSpot(target, label){ tutSpotOff(); const el = typeof target === 'string' ? document.querySelector(target) : target; if(!el) return;
+  if(!tutSpotEl){ tutSpotEl = document.createElement('div'); tutSpotEl.id = 'tutSpot'; tutSpotEl.setAttribute('aria-hidden', 'true'); tutSpotEl.innerHTML = '<b></b>'; document.body.appendChild(tutSpotEl); }
+  tutSpotTarget = el; el.classList.add('tut-zoom'); tutSpotEl.querySelector('b').textContent = label || '여기!'; tutSpotEl.hidden = false;
+  const tick = ()=>{ if(tutSpotTarget !== el) return; const r = el.getBoundingClientRect(), pad = 8;
+    if(r.width > 1 && r.height > 1){ const st = tutSpotEl.style; st.left = (r.left - pad) + 'px'; st.top = (r.top - pad) + 'px'; st.width = (r.width + pad*2) + 'px'; st.height = (r.height + pad*2) + 'px'; st.opacity = 1; tutSpotEl.dataset.below = r.top < 96 ? '1' : ''; const low = r.top + r.height/2 > innerHeight*0.5; if(low) $('voidVn').dataset.top = '1'; else delete $('voidVn').dataset.top; }   /* a target in the lower half would sit under the dialogue box: the box moves to the top */
+    else tutSpotEl.style.opacity = 0;
+    tutSpotRaf = requestAnimationFrame(tick); }; tick(); }
+function tutSpotOff(){ cancelAnimationFrame(tutSpotRaf); if(tutSpotTarget) tutSpotTarget.classList.remove('tut-zoom'); tutSpotTarget = null; delete $('voidVn').dataset.top; if(tutSpotEl){ tutSpotEl.style.opacity = 0; tutSpotEl.hidden = true; } }
+function tutShow(){ tutSpotOff(); const st = TUT[tutStep]; TUT.forEach((x, i)=>{ if(i !== tutStep && x.undo && x._on){ x._on = false; try{ x.undo(); }catch(e){} } }); if(st.undo) st._on = true; if(TUT_SPOT && tutStep < 12){ TUT_SPOT = null; paint(); } if(st.world && W.id !== st.world) tutWorld(st.world); voidShow(typeof st.t === 'function' ? st.t() : st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
+function tutEnd(){ tutSpotOff(); voidHide(); setTimeout(()=>{ try{ flowLockUI(); }catch(e){} }, 0); $('tutSkip').hidden = true; TUT_SPOT = null; try{ paint(); tutMePreview(false); $('panel').classList.remove('hl'); $('restoreBtn').classList.remove('hl'); document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); TUT.forEach(x=>{ x._on = false; }); }catch(e){} if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
 // the tutorial shows each space by actually going there: a short fade, then a swoop down onto the home view (user, 2026-10-28: the words 「왼쪽·오른쪽」 alone meant nothing on screen)
 function goWorld(id){ return new Promise(res=>{ if(W.id === id){ res(); return; } if(ffOn()){ setWorld(id, true); res(); return; } const wipe = $('tutWipe'); wipe.dataset.on = '1';
   setTimeout(()=>{ setWorld(id, true); let ms = 0; if(!reduce){ const far = camera.position.clone().sub(controls.target).multiplyScalar(1.7).add(controls.target); far.y += 420; camera.position.copy(far); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1700); ms = 1700; } delete wipe.dataset.on; setTimeout(res, ms + 200); }, 360); }); }
@@ -9004,7 +9033,7 @@ function setWorld(id, instant){
   $('pSub').textContent = w.sub; $('stage').setAttribute('aria-label', w.aria);
   $('tB').textContent = w.tabB; $('qL').textContent = w.searchL; $('q').placeholder = w.searchP; $('q').value = '';
   const isl = id==='island'; $('tV').hidden = isl; $('tB').hidden = !isl; $('board').hidden = isl && !SCREEN; $('tR').childNodes[0].nodeValue = isl ? '돌아온 기록 ' : '복구 완료 ';
-  $('lLbl').textContent = w.lblBtn;
+  $('lLbl').textContent = w.lblBtn; showLabels = LBL_ON[id] !== false; $('lLbl').setAttribute('aria-pressed', showLabels);
   document.querySelectorAll('.erica-only').forEach(e=> e.hidden = id!=='erica' || (e.id === 'navSeg' && !follow));   // the nav-mode buttons only while 내 시점 is on
   document.querySelectorAll('.island-only').forEach(e=> e.hidden = id==='erica');
   $('credit').innerHTML = w.credit;

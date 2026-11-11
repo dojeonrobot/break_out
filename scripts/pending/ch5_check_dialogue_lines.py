@@ -13,7 +13,7 @@ JS = r"""async()=>{
      const d = p._dl, base = parseFloat(getComputedStyle(p).fontSize); out.n++; out.avail = p.clientWidth; const orig = dlSplit(text).length; out.sentences += orig;
      const fs = d.size || (p.style.fontSize = '', parseFloat(getComputedStyle(p).fontSize)); out.base = Math.max(out.base, parseFloat(getComputedStyle(p).fontSize)); if(d.size){ out.shrunk++; out.minSize = Math.min(out.minSize, d.size); }
      dlShow(p, text, 1e9); let ok = true; for(const c of p.children){ const lh = parseFloat(getComputedStyle(c).lineHeight) || c.offsetHeight; if(c.offsetHeight > lh*1.5 || c.offsetWidth > p.clientWidth + 1) ok = false; }
-     if(ok) out.fit++; else out.wrapped.push(text.slice(0, 40)); if(d.parts.length > orig) out.commaSplit.push(text.slice(0, 46)); out.lines[d.parts.length] = (out.lines[d.parts.length]||0) + 1; }
+     if(ok) out.fit++; else out.wrapped.push(text.slice(0, 40)); if(d.parts.some(t=> /,$/.test(t.trim()))) out.commaSplit.push(text.slice(0, 46)); out.lines[d.parts.length] = (out.lines[d.parts.length]||0) + 1; }
    p.classList.remove('nar'); delete el.dataset.on; return out; };
  return {vn:run('vn', 'vnText', texts.vn), void:run('voidVn', 'voidTxt', texts.void)}; }"""
 SHOW = r"""([box, pid, who, text])=>{ const el = document.getElementById(box), p = document.getElementById(pid); el.dataset.on = '1'; if(who !== null){ document.getElementById('vnName').textContent = who; document.getElementById('vnName').hidden = false; const im = document.getElementById('vnImg'); im.src = 'img/chars/xylo_talk.png'; im.hidden = false; } p._dl = null; dlShow(p, text, 1e9); }"""
@@ -45,7 +45,7 @@ async def main():
                 os.makedirs(SHOT, exist_ok=True)
                 await pg.evaluate(SHOW, ['vn', 'vnText', '자일로', '네. 그러려면 네이티부터 찾아야 해요. 네이티가 끌려간 쪽에 일루아가 흐르던 자리가 있을 겁니다. 관람차 뒤쪽 길부터 찾아봐 주세요.']); await asyncio.sleep(.5); await pg.screenshot(path=os.path.join(SHOT, name + '_vn.png'), timeout=60000)
                 await pg.evaluate("delete document.getElementById('vn').dataset.on")
-                await pg.evaluate(SHOW, ['voidVn', 'voidTxt', None, '거듭된 연구로 인해 일루아는 흐름을 잃고 방황하고 있어. 섬을 살리려면, 일루아를 섬에 돌려줘야 해. 즉, 환원이 필요한거지.']); await asyncio.sleep(.5); await pg.screenshot(path=os.path.join(SHOT, name + '_void.png'), timeout=60000)
+                await pg.evaluate(SHOW, ['voidVn', 'voidTxt', None, '안녕! 난 보이드. 도로랜드가 세워지기 전부터 이 섬의 모습을 기록해 온 로봇이야.']); await asyncio.sleep(.5); await pg.screenshot(path=os.path.join(SHOT, name + '_void.png'), timeout=60000)
             if errs: fails.append((name, 'pageerror', errs[:3]))
             await ctx.close()
         await br.close()
