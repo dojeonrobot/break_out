@@ -8568,6 +8568,7 @@ function activityHelp(q){
  }
  if(q.id==='q5')return step==='device-return'?'잔재 세 개를 모두 없앴어. 시뮬레이션을 다시 돌려 보자.':(step==='hunt'||step==='rail')?`스카이 루프를 타고 돌면서 찾자. 내 신호가 강해지면 「탐지」를 꾹 눌러 줘. 지금 ${3-((m?.got||cp?.got||[]).length)}개 남았어.`:'관람차 아래 연구실로 가자. 지금까지 모은 기록으로 일루아의 흐름을 측정해 볼 거야.';
  if(q.id==='q4')return step==='vik'?'우리 조가 만든 바이킹 모델을 올려 줘.':'바이킹 공사장으로 가자. 자일로가 기다리고 있어.';
+ if(step==='cave')return '내 불빛으로 벽을 비춰 봐. 닳아서 비어 있는 장면이 아직 남아 있어.';
  return '누락된 내용을 모두 채웠어. 환원하기 전에 코덱스를 만나러 동굴로 가자.';
 }
 async function voidHelp(){ if($('voidVn').dataset.on || actBusy || vn) return;
@@ -8575,10 +8576,10 @@ async function voidHelp(){ if($('voidVn').dataset.on || actBusy || vn) return;
   if(!TEAM){ await voidAsk('먼저 위에서 우리 조를 골라 줘.'); return; }
   if(!tutDone()){ tutStep = 0; $('tutSkip').hidden = !ADMIN_KEY; tutShow(); return; }
   if(flowFree()){ await voidAsk('일루아가 원래 자리로 돌아갔어. 우리가 찾아낸 흐름이 코덱스 가문의 눈 문양이었지.', 'joy'); await voidAsk('영상을 다시 보고 싶으면 한 번 더 눌러 줘.'); if(voidHelp.again){ voidHelp.again = false; playRestore(); } else voidHelp.again = true; return; }
-  if(QDONE.has('q3')){await voidAsk('안전하게 돌아가는 방법을 찾았어. 이제 그 방법대로 진짜 일루아를 돌려줄 차례야.');openRestore();return;}
+  if(QDONE.has('q3')){await voidAsk('코덱스가 환원을 허락했어. 시뮬레이터로 먼저 확인하고 진짜 일루아를 돌려주자.');openRestore();return;}
   const waiting=QUESTS.find(q=>questDone(q)&&!teamReady(q));
   if(waiting){await voidAsk('같은 조의 다른 태블릿을 기다리는 중이야. 끝나면 다음 활동을 안내할게.','idle');return;}
-  if(W.id==='island'){const q=dueQuest();await voidAsk(q?activityHelp(q):'ERICA 캠퍼스로 돌아가 카드에 안내된 다음 기록을 찍자.','idle');return;}
+  if(W.id==='island'){const q=dueQuest();await voidAsk(q?activityHelp(q):(QDONE.has('q2')&&!QDONE.has('q4')&&campusZone(2)&&!zoneMine(campusZone(2)))?'네이티의 빛이 가리킨 좌표를 카드에 띄워 뒀어. 그곳의 기록을 찍어 줘.':'ERICA 캠퍼스로 돌아가 카드에 안내된 다음 기록을 찍자.','idle');return;}
   const open = MISSION_E.filter(m=> m.lat != null && !zoneMine(m) && !zoneLocked(m))[0], next = MISSION_E.filter(m=> m.lat != null && !zoneMine(m))[0];
   if(open){ const i = MISSION_E.indexOf(open) + 1;
     if(open.id === 'z1') await voidAsk('지금 할 일은 기록 1이야. 이 건물 어딘가에 있는 물건을 Scaniverse로 한 바퀴 돌면서 찍어.');
