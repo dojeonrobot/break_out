@@ -52,9 +52,9 @@ async def main():
             await asyncio.sleep(1.2)
             h = await ev('__dbg.hero()'); check(h['open'] and h['mates'] is None, f'{name}: the first walk opens the picker and does not start yet {h}')
             box = await ev("(()=>{ const r = document.querySelector('#heroPick .in').getBoundingClientRect(), g = document.getElementById('hpGo').getBoundingClientRect(); return [Math.round(r.top), Math.round(r.bottom), innerHeight, Math.round(g.height), [...document.querySelectorAll('#heroPick .view button')].map(b=> Math.round(b.getBoundingClientRect().height))]; })()")
-            check(box[0] >= 0 and box[1] <= box[2] and box[3] >= 44 and min(box[4]) >= 44, f'{name}: the picker fits the screen and the buttons are at least 44 px tall {box}')
+            check(box[0] >= 0 and box[1] <= box[2] and box[3] >= 44, f'{name}: the picker fits the screen and the buttons are at least 44 px tall {box}')
             await shot('1_picker')
-            await pg.click('#hpWho [data-n="리코"]'); await pg.click('#hpView [data-fp="1"]'); await asyncio.sleep(.3); await shot('2_picker_rico_fp')
+            check(await ev("document.getElementById('hpView').hidden"), f'{name}: no view choice (first person only)'); await pg.click('#hpWho [data-n="리코"]'); await asyncio.sleep(.3); await shot('2_picker_rico_fp')
             await pg.click('#hpGo'); await asyncio.sleep(2.5); await drain(); await asyncio.sleep(1)
             h = await ev('__dbg.hero()'); print(h)
             check(h['mates'] == ['리코'] and h['walkFp'] is True and all(not v for _, v in h['shown']), f'{name}: 리코 alone, first person, neither of the pair is drawn')
@@ -62,9 +62,9 @@ async def main():
             await shot('3_first_person')
             await pg.keyboard.down('KeyW'); await asyncio.sleep(1.5); await shot('3b_first_person_walking'); await pg.keyboard.up('KeyW')
             # switch while walking
-            await pg.click('#walkWho'); await asyncio.sleep(.5); await pg.click('#hpWho [data-n="제로"]'); await pg.click('#hpView [data-fp="0"]'); await pg.click('#hpGo'); await asyncio.sleep(1.2)
+            await pg.click('#walkWho'); await asyncio.sleep(.5); await pg.click('#hpWho [data-n="제로"]'); await pg.click('#hpGo'); await asyncio.sleep(1.2)
             h = await ev('__dbg.hero()'); print(h)
-            check(h['mates'] == ['제로'] and h['walkFp'] is False and dict(h['shown']) == {'리코': False, '제로': True}, f'{name}: switched to 제로, third person, only 제로 is drawn')
+            check(h['mates'] == ['제로'] and h['walkFp'] is True and all(not v for _, v in h['shown']), f'{name}: switched to 제로, still first person')
             check(await ev("__dbg.quest().live?.id") == 'q1', f'{name}: the mission is still live after the switch')
             await shot('4_third_person')
             await pg.keyboard.down('KeyW'); lag = []

@@ -31,6 +31,8 @@ async def main():
             if st['yard'] and SHOT and not shot_yard:
                 await asyncio.sleep(1.5); os.makedirs(SHOT, exist_ok=True); await pg.screenshot(path=os.path.join(SHOT, 'yard_big.png'), timeout=60000); shot_yard = True
                 print('board', await ev("(()=>{ const r = document.getElementById('ydBoard').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), innerWidth, innerHeight, document.querySelector('#yardDlg .room').scrollHeight]; })()"))
+            if st['t'] == '대사 건너뛰기' and '목적지로 이동' in seen and not any(x.startswith('gap') for x in seen):
+                g = await ev("(()=>{ const w = __dbg.walkState(), x = __dbg.chars().XYLO.position; return Math.hypot(w.x - x.x, w.z - x.z); })()"); seen.append(f'gap {g:.1f}'); print('자일로와의 거리', round(g, 1), flush=True)
             if st['t'] and (not seen or seen[-1] != st['t']): seen.append(st['t']); print(len(seen), st['t'], st['done'], flush=True)
             if 'q2' in st['done']: break
             if st['t']: await ev("document.getElementById('admSkip').click()")
