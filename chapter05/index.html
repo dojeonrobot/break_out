@@ -5788,7 +5788,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 
   // ----- 5. the gate: a grand entrance — taller gate, arcaded wings with corner towers, turnstiles, flags, lamps, planters -----
   {
-    gate.position.z=PARK_ENTRY.z;   /* 2026-11-12: the gate is drawn at 0.55 (a later step put that scale back); scale.set(1.2,1.1,1) here only reached the walk grid, which then held an invisible wall out to x 166 */ clearTreesAt(-70, 405, 42); clearTreesAt(70, 405, 42);
+    gate.position.z=PARK_ENTRY.z;   /* 2026-11-12: the gate is drawn at 0.55 (a later step put that scale back); scale.set(1.2,1.1,1) here only reached the walk grid, which then held an invisible wall out to x 166 */ clearTreesAt(-70, 405, 42); clearTreesAt(70, 405, 42); clearTreesAt(FERRIS_X*K + Math.cos(290*Math.PI/180)*92, FERRIS_Z*K + Math.sin(290*Math.PI/180)*92, 15);   /* the lab gate behind the wheel (LABG.ang) */
     const Gt = gate, beige = 0xeccf96, trimC = 0xd9b97a;
     // clock on the gate crown
     add(Gt, new THREE.CylinderGeometry(5, 5, 1, 24).rotateX(Math.PI/2), mat(0xffffff), 0, 46.5, 0); add(Gt, new THREE.TorusGeometry(5, 0.6, 8, 24), mat(C.navy), 0, 46.5, 0.5);
@@ -8230,7 +8230,7 @@ function vikSpot(){ if(vikSpot.p) return vikSpot.p; const b = VIK_B, R0 = b.r ||
   return vikSpot.p = [p[0], p[1], Math.atan2(p[0] - x[0], p[1] - x[1]), x[0], x[1]]; }   /* [길 x, 길 z, 자일로 방향, 자일로 x, 자일로 z] */
 function codexWait(){ return codexWait.p || (codexWait.p = freeSpot(CAVE_MOUTH[0] + 7, CAVE_MOUTH[1] + 19)); }   /* clear of the boulders at the mouth (user, 2026-11-12) */
 function questTarget(q){ if(mini && mini.q === q){ const t = miniTarget(); if(t) return t; } return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? (q.mazeEntered?NATY_HIDE:mazeEntrance()) : q.id==='q4' ? vikSpot().slice(3) : q.id==='q5' ? (buildLabDoor(), LAB_DOOR) : codexWait(); }
-function questApply(){ try{ flowLockUI(); if(collectorModel)collectorSync(); }catch(e){}
+function questApply(){ try{ flowLockUI(); if(collectorModel)collectorSync(); }catch(e){} try{ if(QDONE.has('q4') || QDONE.has('q5')) labGateBuild(); }catch(e){}   /* the lab's way down stays open for a team that has been there */
   if(typeof actBusy!=='undefined'&&(actBusy||STAGED||vn)){renderWalkPick();return;}
   if(!XYLO_HIDE){ const c = IB.find(b=> b.label === '롤러코스터'); const cx = c ? c.cx : -270, cz = c ? c.cz : 257, rr = (c ? c.r : 128) + 10, a = Math.atan2(200 - cz, -190 - cx); XYLO_HIDE = freeSpot(cx + Math.cos(a)*rr, cz + Math.sin(a)*rr); XYLO_HIDE.push(Math.atan2(cx - XYLO_HIDE[0], cz - XYLO_HIDE[1])); }
   if(questDone(QUESTS[1]) && !questDone(QUESTS[2]) && needsBack(QUESTS[2]) && TEAM && !flowFree()){ const vs = vikSpot(); XYLO.position.set(vs[3], G, vs[4]); XYLO.rotation.y = vs[2]; }   /* mission 3: 자일로 waits at the viking site */
@@ -9003,13 +9003,42 @@ function mazeToLab(withFade){
   };
   if(withFade) fadeThrough('#05070c', go); else go();
 }
-function buildLabDoor(){ if(LAB_DOOR) return; const FX = FERRIS_X*K, FZ = FERRIS_Z*K; let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - FX, pz - FZ); if(d < bd){ bd = d; best = [px, pz]; } }   // the park path that climbs to the wheel: the door sits at the hill's foot on that side
-  const ax = best ? best[0] - FX : 0, az = best ? best[1] - FZ : 1, L = Math.hypot(ax, az) || 1, ux = ax/L, uz = az/L, yaw = Math.atan2(ux, uz);
-  const g = new THREE.Group(); g.position.set(FX + ux*75, G, FZ + uz*75); g.rotation.y = yaw; islRoot.add(g);
-  add(g, BOX(9, 8, 4), flat(C.cliff), 0, 0, -1); add(g, BOX(4.2, 6.4, 0.3), mat(0x1a1d22), 0, 0, 1.1, false); add(g, BOX(5.2, 7, 0.6), mat(0x4a5058), 0, 0, 0.8); add(g, BOX(4.2, 6.4, 0.3), mat(0x1a1d22), 0, 0, 1.15, false);
-  add(g, new THREE.PlaneGeometry(4, 1), new THREE.MeshBasicMaterial({map:signTex('출입금지', {bg:'#ffd400', fg:'#1a1d22', size:60, w:384, h:96})}), 0, 6.3, 1.35, false);
-  [-2.6, 2.6].forEach(x=> add(g, CYL(0.3, 0.3, 5, 6), mat(0x9aa3ad), x, 0, 1.6)); add(g, BOX(1.2, 2.2, 1), mat(0x9aa3ad), -3.6, 0, 2.2);
-  LAB_DOOR = freeSpot(FX + ux*86, FZ + uz*86); }
+/* the way down to 자일로's lab (user, 2026-11-12): behind the wheel, inside the hill until the children get there */
+const LABG = {ang:290, near:38, out:2.4, back:1.6};   /* ang: where round the hill (the park path climbs it at 118), near: how close before it shows, out/back: seconds to come out / go back in */
+function labHallTex(){ const c = document.createElement('canvas'); c.width = 256; c.height = 288; const x = c.getContext('2d'), vx = 128, vy = 132;
+  const bg = x.createLinearGradient(0, 0, 0, 288); bg.addColorStop(0, '#10242f'); bg.addColorStop(1, '#060d13'); x.fillStyle = bg; x.fillRect(0, 0, 256, 288);
+  const pt = i=>{ const k = 1 - 1/(1 + i*0.42); return [288 - (288 - vy)*k, 128*(1 - k) + 24*k]; };
+  for(let i = 0; i < 9; i++){ const [y0, w0] = pt(i), [y1, w1] = pt(i + 1), l = Math.max(10, 40 - i*4);
+    x.fillStyle = `rgb(${l},${l + 14},${l + 22})`; x.beginPath(); x.moveTo(vx - w0, y0); x.lineTo(vx + w0, y0); x.lineTo(vx + w1, y1); x.lineTo(vx - w1, y1); x.closePath(); x.fill();
+    x.fillStyle = 'rgba(127,227,255,' + (0.85 - i*0.07) + ')'; x.fillRect(vx - w1, y1 - 1.5, w1*2, 3); }
+  const [yf, wf] = pt(9); x.fillStyle = '#bff1ff'; x.fillRect(vx - wf, yf - 58, wf*2, 58);
+  const gl = x.createRadialGradient(vx, yf - 30, 4, vx, yf - 30, 96); gl.addColorStop(0, 'rgba(160,236,255,.85)'); gl.addColorStop(1, 'rgba(160,236,255,0)'); x.fillStyle = gl; x.fillRect(0, 0, 256, 288);
+  x.strokeStyle = 'rgba(127,227,255,.55)'; x.lineWidth = 3; [[-1], [1]].forEach(([d])=>{ x.beginPath(); x.moveTo(vx + d*128, 0); x.lineTo(vx + d*wf, yf - 58); x.stroke(); x.beginPath(); x.moveTo(vx + d*122, 170); x.lineTo(vx + d*(wf + 2), yf - 22); x.stroke(); });
+  const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx; }
+function labGateBuild(){ if(labGateBuild.o) return labGateBuild.o; const FX = FERRIS_X*K, FZ = FERRIS_Z*K, A = LABG.ang*Math.PI/180, ux = Math.cos(A), uz = Math.sin(A);
+  const g = new THREE.Group(); g.name = 'lab-gate'; g.position.set(FX + ux*76, G, FZ + uz*76); g.rotation.y = Math.atan2(ux, uz); g.visible = false; islRoot.add(g);
+  const conc = new THREE.MeshLambertMaterial({color:0x8d939b}), steel = new THREE.MeshLambertMaterial({color:0x4a5058}), dark = new THREE.MeshLambertMaterial({color:0x10151c}), warn = new THREE.MeshLambertMaterial({color:0xffd400});
+  const P = new THREE.Group(), Q = new THREE.Group(); g.add(P); g.add(Q);
+  add(P, BOX(14, 9, 7), conc, 0, 0, -1.5, false); add(P, BOX(15, 0.8, 7.6), steel, 0, 9, -1.5, false); add(P, BOX(14, 0.25, 6), conc, 0, 0, 5, false);
+  add(P, BOX(6.8, 7.3, 0.2), dark, 0, 0, 2.0, false);
+  const hall = add(P, new THREE.PlaneGeometry(6.4, 7), new THREE.MeshBasicMaterial({map:labHallTex(), transparent:true, opacity:0}), 0, 3.6, 2.13, false);
+  const leaves = [-1, 1].map(sd=>{ const L = new THREE.Group(); P.add(L); add(L, BOX(3.4, 7.3, 0.4), steel, 0, 0, 0, false); add(L, BOX(3.4, 0.8, 0.46), warn, 0, 3.1, 0, false); L.position.set(sd*1.7, 0, 2.36); L.userData.sd = sd; return L; });
+  add(P, new THREE.PlaneGeometry(4.6, 1.15), new THREE.MeshBasicMaterial({map:signTex('출입금지', {bg:'#ffd400', fg:'#1a1d22', size:60, w:384, h:96})}), 0, 8.15, 2.03, false);
+  add(P, CYL(0.5, 0.6, 0.5, 8), steel, 0, 9.8, 1.2, false); const lamp = add(P, SPH(0.55, 10, 8), glowMat(0xffb23e, 0.5), 0, 10.6, 1.2, false);
+  [-1, 1].forEach(sd=>{ add(Q, CYL(0.35, 0.35, 4.6, 8), conc, sd*7.6, 0, 7.2, false); add(Q, SPH(0.45, 8, 6), glowMat(0xffb23e, 0.9), sd*7.6, 4.8, 7.2, false); });
+  const st = {k:0, last:null}, ez = v=>{ v = Math.min(Math.max(v, 0), 1); return v*v*(3 - 2*v); };
+  const pose = t=>{ const a = ez(st.k/0.55), b = ez((st.k - 0.5)/0.5); g.visible = st.k > 0; P.position.z = -11*(1 - a); Q.position.y = -5.6*(1 - a);
+    leaves.forEach(L=>{ L.position.x = L.userData.sd*(1.7 + 3.4*b); }); hall.material.opacity = b; lamp.material.opacity = st.k > 0 && st.k < 1 ? (Math.sin(t*14) > 0 ? 0.95 : 0.3) : 0.5; };
+  islAnim.push(t=>{ if(typeof RIDE_PROBE !== 'undefined' && RIDE_PROBE) return; const dt = st.last == null ? 0 : Math.min(Math.max(t - st.last, 0), 0.05); st.last = t;
+    const done = QDONE.has('q5'), open = !!ADMIN_KEY || QDONE.has('q4') || done, near = !!walk && Math.hypot(walk.x - g.position.x, walk.z - g.position.z) < LABG.near;
+    const want = open && (near || done || (mini && mini.kind === 'device'));
+    if(want && st.k === 0 && walk && dt > 0) sfx('open');
+    if((want && st.k >= 1) || (!want && st.k <= 0)) return;
+    st.k = Math.min(Math.max(st.k + (want ? dt/LABG.out : -dt/LABG.back), 0), 1); pose(t); });
+  pose(0);
+  return labGateBuild.o = {g, st, spot:[FX + ux*90, FZ + uz*90]}; }
+window.__labGate = ()=>{ const o = labGateBuild(); return {k:+o.st.k.toFixed(3), visible:o.g.visible, x:o.g.position.x, z:o.g.position.z, spot:o.spot, door:LAB_DOOR}; };
+function buildLabDoor(){ if(LAB_DOOR) return; const o = labGateBuild(); LAB_DOOR = freeSpot(o.spot[0], o.spot[1]); }
 function labStop(){if(labGame){cancelAnimationFrame(labGame.raf);clearInterval(labGame.iv);labGame=null;}}
 function labBuild(){labStop();$('lbGo').hidden=true;$('lbGo').textContent='분석 확인 · 계속';$('lbP').textContent='모은 기록을 맞춰 확인한 흐름입니다. 마지막 기록은 아직 비어 있습니다.';
  $('lbMons').innerHTML=`<section class="flow-analysis"><header><small>FLOW ANALYSIS</small><h2>흐름의 이상 지점</h2></header><svg viewBox="0 0 500 290" role="img" aria-label="네 개의 기록을 이은 흐름이 오른쪽 아래에서 꺾이는 모습. 마지막 기록은 빈칸."><path d="M52 148Q58 55 174 35T389 63Q477 106 423 211T182 262Q45 254 52 148Z" fill="#163630" stroke="#547d71" stroke-width="2"/><path d="M142 77Q85 116 122 183T244 211Q298 188 323 166L398 212" fill="none" stroke="#9ddbdc" stroke-width="5"/><path d="M323 166L332 110" fill="none" stroke="#7996a6" stroke-width="3" stroke-dasharray="6 7"/>${[[142,77],[122,183],[244,211],[323,166]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="15" fill="#a6e7da"/><text x="${x}" y="${y+5}" text-anchor="middle" fill="#173a34" font-size="15">${i+1}</text>`).join('')}<circle cx="332" cy="94" r="17" fill="#13222b" stroke="#9aaeb9" stroke-dasharray="3 3"/><text x="332" y="100" text-anchor="middle" fill="#c6d5df" font-size="17">?</text><circle cx="398" cy="212" r="24" fill="#512c29" stroke="#f3a273" stroke-width="3"/><text x="398" y="219" text-anchor="middle" fill="#ffe3c8" font-size="22">!</text><text x="355" y="261" fill="#ffd0aa" font-size="15">현장 확인 필요</text></svg><p>여기서 흐름이 꺾입니다. 원인은 현장에서 확인하세요.</p></section><section class="previous-trials"><small>PREVIOUS VIRTUAL TEST</small><h2>자일로의 이전 가상 시험</h2><div><b>한 번에 많이</b><p>시설 이상 반응</p></div><div><b>조금씩</b><p>이상 반응 감소</p></div><p class="pending">기록 누락으로 전체 흐름은 미확인</p></section>`;}
