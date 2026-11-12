@@ -8027,7 +8027,7 @@ function stopWalk(byUser){ if(MAZE) MAZE.clip.constant = 1e6; document.body.clas
 const _wt = new THREE.Vector3(), _ct = new THREE.Vector3();
 function walkTick(now){
   const w = walk, dt = Math.min(0.05, Math.max(0, (now - w.last)/1000)); w.last = now;
-  if(w.ride){ rideTick(now, dt); questNav(); return; }   // mission 1: the Sky Loop lap drives the camera and the pair
+  if(w.ride){ (w.ride.rem ? remRideTick : rideTick)(now, dt); questNav(); return; }   // mission 1: the Sky Loop lap drives the camera and the pair
   if(questLive && mini && now - (w.saveAt || 0) > 3000){ w.saveAt = now; miniSavePos(); }
   const k = WALK_KEYS, hold = vn || qRewardEl.dataset.on || $('heroPick').dataset.on ? 0 : 1;   // no walking while a dialogue or the coordinate card is up
   const fwd = ((k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0))*hold, turn = ((k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0))*hold, strafe = ((k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0))*hold;
@@ -8180,6 +8180,7 @@ Object.assign(STORY, {"record2": [{"who": "보이드", "text": "회전목마 뒤
 Object.assign(STORY, {"vikDone": [{"who": "제로", "text": "섰다! 우리가 만든 바이킹이야!"}, {"who": "자일로", "text": "잘 움직이네요. 고맙습니다. 무너졌던 바이킹이 돌아왔어요."}, {"who": "자일로", "text": "이제 관람차 아래 연구실로 갑시다. 지금까지 모은 기록으로 일루아의 흐름을 측정해 볼 거예요."}, {"who": "제로", "text": "좋아요. 가요!"}], "deviceFound": [{"who": "자일로", "text": "오셨군요. 지금까지 모은 기록으로 일루아의 흐름을 측정해 보죠."}], "act3pre": [{"who": "자일로", "text": "마지막 기록까지 들어왔군요. 수고했어요."}, {"who": "제로", "text": "다섯 개를 전부 채웠어요!"}, {"who": "자일로", "text": "이제 일루아의 흐름을 완벽하게 복원할 수 있어요. 시뮬레이션을 가동해 봅시다."}], "record3": [{"who": "보이드", "text": "관람차 언덕 주변의 흐름도 확인했어. 언덕 아래를 지나 해안 쪽으로 이어지고 있었어."}, {"who": "보이드", "text": "이걸로 누락됐던 다섯 기록을 모두 채웠어. 원천에서 다섯 기록의 자리까지 전부 이어졌어."}, {"who": "제로", "text": "잠깐…… 이 모양, 코덱스 문양이잖아?"}, {"who": "리코", "text": "정말이야. 코덱스한테도 보여 줘야겠어."}]});   /* 2026-11-12 바이킹 → 연구실 측정·잔재 → 마지막 스캔 → 연구실에서 문양 시뮬레이션 */
 STORY.act3 = [{who:'자일로', text:'흐름은 모두 찾았어요. 이제 환원만 남았습니다.'}, ...STORY.act3.slice(4)];   /* the first lines moved before the simulation (act3pre) */
 STORY.ending = STORY.ending.filter(L=> L.text.indexOf('이 모양, 코덱스 문양이잖아') < 0);   /* the glyph is found in act 3 now; in the ending 코덱스 sees it for the first time */
+Object.assign(STORY, {"remRail": [{"who": "보이드", "text": "노이즈가 번지는 곳은 모두 섬 바깥쪽이야. 스카이 루프를 타고 돌면서 찾자."}, {"who": "보이드", "text": "내 신호가 강해지면 「탐지」를 꾹 눌러 줘."}, {"who": "제로", "img": "zero_brave", "text": "좋아, 출발!"}]});   /* 2026-11-12 잔재 수색을 스카이 루프 위에서 */
 const QUESTS = [
   {id:'q1', act:1, who:[PAIR], short:'예비 배전선', title:'섬의 전원을 되살려라', hint:'롤러코스터가 제일 잘 보이는 자리', needs:['z1'], zones:[], mini:'loop', r:7, pop:'자일로 발견!'},
   {id:'q2', act:1, who:[PAIR], short:'네이티 수색', title:'네이티를 찾아라', hint:'관람차 뒤쪽 길', needs:['z1'], zones:['z2'], mini:'maze', r:6, pop:'네이티 발견!'},
@@ -8295,7 +8296,7 @@ function miniLoad(){ try{ const o = JSON.parse(localStorage.getItem(MINI_KEY()) 
 function miniSave(step, patch){ if(!questLive) return; const cur = miniLoad(), o = Object.assign(cur && cur.q === questLive.id ? cur : {q:questLive.id}, {step}, patch || {}); if(walk && !walk.ride) o.pos = [walk.x, walk.z, walk.yaw]; o.t = Date.now(); try{ localStorage.setItem(MINI_KEY(), JSON.stringify(o)); }catch(e){} }
 function miniSavePos(){ const cur = miniLoad(); if(!cur || !questLive || cur.q !== questLive.id || !walk || walk.ride) return; cur.pos = [walk.x, walk.z, walk.yaw]; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cur)); }catch(e){} }
 function miniForget(){ try{ localStorage.removeItem(MINI_KEY()); }catch(e){} }
-const STEP_LINE = {vik:'우리 조가 만든 바이킹 모델을 올려 줘.', hunt:'빨간 원 안으로 가 봐. 내 신호 소리가 빨라지는 쪽에 잔재가 있어.', mid:'연구실에서 시뮬레이션을 다시 보자.', 'device-return':'연구실로 돌아가서 시뮬레이션을 다시 돌려 보자.', found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 예비 배전선을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
+const STEP_LINE = {rail:'스카이 루프를 타고 돌면서 찾자. 내 신호가 강해지면 「탐지」를 꾹 눌러 줘.', vik:'우리 조가 만든 바이킹 모델을 올려 줘.', hunt:'빨간 원 안으로 가 봐. 내 신호 소리가 빨라지는 쪽에 잔재가 있어.', mid:'연구실에서 시뮬레이션을 다시 보자.', 'device-return':'연구실로 돌아가서 시뮬레이션을 다시 돌려 보자.', found:'찾았던 자리에서 이어서 하자.', yard:'정비동 문으로 가자. 예비 배전선을 이어야 해.', station:'스카이 루프 역으로 가자.', record:'네이티와 함께 연구실로 가자.', lab:'관람차 아래 연구실로 가자.', cave:'동굴로 들어가자.'};
 // put the walker back where the mission was left and jump straight to its step (the intro and the finding are already done)
 function miniResume(q, cp){ const w = walk; if(!w) return false;
   if(cp.pos && !walkBlocked(cp.pos[0], cp.pos[1])){ w.x = cp.pos[0]; w.z = cp.pos[1]; if(cp.pos[2] != null) w.yaw = cp.pos[2]; }
@@ -8310,7 +8311,9 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
     chaseBegin(q); return true;   /* left after Naty was found: the chase starts again at the maze entrance */
   }
   else if(q.mini==='viking'){ mini = {q, kind:'viking'}; vikAsk(); }
-  else if(q.mini==='device'){mini={q,kind:'device',phase:st,got:cp.got||[]};if(st==='device-return'){remBuild();remBack();}else if(st==='hunt')huntStart();else{midCheck(q);return true;}}
+  else if(q.mini==='device'){mini={q,kind:'device',phase:st,got:cp.got||[]};if(st==='device-return'){ remBuild(); REM.models.forEach(m=>{ if(m.state !== 2) remCollapse(m, true); }); setTimeout(()=>{ if(mini && mini.kind === 'device') remRerun(); }, 900); }
+    else if(st==='hunt' || st==='rail'){ buildStation(); const sp = STATION.spot, L = Math.hypot(sp[0], sp[1]) || 1, p = freeSpot(sp[0] - sp[0]/L*16, sp[1] - sp[1]/L*16); if(!cp.pos || Math.hypot(w.x - sp[0], w.z - sp[1]) > 60){ w.x = p[0]; w.z = p[1]; w.yaw = Math.atan2(sp[0] - p[0], sp[1] - p[1]); w.snap = true; } remRail(); st === 'hunt' && (cp.step = 'rail'); }
+    else{midCheck(q);return true;}}
   else if(q.mini === 'cave'){ mini = {q, kind:'cave', decoded:!!cp.decoded,trialRows:cp.trialRows||[]}; caveOpen(); }
   else return false;
   qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say'); return true; }
@@ -8550,7 +8553,7 @@ function activityHelp(q){
   if(step==='maze')return '이 미로 어딘가에 네이티가 있을지도 몰라. 한가운데까지 가 보자.';
   return '네이티가 사라졌어. 네이티가 흩어지는 건 일루아가 흔들린다는 뜻이야. 관람차 뒤쪽 길부터 찾아보자.';
  }
- if(q.id==='q5')return step==='device-return'?'잔재 세 개를 모두 없앴어. 연구실로 돌아가서 시뮬레이션을 다시 돌려 보자.':step==='hunt'?`내 탐지 소리가 빨라지는 쪽으로 가 봐. 잔재는 눈에 안 띄게 숨겨져 있어. 지금 ${3-((m?.got||cp?.got||[]).length)}개 남았어.`:'관람차 아래 연구실로 가자. 지금까지 모은 기록으로 일루아의 흐름을 측정해 볼 거야.';
+ if(q.id==='q5')return step==='device-return'?'잔재 세 개를 모두 없앴어. 시뮬레이션을 다시 돌려 보자.':(step==='hunt'||step==='rail')?`스카이 루프를 타고 돌면서 찾자. 내 신호가 강해지면 「탐지」를 꾹 눌러 줘. 지금 ${3-((m?.got||cp?.got||[]).length)}개 남았어.`:'관람차 아래 연구실로 가자. 지금까지 모은 기록으로 일루아의 흐름을 측정해 볼 거야.';
  if(q.id==='q4')return step==='vik'?'우리 조가 만든 바이킹 모델을 올려 줘.':'바이킹 공사장으로 가자. 자일로가 기다리고 있어.';
  return m?.decoded||cp?.decoded?'선대의 글에 나온 순서와 연구실에서 확인한 양으로 가상 시험을 해 보자. 실패한 결과는 시험 기록에서 다시 볼 수 있어.':'누락된 내용을 모두 채웠어. 환원하기 전에 코덱스를 만나러 동굴로 가자.';
 }
@@ -8799,7 +8802,7 @@ function miniStart(q){
   if(q.mini==='device'){mini={q,kind:'device',phase:'mid',got:[]};midCheck(q);return;}
   if(q.mini === 'cave'){ mini = {q, kind:'cave'}; miniSave('cave'); caveOpen(); }
 }
-function miniTarget(){ if(!mini) return null; if(mini.kind === 'chase') return chase ? [chase.x, chase.z] : null; if(mini.kind === 'device' && ['hunt','dig','game'].includes(mini.phase)) return remNext();   /* while digging or in the ring game the target stays on that remnant, not the lab door */ if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(['walk','naty-shot'].includes(mini.phase) && mini.target) return mini.target; if(mini.kind==='loop'&&mini.phase==='forest-shot')return forestSpot(); return null; }
+function miniTarget(){ if(!mini) return null; if(mini.kind === 'chase') return chase ? [chase.x, chase.z] : null; if(mini.kind === 'device' && ride && ride.rem){ const sp = remRideNext(); return sp ? [sp.x, sp.z] : STATION.spot; } if(mini.kind === 'device' && ['hunt','dig','game'].includes(mini.phase)) return remNext();   /* while digging or in the ring game the target stays on that remnant, not the lab door */ if(mini.kind === 'loop' && ride){ const s = rideNext(); return s ? s.at : STATION.spot; } if(['walk','naty-shot'].includes(mini.phase) && mini.target) return mini.target; if(mini.kind==='loop'&&mini.phase==='forest-shot')return forestSpot(); return null; }
 function miniTick(now, moving){
   const w = walk; if(!mini || !w) return;
   if(mini.kind === 'chase'){ chaseTick(now); return; }
@@ -8932,7 +8935,7 @@ function rideTick(now, dt){
   const allDone = R.spots.every(s=> s.done), dS = ((R.u - STATION.u + 1.5) % 1) - 0.5;
   if(allDone && Math.abs(dS) < 0.004 && !R.passed){ R.passed = true; rideEnd(true); }
 }
-function rideEnd(done){ const R = ride; if(!R) return; ride = null; if(walk){ walk.ride = null; walk.snap = true; walk.x = STATION.spot[0]; walk.z = STATION.spot[1]; walk.pitch = -0.2; } miniGo.classList.remove('hot'); TRAIN.mode = done ? 'run' : 'stop'; TRAIN.u = STATION.u; miniBox.hidden = true;
+function rideEnd(done){ const R = ride; if(!R) return; ride = null; if(R.rem){ remPulse(0); if(walk) $('walkPad').hidden = false; } if(walk){ walk.ride = null; walk.snap = true; walk.x = STATION.spot[0]; walk.z = STATION.spot[1]; walk.pitch = -0.2; } miniGo.classList.remove('hot'); TRAIN.mode = done ? 'run' : 'stop'; TRAIN.u = STATION.u; miniBox.hidden = true;
   if(!done) return;
   miniSave('coordinates',{routes:[0,1,2,3]});setTimeout(()=>say(STORY.rideDone,showRouteCard),500); }
 miniGo.addEventListener('pointerdown', e=>{ const hunt = mini && mini.kind === 'device' && mini.phase === 'hunt'; if(ride || hunt){ if(ride) ride.press = true; else mini.press = true; miniGo.setPointerCapture(e.pointerId); e.preventDefault(); } });
@@ -9022,12 +9025,49 @@ function deviceReturn(){buildLabDoor();mini.hits=3;miniSave('device-return',{hit
 // visible by just walking past: only the red circles from the mid-check, the void's beeps and a held 「파내기」 reveal one. Dismantling = take the three
 // rings off the core, outermost first, each when its gap meets the mark on top.
 const REM_R = 46, REM = {spots:null, models:[], rings:[], game:null};
-function remSpots(){ if(REM.spots) return REM.spots;
-  const car = MI.find(m=> m.id === 'dl-carousel'), cb = car && car.b, lake = IB.find(b=> /레이크|호수|LAKE/i.test(b.label || ''));
-  const out = (b, d)=>{ const L = Math.hypot(b.cx, b.cz) || 1; return [b.cx + b.cx/L*((b.r || 30) + d), b.cz + b.cz/L*((b.r || 30) + d)]; };
-  const seeds = [[-418, -88, '땅 밑'], cb ? [...out(cb, 16), '건물 아래'] : [120, -60, '건물 아래'], lake ? [...out(lake, 6), '물가'] : [-120, 120, '물가']];
-  REM.spots = seeds.map(([x, z, kind], i)=>{ const s = freeSpot(x, z), a = i*2.1 + 0.7, off = 14 + i*4; return {x:s[0], z:s[1], kind, cx:s[0] + Math.cos(a)*off, cz:s[1] + Math.sin(a)*off}; });
+function remSpots(){ if(REM.spots) return REM.spots; buildStation(); const c = TRAIN.curve;   /* 2026-11-12 (user): on the island's outskirts, beside the Sky Loop */
+  REM.spots = [0.25, 0.5, 0.75].map((f, i)=>{ const u = (STATION.u + f) % 1, p = c.getPointAt(u), r = Math.hypot(p.x, p.z) || 1, d = 13 + i*2, x = p.x/r*(r + d), z = p.z/r*(r + d); return {x, z, u, kind:'외곽', cx:x, cz:z}; });
   return REM.spots; }
+/* ----- mission 4 on the rail (user, 2026-11-12): ride the Sky Loop and lock on where the void's signal peaks ----- */
+const REM_WIN = 0.024, REM_FAR = 0.12, REM_LAP = 62;   /* lock-on window and the range of the signal, in laps; seconds for one lap */
+function remDots(){ const got = mini ? mini.got || [] : []; miniDots.innerHTML = [0, 1, 2].map(i=> `<i class="${got.includes(i) ? 'on' : ''}">잔재 ${i + 1}</i>`).join(''); }
+function remRail(){ buildStation(); remBuild(); const got = mini.got = mini.got || []; REM.models.forEach((m, i)=>{ if(got.includes(i) && m.state !== 2) remCollapse(m, true); });
+  miniSave('rail', {got}); miniWalkTo(2, '숨겨진 잔재를 찾아라', '스카이 루프 역에서 열차 타기', STATION.spot, 7, remBoard); }
+function remBoard(){ const w = walk; if(!w || !mini || mini.kind !== 'device' || ride) return; sfx('ride');
+  say(STORY.remRail, ()=>{ if(!walk || !mini || mini.kind !== 'device' || ride) return;
+    ride = {rem:true, q:mini.q, u:STATION.u, spots:remSpots().map((sp, i)=> ({i, u:sp.u, x:sp.x, z:sp.z, hold:0, wasIn:false})), press:false, pause:false, look:null, lookK:0, beepAt:0};
+    mini.phase = 'ride'; TRAIN.mode = 'ride'; TRAIN.u = ride.u; walk.ride = ride; walk.snap = true; $('walkPad').hidden = true;
+    miniGo.textContent = '탐지'; miniGo.disabled = false; miniDoneBtn.hidden = true; remDots(); miniBox.hidden = false; miniHud(2, '숨겨진 잔재를 찾아라', '보이드의 신호가 강해지는 곳 찾기'); }); }
+function remRideNext(){ if(!ride || !mini) return null; const got = mini.got || []; let best = null, bd = 9; ride.spots.forEach(sp=>{ if(got.includes(sp.i)) return; const d = (sp.u - ride.u + 1) % 1; if(d < bd){ bd = d; best = sp; } }); return best; }
+function remRideTick(now, dt){
+  const w = walk, R = ride, c = TRAIN.curve; if(!R || !mini) return; dt *= R.boost || 1;
+  const go = vn || REM.game || R.pause ? 0 : 1, got = mini.got || []; R.u = (R.u + dt/REM_LAP*go) % 1; TRAIN.u = R.u;
+  const press = go && (R.press || WALK_KEYS.Space);
+  let best = null, bd = 9; R.spots.forEach(sp=>{ if(got.includes(sp.i)) return; const d = ((R.u - sp.u + 1.5) % 1) - 0.5; if(Math.abs(d) < Math.abs(bd)){ bd = d; best = sp; } });
+  const k = best ? Math.max(0, 1 - Math.abs(bd)/REM_FAR) : 0, inside = !!best && Math.abs(bd) < REM_WIN;
+  if(go){ remPulse(k);
+    if(k > 0){ const gap = Math.max(110, 1100*(1 - k)); if(now - R.beepAt > gap){ R.beepAt = now; sfx('tap'); } }
+    R.spots.forEach(sp=>{ if(sp !== best || !inside){ if(sp.wasIn && !got.includes(sp.i) && sp === best && bd > 0){ qPop('지나쳤다'); if(!R.missSaid){ R.missSaid = true; say([{who:'리코', img:'rico_hmm', text:'지나쳤어. 괜찮아, 한 바퀴 더 돌면 다시 와.'}]); } } sp.wasIn = false; sp.hold = 0; } });
+    if(inside){ best.wasIn = true; if(press){ best.hold += dt/1.0; if(best.hold >= 1){ best.hold = 0; best.wasIn = false; remRideFound(best); } } else best.hold = Math.max(0, best.hold - dt*0.6); }
+    miniGo.classList.toggle('hot', inside); miniGo.style.setProperty('--p', inside ? Math.min(1, best.hold).toFixed(2) : 0);
+    $('qhHint').textContent = !best ? '역으로 돌아가는 중' : inside ? (press ? '탐지 중! 꾹 누르고 있어요' : '지금! 「탐지」를 꾹 눌러요') : k > 0.45 ? `신호가 강해지고 있어요 · 남은 잔재 ${3 - got.length}` : `보이드의 신호가 강해지는 곳 찾기 · 남은 잔재 ${3 - got.length}`; }
+  /* the camera rides behind the locomotive; while a remnant is being dismantled it turns to look at it */
+  c.getPointAt(R.u, _rp); c.getPointAt((R.u + 0.004) % 1, _rq); const dx = _rq.x - _rp.x, dz = _rq.z - _rp.z, L = Math.hypot(dx, dz) || 1, ux = dx/L, uz = dz/L;
+  _ct.set(_rp.x - ux*15, _rp.y + 12.5, _rp.z - uz*15); if(w.snap){ camera.position.copy(_ct); w.snap = false; } else camera.position.lerp(_ct, 1 - Math.pow(0.001, dt));   /* higher than the old ride camera: the cab must not fill the view */
+  _wt.set(_rq.x + ux*26, _rq.y + 2, _rq.z + uz*26); R.lookK += ((R.look ? 1 : 0) - R.lookK)*(1 - Math.exp(-dt*3)); if(R.look && R.lookK > 0.001){ _rq.set(R.look.x, groundY(R.look.x, R.look.z) + 4, R.look.z); _wt.lerp(_rq, R.lookK); }
+  camera.lookAt(_wt); controls.target.copy(_wt);
+  const car = c.getPointAt((R.u - 0.0075 + 1) % 1); w.mates.forEach((m, i)=>{ m.g.position.set(car.x - uz*(i ? 1.3 : -1.3), car.y + 3.0, car.z + ux*(i ? 1.3 : -1.3)); m.g.rotation.y = Math.atan2(ux, uz); if(m.g.userData.legL) walkPose(m.g, 0, 1); });
+  w.x = _rp.x; w.z = _rp.z;
+  if(got.length >= 3 && go && Math.abs(((R.u - STATION.u + 1.5) % 1) - 0.5) < 0.004) remRideEnd();
+}
+function remRideFound(sp){ const R = ride, m = REM.models[sp.i]; if(!R || !m) return; R.pause = true; R.look = sp; miniGo.classList.remove('hot'); miniBox.hidden = true; remPulse(0); mini.phase = 'dig';
+  m.g.visible = true; m.state = 1; sfx('open'); flash(); qPop('잔재 발견!');
+  if(!m.beam) m.beam = add(m.g, new THREE.CylinderGeometry(0.9, 1.9, 34, 10, 1, true), glowMat(0xff5a4e, 0.3, true), 0, 17, 0, false); m.beam.visible = true;
+  remTween(1300, k=>{ m.g.position.y = m.y0 - 7*(1 - k)*(1 - k); });
+  setTimeout(()=>{ if(!mini || mini.kind !== 'device' || ride !== R) return; if(!(mini.got || []).length && !mini.firstSaid){ mini.firstSaid = true; say(STORY.remFirst, ()=> remGame(sp.i)); } else remGame(sp.i); }, reduce ? 200 : 1500); }
+function remRideEnd(){ const R = ride; if(!R) return; ride = null; const w = walk; if(w){ w.ride = null; w.snap = true; w.x = STATION.spot[0]; w.z = STATION.spot[1]; w.pitch = w.fp ? -0.05 : -0.2; }
+  miniGo.classList.remove('hot'); miniBox.hidden = true; remPulse(0); $('walkPad').hidden = false; TRAIN.mode = 'run'; TRAIN.u = STATION.u; miniSave('device-return', {got:mini.got || [0, 1, 2]});
+  setTimeout(()=>{ if(mini && mini.kind === 'device') remRerun(); }, 600); }
 function remBuild(){ if(REM.models.length) return; remSpots().forEach((s, i)=>{
   const g = new THREE.Group(); g.name = 'remnant-' + i; g.userData.dynamic = true; const y0 = groundY(s.x, s.z) - 0.2; g.position.set(s.x, y0 - 7, s.z); g.visible = false; islRoot.add(g);
   add(g, CYL(3.2, 3.8, 0.8, 10), mat(0x5d5f5a));
@@ -9083,7 +9123,8 @@ function remTap(){ const G2 = REM.game; if(!G2 || G2.done || vn) return; const k
     else $('rmP').textContent = `고리 하나가 빠졌다. 남은 고리 ${3 - G2.ring}`; }
   else { G2.boost = performance.now() + 900; sfx('tap'); $('rmP').textContent = '빗나갔어. 틈이 표시에 닿을 때까지 기다려.'; const d = $('remDlg'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake'); } }
 function remFinish(i){ delete $('remDlg').dataset.on; REM.game = null; const m = REM.models[i]; remCollapse(m, false); const got = mini.got = [...new Set([...(mini.got || []), i])]; miniSave('hunt', {got});
-  if(REM.rings[i]){ miniRoot.remove(REM.rings[i]); REM.rings[i] = null; } const left = 3 - got.length;
+  if(REM.rings[i]){ miniRoot.remove(REM.rings[i]); REM.rings[i] = null; } const left = 3 - got.length; if(m.beam) m.beam.visible = false;
+  if(ride && ride.rem){ const R = ride; remDots(); say([{who:'보이드', text: left ? `신호 하나가 꺼졌어. 남은 건 ${left}개야.` : '마지막 신호까지 꺼졌어. 역으로 돌아가서 시뮬레이션을 다시 돌려 보자.'}], ()=>{ if(!mini || ride !== R) return; mini.phase = 'ride'; R.pause = false; R.look = null; miniBox.hidden = false; }); return; }
   say([{who:'보이드', text: left ? `신호 하나가 꺼졌어. 남은 건 ${left}개야.` : '마지막 신호까지 꺼졌어. 연구실로 돌아가서 다시 돌려 보자.'}], ()=>{ if(!mini) return; if(left){ mini.phase = 'hunt'; remHud(); } else remBack(); }); }
 function remBack(){ buildLabDoor(); remPulse(0); const got = mini.got || [0, 1, 2]; REM.models.forEach((m, i)=>{ if(got.includes(i) && m.state !== 2) remCollapse(m, true); }); miniSave('device-return', {got});
   miniWalkTo(3, '연구실로 돌아가기', '관람차 언덕 아래 연구실 문', LAB_DOOR, 8, remRerun); }
@@ -9100,9 +9141,10 @@ function simNoise(on){ if(SIM_NOISE){ simRoot.remove(SIM_NOISE.g); SIM_NOISE.g.t
 async function midCheck(q){ miniSave('mid'); actBusy = true; stopWalk(); await wait(300); setSim(true); await wait(reduce ? 400 : 3000);
   await new Promise(r=> say(STORY.midA, r)); await new Promise(r=> say(STORY.midA2, r)); simNoise(true); sfx('powerdown'); await wait(reduce ? 400 : 3200);
   await new Promise(r=> say(STORY.midB, r)); simNoise(false); setSim(false); await wait(500);
-  const cp = miniLoad() || {q:q.id}; cp.q = q.id; cp.step = 'hunt'; cp.got = cp.got || []; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cp)); }catch(e){}
+  const cp = miniLoad() || {q:q.id}; cp.q = q.id; cp.step = 'rail'; cp.got = cp.got || []; delete cp.pos; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cp)); }catch(e){}
   actBusy = false; startWalk(PAIR); }
-window.__rem = ()=> ({spots:REM.spots, models:REM.models.map(m=> m.state), mini:mini && mini.kind === 'device' ? {phase:mini.phase, got:mini.got, dig:mini.dig} : null, game:REM.game ? {ring:REM.game.ring, a:REM.game.a, done:REM.game.done} : null, noise:!!SIM_NOISE});
+window.__rem = ()=> ({spots:REM.spots, models:REM.models.map(m=> m.state), mini:mini && mini.kind === 'device' ? {phase:mini.phase, got:mini.got, dig:mini.dig} : null, game:REM.game ? {ring:REM.game.ring, a:REM.game.a, done:REM.game.done} : null, noise:!!SIM_NOISE, station:STATION ? STATION.spot : null, ride:ride && ride.rem ? {u:+ride.u.toFixed(4), pause:ride.pause, next:(remRideNext() || {}).i} : null, edge:REM.spots ? REM.spots.map(sp=> Math.round(Math.hypot(sp.x, sp.z))) : null});
+window.__remBoost = k=>{ if(ride) ride.boost = k; };
 window.__remAim = ()=>{ const G2 = REM.game; if(G2) G2.a[G2.ring] = -Math.PI/2; };
 // Keep keyboard navigation within the active analysis/game without intercepting dialogue controls.
 document.addEventListener('keydown',e=>{if(e.key!=='Tab'||vn)return;const host=['deviceDlg','labDlg'].map($).find(el=>el.dataset.on);if(!host)return;const buttons=[...host.querySelectorAll('button:not([disabled]):not([hidden])')].filter(b=>b.getClientRects().length);if(!buttons.length)return;const first=buttons[0],last=buttons.at(-1);if(e.shiftKey&&(!host.contains(document.activeElement)||document.activeElement===first)){last.focus();e.preventDefault();}else if(!e.shiftKey&&(!host.contains(document.activeElement)||document.activeElement===last)){first.focus();e.preventDefault();}});
@@ -9380,6 +9422,7 @@ function admStep(q){ const w = walk; if(!w) return null; if(typeof PARK_WAKE !==
   if(!mini) return q.found ? null : go(q.mini === 'maze' && q.mazeEntered ? '미로 한가운데로 이동' : q.mini === 'maze' ? '미로 입구로 이동' : '목적지로 이동', questTarget(q));
   if(mini.kind === 'chase') return chase && !chase.over ? {t:'추격 건너뛰기', run:()=>{ const e = chase.R && chase.R.pts ? chase.R.pts[chase.R.pts.length - 1] : null; if(e){ chase.x = e[0]; chase.z = e[1]; w.x = e[0] - 3; w.z = e[1] - 3; } chaseWin(); }} : null;
   if(mini.kind === 'viking' && mini.phase === 'upload') return {t:'바이킹 올리기 건너뛰기', run:()=> vikWon(false)};
+  if(mini.kind === 'device' && ride && ride.rem){ const sp = remRideNext(); return ride.pause ? null : sp ? {t:`잔재 찾기 · 남은 ${3 - (mini.got || []).length}`, run:()=>{ ride.u = sp.u; remRideFound(sp); }} : {t:'역으로 돌아가기', run:()=> remRideEnd()}; }
   if(mini.kind === 'device' && mini.phase === 'hunt'){ const got = mini.got || [], i = remSpots().findIndex((sp, k)=> !got.includes(k)); if(i < 0) return null; const sp = remSpots()[i]; return Math.hypot(w.x - sp.x, w.z - sp.z) < 2 ? {t:'파내기', run:()=>{ mini.dig = 0; mini.press = false; remReveal(i); }} : go(`잔재 자리로 이동 · 남은 ${3 - got.length}`, [sp.x, sp.z]); }
   if(mini.phase === 'walk' && mini.target && !mini.arrived) return go('목적지로 이동', mini.target);
   return null; }

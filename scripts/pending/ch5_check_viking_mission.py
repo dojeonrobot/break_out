@@ -116,22 +116,34 @@ async def main():
             if await ev("__rem().noise") and SHOT and not os.path.exists(os.path.join(SHOT, 'vm5b_noise.png')): await shot(pg, 'vm5b_noise')
             if await ev("__rem().mini?.phase==='hunt'"): break
             await asyncio.sleep(.5)
-        print('lab', said); check(await ev("__rem().mini?.phase") == 'hunt', 'the measurement ends in the remnant hunt'); await asyncio.sleep(1); await shot(pg, 'vm5c_hunt')
+        print('lab', said)
+        # the hunt is on the rail now: a cut to the Sky Loop station, board, lock on three times while riding, dismantle each
+        for _ in range(120):
+            said += [t for t in await drain(pg) if t not in said]
+            if await ev("__rem().mini?.phase==='walk'"): break
+            await asyncio.sleep(.5)
+        r0 = await ev('__rem()'); st = r0['station']; ws = await ev('__dbg.walkState()'); dist = ((ws['x'] - st[0])**2 + (ws['z'] - st[1])**2)**.5
+        check(r0['mini'] and r0['mini']['phase'] == 'walk' and dist < 40, f'after the measurement the pair stand by the Sky Loop station ({dist:.0f} away) and walk to it')
+        check(min(r0['edge']) > 400, f"the three remnants sit on the outskirts, just outside the track (distance from the centre {r0['edge']}; the track is not a circle)")
+        hud = await ev("document.getElementById('questHud').innerText"); check('스카이 루프 역' in hud, f'the mission box points to the station ({hud!r})'); await shot(pg, 'vm5c_station')
+        await ev(f"__dbg.walkTo({st[0]}, {st[1]})"); await wf(pg, '!!__dbg.quest().vn()', 20); said = await drain(pg); print('board', said)
+        await wf(pg, "!!__rem().ride", 20); check(await ev("document.getElementById('miniGo').textContent") == '탐지', 'on the train: the 「탐지」 button'); await asyncio.sleep(1.5); await shot(pg, 'vm5c_riding')
+        await ev('__remBoost(6)'); await pg.keyboard.down('Space'); found = 0
         for i in range(3):
-            sp = (await ev('__rem()'))['spots'][i]
-            await ev(f"__dbg.walkTo({sp['x']}, {sp['z']})"); await asyncio.sleep(.8)
-            await ev("()=>{ const b=document.getElementById('miniGo'); b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1})); }")
-            await wf(pg, "['dig','game'].includes(__rem().mini?.phase)", 60)
-            await ev("()=>{ const b=document.getElementById('miniGo'); b.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1})); }")
-            for _ in range(60):
+            if i == 0:
+                await wf(pg, '!!(__rem().ride && __rem().ride.pause)', 60); await asyncio.sleep(1.3); await shot(pg, 'vm5c_found')
+            for _ in range(400):
                 await drain(pg)
                 if await ev("!!document.querySelector('#remDlg[data-on]')"): break
                 await asyncio.sleep(.25)
+            if i == 0: await shot(pg, 'vm5c_game')
             for k in range(3):
                 await ev("()=>{ __remAim(); document.getElementById('rmGo').click(); }"); await asyncio.sleep(.3)
-            await wf(pg, "!document.querySelector('#remDlg[data-on]')", 30); await asyncio.sleep(.5); await drain(pg)
-        await wf(pg, "__rem().mini?.phase==='walk'", 30); await ev('__dbg.walkTo(...__dbg.labDoor())'); await asyncio.sleep(1); said = []
-        for _ in range(80):
+            await wf(pg, "!document.querySelector('#remDlg[data-on]')", 30); await asyncio.sleep(.5); await drain(pg); found += 1
+            print('  remnant', i + 1, await ev("[__rem().models, __rem().mini?.got, __rem().ride]"), flush=True)
+        check(found == 3 and await ev("(__rem().mini?.got || []).length") == 3, 'three remnants found from the train and dismantled')
+        await pg.keyboard.up('Space'); said = []
+        for _ in range(240):
             said += [t for t in await drain(pg) if t not in said]
             if await ev("!!document.querySelector('#qReward[data-on]')"): break
             await asyncio.sleep(.5)
