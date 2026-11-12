@@ -1,4 +1,4 @@
-# 튜토리얼 짚기 연출 점검: 조를 고르고 튜토리얼을 넘기며 14·18·20·22번째 단계에서 밝게 남는 영역이 대상과 맞는지, 화면 안에 있는지, 대사 창에 가리지 않는지 잰다.
+# 튜토리얼 짚기 연출 점검: 조를 고르고 튜토리얼을 넘기며 15·19·21·23번째 단계에서 밝게 남는 영역이 대상과 맞는지, 화면 안에 있는지, 대사 창에 가리지 않는지 잰다.
 # 사설 API 8096 + 정적 8097. python scripts/pending/ch5_check_tut_spotlight.py [shot_dir]
 import asyncio, json, re, sys, os
 from playwright.async_api import async_playwright
@@ -42,7 +42,7 @@ async def main():
                 await pg.evaluate("document.getElementById('voidNext').click()"); await asyncio.sleep(.4)
             on = sorted(k for k, v in seen.items() if v['on'])
             print(name, '짚은 단계', on, '끝난 뒤 남음', await pg.evaluate("!!document.querySelector('.tut-zoom') || (document.getElementById('tutSpot') && !document.getElementById('tutSpot').hidden)"), errs, flush=True)
-            if on != [14, 18, 20, 22]: fails.append((name, 'steps', on))
+            if on != [15, 19, 21, 23]: fails.append((name, 'steps', on))
             if errs: fails.append((name, 'pageerror', errs[:2]))
             await ctx.close()
         await br.close()
