@@ -51,7 +51,7 @@ async def main():
                 os.makedirs(SHOT, exist_ok=True); await pg.screenshot(path=os.path.join(SHOT, n + '.png'), timeout=60000)
         async def load(pg):
             await pg.goto(f'{STATIC}/chapter05/index.html?team={T}', wait_until='domcontentloaded', timeout=120000)
-            await wf(pg, "typeof window.__dbg!=='undefined' && !!window.__dbg.rideState && typeof window.__vikQ==='function'", 120)
+            await wf(pg, "typeof window.__dbg!=='undefined' && !!window.__dbg.rideState && typeof window.__vikQ==='function' && !!window.__rem", 120)
             await pg.evaluate("()=>{ const tp=document.getElementById('teamPick'); if(tp) delete tp.dataset.on; }"); await pg.evaluate("__dbg.setWorld('island',true)"); await asyncio.sleep(1.5)
         post = lambda path, body, adm=False: rq.post(API + '/api/void/' + path, data=json.dumps(body), headers=ADM if adm else {'content-type': 'application/json'})
         await post('team_reset', {'team': T, 'confirm': 'AGAIN'}, True); await post('admin/viking_clear', {'team': T}, True)
@@ -103,10 +103,42 @@ async def main():
         said = await drain(pg); print('done', said); check(any('우리가 만든 바이킹' in t for t in said), 'the completion dialogue plays')
         await wf(pg, "!!document.getElementById('qReward').dataset.on", 20)
         rw = await ev("document.getElementById('qReward').innerText"); print('reward', repr(rw)); await shot(pg, 'vm5_reward')
-        check('MISSION 3' in rw and '바이킹 복구' in rw and '기록 3' in rw, 'reward card: mission 3, the viking, the third coordinate')
+        check('MISSION 3' in rw and '바이킹 복구' in rw and '미션 4 · 숨겨진 잔재를 찾아라' in rw and '37.' not in rw, 'reward card: mission 3, the viking, straight on to mission 4 (no coordinate yet)')
         check('q4' in await ev('__dbg.quest().done'), 'mission 3 is saved as done')
-        v = await ev('__vik()'); check(v['on'] and abs(v['rot']) >= 0 and v['asm'], f"the uploaded assembly is up (asm {v['asm']}, parts {v['parts']})")
-        await ev("document.getElementById('qrMap').click()"); await wf(pg, "document.getElementById('voidVn').dataset.on==='1' || !!document.getElementById('voidVn').dataset.on", 20)
+        v = await ev('__vik()'); check(v['on'] and v['asm'], f"the uploaded assembly is up (asm {v['asm']}, parts {v['parts']})")
+        # 4b) mission 4: the lab under the wheel, the measurement, three remnants, the last coordinate
+        await ev("document.getElementById('qrMap').click()"); await asyncio.sleep(2.5); said = await drain(pg); print('m4 intro', said)
+        check(await ev("__dbg.quest().live?.id") == 'q5', 'mission 4 (the lab) is live right after the viking')
+        hud = await ev("document.getElementById('questHud').innerText"); print('hud', repr(hud)); check('미션 4' in hud and '연구실' in hud, 'the mission box points to the lab')
+        await ev('__dbg.walkTo(...__dbg.labDoor())'); await wf(pg, '!!__dbg.quest().vn()', 20); said = []
+        for _ in range(240):
+            said += [t for t in await drain(pg) if t not in said]
+            if await ev("__rem().noise") and SHOT and not os.path.exists(os.path.join(SHOT, 'vm5b_noise.png')): await shot(pg, 'vm5b_noise')
+            if await ev("__rem().mini?.phase==='hunt'"): break
+            await asyncio.sleep(.5)
+        print('lab', said); check(await ev("__rem().mini?.phase") == 'hunt', 'the measurement ends in the remnant hunt'); await asyncio.sleep(1); await shot(pg, 'vm5c_hunt')
+        for i in range(3):
+            sp = (await ev('__rem()'))['spots'][i]
+            await ev(f"__dbg.walkTo({sp['x']}, {sp['z']})"); await asyncio.sleep(.8)
+            await ev("()=>{ const b=document.getElementById('miniGo'); b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId:1})); }")
+            await wf(pg, "['dig','game'].includes(__rem().mini?.phase)", 60)
+            await ev("()=>{ const b=document.getElementById('miniGo'); b.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId:1})); }")
+            for _ in range(60):
+                await drain(pg)
+                if await ev("!!document.querySelector('#remDlg[data-on]')"): break
+                await asyncio.sleep(.25)
+            for k in range(3):
+                await ev("()=>{ __remAim(); document.getElementById('rmGo').click(); }"); await asyncio.sleep(.3)
+            await wf(pg, "!document.querySelector('#remDlg[data-on]')", 30); await asyncio.sleep(.5); await drain(pg)
+        await wf(pg, "__rem().mini?.phase==='walk'", 30); await ev('__dbg.walkTo(...__dbg.labDoor())'); await asyncio.sleep(1); said = []
+        for _ in range(80):
+            said += [t for t in await drain(pg) if t not in said]
+            if await ev("!!document.querySelector('#qReward[data-on]')"): break
+            await asyncio.sleep(.5)
+        print('rerun', said); rw = await ev("document.getElementById('qReward').innerText"); print('reward', repr(rw)); await shot(pg, 'vm5d_reward4')
+        check('MISSION 4' in rw and '선대의 잔재 해체' in rw and '기록 3' in rw and '37.' in rw, 'reward card: mission 4, the remnants, the third coordinate')
+        check('q5' in await ev('__dbg.quest().done'), 'mission 4 is saved as done')
+        await ev("document.getElementById('qrMap').click()"); await wf(pg, "!!document.getElementById('voidVn').dataset.on", 20)
         vt = await ev("document.getElementById('voidTxt').textContent"); print('campus', repr(vt)); check('마지막 좌표' in vt, 'back on the campus the void points to the last coordinate'); await shot(pg, 'vm6_campus')
         await ctx.close()
         # 5) another tablet of the same team: the viking is already up

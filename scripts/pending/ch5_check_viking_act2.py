@@ -4,7 +4,7 @@
 import asyncio, json, re, sys, os
 from playwright.async_api import async_playwright
 STATIC = 'http://127.0.0.1:8097'; API = 'http://127.0.0.1:8096'; ADM = {'content-type': 'application/json', 'X-Admin-Key': '0101'}; T = 8
-SHOT = sys.argv[1] if len(sys.argv) > 1 else None
+N = int(sys.argv[1]) if len(sys.argv) > 1 else 2; SHOT = sys.argv[2] if len(sys.argv) > 2 else None   # N = 2막 또는 3막
 async def main():
     async with async_playwright() as pw:
         br = await pw.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
@@ -16,8 +16,8 @@ async def main():
         await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','vikact');localStorage.setItem('void-sound','0');")
         post = lambda path, body, adm=False: rq.post(API + '/api/void/' + path, data=json.dumps(body), headers=ADM if adm else {'content-type': 'application/json'})
         await post('team_reset', {'team': T, 'confirm': 'AGAIN'}, True); await post('admin/viking_clear', {'team': T}, True)
-        for z in ('z1', 'z2'): await post('admin/skip', {'team': T, 'mission': z}, True)
-        await post('quest', {'team': T, 'dev': 'vikact', 'done': ['q1', 'q2'], 'act': 1, 'tut': True, 'story': 3, 'power': True})
+        for z in ('z1', 'z2', 'z3')[:N]: await post('admin/skip', {'team': T, 'mission': z}, True)
+        await post('quest', {'team': T, 'dev': 'vikact', 'done': ['q1', 'q2', 'q4', 'q5'][:2 if N == 2 else 4], 'act': N - 1, 'tut': True, 'story': 3, 'power': True})
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append((getattr(e,'stack',None) or str(e))[:700]))
         await pg.goto(f'{STATIC}/chapter05/index.html?team={T}', wait_until='domcontentloaded', timeout=120000)
         for _ in range(480):
@@ -31,17 +31,18 @@ async def main():
             st = await pg.evaluate("({vn:document.getElementById('vn').dataset.on ? document.getElementById('vnName').textContent + ': ' + document.getElementById('vnText').textContent : '', vd:document.getElementById('voidVn').dataset.on ? '보이드(안내): ' + document.getElementById('voidTxt').textContent : '', rd:document.getElementById('recDone').dataset.on ? '[카드] ' + document.getElementById('rdT').textContent : '', live:__dbg.quest().live?.id || null, walk:!!__dbg.quest().live})")
             for k in ('rd', 'vd', 'vn'):
                 if st[k] and (not seen or seen[-1] != st[k]): seen.append(st[k])
-            if st['live'] == 'q4' and not st['vn'] and not st['vd']:
+            if st['live'] == ('q4' if N == 2 else 'q3') and not st['vn'] and not st['vd']:
                 await asyncio.sleep(1.5)
                 if not await pg.evaluate("!!document.getElementById('vn').dataset.on"): ok = True; break
             await pg.keyboard.press('Space'); await asyncio.sleep(.45)
-            if SHOT and st['vn'].startswith('보이드: 자일로가 바이킹'):
-                os.makedirs(SHOT, exist_ok=True); await pg.screenshot(path=os.path.join(SHOT, 'act2_scene.png'), timeout=60000)
+            if SHOT and (st['vn'].startswith('보이드: 자일로가 바이킹') or st['vn'].startswith('제로: 잠깐') or st['vn'].startswith('자일로: 마지막 기록까지')):
+                os.makedirs(SHOT, exist_ok=True); await pg.screenshot(path=os.path.join(SHOT, f'act{N}_scene_{len(seen)}.png'), timeout=60000)
         print('\n'.join(seen))
         q = await pg.evaluate('__vikQ()'); d = ((q['spot'][3] - q['xylo'][0])**2 + (q['spot'][4] - q['xylo'][1])**2)**.5
         hud = await pg.evaluate("document.getElementById('questHud').innerText")
-        print(('OK   ' if ok else 'FAIL ') + 'act 2 ends with mission 3 being walked'); print(('OK   ' if d < 1 else 'FAIL ') + f'자일로 is at the viking site when the walk starts (off by {d:.1f})'); print('hud', repr(hud))
-        cast = await pg.evaluate("document.body.innerText.includes('연구실')"); print(('OK   ' if not any('연구실' in s or '잔재' in s for s in seen) else 'FAIL ') + 'no lab / remnant lines in act 2')
-        if SHOT: await pg.screenshot(path=os.path.join(SHOT, 'act2_walk.png'), timeout=60000)
+        print(('OK   ' if ok else 'FAIL ') + f'act {N} ends with the next mission being walked')
+        if N == 2: print(('OK   ' if d < 1 else 'FAIL ') + f'자일로 is at the viking site when the walk starts (off by {d:.1f})'); print('hud', repr(hud))
+        if N == 3: print(('OK   ' if any('코덱스 문양이잖아' in x for x in seen) and any('시뮬레이션을 가동해 봅시다' in x for x in seen) else 'FAIL ') + 'act 3: the simulation is started at the lab and the glyph is recognised')
+        if SHOT: await pg.screenshot(path=os.path.join(SHOT, f'act{N}_walk.png'), timeout=60000)
         print('errors:', errs); await br.close()
 asyncio.run(main())
