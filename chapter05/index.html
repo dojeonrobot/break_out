@@ -2863,7 +2863,7 @@ PATHS[25]=[[0,390],PATHS[25][PATHS[25].length-1]];
 PATHS[26]=[[0,430],PATHS[26][PATHS[26].length-1]];
 PATHS[27]=[[-110,190],[-125,250],[-120,330],[-65,360],[0,360]];
 PATHS[28]=[[-155,435],[-115,440],[0,430]];
-PATHS[24]=[[85,380],[100,398],[108,404]];
+PATHS[24]=[[85,380],[97,385],[106,386]];
 const pathSamples = [];
 // A common rounded ribbon avoids triangular flares at path joins.
 const pathHalfWidth = i => i===0 || i===25 ? 8.5 : [1,3,5,7,9,10,11,27].includes(i) ? 6 : 4.2;   // 25 = pier, 27 = west ring road (three spurs were added to the literal on 2026-10-28, so the pushed paths moved by 3)
@@ -4454,8 +4454,8 @@ const carpetRide = new THREE.Group();
   // swings back and forth, the arc growing and shrinking over a long cycle; the carpet stays level
   poweredAnim(t=>{ const amp = 0.55 + 0.55*(0.5 + 0.5*Math.sin(t*0.09)); swing.rotation.x = Math.sin(t*1.05)*amp; carpet.rotation.x = -swing.rotation.x; });
 }
-place(carpetRide, 110/K, 375/K, 0.3);
-pickable(carpetRide, {n:'플라잉 카펫', c:'ride', sub:'스윙 라이드', cx:110/K, cz:375/K, h:16, r:22, desc:'두 탑 사이에 매달린 보라색 양탄자가 앞뒤로 크게 날아오르는 놀이기구. 꼭대기에서 잠깐 멈출 때 공원 전체가 한눈에 들어옵니다.', facts:[['위치','미니열차 선로 남쪽 · 미로 정원 북서쪽'],['특징','12인승 양탄자 · 최대 각도 약 65°']]});
+place(carpetRide, 119/K, 369/K, 0.3);   /* 2026-11-12: off the gate tower and the garden wall */
+pickable(carpetRide, {n:'플라잉 카펫', c:'ride', sub:'스윙 라이드', cx:119/K, cz:369/K, h:16, r:22, desc:'두 탑 사이에 매달린 보라색 양탄자가 앞뒤로 크게 날아오르는 놀이기구. 꼭대기에서 잠깐 멈출 때 공원 전체가 한눈에 들어옵니다.', facts:[['위치','미니열차 선로 남쪽 · 미로 정원 북서쪽'],['특징','12인승 양탄자 · 최대 각도 약 65°']]});
 
 // swing ride
 const swingRide = new THREE.Group();
@@ -8853,7 +8853,9 @@ function yardPaint(){ const {W, H, tiles} = yard, on = yardPower(); let lit = 0;
 $('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || !yard || yard.done) return; const x = +b.dataset.x, y = +b.dataset.y; yard.tiles[y][x] = yard.rot(yard.tiles[y][x]); $('ydBoard').querySelectorAll('button.turn').forEach(o=> o.classList.remove('turn')); yardPaint(); void b.offsetWidth; if(!yard.done){ b.classList.add('turn'); sfx('tap'); } });
 $('ydContinue').onclick=()=>{if(yard?.done)yardDone();};
 $('ydMix').onclick = ()=>{ if(yard && !yard.done) yardBuild(); };
-function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true; });
+function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true;
+    if(walk && XYLO_HIDE){ const p = freeSpot(XYLO_HIDE[0] - Math.sin(XYLO_HIDE[2])*7, XYLO_HIDE[1] - Math.cos(XYLO_HIDE[2])*7); walk.x = p[0]; walk.z = p[1]; walk.yaw = Math.atan2(XYLO_HIDE[0] - p[0], XYLO_HIDE[1] - p[1]); walk.snap = true; walk.imx = walk.imz = 0;
+      XYLO.rotation.y = Math.atan2(p[0] - XYLO_HIDE[0], p[1] - XYLO_HIDE[1]); } });   /* back beside 자일로 for his lines; mission 2 starts here, not behind the coaster (user, 2026-11-12) */
   setTimeout(()=> parkWake(()=> say([...STORY.yardDone, ...STORY.natyGone], ()=> questComplete(mini ? mini.q : QUESTS[0]))), 700); }
 // ---------- the park wakes up (2026-11-04): seen from above, a ring of light runs out from the service yard, the bulbs come on from the
 // ground up and every ride starts slowly and picks up speed. Its own clock (dt capped at 1/20 s), so a slow tablet plays it slower, never skips it.
