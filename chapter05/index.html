@@ -2149,7 +2149,7 @@ let flowHour = QS.get('hour') ? +QS.get('hour') : (new Date().getHours() + new D
 if(flowHour < 6 || flowHour > 21) flowHour = 6;
 $('hr').step = 'any'; $('hr').value = flowHour;
 $('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); });
-setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2; if(flowHour > 21) flowHour = 6; $('hr').value = flowHour; updateSun(); }, 2000);
+setInterval(()=>{ if(!flowing) return; flowHour += 20/60/60*2*(flowHour >= 7.5 && flowHour < 17.5 ? 0.5 : 2.5); if(flowHour > 21) flowHour = 6;   /* a longer day (user, 2026-11-12): daytime at half speed, dusk and night quicker */ $('hr').value = flowHour; updateSun(); }, 2000);
 function tgl(id, fn){ const b=$(id); b.onclick=()=>{ const v=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',v); fn(v); }; }
 let showLabels = true;   // building names sit on the 3D map itself (user, 2026-10-15); the toggle can hide them
 const LBL_ON = {erica:true, island:false};   // island place labels start hidden (user, 2026-11-11); each world keeps its own switch
@@ -2859,12 +2859,12 @@ PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 PATHS.push([[405,162],[440,155],[477.39,128.73]], [[230,321],[239,306],[244.25,294.75]]);
 // Remove the western bypass and lead all arrivals through the entrance.
 PATHS[0]=[[0,128],[0,205],[0,300],[0,360],[0,390],[0,449]];
-PATHS[17]=[[0,360],[68,360],[96,376],[116,407],[140,421]];   /* through the garden lane, then east of the gate's corner tower */
+PATHS[17]=[[0,360],[68,360],[120,364],[166,366],[190,371]];   /* through the garden lane, along the north side of the gate wing, round its corner tower to the maze */
 PATHS[25]=[[0,390],PATHS[25][PATHS[25].length-1]];
-PATHS[26]=[[0,430],PATHS[26][PATHS[26].length-1]];
+PATHS[26]=[[0,340],[0,344]];   /* 2026-11-12 (user): no path out to the harbour, it cut into the round gate plaza. Kept as a stub on the main street so the path numbers stay */
 PATHS[27]=[[-110,190],[-125,250],[-120,330],[-65,360],[0,360]];
-PATHS[28]=[[-155,435],[-115,440],[0,430]];
-PATHS[24]=[[96,376],[101,374]];
+PATHS[28]=[[0,346],[0,350]];   /* the harbour arc: removed the same way */
+PATHS[24]=[[108,286],[110,290]];   /* the flying carpet, off the lake path */
 const pathSamples = [];
 // A common rounded ribbon avoids triangular flares at path joins.
 const pathHalfWidth = i => i===0 || i===25 ? 8.5 : [1,3,5,7,9,10,11,27].includes(i) ? 6 : 4.2;   // 25 = pier, 27 = west ring road (three spurs were added to the literal on 2026-10-28, so the pushed paths moved by 3)
@@ -2905,7 +2905,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-42,-528,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,32],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],[Math.cos(-0.05)*(islR(-0.05)+12),Math.sin(-0.05)*(islR(-0.05)+12),18],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[358,173,30],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [165,420,40],[-150,412,24],[95,225,52],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [198,408,38],[-150,412,24],[95,225,52],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -4462,8 +4462,8 @@ const carpetRide = new THREE.Group();
   // swings back and forth, the arc growing and shrinking over a long cycle; the carpet stays level
   poweredAnim(t=>{ const amp = 0.55 + 0.55*(0.5 + 0.5*Math.sin(t*0.09)); swing.rotation.x = Math.sin(t*1.05)*amp; carpet.rotation.x = -swing.rotation.x; });
 }
-place(carpetRide, 119/K, 369/K, 0.3);   /* 2026-11-12: off the gate tower and the garden wall */
-pickable(carpetRide, {n:'플라잉 카펫', c:'ride', sub:'스윙 라이드', cx:119/K, cz:369/K, h:16, r:22, desc:'두 탑 사이에 매달린 보라색 양탄자가 앞뒤로 크게 날아오르는 놀이기구. 꼭대기에서 잠깐 멈출 때 공원 전체가 한눈에 들어옵니다.', facts:[['위치','미니열차 선로 남쪽 · 미로 정원 북서쪽'],['특징','12인승 양탄자 · 최대 각도 약 65°']]});
+place(carpetRide, 112/K, 312/K, 0.3);   /* 2026-11-12: off the gate tower and the garden wall */
+pickable(carpetRide, {n:'플라잉 카펫', c:'ride', sub:'스윙 라이드', cx:112/K, cz:312/K, h:16, r:22, desc:'두 탑 사이에 매달린 보라색 양탄자가 앞뒤로 크게 날아오르는 놀이기구. 꼭대기에서 잠깐 멈출 때 공원 전체가 한눈에 들어옵니다.', facts:[['위치','미니열차 선로 남쪽 · 미로 정원 북서쪽'],['특징','12인승 양탄자 · 최대 각도 약 65°']]});
 
 // swing ride
 const swingRide = new THREE.Group();
@@ -4926,7 +4926,7 @@ pickable(obsTower, {n:'클라우드 타워', c:'ride', sub:'전망 타워', cx:-
 // hedge maze — a real maze (2026-10-29, mission 2): one way in from the park path, every corridor leads somewhere, the heart holds the traces of the old watercourse
 const maze = new THREE.Group(); let MAZE = null;
 {
-  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36).clone(), MX = 165, MZ = 420, MR = 0.2;
+  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36).clone(), MX = 198, MZ = 408, MR = 0;   /* 2026-11-12: east of the gate wing's corner tower, square to the wall */
   hedge.userData.keep = true;   // prepGroup must retain the live clipping plane, not clone a frozen copy
   let s2 = 7; const r2 = ()=> (s2 = (s2*16807) % 2147483647) / 2147483647;
   add(maze, BOX(S+2, 0.3, S+2), mat(0xd8c9a3));
@@ -4949,8 +4949,8 @@ const maze = new THREE.Group(); let MAZE = null;
   MAZE = {S, n, cell, TH, H, V, ent, dist, cx:MX, cz:MZ, rot:MR, marks, clip, seen:new Set()};
   islRoot.userData.mazeDeck = {cx:MX, cz:MZ, rot:MR, half:S/2 + 1, top:G + 0.3};
 }
-place(maze, 165/K, 420/K, 0.2);
-pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:165/K, cz:420/K, h:8, r:36, desc:'키 높은 생울타리 미로. 안쪽에서 깜빡이는 붉은 빛을 따라 네이티를 찾아보세요.', facts:[['위치','정문 동쪽']]});
+place(maze, 198/K, 408/K, 0);
+pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:198/K, cz:408/K, h:8, r:36, desc:'키 높은 생울타리 미로. 안쪽에서 깜빡이는 붉은 빛을 따라 네이티를 찾아보세요.', facts:[['위치','정문 동쪽']]});
 // a walker inside the maze is stopped by the hedges (point-to-wall distance), never by the maze lot itself
 function mazeInside(x, z, margin = 1){ const M = MAZE; if(!M) return false; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); return Math.abs(lx) < M.S/2 + margin && Math.abs(lz) < M.S/2 + margin; }
 function mazeHeart(x, z){ const M = MAZE; if(!M) return true; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); const i = Math.floor((lz + M.S/2)/M.cell), j = Math.floor((lx + M.S/2)/M.cell); return i >= 0 && j >= 0 && i < M.n && j < M.n && M.dist[i][j] === 0; }
@@ -5788,14 +5788,14 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 
   // ----- 5. the gate: a grand entrance — taller gate, arcaded wings with corner towers, turnstiles, flags, lamps, planters -----
   {
-    gate.position.z=PARK_ENTRY.z; gate.scale.set(1.2,1.1,1); clearTreesAt(-70, 405, 42); clearTreesAt(70, 405, 42);
+    gate.position.z=PARK_ENTRY.z;   /* 2026-11-12: the gate is drawn at 0.55 (a later step put that scale back); scale.set(1.2,1.1,1) here only reached the walk grid, which then held an invisible wall out to x 166 */ clearTreesAt(-70, 405, 42); clearTreesAt(70, 405, 42);
     const Gt = gate, beige = 0xeccf96, trimC = 0xd9b97a;
     // clock on the gate crown
     add(Gt, new THREE.CylinderGeometry(5, 5, 1, 24).rotateX(Math.PI/2), mat(0xffffff), 0, 46.5, 0); add(Gt, new THREE.TorusGeometry(5, 0.6, 8, 24), mat(C.navy), 0, 46.5, 0.5);
     add(Gt, BOX(0.6, 3.6, 0.3), mat(C.navy), 0, 46.5, 1); add(Gt, BOX(2.6, 0.6, 0.3), mat(C.navy), 1.1, 46.5, 1); add(Gt, CONE(3, 5, 4).rotateY(Math.PI/4), mat(C.navy), 0, 52, 0);
     // arcaded wings
     [-1, 1].forEach(s=>{
-      for(let i=0;i<(s > 0 ? 1 : 5);i++){ const x = s*(44 + i*16);   /* 2026-11-12: the east wing ran across the park inside the fence; it now ends where the fence turns */
+      for(let i=0;i<5;i++){ const x = s*(44 + i*16);
         add(Gt, BOX(14, 16, 6), mat(beige), x, 0, 0); add(Gt, BOX(15, 1.6, 7), mat(trimC), x, 16, 0);
         add(Gt, new THREE.TorusGeometry(4.6, 1.2, 8, 16, Math.PI), mat(0x3b4c78), x, 5, 0); add(Gt, BOX(9, 5.2, 1), mat(0x1d2f55), x, 0, 0);
         add(Gt, BOX(3, 18, 7), mat(trimC), x + s*8, 0, 0);
@@ -5804,12 +5804,12 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
         add(Gt, SPH(1.2, 10, 8), glowMat(0xfff0b8), x, 19, 4, false); add(Gt, CYL(0.3, 0.3, 3, 6), mat(0x2f3540), x, 17.6, 4);
       }
       // corner tower
-      const tx = s > 0 ? 66 : -128;
+      const tx = s*128;
       add(Gt, CYL(9, 10, 36, 14), mat(beige), tx, 0, 0); add(Gt, CYL(10.5, 10.5, 1.6, 14), mat(trimC), tx, 36, 0); add(Gt, CONE(11, 14, 14), mat(C.navy), tx, 37.6, 0);
       for(let k=0;k<4;k++) add(Gt, BOX(2.4, 4, 0.6), mat(0x2b3a5a), tx + Math.cos(k*1.57)*9.6, 22, Math.sin(k*1.57)*9.6, false).rotation.y = -k*1.57;
       add(Gt, CYL(0.3, 0.3, 14, 6), mat(0x3a3f4a), tx, 51.6, 0); const f = add(Gt, new THREE.PlaneGeometry(7, 4.4), new THREE.MeshLambertMaterial({color:C.sun, side:THREE.DoubleSide}), tx + 3.6, 63, 0, false); islAnim.push(t=>{ f.rotation.y = Math.sin(t*3 + s)*0.3; });
       // planters along the wing
-      for(let i=0;i<(s > 0 ? 0 : 4);i++){ const x = s*(52 + i*16); add(Gt, BOX(8, 3, 4), mat(0x9a6b45), x, 0, 8); for(let k=0;k<6;k++) add(Gt, ICO(1, 0), flat([0xff9fcf, 0xffd400, 0xffffff, 0x58b368][k%4]), x - 3 + k*1.2, 3.6, 7.2 + (k%2)*1.4, false); }
+      for(let i=0;i<4;i++){ const x = s*(52 + i*16); add(Gt, BOX(8, 3, 4), mat(0x9a6b45), x, 0, 8); for(let k=0;k<6;k++) add(Gt, ICO(1, 0), flat([0xff9fcf, 0xffd400, 0xffffff, 0x58b368][k%4]), x - 3 + k*1.2, 3.6, 7.2 + (k%2)*1.4, false); }
     });
     // turnstiles in front of the gate
     for(let i=0;i<11;i++){ const x = -18 + i*3.6;
@@ -5822,7 +5822,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
           if(walk){const wp=new THREE.Vector3();hinge.getWorldPosition(wp);if(Math.hypot(walk.x-wp.x,walk.z-wp.z)<5)open=1;}
           const wp=new THREE.Vector3();hinge.getWorldPosition(wp);if(islRoot.userData.visitorAudit?.positions?.some(p=>p&&Math.abs(p[0]-(wp.x+1.6))<2&&Math.abs(p[1]-wp.z)<4))open=1;hinge.rotation.set(0,0,open*Math.PI*.48);}; islAnim.push(animate); hinge.userData.animate=animate;
       } }
-    add(Gt, BOX(44, 5.6, 1.2), mat(0x3b4c78), -76, 17.6, 3.2); add(Gt, new THREE.PlaneGeometry(40, 5), new THREE.MeshBasicMaterial({map:signTex('WELCOME TO DOROLAND', {bg:'#1d2f55', fg:'#ffd400', size:60, w:1024, h:128})}), -76, 20.4, 3.9, false);
+    add(Gt, BOX(44, 5.6, 1.2), mat(0x3b4c78), 76, 17.6, 3.2); add(Gt, new THREE.PlaneGeometry(40, 5), new THREE.MeshBasicMaterial({map:signTex('WELCOME TO DOROLAND', {bg:'#1d2f55', fg:'#ffd400', size:60, w:1024, h:128})}), 76, 20.4, 3.9, false);
     // lamp posts and benches round the plaza outside, flagpoles with rainbow flags, a balloon arch at the pier head
     for(let i=0;i<10;i++){ const a = Math.PI*0.08 + i/9*Math.PI*0.84, x = Math.cos(a)*60, z = 452 + Math.sin(a)*60; lampPost(islRoot, x, z, 9, 1.1).position.y = G; }
     [[-54, 420, 0.9],[54, 420, -0.9],[-66, 470, 1.6],[66, 470, -1.6]].forEach(([x,z,r])=> bench(islRoot, x, z, r).position.y = G);
@@ -6524,7 +6524,6 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   for(let x=-220;x<=-40;x+=12)add(apron,BOX(.1,.025,88),mat(0xb0a58f),x,G+.065,458,false);
   for(let z=418;z<=500;z+=12)add(apron,BOX(180,.025,.1),mat(0xb0a58f),-130,G+.065,z,false);
   for(let x=-225;x<=-40;x+=12)for(let z=406;z<=510;z+=12)clearRoute(x,z,10);
-  walkway(PATHS[26],12,'harbour-main-concourse');
   // A single terminal, with an open canopy facing the route to the gate.
   const hall=new THREE.Group();hall.name='harbour-terminal';hall.position.set(-155,G,420);apron.add(hall);
   add(hall,BOX(42,.8,20),mat(0xd6cbb5),0,-.6,0);
@@ -7930,7 +7929,7 @@ function buildWalkGrid(){
     const mark = (x, z)=>{ for(let dz = -0.5; dz <= 0.5; dz += 0.5) for(let dx = -0.5; dx <= 0.5; dx += 0.5) if(inb(x + dx, z + dz)) a[at(x + dx, z + dz)] = 1; };
     const seg = (ax, az, bx, bz)=>{ const L = Math.hypot(bx - ax, bz - az), n = Math.max(1, Math.ceil(L/0.5)); for(let i = 0; i <= n; i++){ const t = i/n; mark(ax + (bx - ax)*t, az + (bz - az)*t); } };
     const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3(), nm = new THREE.Vector3(), e1 = new THREE.Vector3(), e2 = new THREE.Vector3();
-    const skipped = o => { for(let p = o; p; p = p.parent) if(SKIP.has(p)) return true; return false; };
+    const skipped = o => { for(let p = o; p; p = p.parent) if(SKIP.has(p) || !p.visible) return true; return false; };   /* a mesh under a hidden group is not there (2026-11-12) */
     root.traverse(m=>{ if(!m.isMesh || m.isInstancedMesh || !m.visible || !m.geometry || !m.geometry.attributes.position || skipped(m)) return;
       const g = m.geometry, pos = g.attributes.position, ix = g.index, M = m.matrixWorld, n = ix ? ix.count : pos.count;
       for(let i = 0; i + 2 < n; i += 3){ const i0 = ix ? ix.getX(i) : i, i1 = ix ? ix.getX(i + 1) : i + 1, i2 = ix ? ix.getX(i + 2) : i + 2;
@@ -8224,7 +8223,7 @@ function stepWorld(){ if(flowFree() || !TEAM || AUX || (tutStep >= 0 && tutStep 
 function flowLockUI(){ const sw = stepWorld(); document.querySelectorAll('#worlds button').forEach(b=>{ const lock = !!sw && b.dataset.w !== sw; b.classList.toggle('lock', lock); b.setAttribute('aria-disabled', lock); }); }
 
 // where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
-const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [165, 420];   // Naty waits in the maze (mission 2)
+const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [198, 408];   // Naty waits in the maze (mission 2)
 let XYLO_HIDE = null, NATY_HOME = null;
 function vikSpot(){ if(vikSpot.p) return vikSpot.p; const b = VIK_B, R0 = b.r || 40; let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - b.cx, pz - b.cz); if(d > R0 + 2 && d < bd){ bd = d; best = [px, pz]; } }
   const p = best ? freeSpot(best[0], best[1]) : freeSpot(b.cx, b.cz + R0 + 12), dx = b.cx - p[0], dz = b.cz - p[1], D = Math.hypot(dx, dz) || 1, x = freeSpot(p[0] + dx/D*6 - dz/D*4, p[1] + dz/D*6 + dx/D*4);
