@@ -4,7 +4,7 @@
   "kind": "campus",
   "campus": {
    "id": "z1",
-   "name": "융합교육관 전시대",
+   "name": "융합교육관",
    "lat": 37.295655,
    "lng": 126.838475
   },
@@ -19,13 +19,13 @@
   "kind": "campus",
   "campus": {
    "id": "z2",
-   "name": "하냥이 벤치",
-   "lat": 37.295777,
-   "lng": 126.841176
+   "name": "캠퍼스 기록 2",
+   "lat": 37.295565,
+   "lng": 126.840878
   },
   "island": {
-   "id": "dl-ferris",
-   "name": "관람차"
+   "id": "dl-carousel",
+   "name": "회전목마"
   },
   "scans": []
  },
@@ -34,23 +34,23 @@
   "kind": "campus",
   "campus": {
    "id": "z3",
-   "name": "카카오데이터센터",
+   "name": "캠퍼스 기록 3",
    "lat": 37.293614,
    "lng": 126.831854
   },
   "island": {
-   "id": "dl-safari",
-   "name": "사파리"
+   "id": "dl-ferris",
+   "name": "관람차"
   },
   "scans": []
  },
  {
-  "id": "dl-carousel",
+  "id": "dl-safari",
   "kind": "quest",
-  "quest": "q2",
+  "quest": "q5",
   "island": {
-   "id": "dl-carousel",
-   "name": "회전목마"
+   "id": "dl-safari",
+   "name": "사파리"
   },
   "scans": []
  },
