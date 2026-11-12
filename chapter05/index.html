@@ -41,6 +41,7 @@ body.admkey.teamdev #adminBtn{width:auto;padding:0 12px;gap:2px}
 #chaseFail button:active{transform:scale(.98)}
 #questHud.far{border-color:#ff8a7a;box-shadow:0 0 0 3px rgba(255,107,94,.35)}
 @media (prefers-reduced-motion:reduce){#chaseFail .in{animation:none}}
+#heroPick{position:fixed;inset:0;z-index:34;display:none;place-items:center;overflow:auto;background:color-mix(in srgb,var(--void) 88%,transparent);color:var(--void-fg);-webkit-user-select:none;user-select:none}#heroPick[data-on]{display:grid}#heroPick .in{display:grid;gap:18px;justify-items:center;width:min(560px,92vw);margin:16px 0;padding:26px 24px 24px;border-radius:22px;box-sizing:border-box;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--void-edge) 30%,transparent),transparent 55%),var(--void);border:1px solid color-mix(in srgb,var(--void-edge) 55%,transparent)}#heroPick h2{margin:0;font-size:22px;word-break:keep-all}#heroPick .who,#heroPick .view{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}#heroPick .who button,#heroPick .view button{border:1px solid color-mix(in srgb,var(--void-fg) 18%,transparent);background:color-mix(in srgb,var(--void-fg) 6%,transparent);color:var(--void-fg);border-radius:16px;font:700 16px var(--sans);cursor:pointer;transition:border-color .15s,background .15s,transform .12s}#heroPick .who button{display:grid;justify-items:center;gap:8px;padding:14px 10px 14px}#heroPick .who img{height:clamp(96px,22vh,150px);max-width:100%;object-fit:contain;object-position:bottom}#heroPick .view button{display:grid;gap:4px;min-height:64px;padding:12px 10px;text-align:center}#heroPick .view span{font:500 13px/1.4 var(--sans);color:color-mix(in srgb,var(--void-fg) 72%,transparent);word-break:keep-all}#heroPick button[aria-pressed="true"]{border-color:#9ff6ff;background:color-mix(in srgb,#9ff6ff 12%,transparent);box-shadow:0 0 0 3px rgba(159,246,255,.18)}#heroPick button:active{transform:scale(.98)}#heroPick button:focus-visible{outline:2px solid #9ff6ff;outline-offset:2px}#heroPick .go{border:0;border-radius:999px;min-height:48px;padding:13px 40px;background:#9ff6ff;color:#06111a;font:700 16px var(--sans);cursor:pointer}@media (max-height:520px){#heroPick .in{gap:12px;padding:16px 18px}#heroPick .who img{height:80px}}@media (prefers-reduced-motion:reduce){#heroPick .who button,#heroPick .view button{transition:none}}html.aux #heroPick{display:none!important}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -593,6 +594,7 @@ body.walk #questHud.near{border-color:rgba(159,246,255,.62);box-shadow:0 8px 24p
 body.walk #questHud .tmp{position:absolute;left:0;top:calc(100% + 4px);min-height:44px}
 #walkHelp:focus-visible,#walkX:focus-visible{outline:3px solid #9ff6ff;outline-offset:3px}
 @media(max-width:760px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(520px,calc(100vw - 24px))}}
+@media(max-width:960px){body.walk #questHud{top:calc(80px + env(safe-area-inset-top,0px));width:min(520px,calc(100vw - 24px))}}
 #ydSuccess{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 0;padding:12px;border-radius:10px;background:#123f34;border:1px solid #7de7b7;color:#d9fff0;font-size:12px}
 #ydSuccess[hidden]{display:none}
 #ydSuccess b{font-size:16px;color:#a8ffd0}
@@ -707,7 +709,8 @@ body.island #panel,body.sim #panel{display:none}
   <div class="grid" id="wpGrid"></div>
   <button type="button" class="skip" id="wpSkip">나중에</button>
 </div></div>
-<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-label="조작법" title="조작법" aria-expanded="false" aria-controls="walkHint">?</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkX">나가기</button></section>
+<div id="heroPick" role="dialog" aria-modal="true" aria-labelledby="hpT"><div class="in"><h2 id="hpT">누구로 탐험할까요?</h2><div class="who" id="hpWho"></div><div class="view" id="hpView" role="group" aria-label="시점"></div><button type="button" class="go" id="hpGo">시작</button></div></div>
+<section id="walkHud" class="glass" hidden aria-live="polite"><div><small>EXPLORE</small><b id="walkName"></b></div><button type="button" id="walkHelp" aria-label="조작법" title="조작법" aria-expanded="false" aria-controls="walkHint">?</button><span class="hint" id="walkHint" hidden></span><button type="button" id="walkWho" hidden>캐릭터·시점</button><button type="button" id="walkX">나가기</button></section>
 <div id="walkPad" hidden aria-hidden="true"><i></i></div>
 <div id="miniBox" hidden><div class="dots" id="miniDots"></div><button type="button" id="miniGo">찍기</button><button type="button" id="miniDone" class="alt" hidden>완료</button></div><div id="flash"></div>
 <div id="yardDlg" role="dialog" aria-modal="true" aria-labelledby="ydT"><div class="room"><i class="lamp"></i><div class="in"><small>MAINTENANCE · SPARE BREAKER</small><h1 id="ydT">예비 배전선</h1><p id="ydP">칸을 눌러 돌리세요. 발전기에서 모든 칸까지 선이 이어지면 선로에 불이 들어옵니다.</p><div class="board" id="ydBoard"></div><p id="ydSuccess" role="status" hidden><b>전력 복구 완료</b><span>섬 전체의 놀이기구와 조명에 전원이 들어왔어요</span></p><button type="button" class="go" id="ydContinue" hidden>Space ▸ 계속</button><div class="row"><span class="lamps" id="ydLamps"></span><button type="button" class="later" id="ydMix">다시 섞기</button></div></div></div></div><div id="rideDlg" role="dialog" aria-modal="true" aria-labelledby="rdT2"><div class="in"><small class="k">SKY LOOP · HOW TO</small><h1 id="rdT2">스카이루프에서 네 좌표를 확보해요</h1><ol><li><i>1</i><b>열차가 섬을 한 바퀴 돌아요</b><span>열차를 타고 이동하며 남은 촬영 좌표를 확인해요. 열차는 저절로 달려요.</span></li><li><i>2</i><b>노선의 표시 지점 네 곳을 확인해요</b><span>표시 지점에서 좌표 카드를 받아요. 캠퍼스 두 곳과 섬 두 곳의 좌표예요.</span></li><li><i>3</i><b>열차가 고리 안에 있을 때 「좌표 확인」을 꾹</b><span>버튼이 차면 좌표 확보 완료. 놓쳤다면 다음 바퀴에 다시 확인해요. 실제 기록은 내려서 그 자리에서 찍어요.</span></li></ol><div class="demo" aria-hidden="true"><div class="cap"><span>고리 밖 · 아직 흐려요, 기다리기</span><span>고리 안 · 지금 「좌표 확인」을 꾹!</span><span>좌표 확보 ✓</span></div><div class="rail"></div><div class="ring"></div><div class="tr"></div><div class="btn"><b>좌표 확인</b></div></div><p class="sub">네 좌표를 모두 확보하면 역으로 돌아와요. 좌표만 얻었을 때는 기록 수가 늘지 않아요.</p><button type="button" id="rideGo">출발 · 한 바퀴 돌기</button></div></div>
@@ -6055,7 +6058,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
       BAKED.forEach(e=>{ e.p.updateWorldMatrix(true, false); e.node.updateWorldMatrix(true, false); e.m.updateMatrix(); const rel = relativeMatrix(e.p, e.node); let moved = false; for(let i = 0; i < 16; i++) if(Math.abs(rel.elements[i] - e.pw.elements[i]) > 1e-3){ moved = true; break; } const own = !e.m.matrix.equals(e.ml) && !moved, vis = e.m.visible !== e.v;
         let attached = false; for(let q = e.p; q; q = q.parent) if(q.isScene){ attached = true; break; }
         if(!(moved || own || vis)) return; const k = label(e.p) + ' | ' + (moved ? '합친 자리와 따로 움직임' : own ? '조각이 움직임' : '보임/숨김 바뀜') + (attached ? '' : ' (분리된 그룹)'); const r = out.get(k) || {n:0, colors:new Set()}; r.n++; const mt = e.m.material; if(mt && mt.color) r.colors.add('#' + mt.color.getHexString()); out.set(k, r); });
-      return [...out].map(([k, r])=> [k, r.n, [...r.colors].slice(0, 4).join(' ')]).sort((a, b)=> b[1] - a[1]); }, zoneMine:(id)=>{ const m = MISSION_E.find(x=> x.id === id) || MI.find(x=> x.id === id); return zoneMine(m); }, walkGrid:()=> WGRID || (WGRID = buildWalkGrid()), onPath:(x, z)=> onPath(x, z), walkBlocked:(x, z)=> walkBlocked(x, z), miniCp:()=> miniLoad(), say:(...a)=> say(...a), walkTo:(x, z)=>{ if(walk){ walk.x = x; walk.z = z; } }, walkState:()=> walk ? {x:walk.x, z:walk.z, name:walk.name} : null, mini:()=> mini ? {kind:mini.kind, phase:mini.phase, target:mini.target || null, arrived:!!mini.arrived} : null, target:()=> questLive ? questTarget(questLive) : null, qdone:()=> [...QDONE], quests:()=> QUESTS.map(q=> ({id:q.id, open:questOpen(q), done:questDone(q)})), act:(n)=> playAct(n), chars:()=> ({ZERO, RICO, XYLO, CODEX, NATY}), rigPose:(...a)=> rigPose(...a), act:(n)=> playAct(n), tutEnd:()=> tutEnd(), simState:()=> ({simOn, lit:SIM_LIT, reveals:REVEALS.length, busy:actBusy, walk:!!walk, vn:!!vn, cinema:!$('cinema').hidden}), tutState:()=> ({step:tutStep, world:W.id, len:TUT.length, LOCAL, locked:MISSION_E.filter(m=> m.lat != null).map(m=> [m.id, zoneLocked(m), zoneDone(m)]), restoreShow:typeof restoreShow, goWorld:typeof goWorld, vnVoid:VN_IMG['보이드']}), islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=> startWalk(n), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, NATY_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, qnav:()=> ({route:qNav, count:qTrailMesh ? qTrailMesh.count : -1, mark:$('qMark').className, markT:$('qMark').style.transform, markTxt:$('qMark').textContent, route2:(s, t, r)=> qRoute(...s, ...t, r)}), scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid, ride:()=> ride, caveS:()=> caveS, yard:()=> yard, lab:()=> labGame, train:()=> TRAIN, maze:()=> MAZE, mazeBlocked:(x, z)=> mazeBlocked(x, z), station:()=> STATION, power:()=>({on:parkPowerOn(),clock:PARK_T,poweredAnimations:islAnim.filter(f=>f.powered).length}),forestSpot,device:()=>({model:collectorModel,mini,spot:deviceSpot()}),labDoor:()=> LAB_DOOR, natyHide:()=> NATY_HIDE, yardPaint:()=> yardPaint(), labWin:()=> labGame && labGame.win(), yardDoor:()=> YARD_DOOR, dlg:{yard:(win)=>{ yardBuild(); if(win){ yard.tiles = yard.sol.map(r=> r.map(c=> new Set(c))); yard.done = true; yardPaint(); $('yardDlg').classList.add('win'); } $('yardDlg').dataset.on = '1'; }, lab:(all)=>{ mini = {kind:'maze'}; labBuild(); if(all)$('lbGo').hidden=false; $('labDlg').dataset.on = '1'; }, cave:(test)=>{ caveBuild(); if(test){ $('cvNext').click(); } $('caveDlg').dataset.on = '1'; }}};   // for the overlap audit and screenshot scripts
+      return [...out].map(([k, r])=> [k, r.n, [...r.colors].slice(0, 4).join(' ')]).sort((a, b)=> b[1] - a[1]); }, zoneMine:(id)=>{ const m = MISSION_E.find(x=> x.id === id) || MI.find(x=> x.id === id); return zoneMine(m); }, walkGrid:()=> WGRID || (WGRID = buildWalkGrid()), onPath:(x, z)=> onPath(x, z), walkBlocked:(x, z)=> walkBlocked(x, z), miniCp:()=> miniLoad(), say:(...a)=> say(...a), walkTo:(x, z)=>{ if(walk){ walk.x = x; walk.z = z; } }, walkState:()=> walk ? {x:walk.x, z:walk.z, name:walk.name} : null, mini:()=> mini ? {kind:mini.kind, phase:mini.phase, target:mini.target || null, arrived:!!mini.arrived} : null, target:()=> questLive ? questTarget(questLive) : null, qdone:()=> [...QDONE], quests:()=> QUESTS.map(q=> ({id:q.id, open:questOpen(q), done:questDone(q)})), act:(n)=> playAct(n), chars:()=> ({ZERO, RICO, XYLO, CODEX, NATY}), rigPose:(...a)=> rigPose(...a), act:(n)=> playAct(n), tutEnd:()=> tutEnd(), simState:()=> ({simOn, lit:SIM_LIT, reveals:REVEALS.length, busy:actBusy, walk:!!walk, vn:!!vn, cinema:!$('cinema').hidden}), tutState:()=> ({step:tutStep, world:W.id, len:TUT.length, LOCAL, locked:MISSION_E.filter(m=> m.lat != null).map(m=> [m.id, zoneLocked(m), zoneDone(m)]), restoreShow:typeof restoreShow, goWorld:typeof goWorld, vnVoid:VN_IMG['보이드']}), islRoot, pathSamples, OCC, IB, PATHS, G, K, camera, controls, flyTo, setWorld:(...a)=> setWorld(...a), setSim:(v)=> setSim(v), sim:()=> simRoot, glyph:()=> ({GLYPH, glyphBits, glyphSlice}), startWalk:(n)=>{ if(n === PAIR && !heroLoad()) heroSave('제로', false); startWalk(n); }, hero:()=> ({n:HERO, fp:FPV, open:!!$('heroPick').dataset.on, walkFp:walk ? !!walk.fp : null, mates:walk ? walk.mates.map(m=> CHAR.find(c=> c.g === m.g).n) : null, shown:CHAR.filter(c=> PAIR_NAMES.includes(c.n)).map(c=> [c.n, c.g.visible])}), stopWalk:()=> stopWalk(), walk:()=> walk, setDemo:(ids, on)=> setDemo(ids, on), me:()=> myPos, follow:()=> follow, followMe:()=> followMe(), fly:()=> fly, nav:()=> ({navMode, navDirS, compassDeg}), setNavMode, fakeCompass:(d)=>{ compassDeg = d; compassAt = Date.now(); }, walkBlocked:(x, z)=> walkBlocked(x, z), groundY:(x, z)=> groundY(x, z), stageAt:(z, n)=> stageAt(z, (typeof ACT_CAST === 'object' ? ACT_CAST[n] : ()=> [])()), quest:()=> ({QUESTS, done:[...QDONE], live:questLive, target:questTarget, mini:()=> mini, set:(ids)=>{ QDONE = new Set(ids); saveQuest(); questApply(); renderList(); renderBoard(); }, say, next:()=> vnNext(), vn:()=> vn, XYLO_HIDE, NATY_HIDE, CAVE_MOUTH, zonesDone:()=> MISSION_E.filter(zoneDone).map(m=> m.id), open:()=> WALKERS.filter(walkerOpen)}), arrow:()=> meArrow, qnav:()=> ({route:qNav, count:qTrailMesh ? qTrailMesh.count : -1, mark:$('qMark').className, markT:$('qMark').style.transform, markTxt:$('qMark').textContent, route2:(s, t, r)=> qRoute(...s, ...t, r)}), scene:()=> sceneI, bed:()=> simBed, grid:()=> simGrid, ride:()=> ride, caveS:()=> caveS, yard:()=> yard, lab:()=> labGame, train:()=> TRAIN, maze:()=> MAZE, mazeBlocked:(x, z)=> mazeBlocked(x, z), station:()=> STATION, power:()=>({on:parkPowerOn(),clock:PARK_T,poweredAnimations:islAnim.filter(f=>f.powered).length}),forestSpot,device:()=>({model:collectorModel,mini,spot:deviceSpot()}),labDoor:()=> LAB_DOOR, natyHide:()=> NATY_HIDE, yardPaint:()=> yardPaint(), labWin:()=> labGame && labGame.win(), yardDoor:()=> YARD_DOOR, dlg:{yard:(win)=>{ yardBuild(); if(win){ yard.tiles = yard.sol.map(r=> r.map(c=> new Set(c))); yard.done = true; yardPaint(); $('yardDlg').classList.add('win'); } $('yardDlg').dataset.on = '1'; }, lab:(all)=>{ mini = {kind:'maze'}; labBuild(); if(all)$('lbGo').hidden=false; $('labDlg').dataset.on = '1'; }, cave:(test)=>{ caveBuild(); if(test){ $('cvNext').click(); } $('caveDlg').dataset.on = '1'; }}};   // for the overlap audit and screenshot scripts
     window.__islandCam = (x, z, d=120)=>{ setWorld('island', true); flyTo(new THREE.Vector3(x + d*0.55, G + d*0.75, z + d*0.8), new THREE.Vector3(x, G, z), 10); };
   }
 
@@ -7963,22 +7966,44 @@ function walkBlocked(x, z){ if(portFenceBlocked(x,z))return true; if(caveBlocked
   if(Math.hypot(x, z) > edgeR(x, z) - 7) return true; for(const b of WALK_BLOCKS()) if(Math.hypot(x - b.cx, z - b.cz) < b.rr) return true; return false; }
 function freeSpot(x, z){ for(let i=0;i<80 && walkBlocked(x, z);i++){ const a = i*0.8, d = 6 + i*3; x += Math.cos(a)*d; z += Math.sin(a)*d; } return [x, z]; }
 let walkSaved = null;
+/* ---------- one explorer of the pair, third or first person (user, 2026-11-12) ---------- */
+let HERO = null, FPV = false, heroSel = {n:'제로', fp:false}, heroCb = null;
+const HERO_KEY = ()=> `void-hero-${TEAM || 0}`;
+function heroLoad(){ HERO = null; FPV = false; try{ const o = JSON.parse(localStorage.getItem(HERO_KEY()) || 'null'); if(o && PAIR_NAMES.includes(o.n)){ HERO = o.n; FPV = !!o.fp; } }catch(e){} return HERO; }
+function heroSave(n, fp){ HERO = n; FPV = !!fp; try{ localStorage.setItem(HERO_KEY(), JSON.stringify({n, fp:FPV})); }catch(e){} }
+function heroDraw(){
+  $('hpWho').innerHTML = ['제로', '리코'].map(n=> `<button type="button" data-n="${n}" aria-pressed="${heroSel.n === n}"><img src="img/chars/${n === '제로' ? 'zero' : 'rico'}.png?v=20261028c" alt=""><b>${n}</b></button>`).join('');
+  $('hpView').innerHTML = [[0, '3인칭', '캐릭터가 화면에 보여요'], [1, '1인칭', '캐릭터의 눈으로 봐요']].map(([v, t, d])=> `<button type="button" data-fp="${v}" aria-pressed="${!!v === heroSel.fp}"><b>${t}</b><span>${d}</span></button>`).join(''); }
+function heroPick(cb){ heroLoad(); heroSel = {n:HERO || '제로', fp:FPV}; heroCb = cb || null; heroDraw(); $('heroPick').dataset.on = '1'; setTimeout(()=>{ try{ $('hpGo').focus(); }catch(e){} }, 50); }
+$('heroPick').addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b) return; e.stopPropagation();
+  if(b.dataset.n){ heroSel.n = b.dataset.n; sfx('tap'); heroDraw(); return; }
+  if(b.dataset.fp != null){ heroSel.fp = b.dataset.fp === '1'; sfx('tap'); heroDraw(); return; }
+  if(b.id === 'hpGo'){ heroSave(heroSel.n, heroSel.fp); delete $('heroPick').dataset.on; sfx('open'); const cb = heroCb; heroCb = null; if(walk) heroApply(); if(cb) cb(); } });
+function heroHide(w){ w.hid = w.name === PAIR ? CHAR.filter(x=> PAIR_NAMES.includes(x.n) && x !== w.c).map(x=> ({g:x.g, v:x.g.visible})) : []; w.hid.forEach(h=>{ h.g.visible = false; }); }
+function heroApply(){ const w = walk; if(!w || w.name !== PAIR) return; const c = CHAR.find(x=> x.n === HERO); if(!c) return;
+  if(c !== w.c){ w.home.forEach(h=>{ h.g.position.copy(h.p); h.g.rotation.y = h.r; }); (w.hid || []).forEach(h=>{ h.g.visible = h.v; }); w.mates.forEach(m=>{ m.g.visible = true; });
+    w.c = c; w.mates = [c]; w.home = [{g:c.g, p:c.g.position.clone(), r:c.g.rotation.y}]; heroHide(w); c.g.userData.fx = null; }
+  w.fp = FPV; w.pitch = FPV ? -0.05 : -0.32; w.snap = true; $('walkName').textContent = HERO; }
+$('walkWho').onclick = ()=>{ if(walk && walk.name === PAIR && !vn) heroPick(null); };
 function startWalk(name){
-  const lead = name === PAIR ? '제로' : name, c = CHAR.find(c=> c.n === lead); if(!c || walk) return; sfx('whoosh');
+  const lead = name === PAIR ? (heroLoad() || '제로') : name, c = CHAR.find(c=> c.n === lead); if(!c || walk) return;
   if(AUX){ toast('미션은 조 태블릿에서 이어져요'); return; }
   if(!walkerOpen(name)){ toast(`${name}의 시점은 ${walkerWhy(name)} 열립니다`); return; }
   delete $('walkPick').dataset.on;
+  if(name === PAIR && !HERO){ heroPick(()=> startWalk(name)); return; }   /* the first walk: choose who and how */
+  sfx('whoosh');
   if(W.id !== 'island') setWorld('island', true);
   if(simOn) setSim(false); if(inside) exitInterior(); select(-1); delete $('restoreDlg').dataset.on;
   const box = new THREE.Box3().setFromObject(c.g), eye = c.n === '네이티' ? 0.6 : Math.max(1.3, (box.max.y - box.min.y)*0.9);   // 네이티 floats (lift 1.2 in walkTick): 0.6 + lift ≈ a child's eye line (2026-10-29)
   const p = c.g.getWorldPosition(new THREE.Vector3());
-  walk = {c, name, mates:name === PAIR ? CHAR.filter(x=> PAIR_NAMES.includes(x.n)) : [c], eye, x:p.x, z:p.z, yaw:c.g.rotation.y, pitch:-0.32, bob:0, last:performance.now(), drag:null, fly:c.n === '네이티', snap:true};
+  walk = {c, name, mates:[c], fp:name === PAIR && FPV, eye, x:p.x, z:p.z, yaw:c.g.rotation.y, pitch:name === PAIR && FPV ? -0.05 : -0.32, bob:0, last:performance.now(), drag:null, fly:c.n === '네이티', snap:true};
   walk.home = walk.mates.map(m=> ({g:m.g, p:m.g.position.clone(), r:m.g.rotation.y}));   // put them back where they stood when the walk ends
+  heroHide(walk);   /* the one who was not chosen is not drawn while walking */
   for(let i=0;i<80 && walkBlocked(walk.x, walk.z);i++){ const a = i*0.8, d = 6 + i*3; walk.x = p.x + Math.cos(a)*d; walk.z = p.z + Math.sin(a)*d; }   // characters standing in a fenced lot step out
   walkSaved = {pos:camera.position.clone(), tgt:controls.target.clone(), near:camera.near, fov:camera.fov};
   fly = null; if(follow) setFollow(false); hovered = -1; renderer.domElement.style.cursor = '';
   camera.near = 0.2; camera.fov = 68; camera.updateProjectionMatrix(); controls.enabled = false;
-  document.body.classList.add('walk'); $('walkName').textContent = name; $('walkHud').setAttribute('aria-label', `${name} 시점`);
+  document.body.classList.add('walk'); $('walkName').textContent = name === PAIR ? HERO : name; $('walkWho').hidden = name !== PAIR; $('walkHud').setAttribute('aria-label', `${name} 시점`);
   $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '패드로 걷기 · 끝까지 밀면 달리기 · 화면 끌어 둘러보기' : '방향키로 걷기 · Shift 달리기 · 화면 끌어 둘러보기';
   $('walkHint').hidden = true; $('walkHelp').setAttribute('aria-expanded', 'false');
   $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none'); placeQuestHud();
@@ -7992,6 +8017,7 @@ function stopWalk(byUser){ if(MAZE) MAZE.clip.constant = 1e6; document.body.clas
   if(typeof mini !== 'undefined' && mini) miniClear();
   if(!walk) return;
   if(left && byUser) setTimeout(()=>{ try{ voidSay('미션 진행은 저장해 뒀어. 왼쪽 아래 「미션 이어하기」를 누르면 하던 데서 다시 시작해.', 7000, 'say'); }catch(e){} }, 400);
+  (walk.hid || []).forEach(h=>{ h.g.visible = h.v; }); walk.mates.forEach(m=>{ m.g.visible = true; }); delete $('heroPick').dataset.on;
   walk.home.forEach(h=>{ h.g.position.copy(h.p); h.g.rotation.y = h.r; }); walk = null; for(const k in WALK_KEYS) delete WALK_KEYS[k]; walkPad.dx = walkPad.dz = 0; walkPad.run = false; walkPad.id = null; $('walkPad').classList.remove('run'); $('walkPad').querySelector('i').style.transform = '';
   camera.near = walkSaved.near; camera.fov = mapFov(); camera.updateProjectionMatrix();
   camera.position.copy(walkSaved.pos); controls.target.copy(walkSaved.tgt); controls.enabled = true;
@@ -8003,7 +8029,7 @@ function walkTick(now){
   const w = walk, dt = Math.min(0.05, Math.max(0, (now - w.last)/1000)); w.last = now;
   if(w.ride){ rideTick(now, dt); questNav(); return; }   // mission 1: the Sky Loop lap drives the camera and the pair
   if(questLive && mini && now - (w.saveAt || 0) > 3000){ w.saveAt = now; miniSavePos(); }
-  const k = WALK_KEYS, hold = vn || qRewardEl.dataset.on ? 0 : 1;   // no walking while a dialogue or the coordinate card is up
+  const k = WALK_KEYS, hold = vn || qRewardEl.dataset.on || $('heroPick').dataset.on ? 0 : 1;   // no walking while a dialogue or the coordinate card is up
   const fwd = ((k.ArrowUp || k.KeyW ? 1 : 0) - (k.ArrowDown || k.KeyS ? 1 : 0))*hold, turn = ((k.ArrowLeft || k.KeyA ? 1 : 0) - (k.ArrowRight || k.KeyD ? 1 : 0))*hold, strafe = ((k.KeyE ? 1 : 0) - (k.KeyQ ? 1 : 0))*hold;
   w.yaw += turn*1.8*dt;
   let mx = fwd - walkPad.dz*hold, mz = strafe + walkPad.dx*hold; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
@@ -8019,31 +8045,33 @@ function walkTick(now){
   const gy = groundY(w.x, w.z), moving = w.x !== oldX || w.z !== oldZ;
   const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : 0;
   // third person: the characters stand where you walk and face the way you go (side by side for the pair); the camera follows from behind and above
-  const inMaze = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1); w.mazeCamera = inMaze;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
+  const inMazeNow = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1), inMaze = inMazeNow && !w.fp; w.mazeCamera = inMazeNow;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
   w.mates.forEach((m, i)=>{ const k = i - (w.mates.length - 1)/2; let side = k*(inMaze ? 0.9 : 2.4), back = inMaze ? Math.abs(k)*1.6 : 0;
     let px = w.x + cy*side - sy*back, pz = w.z - sy*side - cy*back; if(inMaze && mazeBlocked(px, pz)){ px = w.x; pz = w.z; }
     const u = m.g.userData, far = u.fx == null || w.snap || Math.hypot(px - u.fx, pz - u.fz) > 6 || dt <= 0;
     if(far){ u.fx = px; u.fz = pz; u.fyaw = w.yaw; u.fv = 0; }
-    else { const fk = 1 - Math.exp(-dt*(inMaze ? 20 : 11)), ox = u.fx, oz = u.fz; u.fx += (px - u.fx)*fk; u.fz += (pz - u.fz)*fk;
+    else { const fk = w.mates.length === 1 ? 1 : 1 - Math.exp(-dt*(inMaze ? 20 : 11)), ox = u.fx, oz = u.fz; u.fx += (px - u.fx)*fk; u.fz += (pz - u.fz)*fk;
       if(inMaze && mazeBlocked(u.fx, u.fz)){ u.fx = px; u.fz = pz; }
       const vx = (u.fx - ox)/dt, vz = (u.fz - oz)/dt, v = Math.hypot(vx, vz); u.fv += (v - u.fv)*(1 - Math.exp(-dt*10));
       const want = v > 0.9 ? Math.atan2(vx, vz) : w.yaw; u.fyaw += Math.atan2(Math.sin(want - u.fyaw), Math.cos(want - u.fyaw))*(1 - Math.exp(-dt*(v > 0.9 ? 7 : 5)));
       u.fph = (u.fph || 0) + v*dt*0.9; }
-    m.g.position.set(u.fx, characterGroundY(u.fx, u.fz) + lift, u.fz); m.g.rotation.y = u.fyaw;
+    m.g.position.set(u.fx, characterGroundY(u.fx, u.fz) + lift, u.fz); m.g.rotation.y = u.fyaw; m.g.visible = !w.fp;
     if(u.rig && !w.fly){ u.walkedAt = islT; u.swayT = now/1000 + i*1.7; u.walkK = Math.min(1.2, u.fv/5); u.walkT = u.fph || 0; rigPose(m.g, u.walkT, 1, u.walkK); }
     else if(u.legL) walkPose(m.g, moving ? w.bob*0.9 : 0, 1); }); miniTick(now, moving);
   const cpi = inMaze ? 0 : w.pitch;   // a fixed raised view keeps the pair and the next corridor visible beside a hedge
   const ease = 1 - Math.pow(0.002, dt);
   if(inMaze || w.snap || w.camYaw == null){ w.camYaw = w.yaw; w.camPitch = cpi; }
   else { w.camYaw += Math.atan2(Math.sin(w.yaw - w.camYaw), Math.cos(w.yaw - w.camYaw))*ease; w.camPitch += (cpi - w.camPitch)*ease; }
-  const cs = Math.sin(w.camYaw), cc = Math.cos(w.camYaw), cp = Math.cos(w.camPitch), sp = Math.sin(w.camPitch); let D = inMaze ? 6.5 : Math.max(7.5, w.eye*3.4), H = inMaze ? 13 : w.eye*1.1;   /* in the maze: looking down from above, nothing is cut (user, 2026-11-12) */ document.body.classList.toggle('inmaze', inMaze);
+  const cs = Math.sin(w.camYaw), cc = Math.cos(w.camYaw), cp = Math.cos(w.camPitch), sp = Math.sin(w.camPitch); let D = inMaze ? 6.5 : Math.max(7.5, w.eye*3.4), H = inMaze ? 13 : w.eye*1.1;   /* in the maze: looking down from above, nothing is cut (user, 2026-11-12) */ document.body.classList.toggle('inmaze', inMazeNow);
   // Keep the resting distance and tilt. Cut only foreground hedge geometry instead of zooming the camera.
   if(MAZE) MAZE.clip.constant = 1e6;
   _ct.set(w.x - cs*cp*D, gy + H - sp*D, w.z - cc*cp*D);
   _ct.y = Math.max(_ct.y, groundY(_ct.x, _ct.z) + 0.9);
   camera.position.copy(_ct); w.snap = false;
   _wt.set(w.x + (inMaze ? sy*2.6 : 0), gy + w.eye*(inMaze ? 0.7 : 0.85) + lift, w.z + (inMaze ? cy*2.6 : 0));
-  camera.lookAt(_wt); controls.target.copy(_wt); if(PARK_WAKE) parkWakeCam(); if(mini && mini.cam) mini.cam();
+  camera.lookAt(_wt);
+  if(w.fp){ const ey = gy + w.eye + lift, cpf = Math.cos(w.pitch), spf = Math.sin(w.pitch); camera.position.set(w.x, ey, w.z); _wt.set(w.x + sy*cpf*10, ey + spf*10, w.z + cy*cpf*10); camera.lookAt(_wt); }   /* first person: the eye line, the explorer is not drawn */
+  controls.target.copy(_wt); if(PARK_WAKE) parkWakeCam(); if(mini && mini.cam) mini.cam();
   questNav(); questTick();
 }
 $('qTmp').onclick = ()=>{ const q = questLive; if(!q || !walk) return; if(vn) return; if(mini) miniClear(); questComplete(q); };
@@ -8289,7 +8317,7 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
 // the island pill: the mission that is due, to start or resume without going through 탐험 → 캐릭터 (user, 2026-11-02)
 const dueQuest = ()=> QUESTS.find(q=> chainOpen(q) && !questDone(q)) || null;
 function questPillTick(){ const el = $('questPill'); if(!el) return; let q = null;
-  try{ if(TEAM && !AUX && !SCREEN && W.id === 'island' && !walk && !actBusy && !intro && !vn && !$('voidVn').dataset.on && !$('teamPick').dataset.on && !qRewardEl.dataset.on && !$('callDlg').dataset.on && !$('restoreDlg').dataset.on && $('cinema').hidden && !document.body.classList.contains('admin')){ q = dueQuest(); if(q && actSeen() < q.act) q = null; } }catch(e){ q = null; }
+  try{ if(TEAM && !AUX && !SCREEN && W.id === 'island' && !walk && !actBusy && !intro && !vn && !$('voidVn').dataset.on && !$('teamPick').dataset.on && !$('heroPick').dataset.on && !qRewardEl.dataset.on && !$('callDlg').dataset.on && !$('restoreDlg').dataset.on && $('cinema').hidden && !document.body.classList.contains('admin')){ q = dueQuest(); if(q && actSeen() < q.act) q = null; } }catch(e){ q = null; }
   el.hidden = !q; if(!q) return; const cp = miniLoad(), n = QUESTS.indexOf(q) + 1, resume = cp && cp.q === q.id; el.querySelector('b').textContent = `미션 ${n} ${resume ? '이어하기' : '시작하기'}`; el.querySelector('small').textContent = resume ? `${q.title} · 하던 데서 계속` : q.title; }
 const qRewardEl = $('qReward');
 function questOnWalk(name){
@@ -8496,6 +8524,7 @@ document.addEventListener('keydown', e=>{ if($('voidVn').dataset.on && e.code ==
 document.addEventListener('keydown', e=>{
   if(e.code !== 'Space' && e.code !== 'Enter') return; if(e.target.matches('input,textarea,select,button')) return; if(vn || $('voidVn').dataset.on) return; if(performance.now() - VN_CLOSED < 250) return;   // this stroke just closed a dialogue
   const on = id => { const el = $(id); return !!(el && el.dataset.on); }, go = id => { const b = $(id); if(b && !b.disabled && !b.hidden){ e.preventDefault(); b.click(); return true; } return false; };
+  if(on('heroPick')){ go('hpGo'); return; }
   if(on('callDlg')){ go('callGo'); return; }
   if(on('qReward')){ go('qrMap'); return; }
   if(on('rideDlg')){ go('rideGo'); return; }
@@ -9323,6 +9352,7 @@ function admSkipWhat(){
   if(on('simDone')) return {t:'성공 카드 닫기', run:()=> $('simDoneX').click()};
   if(on('restoreDlg')) return {t:'환원 바로 가기', run:()=> $('restoreGo').click()};
   if(on('callDlg')) return {t:'전화 건너뛰기', run:()=> $('callGo').click()};
+  if(on('heroPick')) return {t:'캐릭터 고르기 넘기기', run:()=> $('hpGo').click()};
   if(on('qReward')) return {t:'보상 카드 닫기', run:()=> $('qrMap').click()};
   if(on('rideDlg')) return {t:'안내 닫고 출발', run:()=> $('rideGo').click()};
   if(on('recDone')) return {t:'완료 카드 닫기', run:()=> { if(rdWait) rdWait(); }};
