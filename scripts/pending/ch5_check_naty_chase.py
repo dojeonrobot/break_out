@@ -68,6 +68,7 @@ async def main():
         c = await ev("__chase()"); w = await ev("__dbg.walkState()"); ent = await ev("__dbg.target()")
         hud = await ev("document.getElementById('questHud').innerText.replace(/\\s+/g,' ')")
         check(abs(w['x'] - c['pts'][0][0]) < 3 and abs(w['z'] - c['pts'][0][1]) < 3, f"chase starts at the maze entrance {[round(w['x']), round(w['z'])]}, route {c['len']} long over {len(c['pts'])} points, Naty {round(((c['x']-w['x'])**2 + (c['z']-w['z'])**2)**.5)} ahead")
+        print('  route pts', [[round(p[0]), round(p[1])] for p in c['pts']])
         check('네이티를 놓치지 마라' in hud and '3 / 3' in hud and '네이티까지' in hud, 'HUD: ' + hud[:90])
         print('  config', c['cfg'], ' end', [round(v) for v in c['pts'][-1]], flush=True); await shot('3_chase_start')
         # standing still loses

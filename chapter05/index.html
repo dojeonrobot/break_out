@@ -2859,7 +2859,7 @@ PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 PATHS.push([[405,162],[440,155],[477.39,128.73]], [[230,321],[239,306],[244.25,294.75]]);
 // Remove the western bypass and lead all arrivals through the entrance.
 PATHS[0]=[[0,128],[0,205],[0,300],[0,360],[0,390],[0,449]];
-PATHS[17]=[[0,360],[68,360],[120,364],[166,366],[190,371]];   /* through the garden lane, along the north side of the gate wing, round its corner tower to the maze */
+PATHS[17]=[[0,360],[68,360],[120,364],[144,366],[168,371]];   /* through the garden lane, along the north side of the gate wing, round its corner tower to the maze */
 PATHS[25]=[[0,390],PATHS[25][PATHS[25].length-1]];
 PATHS[26]=[[0,340],[0,344]];   /* 2026-11-12 (user): no path out to the harbour, it cut into the round gate plaza. Kept as a stub on the main street so the path numbers stay */
 PATHS[27]=[[-110,190],[-125,250],[-120,330],[-65,360],[0,360]];
@@ -2905,7 +2905,7 @@ const nearPath = (x,z,d) => pathSamples.some(([px,pz])=> (px-x)*(px-x)+(pz-z)*(p
 // keep-out circles so trees stay off attractions
 const OCC = [[-42,-528,36],[0,67,108],[0,162,12],[0,405,40],[0,452,66],[-277,-54,118],[81,-135,32],[338,27,32],[216,-243,86],[-270,256,138],[-300,340,36],[-81,-257,50],[176,257,12],[-270,-338,50],[54,-398,100],[-148,243,10],[-394,76,14],[-344,-182,8],[-162,-425,64],[Math.cos(-0.05)*(islR(-0.05)+12),Math.sin(-0.05)*(islR(-0.05)+12),18],
   [-32,200,22],[32,200,22],[-32,240,22],[32,240,22],[-32,280,22],[32,280,22],[-32,320,22],[32,320,22],[-44,369,32],[44,369,32],[290,277,66],[358,173,30],[182,135,10],[203,-41,14],[189,354,16],[95,11,14],
-  [198,408,38],[-150,412,24],[95,225,52],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[200,-350,10],[290,-345,10],[-505,293,50]];
+  [176,408,38],[-150,412,24],[95,225,52],[400,-150,52],[-78,282,16],[-150,100,48],[262,130,8],[472,75,64],[40,-70,22],[95,-205,24],[-400,150,32],[340,340,12],[380,380,12],[-150,-160,22],[-6,-172,30],[-60,230,18],[275,-115,32],[-215,-225,46],[258,392,27],[-105,-54,16],[-370,-255,42],[128,-334,26],[-82,82,24],[84,-270,10],[200,-350,10],[290,-345,10],[-505,293,50]];
 const occupied = (x,z,pad=0) => OCC.some(([cx,cz,r])=> Math.hypot(x-cx,z-cz) < r+pad);
 
 // ---------- scenery ----------
@@ -4926,7 +4926,7 @@ pickable(obsTower, {n:'클라우드 타워', c:'ride', sub:'전망 타워', cx:-
 // hedge maze — a real maze (2026-10-29, mission 2): one way in from the park path, every corridor leads somewhere, the heart holds the traces of the old watercourse
 const maze = new THREE.Group(); let MAZE = null;
 {
-  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36).clone(), MX = 198, MZ = 408, MR = 0;   /* 2026-11-12: east of the gate wing's corner tower, square to the wall */
+  const S = 50, n = 9, cell = S/n, TH = 1.2, hedge = mat(0x3f7a36).clone(), MX = 176, MZ = 408, MR = 0;   /* 2026-11-12: east of the gate, square to it; moved a little nearer the gate the same day (user) */
   hedge.userData.keep = true;   // prepGroup must retain the live clipping plane, not clone a frozen copy
   let s2 = 7; const r2 = ()=> (s2 = (s2*16807) % 2147483647) / 2147483647;
   add(maze, BOX(S+2, 0.3, S+2), mat(0xd8c9a3));
@@ -4949,8 +4949,8 @@ const maze = new THREE.Group(); let MAZE = null;
   MAZE = {S, n, cell, TH, H, V, ent, dist, cx:MX, cz:MZ, rot:MR, marks, clip, seen:new Set()};
   islRoot.userData.mazeDeck = {cx:MX, cz:MZ, rot:MR, half:S/2 + 1, top:G + 0.3};
 }
-place(maze, 198/K, 408/K, 0);
-pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:198/K, cz:408/K, h:8, r:36, desc:'키 높은 생울타리 미로. 안쪽에서 깜빡이는 붉은 빛을 따라 네이티를 찾아보세요.', facts:[['위치','정문 동쪽']]});
+place(maze, 176/K, 408/K, 0);
+pickable(maze, {n:'미스터리 메이즈', c:'place', sub:'미로 정원', cx:176/K, cz:408/K, h:8, r:36, desc:'키 높은 생울타리 미로. 안쪽에서 깜빡이는 붉은 빛을 따라 네이티를 찾아보세요.', facts:[['위치','정문 동쪽']]});
 // a walker inside the maze is stopped by the hedges (point-to-wall distance), never by the maze lot itself
 function mazeInside(x, z, margin = 1){ const M = MAZE; if(!M) return false; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); return Math.abs(lx) < M.S/2 + margin && Math.abs(lz) < M.S/2 + margin; }
 function mazeHeart(x, z){ const M = MAZE; if(!M) return true; const dx = x - M.cx, dz = z - M.cz, lx = dx*Math.cos(M.rot) - dz*Math.sin(M.rot), lz = dx*Math.sin(M.rot) + dz*Math.cos(M.rot); const i = Math.floor((lz + M.S/2)/M.cell), j = Math.floor((lx + M.S/2)/M.cell); return i >= 0 && j >= 0 && i < M.n && j < M.n && M.dist[i][j] === 0; }
@@ -8223,7 +8223,7 @@ function stepWorld(){ if(flowFree() || !TEAM || AUX || (tutStep >= 0 && tutStep 
 function flowLockUI(){ const sw = stepWorld(); document.querySelectorAll('#worlds button').forEach(b=>{ const lock = !!sw && b.dataset.w !== sw; b.classList.toggle('lock', lock); b.setAttribute('aria-disabled', lock); }); }
 
 // where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
-const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [198, 408];   // Naty waits in the maze (mission 2)
+const XYLO_HOME = [-190, 200, -2.2], CODEX_HOME = [-18, -468, 2.6], CAVE_MOUTH = [-43, -531], NATY_HIDE = [176, 408];   // Naty waits in the maze (mission 2)
 let XYLO_HIDE = null, NATY_HOME = null;
 function vikSpot(){ if(vikSpot.p) return vikSpot.p; const b = VIK_B, R0 = b.r || 40; let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - b.cx, pz - b.cz); if(d > R0 + 2 && d < bd){ bd = d; best = [px, pz]; } }
   const p = best ? freeSpot(best[0], best[1]) : freeSpot(b.cx, b.cz + R0 + 12), dx = b.cx - p[0], dz = b.cz - p[1], D = Math.hypot(dx, dz) || 1, x = freeSpot(p[0] + dx/D*6 - dz/D*4, p[1] + dz/D*6 + dx/D*4);
