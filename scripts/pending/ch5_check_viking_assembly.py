@@ -40,7 +40,8 @@ async def main():
         await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','vikasm');localStorage.setItem('void-sound','0');")
         rq = ctx.request
         await rq.post(API + '/api/void/team_reset', data={'team': T, 'confirm': 'AGAIN'}, headers=ADM)
-        await rq.post(API + '/api/void/quest', data={'team': T, 'dev': 'vikasm', 'done': ['q1'], 'act': 1, 'tut': True, 'story': 3})
+        for z in ('z1', 'z2'): await rq.post(API + '/api/void/admin/skip', data={'team': T, 'mission': z}, headers=ADM)   # 올리기 버튼은 미션 3(두 번째 캠퍼스 기록 뒤)부터 보인다
+        await rq.post(API + '/api/void/quest', data={'team': T, 'dev': 'vikasm', 'done': ['q1', 'q2'], 'act': 2, 'tut': True, 'story': 3, 'power': True})
         async def route(r):
             q = r.request
             res = await ctx.request.fetch(q.url.replace(STATIC, API), method=q.method, data=q.post_data_buffer, headers={k: v for k, v in q.headers.items() if k not in ['host', 'origin', 'referer']})
