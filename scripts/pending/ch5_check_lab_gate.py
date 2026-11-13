@@ -50,7 +50,7 @@ async def run(pw, T, done, tag):
         await ev(f"__dbg.walkTo({sp[0]}, {sp[1]})"); await asyncio.sleep(2.5)
         vn = await ev("(()=>{ const v = __dbg.quest().vn(); return v ? (v.who || '') + ': ' + (v.text || JSON.stringify(v).slice(0, 80)) : null; })()"); print(tag, 'arrival line', vn); await shot('4_arrive')
         check(vn is not None, f'{tag}: 입구 앞에 도착하면 대사가 나온다')
-        for _ in range(14): await drain(); await asyncio.sleep(1.2)   # 측정 장면(시뮬레이터)까지 넘긴다
+        for _ in range(22): await drain(); await ev("window.__sliceWin && __sliceWin()"); await asyncio.sleep(1.2)   # 모니터 게임과 측정 장면(시뮬레이터)까지 넘긴다
         rm = await ev("(()=>{ const r = __rem(); return {mini:r.mini, walking:!!__dbg.walkState()}; })()"); print(tag, 'after the measuring scene', rm)
         check(rm['mini'] is not None, f'{tag}: 측정 뒤 잔재 수색 단계로 넘어간다')
         if rm['walking']:

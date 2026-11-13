@@ -46,6 +46,7 @@ body.cavestory #walkHud,body.cavestory #walkPad,body.cavestory #questHud,body.ca
 #board.solo .bbar{display:none}#board.solo #bN{font-size:34px;line-height:1;font-variant-numeric:tabular-nums}#board.solo .bseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-top:12px}#board.solo .bseg i{height:12px;border-radius:6px;background:color-mix(in srgb,currentColor 14%,transparent)}#board.solo .bseg i.ok{background:var(--restored,#1a9a5a)}#board.solo .bcount{margin:10px 0 0;font-size:13px;opacity:.75}#board.solo .bcount b{font-size:15px;opacity:1}#walkRun{position:fixed;left:166px;bottom:calc(34px + env(safe-area-inset-bottom,0px));z-index:21;min-width:76px;height:52px;padding:0 16px;border-radius:26px;border:1px solid color-mix(in srgb,currentColor 22%,transparent);background:var(--panel-solid);color:inherit;font:inherit;font-weight:700;font-size:15px;touch-action:manipulation;display:none}#walkRun:not([hidden]){display:block}#walkRun[aria-pressed=true]{background:var(--restored,#1a9a5a);color:#fff;border-color:transparent}#walkRun:active{transform:scale(.97)}body.cavestory #walkRun{display:none!important}@media (pointer:fine){#walkRun{display:none!important}}
 .mk.ok{padding:3px;box-shadow:none}.mk.ok em{margin:0}body.walk .mk.ok{display:none!important}
 #remAim{position:fixed;left:0;top:0;z-index:20;width:88px;height:88px;border-radius:50%;border:4px solid #ffe14a;background:none;padding:0;box-shadow:0 0 0 3px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.4);touch-action:manipulation;cursor:pointer}#remAim[hidden]{display:none}
+#sliceDlg{position:fixed;inset:0;z-index:34;display:none;place-items:center;background:#05080f;-webkit-user-select:none;user-select:none;touch-action:none}#sliceDlg[data-on]{display:grid}#sliceDlg .in{display:grid;grid-template-rows:auto 1fr;gap:12px;width:min(1100px,96vw);height:min(760px,92dvh)}#sliceDlg .hd{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:16px;color:#eaf7ff;padding:0 4px}#sliceDlg h1{margin:0;font-size:22px;font-weight:800}#sliceDlg p{margin:0;font-size:15px;color:#b9cbe0}#sliceDlg b{font-size:26px;font-variant-numeric:tabular-nums;color:#8cecff}#slCv{width:100%;height:100%;border-radius:14px;border:2px solid #2a3a55;background:#061426;touch-action:none;cursor:crosshair}@media (max-width:600px){#sliceDlg .hd{grid-template-columns:1fr auto}#sliceDlg p{grid-column:1 / -1;grid-row:2}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -6846,7 +6847,7 @@ const SIM_VIEW = {pos:new THREE.Vector3(20 + 600, 470, -10 + 1120), tgt:new THRE
 let simFlyOn = false;
 const _sfA = new THREE.Vector3(), _sfB = new THREE.Vector3(), _sfD = new THREE.Vector3();
 function simFlyTick(t){
-  VEIN_U.uPulse.value += ((simFlyOn ? 0 : 1) - VEIN_U.uPulse.value)*0.1;
+  VEIN_U.uPulse.value += ((simFlyOn ? 0 : 1) - VEIN_U.uPulse.value)*0.1; if(bloomPass) bloomPass.strength += ((simFlyOn ? 0.08 : 0.6) - bloomPass.strength)*0.1;   /* the chase view sits close to the light: bloom nearly off while it runs (user, 2026-11-13) */
   if(!simOn || W.id !== 'island' || walk || reduce || SIM_REVEAL_T == null){ simFlyOn = false; return; }
   if(SIM_CALM){ if(simFlyOn){ simFlyOn = false; flyTo(SIM_VIEW.pos.clone(), SIM_VIEW.tgt.clone(), 1700); } return; }
   let best = null;
@@ -6857,7 +6858,7 @@ function simFlyTick(t){
   _sfA.set(secs[i].c[0], FLOW_Y + 4, secs[i].c[1]); _sfD.set(secs[i1].c[0] - secs[i0].c[0], 0, secs[i1].c[1] - secs[i0].c[1]);
   if(_sfD.lengthSq() < 1e-4) _sfD.set(1, 0, 0); _sfD.normalize();
   if(!simFlyOn){ simFlyOn = true; fly = null; }
-  _sfB.copy(_sfA).addScaledVector(_sfD, -270); _sfB.y += 185; camera.position.lerp(_sfB, 0.06);   // a mid-height chase: the vein stays a line, the head of light does not fill the frame
+  _sfB.copy(_sfA).addScaledVector(_sfD, -330); _sfB.y += 430;   /* higher (was 185): at a grazing angle the glow layers stacked into a white screen (user, 2026-11-13) */ camera.position.lerp(_sfB, 0.06);   // a mid-height chase: the vein stays a line, the head of light does not fill the frame
   _sfB.copy(_sfA).addScaledVector(_sfD, 90); controls.target.lerp(_sfB, 0.08);
 }
 const FLOW_Y = G - 26;   // the vein runs through the crust under the island
@@ -6959,7 +6960,7 @@ islAnim.push(t=>{ if(!simOn) return; simAnim.forEach(f=> f(t)); VEIN_U.uTime.val
   if(SIM_REVEAL_T == null) return;
   REVEALS.forEach(r=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - r.delay) / r.dur)), e = 1 - Math.pow(1 - k, 3);
     r.items.forEach(it=> it.g.setDrawRange(0, Math.round(it.total*e/it.step)*it.step));
-    if(r.head){ const on = k > 0 && k < 1; r.head.visible = on; if(on){ const sc = r.secs[Math.min(r.secs.length-1, Math.floor(e*(r.secs.length-1)))]; r.head.position.set(sc.c[0], FLOW_Y + sc.hw*0.45, sc.c[1]); r.head.scale.setScalar(r.head.userData.sz*(1 + 0.25*Math.sin(t*22))); } } });
+    if(r.head){ const on = k > 0 && k < 1; r.head.visible = on; if(on){ const sc = r.secs[Math.min(r.secs.length-1, Math.floor(e*(r.secs.length-1)))]; r.head.position.set(sc.c[0], FLOW_Y + sc.hw*0.45, sc.c[1]); r.head.scale.setScalar(r.head.userData.sz*0.4*(1 + 0.06*Math.sin(t*5)));   /* was full size with a 3.5 Hz flicker: it whited out the chase view (user, 2026-11-13) */ } } });
   FADES.forEach(f=>{ const k = Math.min(1, Math.max(0, (t - SIM_REVEAL_T - f.delay) / f.dur)); f.f(1 - Math.pow(1 - k, 3), k); });
   simFlyTick(t); });
 window.__dbg && (window.__dbg.resetSeen = ()=> localStorage.removeItem(`void-seen-lit-${viewTeam()}`));
@@ -7079,7 +7080,7 @@ function buildSim(revealIds){
       let onK = at >= 0 ? 0 : 1;
       if(at >= 0) fade(e=>{ onK = e; node.material.opacity = 0.95*e; aura.material.opacity = 0.28*e; col.material.uniforms.uAlpha.value = e; ring.material.opacity = 0.9*e; }, at, 1.0);
       simAnim.push(t=>{ const p = 1 + 0.18*Math.sin(t*3 + k); node.scale.setScalar(p); aura.scale.setScalar(1.3 - 0.15*Math.sin(t*3 + k)); ring.rotation.z = -t*0.5;
-        const q = ((t*0.45) + k*0.2) % 1; shock.visible = onK > 0.5; shock.scale.setScalar(1 + q*34); shock.material.opacity = 0.7*(1 - q)*onK; });
+        const q = ((t*0.45) + k*0.2) % 1, whole = SIM_LIT === 5 && !simFlyOn && SIM_REVEAL_T != null && t - SIM_REVEAL_T > Math.max(0, ...REVEALS.map(r=> r.delay + r.dur)) + 0.4; shock.visible = onK > 0.5 && whole;   /* 2026-11-13 (user): no waves while the flow is being followed, too bright; only when the glyph is whole */ shock.scale.setScalar(1 + q*34); shock.material.opacity = 0.7*(1 - q)*onK; });
     });
     // source (top apex): a pulsing core with orbit rings; mouth (bottom apex) once the whole glyph is lit
     const src = GLYPH[0].band.secs, apexT = src.reduce((a, b)=> b.c[1] < a.c[1] ? b : a), mouth = GLYPH[5].band.secs.reduce((a, b)=> b.c[1] > a.c[1] ? b : a);
@@ -7596,7 +7597,7 @@ islAnim.push(t=>{ islT = t;
   // Codex keeps watch in the crystal space
   CODEX.userData.head.rotation.y = Math.sin(t*0.4)*0.5; if(CODEX.userData.rig){ CODEX.userData.rig.head.userData.hold = true; bend(CODEX.userData.rig.head, 'ay', Math.sin(t*0.4)*0.5); } CODEX.userData.orb.scale.setScalar(1 + Math.sin(t*2)*0.15);
   // Naty orbits the ancient tree, its colour drifting through its moods
-  const an = t*0.22; if(NATY.userData.park){ const pk = NATY.userData.park; NATY.position.set(pk[0], pk[2] + Math.sin(t*1.4)*0.5, pk[1]); NATY.rotation.y = MAZE.rot; if(!NATY.userData.beam){ const gm = new THREE.Group(); gm.userData.dynamic = true; const mk = (c, o, add)=> new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, depthWrite:false, side:THREE.DoubleSide, blending:add ? THREE.AdditiveBlending : THREE.NormalBlending});
+  const an = t*0.22; if(NATY.userData.park){ const pk = NATY.userData.park; NATY.position.set(pk[0], pk[2] + Math.sin(t*1.4)*0.5, pk[1]); NATY.rotation.y = walk ? Math.atan2(walk.x - pk[0], walk.z - pk[1]) : MAZE.rot;   /* its face to the walker (user, 2026-11-13) */ if(!NATY.userData.beam){ const gm = new THREE.Group(); gm.userData.dynamic = true; const mk = (c, o, add)=> new THREE.MeshBasicMaterial({color:c, transparent:true, opacity:o, depthWrite:false, side:THREE.DoubleSide, blending:add ? THREE.AdditiveBlending : THREE.NormalBlending});
       const col = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 60, 16, 1, true), mk(0xff4a3a, 0.34)); col.position.y = 30; gm.add(col);
       const arrow = new THREE.Mesh(new THREE.ConeGeometry(3.2, 5.5, 4).rotateX(Math.PI), mk(0xff4a3a, 0.95)); arrow.name = 'goal-arrow'; gm.add(arrow);
       const ring = new THREE.Mesh(new THREE.RingGeometry(1.7, 2.5, 40).rotateX(-Math.PI/2), mk(0xff4a3a, 0.95)); ring.position.y = 0.5; ring.name = 'goal-ring'; gm.add(ring);
@@ -8401,10 +8402,12 @@ function questTick(){
   q.found = true; miniSave('found');
   const tg = q.id === 'q1' || q.id === 'q4' ? XYLO : q.id === 'q3' ? CODEX : null;
   if(tg){ const gx = tg.position.x, gz = tg.position.z; let dx = walk.x - gx, dz = walk.z - gz, d = Math.hypot(dx, dz);   /* never inside the one who was found: step back to 4.5 and face them (user, 2026-11-12) */
-    if(d < 4.5){ if(d < 0.05){ dx = Math.sin(tg.rotation.y); dz = Math.cos(tg.rotation.y); d = 1; } for(let k = 0; k < 8; k++){ const a = k*Math.PI/4*(k % 2 ? 1 : -1), ca = Math.cos(a), sa = Math.sin(a), x = gx + (dx*ca - dz*sa)/d*4.5, z = gz + (dx*sa + dz*ca)/d*4.5; if(!walkBlocked(x, z)){ walk.x = x; walk.z = z; walk.snap = true; walk.imx = walk.imz = 0; break; } } }
+    if(d < 4.5){ if(d < 0.05){ dx = Math.sin(tg.rotation.y); dz = Math.cos(tg.rotation.y); d = 1; } const sp = sceneSpot(gx, gz, 4.5, Math.atan2(dx, dz)); walk.x = sp[0]; walk.z = sp[1]; walk.snap = true; walk.imx = walk.imz = 0; }
+    else { let ok = true; try{ ok = viewClear(walk.x, walk.z, gx, gz); }catch(e){} if(!ok){ const sp = sceneSpot(gx, gz, Math.max(4.5, Math.min(7, d)), Math.atan2(dx, dz)); walk.x = sp[0]; walk.z = sp[1]; walk.snap = true; walk.imx = walk.imz = 0; } }
     tg.rotation.y = Math.atan2(walk.x - gx, walk.z - gz); walk.yaw = Math.atan2(gx - walk.x, gz - walk.z); }   // the one found turns to the walker
-  else walk.yaw = Math.atan2(tx - walk.x, tz - walk.z);
-  walk.pitch = -0.05; $('questHud').hidden = true; qNavHide();
+  else { if(q.mini === 'maze'){ const a0 = Math.atan2(walk.x - tx, walk.z - tz); for(let k = 0; k < 8; k++){ const a = a0 + Math.ceil(k/2)*(Math.PI/4)*(k % 2 ? 1 : -1), x = tx + Math.sin(a)*3, z = tz + Math.cos(a)*3; if(mazeHeart(x, z) && !walkBlocked(x, z)){ walk.x = x; walk.z = z; walk.snap = true; walk.imx = walk.imz = 0; break; } } }   /* 3 m from 네이티, still in the heart cell: at 1.5 m it was cut off by the top of the screen (2026-11-13) */
+    walk.yaw = Math.atan2(tx - walk.x, tz - walk.z); }
+  walk.pitch = q.mini === 'maze' ? 0.2 : -0.05; $('questHud').hidden = true; qNavHide();
   qPop(q.pop || '발견!'); say(QUEST_FOUND[q.id](walk.name), ()=> miniStart(q), {dark:q.dark});
 }
 function questComplete(q){
@@ -8922,8 +8925,16 @@ function yardPaint(){ const {W, H, tiles} = yard, on = yardPower(); let lit = 0;
 $('ydBoard').addEventListener('click', e=>{ const b = e.target.closest('button'); if(!b || !yard || yard.done) return; const x = +b.dataset.x, y = +b.dataset.y; yard.tiles[y][x] = yard.rot(yard.tiles[y][x]); $('ydBoard').querySelectorAll('button.turn').forEach(o=> o.classList.remove('turn')); yardPaint(); void b.offsetWidth; if(!yard.done){ b.classList.add('turn'); sfx('tap'); } });
 $('ydContinue').onclick=()=>{if(yard?.done)yardDone();};
 $('ydMix').onclick = ()=>{ if(yard && !yard.done) yardBuild(); };
+/* where to stand for a dialogue with someone at (tx, tz): d away, on walkable ground, with nothing between and nothing close on either side of the view (user, 2026-11-13: half the screen was a tree). Tries the wanted side first. */
+const _vr = new THREE.Raycaster(), _vo = new THREE.Vector3(), _vd = new THREE.Vector3();
+function viewScore(x, z, tx, tz){ const y = groundY(x, z) + 1.7, a0 = Math.atan2(tx - x, tz - z), L = Math.hypot(tx - x, tz - z); let near = 60; islRoot.updateMatrixWorld();
+  for(const da of [0, -0.28, 0.28]){ _vo.set(x, y, z); _vd.set(Math.sin(a0 + da), 0.14, Math.cos(a0 + da)).normalize(); _vr.set(_vo, _vd); _vr.near = 0.3; _vr.far = 60;
+    for(const h of _vr.intersectObject(islRoot, true)){ let skip = /^(park-visitors|queue-visitors|public-path|facility-spur)/.test(h.object.name || ''); for(let p = h.object; p && !skip; p = p.parent){ if(charGroups.includes(p) || p.isSkinnedMesh || p.visible === false) skip = true; } if(skip) continue; if(da === 0 && h.distance < L + 0.5) return 0; if(h.distance < near) near = h.distance; break; } }
+  return near; }
+function viewClear(x, z, tx, tz){ return viewScore(x, z, tx, tz) >= 14; }
+function sceneSpot(tx, tz, d, wantA){ let fb = null, best = null, bs = 0; for(let k = 0; k < 12; k++){ const a = wantA + Math.ceil(k/2)*(Math.PI/6)*(k % 2 ? 1 : -1), x = tx + Math.sin(a)*d, z = tz + Math.cos(a)*d; if(walkBlocked(x, z)) continue; if(!fb) fb = [x, z]; let sc = 0; try{ sc = viewScore(x, z, tx, tz) - Math.ceil(k/2)*0.5; }catch(e){} if(sc > bs){ bs = sc; best = [x, z]; if(sc > 40) break; } } return best || fb || freeSpot(tx + Math.sin(wantA)*d, tz + Math.cos(wantA)*d); }
 function yardDone(){ miniSave('station'); fadeThrough('#05070c', ()=>{ delete $('yardDlg').dataset.on; $('yardDlg').classList.remove('win'); yard = null; TRAIN.lit = true;
-    if(walk && XYLO_HIDE){ const p = freeSpot(XYLO_HIDE[0] - Math.sin(XYLO_HIDE[2])*7, XYLO_HIDE[1] - Math.cos(XYLO_HIDE[2])*7); walk.x = p[0]; walk.z = p[1]; walk.yaw = Math.atan2(XYLO_HIDE[0] - p[0], XYLO_HIDE[1] - p[1]); walk.snap = true; walk.imx = walk.imz = 0;
+    if(walk && XYLO_HIDE){ const p = sceneSpot(XYLO_HIDE[0], XYLO_HIDE[1], 7, XYLO_HIDE[2] + Math.PI); walk.x = p[0]; walk.z = p[1]; walk.yaw = Math.atan2(XYLO_HIDE[0] - p[0], XYLO_HIDE[1] - p[1]); walk.snap = true; walk.imx = walk.imz = 0;
       XYLO.rotation.y = Math.atan2(p[0] - XYLO_HIDE[0], p[1] - XYLO_HIDE[1]); } });   /* back beside 자일로 for his lines; mission 2 starts here, not behind the coaster (user, 2026-11-12) */
   setTimeout(()=> parkWake(()=> say([...STORY.yardDone, ...STORY.natyGone], ()=> questComplete(mini ? mini.q : QUESTS[0]))), 700); }
 // ---------- the park wakes up (2026-11-04): seen from above, a ring of light runs out from the service yard, the bulbs come on from the
@@ -9248,6 +9259,59 @@ function remBack(){ buildLabDoor(); remPulse(0); const got = mini.got || [0, 1, 
   miniWalkTo(3, '연구실로 돌아가기', '관람차 언덕 아래 연구실 문', LAB_DOOR, 8, remRerun); }
 async function remRerun(){ const q = mini.q; actBusy = true; stopWalk(); await wait(300); setSim(true); await wait(reduce ? 400 : 3400);
   await new Promise(r=> say(STORY.remDone, r)); setSim(false); actBusy = false; questComplete(q); }
+/* ---------- the lab monitor game (user, 2026-11-13): 제로·리코's games cover the screen; slice the icons away and the simulator shows through ---------- */
+Object.assign(STORY, {labGame:[{who:'자일로', text:'시뮬레이터를 켜 볼게요. ……어?'}, {who:'제로', text:'아, 그거요. 저번에 저희가 깔아 둔 게임이에요.'}, {who:'리코', text:'화면을 전부 덮어 버렸네. 저희가 치울게요.'}, {who:'보이드', text:'아이콘을 손가락으로 그어서 지워 줘. 내 얼굴은 베지 마.'}], labGameDone:[{who:'자일로', text:'됐어요. 이제 시뮬레이터가 보입니다.'}]});
+let SLICE = null;
+function sliceDlg(){ let d = $('sliceDlg'); if(d) return d; d = document.createElement('div'); d.id = 'sliceDlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'slT');
+  d.innerHTML = '<div class="in"><div class="hd"><h1 id="slT">모니터 치우기</h1><p id="slP">아이콘을 그어서 베세요</p><b id="slN">0 / 30</b></div><canvas id="slCv" aria-hidden="true"></canvas></div>'; document.body.appendChild(d); return d; }
+function sliceGame(){ return new Promise(done=>{ if(ffOn()){ done(); return; }
+  const d = sliceDlg(), cv = $('slCv'), g = cv.getContext('2d'), NEED = 30, COLS = 6, ROWS = 5, face = new Image(); face.src = 'img/chars/void_face.png?v=20261028d';
+  const S = SLICE = {n:0, items:[], halves:[], trail:[], cover:Array.from({length:COLS*ROWS}, (_, i)=> i), t:0, spawn:0.4, last:performance.now(), down:false, done:false, msg:0, shake:0, raf:0};
+  const fit = ()=>{ const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr); S.w = cv.width; S.h = cv.height; S.k = cv.width/900; }; d.dataset.on = '1'; fit(); addEventListener('resize', fit);
+  const COL = ['#e2574c', '#f39a3b', '#ffd400', '#58b368', '#5aa0e6', '#b07ad8'];
+  const spawn = ()=>{ const bad = S.n > 3 && Math.random() < 0.16, x = S.w*(0.15 + Math.random()*0.7), vx = (S.w/2 - x)/S.w*S.w*0.5 + (Math.random() - 0.5)*S.w*0.25, vy = -S.h*(1.05 + Math.random()*0.25);
+    S.items.push({x, y:S.h + 50*S.k, vx, vy, r:(bad ? 44 : 40)*S.k, rot:Math.random()*6, vr:(Math.random() - 0.5)*5, bad, c:COL[Math.floor(Math.random()*COL.length)], shape:Math.floor(Math.random()*4)}); };
+  const glyph = (it, half)=>{ const r = it.r; g.save(); g.translate(it.x, it.y); g.rotate(it.rot); if(half){ g.beginPath(); g.rect(half < 0 ? -r*1.2 : 0, -r*1.2, r*1.2, r*2.4); g.clip(); }
+    if(it.bad){ g.beginPath(); g.arc(0, 0, r, 0, 6.3); g.fillStyle = '#f4f7fb'; g.fill(); if(face.complete && face.naturalWidth) g.drawImage(face, -r*0.86, -r*0.86, r*1.72, r*1.72); g.lineWidth = 4*S.k; g.strokeStyle = '#ff5a4e'; g.stroke(); }
+    else { g.beginPath(); g.roundRect(-r, -r, r*2, r*2, r*0.36); g.fillStyle = it.c; g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 16*S.k; g.fill(); g.shadowBlur = 0; g.lineWidth = 4*S.k; g.strokeStyle = '#ffffff'; g.stroke(); g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath();
+      if(it.shape === 0){ g.moveTo(-r*0.45, -r*0.5); g.lineTo(r*0.55, 0); g.lineTo(-r*0.45, r*0.5); }
+      else if(it.shape === 1){ g.arc(0, 0, r*0.5, 0, 6.3); }
+      else if(it.shape === 2){ g.rect(-r*0.5, -r*0.5, r*0.44, r*0.44); g.rect(r*0.06, -r*0.5, r*0.44, r*0.44); g.rect(-r*0.5, r*0.06, r*0.44, r*0.44); g.rect(r*0.06, r*0.06, r*0.44, r*0.44); }
+      else { for(let i = 0; i < 10; i++){ const a = i*Math.PI/5 - Math.PI/2, q = i % 2 ? r*0.25 : r*0.58; g.lineTo(Math.cos(a)*q, Math.sin(a)*q); } }
+      g.closePath(); g.fill(); }
+    g.restore(); };
+  const hit = (ax, ay, bx, by, it)=>{ const dx = bx - ax, dy = by - ay, L = dx*dx + dy*dy || 1, u = Math.max(0, Math.min(1, ((it.x - ax)*dx + (it.y - ay)*dy)/L)); return Math.hypot(it.x - ax - dx*u, it.y - ay - dy*u) < it.r*1.05; };
+  const cut = (it, a)=>{ it.dead = true; const nx = Math.cos(a + Math.PI/2), ny = Math.sin(a + Math.PI/2); [-1, 1].forEach(sd=> S.halves.push({...it, dead:false, half:sd, vx:it.vx + nx*sd*220*S.k, vy:it.vy + ny*sd*220*S.k - 80*S.k, vr:sd*6, life:0.8}));
+    if(it.bad){ S.n = Math.max(0, S.n - 2); for(let i = 0; i < 2 && S.cover.length < COLS*ROWS; i++){ const free = Array.from({length:COLS*ROWS}, (_, k)=> k).filter(k=> !S.cover.includes(k)); S.cover.push(free[Math.floor(Math.random()*free.length)]); }
+      S.shake = 0.35; S.msg = 1.4; $('slP').textContent = '보이드는 베면 안 돼요!'; sfx('error'); }
+    else { S.n++; if(S.cover.length) S.cover.splice(Math.floor(Math.random()*S.cover.length), 1); S.strokeN = (S.strokeN || 0) + 1; if(S.strokeN === 3){ S.msg = 1.1; $('slP').textContent = '한 번에 셋! 잘했어요'; } sfx('tap'); }
+    $('slN').textContent = `${Math.min(S.n, NEED)} / ${NEED}`; if(S.n >= NEED && !S.done) win(); };
+  const pos = e=>{ const r = cv.getBoundingClientRect(); return [(e.clientX - r.left)/r.width*S.w, (e.clientY - r.top)/r.height*S.h]; };
+  const move = e=>{ if(!S.down || S.done) return; const [x, y] = pos(e), p = S.trail[S.trail.length - 1]; S.trail.push({x, y, t:S.t}); if(!p) return; const a = Math.atan2(y - p.y, x - p.x); if(Math.hypot(x - p.x, y - p.y) < 2) return; S.items.forEach(it=>{ if(!it.dead && hit(p.x, p.y, x, y, it)) cut(it, a); }); };
+  const dn = e=>{ e.preventDefault(); S.down = true; S.strokeN = 0; S.trail = []; const [x, y] = pos(e); S.trail.push({x, y, t:S.t}); try{ cv.setPointerCapture(e.pointerId); }catch(er){} }, up = ()=>{ S.down = false; };
+  cv.addEventListener('pointerdown', dn); cv.addEventListener('pointermove', move); ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev=> cv.addEventListener(ev, up));
+  const finish = ()=>{ cancelAnimationFrame(S.raf); removeEventListener('resize', fit); cv.removeEventListener('pointerdown', dn); cv.removeEventListener('pointermove', move); delete d.dataset.on; SLICE = null; done(); };
+  function win(){ S.done = true; S.cover = []; $('slP').textContent = '화면이 깨끗해졌어요'; sfx('success'); setTimeout(finish, reduce ? 300 : 1300); }
+  S.win = ()=>{ if(!S.done){ S.n = NEED; $('slN').textContent = `${NEED} / ${NEED}`; win(); } };
+  const draw = ()=>{ const now = performance.now(), dt = Math.min(0.05, (now - S.last)/1000); S.last = now; S.t += dt; const W2 = S.w, H2 = S.h, k = S.k, G2 = H2*1.9;
+    if(!S.done){ S.spawn -= dt; if(S.spawn <= 0){ const many = S.n > 12 ? 3 : S.n > 5 ? 2 : 1; for(let i = 0; i < 1 + Math.floor(Math.random()*many); i++) spawn(); S.spawn = (reduce ? 1.3 : 0.95) - Math.min(0.4, S.n*0.014); } }
+    S.items.forEach(it=>{ it.vy += G2*dt; it.x += it.vx*dt; it.y += it.vy*dt; it.rot += it.vr*dt; }); S.items = S.items.filter(it=> !it.dead && it.y < H2 + 90*k);
+    S.halves.forEach(it=>{ it.vy += G2*dt; it.x += it.vx*dt; it.y += it.vy*dt; it.rot += it.vr*dt; it.life -= dt; }); S.halves = S.halves.filter(it=> it.life > 0);
+    S.trail = S.trail.filter(p=> S.t - p.t < 0.22); if(S.msg > 0){ S.msg -= dt; if(S.msg <= 0 && !S.done) $('slP').textContent = '아이콘을 그어서 베세요'; } S.shake = Math.max(0, S.shake - dt);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W2, H2); if(S.shake > 0) g.translate((Math.random() - 0.5)*14*k, (Math.random() - 0.5)*14*k);
+    /* behind everything: the simulator, the island outline and its flow */
+    g.fillStyle = '#061426'; g.fillRect(0, 0, W2, H2); g.strokeStyle = 'rgba(120,220,255,.16)'; g.lineWidth = 1; for(let x = 0; x < W2; x += 40*k){ g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H2); g.stroke(); } for(let y = 0; y < H2; y += 40*k){ g.beginPath(); g.moveTo(0, y); g.lineTo(W2, y); g.stroke(); }
+    g.save(); g.translate(W2/2, H2*0.54); g.shadowColor = '#5fe4ff'; g.shadowBlur = 22*k; g.strokeStyle = '#8cecff'; g.lineWidth = 5*k; g.beginPath(); for(let i = 0; i <= 60; i++){ const a = i/60*Math.PI*2, r = 1 + 0.09*Math.sin(a*3 + 1) + 0.05*Math.sin(a*5); g.lineTo(Math.cos(a)*W2*0.36*r, Math.sin(a)*H2*0.3*r); } g.closePath(); g.stroke();
+    g.lineWidth = 3*k; g.globalAlpha = 0.5 + 0.3*Math.sin(S.t*2); g.beginPath(); g.ellipse(0, 0, W2*0.13, H2*0.1, 0, 0, 6.3); g.stroke(); g.restore();
+    /* the clutter that covers it: one tile goes with every icon sliced */
+    const cw = W2/COLS, ch = H2/ROWS; S.cover.forEach(i=>{ const cx = (i % COLS)*cw, cy = Math.floor(i/COLS)*ch; g.fillStyle = '#1c2434'; g.fillRect(cx, cy, cw + 1, ch + 1); g.fillStyle = COL[i % COL.length]; g.globalAlpha = 0.3; g.beginPath(); g.roundRect(cx + cw*0.2, cy + ch*0.18, cw*0.6, ch*0.5, 10*k); g.fill(); g.globalAlpha = 0.18; g.fillStyle = '#fff'; g.fillRect(cx + cw*0.25, cy + ch*0.76, cw*0.5, 5*k); g.globalAlpha = 1; });
+    S.items.forEach(it=> glyph(it, 0)); S.halves.forEach(it=>{ g.globalAlpha = Math.min(1, it.life*2); glyph(it, it.half); g.globalAlpha = 1; });
+    if(S.trail.length > 1){ g.lineCap = 'round'; g.lineJoin = 'round'; for(let i = 1; i < S.trail.length; i++){ const a = S.trail[i - 1], b2 = S.trail[i], f = 1 - (S.t - b2.t)/0.22; g.strokeStyle = `rgba(255,255,255,${(0.9*f).toFixed(2)})`; g.lineWidth = (3 + 9*f)*k; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b2.x, b2.y); g.stroke(); } }
+    S.raf = requestAnimationFrame(draw); };
+  draw(); }); }
+window.__sliceWin = ()=>{ if(SLICE) SLICE.win(); };
+window.__scene = {clear:viewClear, depth:viewScore, spot:sceneSpot, blocked:(x, z)=> walkBlocked(x, z), xylo:()=> XYLO_HIDE};   /* check handle */
+window.__slice = ()=> SLICE ? {n:SLICE.n, items:SLICE.items.map(it=> [Math.round(it.x/SLICE.w*1000)/1000, Math.round(it.y/SLICE.h*1000)/1000, it.bad ? 1 : 0]), cover:SLICE.cover.length, done:SLICE.done} : null;
 // the mid-check: the simulator over the island shows the records so far, then the stretches that bend off into red noise at the three remnant areas
 let SIM_NOISE = null;
 function simNoise(on){ if(SIM_NOISE){ simRoot.remove(SIM_NOISE.g); SIM_NOISE.g.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); }); SIM_NOISE = null; } if(!on) return;
@@ -9256,7 +9320,9 @@ function simNoise(on){ if(SIM_NOISE){ simRoot.remove(SIM_NOISE.g); SIM_NOISE.g.t
     for(let k = 0; k < 5; k++){ const a0 = k*1.26 + i, pts = []; for(let j = 0; j <= 9; j++){ const r = j*7, a = a0 + Math.sin(j*1.7 + k)*0.7; pts.push(new THREE.Vector3(s.cx + Math.cos(a)*r, Y + 1 + Math.sin(j + k)*2, s.cz + Math.sin(a)*r)); }
       const m = add(g, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 30, 1.3, 5), glowMat(0xff5a4e, 0.8, true), 0, 0, 0, false); m.material.depthTest = false; m.renderOrder = 10; items.push({m, ph:i*3 + k, jit:true}); } });
   SIM_NOISE = {g, items}; simAnim.push(t=>{ if(!SIM_NOISE) return; SIM_NOISE.items.forEach(it=>{ const f = Math.sin(t*23 + it.ph*7) > 0.15 ? 1 : 0.12; it.m.material.opacity = (0.25 + 0.6*Math.abs(Math.sin(t*5 + it.ph)))*f; if(it.jit){ it.m.position.x = (Math.random() - 0.5)*2; it.m.position.z = (Math.random() - 0.5)*2; } }); }); }
-async function midCheck(q){ miniSave('mid'); actBusy = true; stopWalk(); await wait(300); setSim(true); await wait(reduce ? 400 : 3000);
+async function midCheck(q){ miniSave('mid'); actBusy = true; stopWalk(); await wait(300);
+  await new Promise(r=> say(STORY.labGame, r)); await sliceGame(); await new Promise(r=> say(STORY.labGameDone, r));   /* the monitor is cleared first (user, 2026-11-13) */
+  setSim(true); await wait(reduce ? 400 : 3000);
   await new Promise(r=> say(STORY.midA, r)); await new Promise(r=> say(STORY.midA2, r)); simNoise(true); sfx('powerdown'); await wait(reduce ? 400 : 3200);
   await new Promise(r=> say(STORY.midB, r)); simNoise(false); setSim(false); await wait(500);
   const cp = miniLoad() || {q:q.id}; cp.q = q.id; cp.step = 'rail'; cp.got = cp.got || []; delete cp.pos; try{ localStorage.setItem(MINI_KEY(), JSON.stringify(cp)); }catch(e){}
@@ -9619,6 +9685,7 @@ function admSkipWhat(){
   if(!$('cinema').hidden) return {t:$('cinemaEnd').hidden ? '영상 건너뛰기' : '처음 화면으로', run:()=>{ if($('cinemaEnd').hidden) endRestore(); else $('cinemaX').click(); }};
   if(on('simDone')) return {t:'성공 카드 닫기', run:()=> $('simDoneX').click()};
   if(on('restoreDlg')) return {t:'환원 바로 가기', run:()=> $('restoreGo').click()};
+  if(on('sliceDlg')) return {t:'게임 건너뛰기', run:()=>{ if(SLICE) SLICE.win(); }};
   if(on('callDlg')) return {t:'전화 건너뛰기', run:()=> $('callGo').click()};
   if(on('heroPick')) return {t:'캐릭터 고르기 넘기기', run:()=> $('hpGo').click()};
   if(on('qReward')) return {t:'보상 카드 닫기', run:()=> $('qrMap').click()};

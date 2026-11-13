@@ -113,6 +113,7 @@ async def main():
         await ev('__dbg.walkTo(...__dbg.labDoor())'); await wf(pg, '!!__dbg.quest().vn()', 20); said = []
         for _ in range(240):
             said += [t for t in await drain(pg) if t not in said]
+            await ev("window.__sliceWin && __sliceWin()")
             if await ev("__rem().noise") and SHOT and not os.path.exists(os.path.join(SHOT, 'vm5b_noise.png')): await shot(pg, 'vm5b_noise')
             if await ev("__rem().mini?.phase==='hunt'"): break
             await asyncio.sleep(.5)
