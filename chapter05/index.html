@@ -730,7 +730,7 @@ body.island #panel,body.sim #panel{display:none}
   <button type="button" class="skip" id="tpSkip">나중에</button>
 </div></div>
 <section id="adminDlg" hidden aria-label="관리자">
-  <div class="ah"><div><h2>보이드의 기록 관리자</h2></div><div class="acts" id="adminActs"></div><div class="acts"><button type="button" class="mini" data-aact="logout">관리자 종료</button><button type="button" class="x" id="adminX">지도로 돌아가기</button></div></div>
+  <div class="ah"><div><h2>보이드의 기록 관리자</h2></div><div class="acts" id="adminActs"></div><div class="acts"><button type="button" class="mini danger" data-aact="reset">전체 초기화</button><button type="button" class="mini" data-aact="logout">관리자 종료</button><button type="button" class="x" id="adminX">지도로 돌아가기</button></div></div>
   <div class="scroll" id="adminBody"></div>
 </section>
 <div id="islandActions" role="group" aria-label="미션 및 도움">
@@ -1815,7 +1815,7 @@ function adminHTML(){
     <div class="cols">
       <div class="main">
         <section class="card"><div class="ch"><h3>조별 진행</h3><span class="sum">캠퍼스는 제출 상태, 섬 미션은 태블릿별로 완료 표시</span></div>${table}</section>
-        <section class="card"><div class="ch"><h3>제출 기록</h3><span class="sum">${n ? `${n}건${wait ? ` · 확인 대기 ${wait}` : ''}${errs ? ` · 변환 실패 ${errs}` : ''}` : ''}</span>${n ? '<button type="button" class="mini" data-aact="copy">표로 복사</button>' : ''}</div>
+        <section class="card"><div class="ch"><h3>제출 기록</h3><span class="sum">${n ? `${n}건${wait ? ` · 확인 대기 ${wait}` : ''}${errs ? ` · 변환 실패 ${errs}` : ''}` : ''}</span>${n ? '' : ''}</div>
           ${chips ? `<div class="chips">${chips}</div>` : ''}
           ${list.length ? `<div class="tw"><table class="sbt"><thead><tr><th>조</th><th>기록</th><th>메모</th><th>제출 시각</th><th>상태</th><th></th></tr></thead><tbody>${list.map(subRow).join('')}</tbody></table></div>` : `<p class="empty">${n ? '이 조건에 맞는 제출이 없습니다' : '아직 제출이 없습니다'}</p>`}</section>
       </div>
@@ -1835,10 +1835,6 @@ function adminHTML(){
           ${MISSIONS.map(m=>{ const tw = missionById(m.twin), id = m.twin || m.id; return `<label class="autol"><input type="checkbox" data-demo="${esc(id)}" ${DEMO.has(id) ? 'checked' : ''}> ${esc(tw ? tw.name : m.name)} <small>↔ ${esc(m.name)}</small></label>`; }).join('')}
           ${(typeof MI !== 'undefined' ? MI.filter(m=> m.quest) : []).map(m=> `<label class="autol"><input type="checkbox" data-demo="${esc(m.id)}" ${DEMO.has(m.id) ? 'checked' : ''}> ${esc(m.name)} <small>섬 미션</small></label>`).join('')}
           <div class="arow"><button type="button" class="mini" data-aact="demoAll">전부 켜기</button><button type="button" class="mini" data-aact="demoNone">전부 끄기</button></div>`)}
-        ${det('tools', '도구', HIDDEN.size ? `숨긴 스캔 ${HIDDEN.size}` : '', `<div class="arow col">
-          <button type="button" class="mini" data-aact="copy">제출 목록 표로 복사</button>
-          <button type="button" class="mini" data-aact="unhide" ${HIDDEN.size ? '' : 'hidden'}>숨긴 스캔 ${HIDDEN.size}건 되살리기</button>
-          <button type="button" class="mini danger" data-aact="reset">전체 초기화</button></div>`)}
       </aside>
     </div>
   </div>`;
@@ -1870,7 +1866,7 @@ async function adminAct(act){
     }
     if(act==='reset'){
       const real = SCANS.filter(s=> !s.demo).length;
-      if(!confirm(`모든 조의 제출 기록 ${SUBS.length}건을 지우고, 지금 3D에 들어가 있는 스캔 ${real}건을 숨겨 모든 구역을 "복구 필요"로 되돌립니다.${DEMO.size ? `\n이 기기의 복구 미리보기 ${DEMO.size}곳도 꺼집니다.` : ''}\n모든 태블릿은 조를 다시 고르게 됩니다. 숨긴 스캔은 "숨긴 스캔 되살리기"로 되돌릴 수 있습니다. 계속할까요?`)) return;
+      if(!confirm(`모든 조의 제출 기록 ${SUBS.length}건을 지우고, 지금 3D에 들어가 있는 스캔 ${real}건을 숨겨 모든 구역을 "복구 필요"로 되돌립니다.${DEMO.size ? `\n이 기기의 복구 미리보기 ${DEMO.size}곳도 꺼집니다.` : ''}\n모든 태블릿은 조를 다시 고르게 됩니다. 되돌릴 수 없습니다. 계속할까요?`)) return;
       clearLocalDemo();
       STATE_VER = -1; applyState(await api('/admin/reset', {confirm:'RESET', hide:SCANS_ALL.map(s=>s.id)}, true)); toast('초기화했습니다'); return;
     }
@@ -2835,19 +2831,19 @@ const PATHS = [
   [[-40,-15],[-55,-100],[-60,-150]],                   // → castle
   [[-100,10],[-120,-80]],                              // → safari gate junction (the windmill now stands inside the safari; the old leg ran under the enclosure)
   [[50,100],[110,150],[130,175]],                      // → drop tower
-  [[150,40],[232,78],[300,120],[400,118],[432,48],[395,-15],[450,-23]],   // → lighthouse (south of the carousel and the licence course), ending at its base
+  [[150,40],[232,78],[255.6,88],[277.8,95.6],[300.7,111],[334.8,120],[400,118],[432,48]],   // → lighthouse (south of the carousel and the licence course), ending at its base
   [[-100,10],[-200,62],[-292,56]],                     // → warehouse (round the safari)
   [[0,200],[80,212],[150,240],[170,262]],              // → lake
   [[100,40],[118,92]],                                 // → teacups (off the carousel path)
   [[0,209],[-40,209]],                                 // → bumper cars by the boulevard
   [[100,-60],[132,-38]],                               // → swing ride
   [[100,-60],[160,-70],[176,-84]],                     // → galaxy swing (from the wheel side, not from the lodging); ends at its fence
-  [[-120,-80],[-111,-119]],                            // → 4D theatre (off the windmill path)
+  [[-120,-80],[-115.6,-102.2],[-118.5,-118.5],[-128.1,-124.4],[-134.1,-125.6]],                            // → 4D theatre (off the windmill path)
   [[20,330],[70,326],[104,312]],                       // → maze (east of the gate's right tower)
   [[-200,62],[-230,30]],                               // → tree-house village (off the warehouse path)
   [[-55,-100],[-90,-150],[-120,-185]],                 // → Ren's door
-  [[45,-60],[20,-110],[40,-150],[62,-190]],            // → Codex's box (west of the hologram tree)
-  [[432,48],[360,-40],[296,-100]],                     // → staff lodging (off the lighthouse path, north of the course)
+  [[45,-60],[20,-110],[40,-150],[48,-165]],            // → Codex's box (west of the hologram tree)
+  [[432,48],[380,-20],[352,-48]],                     // → staff lodging (off the lighthouse path, north of the course)
   [[172,58],[182,40],[186,27]],                        // → 4D dome entrance (off the carousel path)
   [[172,58],[190,83]],                                 // → sky flyer
   [[70,326],[80,299]]                                  // → flying carpet (off the maze path)
@@ -2856,13 +2852,13 @@ PATHS.forEach(p=> p.forEach(q=>{ q[0] *= K; q[1] *= K; }));
 { const cv = (a, dr)=>{ const v = coveAt(a, dr); return [v.x, v.z]; };
   PATHS.push([[0,449],[0,470],[0,515],cv(PIER_A, 26)], [[-40,466],[-95,482],(()=>{const p=coveAt(HARBOUR_A,10),r=Math.PI-HARBOUR_A;return [p.x+Math.cos(r)*36+Math.sin(r)*19,p.z-Math.sin(r)*36+Math.cos(r)*19];})()], [[-110,140],[-120,250],[-180,340],[-205,430],(()=>{const p=coveAt(HARBOUR_A,10),r=Math.PI-HARBOUR_A;return [p.x+Math.cos(r)*36+Math.sin(r)*19,p.z-Math.sin(r)*36+Math.cos(r)*19];})()], [[-184,356],[-166,386],[-153.55,398.2]], [[-94,89],[-110,85]]); }   // last two: → kids lagoon (branches off the harbour path), plaza edge → grand stage ticket booth
 // Door-aligned links in world coordinates. No route terminates at a building centre.
-PATHS.push([[405,162],[440,155],[477.39,128.73]], [[230,321],[239,306],[244.25,294.75]]);
+PATHS.push([[513,-27],[480,-8],[452,4]], [[214,336],[230,321],[239,306],[244.25,294.75]], [[205,-93],[232,-150],[256,-164],[300,-192],[326,-218]]);   /* 2026-11-13 (user): to the exam hall forecourt instead of onto the driving track; the lake link starts on the lake path; Sweet Scoop between the wheel hill and the swing, not through the staff village */
 // Remove the western bypass and lead all arrivals through the entrance.
 PATHS[0]=[[0,128],[0,205],[0,300],[0,360],[0,390],[0,449]];
 PATHS[17]=[[0,360],[68,360],[120,363],[142,365],[155,369]];   /* through the garden lane, along the north side of the gate wing, round its corner tower to the maze */
 PATHS[25]=[[0,390],PATHS[25][PATHS[25].length-1]];
 PATHS[26]=[[0,340],[0,344]];   /* 2026-11-12 (user): no path out to the harbour, it cut into the round gate plaza. Kept as a stub on the main street so the path numbers stay */
-PATHS[27]=[[-110,190],[-125,250],[-120,330],[-65,360],[0,360]];
+PATHS[27]=[[-116,177],[-125,250],[-120,330],[-65,360],[0,360]];
 PATHS[28]=[[0,346],[0,350]];   /* the harbour arc: removed the same way */
 PATHS[24]=[[108,286],[110,290]];   /* the flying carpet, off the lake path */
 const pathSamples = [];
@@ -3034,14 +3030,14 @@ for(let i=0;i<40;i++){
 // lamps and benches along paths (instanced)
 {
   const lamps = [], benches = [];
-  PATHS.forEach(pts=>{
+  PATHS.forEach((pts, bpi)=>{
     const curve = new THREE.CatmullRomCurve3(pts.map(([x,z])=>new THREE.Vector3(x,0,z)));
     const L = curve.getLength(), n = Math.floor(L/36);
     for(let i=1;i<=n;i++){
       const u = i/(n+1), p = curve.getPointAt(u), tg = curve.getTangentAt(u), side = i%2 ? 1 : -1;
       const nx = -tg.z*side, nz = tg.x*side;
       lamps.push([p.x+nx*10, p.z+nz*10]);
-      if(i%2===0){ const bx = p.x-nx*11, bz = p.z-nz*11; benches.push([bx, bz, Math.atan2(tg.x, tg.z)]); OCC.push([bx, bz, 2.4]); }   // the seat and the ground in front of it stay clear
+      if(i%2===0){ const bw = pathHalfWidth(bpi) + 1.5, bx = p.x-nx*bw, bz = p.z-nz*bw;   /* at the edge of the pavement, whatever the width (user, 2026-11-13: the benches sat out in the grass) */ benches.push([bx, bz, Math.atan2(tg.x, tg.z)]); OCC.push([bx, bz, 2.4]); }   // the seat and the ground in front of it stay clear
     }
   });
   const post = new THREE.InstancedMesh(CYL(0.12,0.16,4.6,6), mat(0x3a3f4a), lamps.length);
@@ -5457,7 +5453,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 
 // ---------- spur paths to every attraction, and a switchback queue at every ride entrance ----------
 {
-  const SKIP = new Set(['하모니아', '메인 스트리트', '도로랜드 퍼레이드', '포시즌스 가든', '스카이 크루즈', '등대', '홀로그램 고목', '분수 광장', '도로랜드 정문', '항구', '코덱스의 동굴', '그랜드 스테이지']);   // no path leads to the eye cave; the stage opens straight onto the plaza (connector below) (a 270-long spur used to cut through the mountain forest to it)
+  const SKIP = new Set(['하모니아', '메인 스트리트', '도로랜드 퍼레이드', '포시즌스 가든', '스카이 크루즈', '등대', '홀로그램 고목', '분수 광장', '도로랜드 정문', '항구', '코덱스의 동굴', '그랜드 스테이지', '숲 속 풍차']);   // no path leads to the eye cave; the stage opens straight onto the plaza (connector below) (a 270-long spur used to cut through the mountain forest to it)
   const REACH = {'관람차': 84};                                       // the wheel's queue waits at the foot of its hill
   const NO_SPUR = new Set(['관람차']);
   const nearest = (x, z)=>{ let best = null, bd = Infinity; pathSamples.forEach(([px,pz])=>{ const d = (px-x)*(px-x) + (pz-z)*(pz-z); if(d < bd){ bd = d; best = [px, pz]; } }); return [best, Math.sqrt(bd)]; };
@@ -5492,15 +5488,24 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
   });
   { const kl = IB.find(b=> b.label === '키즈 라군'); if(kl){ OCC.push([kl.cx, kl.cz, kl.r + 13]); clearTrees(kl.cx, kl.cz, kl.r + 18); } }
   // queues: four switchback lanes of rope and posts beside the entrance, filled with waiting visitors
+  const laneHalf=(x,z)=>{let h=3.5,bd=4;PATHS.forEach((pts,i)=>{for(const q of pts){const d=Math.hypot(q[0]-x,q[1]-z);if(d<bd){bd=d;h=pathHalfWidth(i);}}});return h;};
+  const gateOf=e=>{const b=e.b,lot=b.c==='ride'&&!NO_LOT.has(b.label),reach=Math.hypot(e.x-b.cx,e.z-b.cz),Rg=lot?b.r+13:reach+3;let sp=null,sc=1e9;
+    for(const q of pathSamples){const dx=q[0]-b.cx,dz=q[1]-b.cz,d=Math.hypot(dx,dz);if(Math.abs(d-Rg)>2.5)continue;const along=(dx*e.dx+dz*e.dz)/d;if(along<0.5)continue;const c=(1-along)*40+Math.abs(d-Rg);if(c<sc){sc=c;sp=q;}}
+    if(!sp)return {x:b.cx+e.dx*Rg,z:b.cz+e.dz*Rg,dx:e.dx,dz:e.dz,half:3.5};
+    let o=null,od=Math.hypot(sp[0]-b.cx,sp[1]-b.cz)+0.8;for(const q of pathSamples){const d=Math.hypot(q[0]-sp[0],q[1]-sp[1]);if(d<2.5||d>7)continue;const r=Math.hypot(q[0]-b.cx,q[1]-b.cz);if(r>od){od=r;o=q;}}
+    let dx=e.dx,dz=e.dz;if(o){const L=Math.hypot(o[0]-sp[0],o[1]-sp[1]);dx=(o[0]-sp[0])/L;dz=(o[1]-sp[1])/L;}
+    return {x:sp[0],z:sp[1],dx,dz,half:laneHalf(sp[0],sp[1])};};   /* where the approach path really crosses the ride's fence line, and which way it runs there (2026-11-13) */
+  entries.forEach(e=>{ if(e.b.c==='ride') e.b.gate=gateOf(e); });
+  const widePath=(x,z)=>PATHS.some((pts,i)=>{const h=pathHalfWidth(i);return h>4.5&&pts.some(q=>Math.hypot(q[0]-x,q[1]-z)<h+0.4);});
   const people = [], postM = mat(0xc9ced6), ropeM = mat(0xd63a2f);
   entries.filter(e=> e.b.c==='ride' && !['키즈 라군','운전면허 시험장'].includes(e.b.label)).forEach((e, qi)=>{
-    const px = -e.dz, pz = e.dx;
-    const choices=[1,-1].flatMap(side=>[9,17].map(forward=>({x:e.x+e.dx*forward+px*side*12,z:e.z+e.dz*forward+pz*side*12})));
-    const point=choices.find(p=>Math.hypot(p.x,p.z)<edgeR(p.x,p.z)-12 && !IB.some(b=>b!==e.b && b.c!=='char' && !b.noPop && Math.hypot(p.x-b.cx,p.z-b.cz)<Math.min(b.r,90)+6) && [-3.2,0,3.2].every(x=>[-4.5,0,4.5].every(z=>!nearPath(p.x+px*x+e.dx*z,p.z+pz*x+e.dz*z,7))));
+    const gt=e.b.gate||{x:e.x,z:e.z,dx:e.dx,dz:e.dz,half:3.5}, px=-gt.dz, pz=gt.dx, lotR=NO_LOT.has(e.b.label)?0:e.b.r+9;
+    const choices=[1,-1].flatMap(side=>[6.6,12,18,25].map(f=>({x:gt.x+gt.dx*f+px*side*(gt.half+3.7),z:gt.z+gt.dz*f+pz*side*(gt.half+3.7)})));   /* beside the path, just outside the gate (user, 2026-11-13: the queues stood off in the grass) */
+    const point=choices.find(p=>Math.hypot(p.x,p.z)<edgeR(p.x,p.z)-12 && !IB.some(b=>b!==e.b && b.c!=='char' && !b.noPop && Math.hypot(p.x-b.cx,p.z-b.cz)<Math.min(b.r,90)+6) && (!lotR||Math.hypot(p.x-e.b.cx,p.z-e.b.cz)>lotR+5.4) && [-3.2,0,3.2].every(x=>[-4.5,0,4.5].every(z=>{const X=p.x+px*x+gt.dx*z,Z=p.z+pz*x+gt.dz*z;return !nearPath(X,Z,3.3)&&!widePath(X,Z);})));
     if(!point) return;
     const cx=point.x, cz=point.z;
-    const th = Math.atan2(e.dx, e.dz), g = new THREE.Group(); g.position.set(cx, G, cz); g.rotation.y = th; g.name='ride-queue'; islRoot.add(g);
-    (islRoot.userData.queues ||= []).push({name:e.b.label,x:cx,z:cz,entry:[e.x,e.z],direction:[e.dx,e.dz],group:g});
+    const th = Math.atan2(gt.dx, gt.dz), g = new THREE.Group(); g.position.set(cx, G, cz); g.rotation.y = th; g.name='ride-queue'; islRoot.add(g);
+    (islRoot.userData.queues ||= []).push({name:e.b.label,x:cx,z:cz,entry:[gt.x,gt.z],direction:[gt.dx,gt.dz],group:g});
     const lanes = 4, W = 1.3, Lz = 8, X0 = -lanes*W/2;
     add(g, BOX(lanes*W + 0.8, 0.3, Lz + 0.8), new THREE.MeshLambertMaterial({color:0xd9cfba, polygonOffset:true, polygonOffsetFactor:-2, polygonOffsetUnits:-2}), 0, 0.05, 0, false).receiveShadow = true;
     for(let k=0;k<=lanes;k++){
@@ -6012,9 +6017,9 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
   const yards = [];
   IB.filter(b=> b.c==='ride' && !SKIP.has(b.label)).forEach(b=>{
     const [p] = nearestPath(b.cx, b.cz); if(!p) return;
-    const ea = b.entry ? Math.atan2(b.entry.dz,b.entry.dx) : Math.atan2(p[1]-b.cz,p[0]-b.cx), R = b.r + 9;
-    woodFence(b.cx, b.cz, R, ea, 13/R);
-    gateSign(b.cx + Math.cos(ea)*(R + 4), b.cz + Math.sin(ea)*(R + 4), Math.PI/2 - ea, b.label);
+    const ea = b.entry ? Math.atan2(b.entry.dz,b.entry.dx) : Math.atan2(p[1]-b.cz,p[0]-b.cx), R = b.r + 9, gt = b.gate, ga = gt ? Math.atan2(gt.z - b.cz, gt.x - b.cx) : ea;
+    woodFence(b.cx, b.cz, R, ga, 13/R);
+    if(gt) gateSign(gt.x, gt.z, Math.PI/2 - Math.atan2(gt.dz, gt.dx), b.label); else gateSign(b.cx + Math.cos(ea)*(R + 4), b.cz + Math.sin(ea)*(R + 4), Math.PI/2 - ea, b.label);   /* the name arch stands across the path itself (2026-11-13) */
     for(const off of [Math.PI, Math.PI - 0.9, Math.PI + 0.9, Math.PI - 1.7, Math.PI + 1.7, Math.PI/2, -Math.PI/2]){
       const a = ea + off, x = b.cx + Math.cos(a)*(R + 15), z = b.cz + Math.sin(a)*(R + 15);
       if(Math.hypot(x, z) > edgeR(x, z) - 32 || occupied(x, z, 11) || nearPath(x, z, 12) || Math.abs(Math.hypot(x,z) - trackR(Math.atan2(z,x))) < 15 || yards.some(([yx,yz])=> Math.hypot(yx-x, yz-z) < 30)) continue;
@@ -6195,10 +6200,10 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   walkway([[-7,-8],[-1,-8],[2,-8]],7,'parking-entry',course,0.305);
   walkway([[38,-15],[38,-5],[38,1]],5,'T-course-exit',course,0.305);
   course.children.filter(o=>o.name.startsWith('parking-')||o.name==='T-course-exit').forEach(o=>o.material=new THREE.MeshLambertMaterial({color:0x50555c,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));
-  walkway([[0,53],[0,45],[2,34]],6,'course-entry',course,0.34);
+  
   // A small forecourt reaches the exam-hall door, outside the north loop.
   add(course,BOX(38,0.2,16),mat(C.plaza),-32,0.05,-61,false);
-  walkway([[-32,-53],[-20,-50],[2,-48],[2,-42]],4,'exam-hall-walk',course,0.35);
+  
 
   // Mirror Lake: restrained reflective water, a real fishing deck, connected boardwalk and bridge rails.
   const waterSurface=lake.children.find(o=>o.isMesh&&o.position.y===-1.9&&o.geometry.type==='ShapeGeometry');
@@ -6479,11 +6484,11 @@ const parkPolish = {amenities:[], borders:[], links:[], animals:[], passengers:[
   const existingSeats=[];islRoot.updateMatrixWorld(true);islRoot.traverse(o=>{const q=o.geometry?.parameters;if(o.isMesh&&!o.isInstancedMesh&&((q?.width>=3&&q.width<=4.5&&q.height<=.35&&q.depth>=1&&q.depth<=1.4)||(q?.width===4.2&&q.height===0.16&&q.depth===0.23))){const p=o.getWorldPosition(new THREE.Vector3());if(clearance(p.x,p.z)<0.8){o.parent.visible=false;return;}existingSeats.push([p.x,p.z]);}});   // a bench a path runs through is no bench
   const lamps=islRoot.userData.lamps||[],newLamps=[];
   routes.forEach((route,ri)=>{const c=new THREE.CatmullRomCurve3(route.points.map(([x,z])=>new THREE.Vector3(x,0,z))),L=c.getLength();
-    for(let d=18;d<L-12;d+=33){const p=c.getPointAt(d/L),v=c.getTangentAt(d/L),side=ri%2?1:-1,x=p.x-v.z*side*(route.width/2+6),z=p.z+v.x*side*(route.width/2+6);
-      if(!free(x,z,2.8)||parkPolish.amenities.some(a=>Math.hypot(a.x-x,a.z-z)<12))continue;
-      if(existingSeats.every(([a,b])=>Math.hypot(x-a,z-b)>20)&&parkPolish.borders.every(a=>Math.hypot(a.x-x,a.z-z)>3.6)){
+    for(let d=18;d<L-12;d+=33){const p=c.getPointAt(d/L),v=c.getTangentAt(d/L),side=ri%2?1:-1,x=p.x-v.z*side*(route.width/2+1.9),z=p.z+v.x*side*(route.width/2+1.9);
+      if(!free(x,z,.7)||parkPolish.amenities.some(a=>Math.hypot(a.x-x,a.z-z)<12))continue;
+      if(existingSeats.every(([a,b])=>Math.hypot(x-a,z-b)>20)){
         const g=seat(islRoot,x,z,Math.atan2(-v.z*side,v.x*side)+Math.PI);g.position.y=G;   // the backrest goes on the far side: a sitter faces the path
-        add(g,BOX(5,.14,2.5),mat(0xd6ccb5),0,-.02,0,false);parkPolish.amenities.push({kind:'bench',x,z});existingSeats.push([x,z]);
+        add(g,BOX(5,.14,2.5),mat(0xd6ccb5),0,-.02,0,false);parkPolish.amenities.push({kind:'bench',x,z});existingSeats.push([x,z]);parkPolish.borders.forEach((a,bi)=>{if(Math.hypot(a.x-x,a.z-z)<4.4){hedges.setMatrixAt(bi,new THREE.Matrix4().makeScale(0,0,0));hedges.instanceMatrix.needsUpdate=true;}});
       }
       const lx=p.x+v.z*side*(route.width/2+3.5),lz=p.z-v.x*side*(route.width/2+3.5);
       if(free(lx,lz,.8)&&lamps.every(([a,b])=>Math.hypot(a-lx,b-lz)>18)){
@@ -7554,7 +7559,7 @@ islAnim.push(t=>{ islT = t;
   // Codex keeps watch in the crystal space
   CODEX.userData.head.rotation.y = Math.sin(t*0.4)*0.5; if(CODEX.userData.rig){ CODEX.userData.rig.head.userData.hold = true; bend(CODEX.userData.rig.head, 'ay', Math.sin(t*0.4)*0.5); } CODEX.userData.orb.scale.setScalar(1 + Math.sin(t*2)*0.15);
   // Naty orbits the ancient tree, its colour drifting through its moods
-  const an = t*0.22; if(NATY.userData.park){ const pk = NATY.userData.park; NATY.position.set(pk[0], pk[2] + Math.sin(t*1.4)*0.5, pk[1]); NATY.rotation.y = MAZE.rot; } else if(!STAGED){ NATY.position.set(60*K + Math.cos(an)*30, G + 12 + Math.sin(t*1.4)*1.5, -100*K + Math.sin(an)*30); NATY.rotation.y = -an; } else NATY.position.y = groundY(NATY.position.x, NATY.position.z) + 3 + Math.sin(t*1.4)*0.4;
+  const an = t*0.22; if(NATY.userData.park){ const pk = NATY.userData.park; NATY.position.set(pk[0], pk[2] + Math.sin(t*1.4)*0.5, pk[1]); NATY.rotation.y = MAZE.rot; if(!NATY.userData.beam){ const bm = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.5, 110, 16, 1, true), new THREE.MeshBasicMaterial({color:0xff6a5a, transparent:true, opacity:0.3, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending})); bm.userData.dynamic = true; bm.userData.noShadow = true; islRoot.add(bm); NATY.userData.beam = bm; } const bm = NATY.userData.beam; bm.visible = NATY.visible !== false; bm.position.set(pk[0], G + 55, pk[1]); bm.material.opacity = 0.26 + 0.1*Math.sin(t*3); }   /* a red column over the heart of the maze: the children see where Naty is from any corridor (user, 2026-11-13) */ else if(!STAGED){ if(NATY.userData.beam) NATY.userData.beam.visible = false; NATY.position.set(60*K + Math.cos(an)*30, G + 12 + Math.sin(t*1.4)*1.5, -100*K + Math.sin(an)*30); NATY.rotation.y = -an; } else NATY.position.y = groundY(NATY.position.x, NATY.position.z) + 3 + Math.sin(t*1.4)*0.4;
   const mi = Math.floor(t/3) % NATY_MOODS.length, mk = clamp01((t%3)/0.8);
   _c1.set(NATY_MOODS[mi]); _c2.set(NATY_MOODS[(mi+NATY_MOODS.length-1)%NATY_MOODS.length]); _c2.lerp(_c1, mk);
   if(NATY.userData.hold){ const hd = NATY.userData.hold, age = (performance.now() - hd.t)/1000; if(hd.keep || age < 3){ _c2.set(hd.color); if(!hd.keep) _c2.lerp(_c1, clamp01((age - 2)/1)); } else NATY.userData.hold = null; }
@@ -8238,7 +8243,7 @@ function questApply(){ try{ flowLockUI(); if(collectorModel)collectorSync(); }ca
   // the Sky Loop sleeps until mission 1 brings its line back (a visitor without a team, the dashboard and the admin see it running)
   if(typeof TRAIN !== 'undefined' && TRAIN){ if(typeof STATION !== 'undefined' && !STATION && typeof buildStation === 'function') buildStation(); TRAIN.mode = TRAIN.mode === 'ride' ? 'ride' : parkPowerOn() ? 'run' : 'stop'; }
   // 네이티 waits in the heart of the maze while mission 2 is due; otherwise it drifts round the ancient tree as before
-  NATY.userData.park = (questDone(QUESTS[0]) && !questDone(QUESTS[1]) && TEAM && !flowFree()) ? [NATY_HIDE[0], NATY_HIDE[1], G + 5.4] : null; if(!NATY.userData.park && NATY.userData.hold && NATY.userData.hold.keep) NATY.userData.hold = null;
+  NATY.userData.park = (questDone(QUESTS[0]) && !questDone(QUESTS[1]) && TEAM && !flowFree()) ? [NATY_HIDE[0], NATY_HIDE[1], G + 8] : null; if(!NATY.userData.park && NATY.userData.hold && NATY.userData.hold.keep) NATY.userData.hold = null;
   // 코덱스 went ahead to the eye cave for the test; after it he is back by the cave hill
   if(QDONE.has('q3')){ CODEX.position.set(CODEX_HOME[0], G, CODEX_HOME[1]); CODEX.rotation.y = CODEX_HOME[2]; } else { const cw = codexWait(); CODEX.position.set(cw[0], G, cw[1]); CODEX.rotation.y = Math.atan2(-cw[0], -cw[1]); }
   renderWalkPick();
@@ -8316,7 +8321,7 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
     if(false){}
     else miniWalkTo(2, '정비동으로', '롤러코스터 옆 정비동 문', YARD_DOOR, 7, yardOpen); }
   else if(q.mini==='maze'){
-    if(st==='maze'){q.mazeEntered=true;questLive=q;mini=null;miniHud(2,'네이티를 찾아라','미로 한가운데까지 가기');return true;}
+    if(st==='maze'){q.mazeEntered=true;questLive=q;mini=null;miniHud(2,'네이티를 찾아라','붉은 빛기둥이 선 한가운데까지 가기');return true;}
     chaseBegin(q); return true;   /* left after Naty was found: the chase starts again at the maze entrance */
   }
   else if(q.mini==='viking'){ mini = {q, kind:'viking'}; vikAsk(); }
@@ -8345,7 +8350,7 @@ function questTick(){
   const q = questLive; if(!q || !walk || vn || q.found || mini) return;
   if(q.mini==='maze'&&q.mazeEntered)mazeGuide(walk,performance.now());
   const [tx, tz] = questTarget(q); if(Math.hypot(walk.x - tx, walk.z - tz) > q.r) return;
-  if(q.mini==='maze'&&!q.mazeEntered){q.mazeEntered=true;miniSave('maze');$('questHud').hidden=true;qNavHide();say(STORY.mazeEntrance,()=>{$('qhT').textContent='네이티를 찾아라';$('qhHint').textContent='미로 한가운데까지 가기';$('qhStep').textContent='2 / 3';$('questHud').hidden=false;});return;}
+  if(q.mini==='maze'&&!q.mazeEntered){q.mazeEntered=true;miniSave('maze');$('questHud').hidden=true;qNavHide();say(STORY.mazeEntrance,()=>{$('qhT').textContent='네이티를 찾아라';$('qhHint').textContent='붉은 빛기둥이 선 한가운데까지 가기';$('qhStep').textContent='2 / 3';$('questHud').hidden=false;});return;}
   if(q.mini === 'maze' && !mazeHeart(walk.x, walk.z)) return;   // through a hedge from the next corridor does not count (user, 2026-11-02)
   q.found = true; miniSave('found');
   const tg = q.id === 'q1' || q.id === 'q4' ? XYLO : q.id === 'q3' ? CODEX : null;
@@ -8719,7 +8724,7 @@ function tutMePreview(on){ const m = MISSION_E.find(x=> x.id === 'z1'); if(!m ||
   if(on){ const b = m.b, x = b.cx + 26, z = b.cz + 30; meArrow.visible = true; meArrow.position.set(x, 0.4, z); meArrow.rotation.y = Math.atan2(b.cx - x, b.cz - z); meArrow.scale.setScalar(0.55);
     flyTo(new THREE.Vector3(x + 40, 60, z + 70), new THREE.Vector3(x, 2, z), 1400); }
   else { if(!follow) meArrow.visible = false; flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1200); } }
-const tutDone = ()=> TUT_LOCAL || !!myEntry().tut;
+const tutDone = ()=>{ if(TUT_LOCAL) return true; const e = myEntry(); return !!e.tut || (+e.act || 0) > 0 || Object.keys(e).some(k=> QID.test(k)) || (typeof MISSION_E !== 'undefined' && typeof zoneMine === 'function' && MISSION_E.some(m=> m.lat != null && zoneMine(m))); };   /* a team that already has a record, an act or a mission behind it never gets the first greeting again (user, 2026-11-13: after mission 3 the void started over) */
 function maybeGuide(){ if(!TEAM || SCREEN || LOCAL || AUX || intro || tutStep >= 0 || tutDone() || $('teamPick').dataset.on || typeof MI === 'undefined') return; tutStep = 0; $('tutSkip').hidden = !ADMIN_KEY; tutShow(); }
 // ---- tutorial spotlight: the part of the page the void is talking about stays bright and grows a little, the rest dims (user, 2026-11-11) ----
 let tutSpotEl = null, tutSpotRaf = 0, tutSpotTarget = null;
