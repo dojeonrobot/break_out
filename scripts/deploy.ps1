@@ -5,12 +5,46 @@
 .EXAMPLE
     .\scripts\deploy.ps1
     .\scripts\deploy.ps1 -Message "chapter01 이미지 교체"
+    .\scripts\deploy.ps1 -Message "chapter03 허브" -Only chapter03/index.html,chapter03/hub.js
+
+.PARAMETER Only
+    이번 배포에서 고친 파일·폴더(저장소 기준 경로). 주면, 그 밖의 변경이 작업 폴더에
+    있을 때 커밋·업로드 전에 멈춘다. 압축은 작업 폴더 전체를 올리므로 일부만 올리는
+    기능이 아니라, 다른 사람·다른 세션의 작업이 섞여 올라가는 것을 막는 확인이다.
 #>
 
 param(
     [string]$KeyFile = "hy_key.pem",
-    [string]$Message = ""
+    [string]$Message = "",
+    [string[]]$Only = @()
 )
+
+# -Only a,b 를 -File 로 넘기면 한 문자열로 들어오므로 쉼표로 다시 나눈다
+$Only = @($Only | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+
+# 작업 폴더의 변경 중 $Scope 밖에 있는 경로를 돌려준다 ($Scope 가 비면 변경 전부)
+function Get-OutOfScope([string[]]$Scope) {
+    $prevEnc = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [Text.Encoding]::UTF8
+    $lines = git -c core.quotepath=false status --porcelain --untracked-files=all
+    [Console]::OutputEncoding = $prevEnc
+    $norm = @($Scope | ForEach-Object { (($_ -replace '\\', '/') -replace '^\./', '').TrimEnd('/') } | Where-Object { $_ })
+    $found = @()
+    foreach ($line in $lines) {
+        if (-not $line -or $line.Length -lt 4) { continue }
+        $p = $line.Substring(3)
+        $parts = if ($p -match ' -> ') { $p -split ' -> ' } else { @($p) }
+        foreach ($one in $parts) {
+            $one = $one.Trim('"')
+            $inScope = $false
+            foreach ($s in $norm) {
+                if ($one -eq $s -or $one.StartsWith("$s/", [StringComparison]::OrdinalIgnoreCase)) { $inScope = $true; break }
+            }
+            if (-not $inScope) { $found += $one }
+        }
+    }
+    return ,$found
+}
 
 $HOST_IP    = if ($env:BREAKOUT_HOST) { $env:BREAKOUT_HOST } else { "210.109.15.216" }
 $RemoteUser = "ubuntu"
@@ -33,6 +67,15 @@ if (-not (Test-Path $KEY)) {
 Write-Host "[1/7] Git sync (commit + pull + push)..." -ForegroundColor Cyan
 Push-Location $ProjectRoot
 $changes = git status --porcelain
+if ($Only.Count -gt 0) {
+    $foreign = Get-OutOfScope $Only
+    if ($foreign.Count -gt 0) {
+        Pop-Location
+        Write-Host "[ERROR] -Only 범위 밖의 변경이 있어 멈춤 (커밋·업로드 안 함). 누구 작업인지 확인하고 빼 둔 뒤 다시 실행:" -ForegroundColor Red
+        $foreign | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+        exit 1
+    }
+}
 if ($changes) {
     if (-not $Message) { $Message = "deploy $(Get-Date -Format 'yyyy-MM-dd HH:mm')" }
     git add -A
@@ -79,6 +122,17 @@ Write-Host "  OK" -ForegroundColor Green
 
 # -- tar --
 Write-Host "[3/7] Compressing..." -ForegroundColor Cyan
+# -Only: 커밋 뒤에는 작업 폴더가 깨끗해야 한다. 그 사이 새로 생긴 변경은 다른 작업이다.
+if ($Only.Count -gt 0) {
+    Push-Location $ProjectRoot
+    $late = Get-OutOfScope @()
+    Pop-Location
+    if ($late.Count -gt 0) {
+        Write-Host "[ERROR] 커밋 뒤에 작업 폴더가 바뀌어 멈춤 (업로드 안 함, 커밋·푸시는 이미 됨):" -ForegroundColor Red
+        $late | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+        exit 1
+    }
+}
 $tarFile = Join-Path $ProjectRoot "breakout-deploy.tar.gz"
 
 $excludes = @(
