@@ -134,12 +134,21 @@ async def main():
                 await wf(pg, '!!(__rem().ride && __rem().ride.pause)', 60); await asyncio.sleep(1.3); await shot(pg, 'vm5c_found')
             for _ in range(400):
                 await drain(pg)
-                if await ev("!!document.querySelector('#remDlg[data-on]')"): break
+                if await ev("!!(__rem().game && !__rem().game.done)"): break
                 await asyncio.sleep(.25)
-            if i == 0: await shot(pg, 'vm5c_game')
-            for k in range(3):
-                await ev("()=>{ __remAim(); document.getElementById('rmGo').click(); }"); await asyncio.sleep(.3)
-            await wf(pg, "!document.querySelector('#remDlg[data-on]')", 30); await asyncio.sleep(.5); await drain(pg); found += 1
+            await asyncio.sleep(1.2); r1 = await ev('__rem()')
+            if i == 0:
+                await shot(pg, 'vm5c_game'); print('  on the ground', r1['down'], 'camera', r1['cam']); check(r1['down'] and r1['cam'][1] < r1['station'][0]*0 + 12, 'the view comes down beside the remnant (camera low)')
+                await ev("()=>{ const G = __rem().game; }"); await pg.keyboard.up('Space')
+                miss = await ev("(()=>{ const m = document.getElementById('qhHint'); return m.textContent; })()"); print('  hint', repr(miss))
+            for k in range(8):
+                if await ev("!__rem().game || __rem().game.done"): break
+                await ev("__remAim()"); await asyncio.sleep(.12); await ev("document.getElementById('miniGo').click()"); await asyncio.sleep(.25)
+                if i == 0 and k == 2: await shot(pg, 'vm5c_game_mid')
+            await wf(pg, "!__rem().game", 30); await asyncio.sleep(.5); await drain(pg); found += 1
+            if i == 0:
+                await asyncio.sleep(2.5); r2 = await ev('__rem()'); print('  back on the train', r2['down'], r2['cam']); check(not r2['down'] and r2['cam'][1] > 20, 'after it the view is back on the train'); await shot(pg, 'vm5c_back')
+            await pg.keyboard.down('Space')
             print('  remnant', i + 1, await ev("[__rem().models, __rem().mini?.got, __rem().ride]"), flush=True)
         check(found == 3 and await ev("(__rem().mini?.got || []).length") == 3, 'three remnants found from the train and dismantled')
         await pg.keyboard.up('Space'); said = []

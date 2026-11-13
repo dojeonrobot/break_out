@@ -39,18 +39,18 @@
    "lng": 126.831854
   },
   "island": {
-   "id": "dl-ferris",
-   "name": "관람차"
+   "id": "dl-safari",
+   "name": "사파리"
   },
   "scans": []
  },
  {
-  "id": "dl-safari",
+  "id": "dl-ferris",
   "kind": "quest",
   "quest": "q5",
   "island": {
-   "id": "dl-safari",
-   "name": "사파리"
+   "id": "dl-ferris",
+   "name": "관람차"
   },
   "scans": []
  },
