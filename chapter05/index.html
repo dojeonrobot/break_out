@@ -9681,7 +9681,7 @@ renderList(); applyTheme();
 // (the server marks it restored without a scan, /admin/skip, password) → the act or island mission that follows. A child's tablet has none of this.
 function admSkipWhat(){
   if(!ADMIN_KEY || SCREEN || LOCAL) return null;
-  const on = id => !!$(id).dataset.on;
+  const on = id => { const el = $(id); return !!(el && el.dataset.on); };   /* a dialog built on first use may not exist yet */
   if(!$('cinema').hidden) return {t:$('cinemaEnd').hidden ? '영상 건너뛰기' : '처음 화면으로', run:()=>{ if($('cinemaEnd').hidden) endRestore(); else $('cinemaX').click(); }};
   if(on('simDone')) return {t:'성공 카드 닫기', run:()=> $('simDoneX').click()};
   if(on('restoreDlg')) return {t:'환원 바로 가기', run:()=> $('restoreGo').click()};
