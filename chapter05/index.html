@@ -2824,7 +2824,7 @@ function portFenceBlocked(x,z){if(Math.abs(z-410)<.8&&Math.abs(x)<22.3&&Math.abs
 const PATHS = [
   [[0,95],[0,150],[0,250],[0,300],[0,333]],           // fountain → main street → gate → gate plaza
   [[-60,40],[-100,10],[-120,-10]],                     // → safari
-  [[25,-20],[45,-60],[55,-75]],                        // → ancient tree
+  [[25,-20],[48,-28],[53,-56],[55,-75]],                        // → ancient tree
   [[70,40],[150,40],[215,25],[236,22]],                // → carousel, on to the teacups' fence
   [[60,0],[100,-60],[118,-100]],                       // → ferris hill path
   [[-55,90],[-85,130],[-104,164]],                     // → coaster (ends at the station's east gate; the track never crosses it)
@@ -2842,7 +2842,7 @@ const PATHS = [
   [[20,330],[70,326],[104,312]],                       // → maze (east of the gate's right tower)
   [[-200,62],[-230,30]],                               // → tree-house village (off the warehouse path)
   [[-55,-100],[-90,-150],[-120,-185]],                 // → Ren's door
-  [[45,-60],[20,-110],[40,-150],[48,-165]],            // → Codex's box (west of the hologram tree)
+  [[52,-58],[20,-110],[40,-150],[48,-165]],            // → Codex's box (west of the hologram tree)
   [[432,48],[380,-20],[352,-48]],                     // → staff lodging (off the lighthouse path, north of the course)
   [[172,58],[182,40],[186,27]],                        // → 4D dome entrance (off the carousel path)
   [[172,58],[190,83]],                                 // → sky flyer
@@ -4158,7 +4158,7 @@ const mainStreet = new THREE.Group();
   let n = 0;
   [-1, 1].forEach(side=>{
     for(let k=0;k<6;k++){
-      if(side < 0 && (k===3 || k===4)) continue;                       // gap for the bumper-car pavilion behind
+      if((side < 0 && (k===3 || k===4)) || (side > 0 && k===3)) continue;   /* east k 3 stood on the lake path */                       // gap for the bumper-car pavilion behind
       const [name, wall, trim] = STALLS[n++ % STALLS.length];
       const g = new THREE.Group(); g.position.set(side*22, 0, 204 + k*22); g.rotation.y = side < 0 ? Math.PI/2 : -Math.PI/2; g.scale.setScalar(0.55); mainStreet.add(g);
       add(g, BOX(11, 3.4, 5), mat(new THREE.Color(wall).getHex()), 0, 0, 0.5);
@@ -4850,7 +4850,7 @@ hut(-82, 452, 0.5, '안내소', 0xfff3d6, 0x1d2f55); hut(-118, 432, 0.7, '화장
     SIGN[i].forEach((t,k)=>{ const s = add(g, BOX(9, 2, 0.4), mat(0x9a6b45), k ? 3.5 : -3.5, 9 - k*2.6, 0); s.rotation.y = k ? 0.4 : -0.3;
       add(s, new THREE.PlaneGeometry(8.4, 1.6), new THREE.MeshBasicMaterial({map:signTex(t, {bg:'#9a6b45', fg:'#fff7d6', size:58, w:384, h:72})}), 0, 1, 0.21, false); });
   });
-  cart(0xf6b6c9, '#e85d8a', 36/K, 432/K, 0.3); cart(0xffe08a, '#b8562a', -30/K, 440/K, -0.3); cart(0xa8e2cf, '#3aa58a', -170/K, 150/K, -0.3); cart(0xffe08a, '#e2574c', 230/K, 320/K, 0.8); cart(0xd9c8ff, '#6a4bc4', -100/K, 380/K, 0.2);
+  cart(0xf6b6c9, '#e85d8a', 36/K, 432/K, 0.3); cart(0xffe08a, '#b8562a', -30/K, 440/K, -0.3); cart(0xa8e2cf, '#3aa58a', -170/K, 150/K, -0.3); cart(0xffe08a, '#e2574c', 240/K, 328/K, 0.8); cart(0xd9c8ff, '#6a4bc4', -100/K, 380/K, 0.2);
   // pergolas and flower arches
   [[240, 192, 0.3], [-100, 322, -0.2]].forEach(([x,z,r])=>{ const g = new THREE.Group(); g.position.set(x, G, z); g.rotation.y = r; islRoot.add(g); OCC.push([x, z, 13]);
     [[-8,-5],[8,-5],[-8,5],[8,5]].forEach(([a,b])=> add(g, BOX(1, 10, 1), mat(0xffffff), a, 0, b));
@@ -5455,7 +5455,7 @@ pickable(course, {n:'운전면허 시험장', c:'ride', sub:'챕터 1', cx:472/K
 {
   const SKIP = new Set(['하모니아', '메인 스트리트', '도로랜드 퍼레이드', '포시즌스 가든', '스카이 크루즈', '등대', '홀로그램 고목', '분수 광장', '도로랜드 정문', '항구', '코덱스의 동굴', '그랜드 스테이지', '숲 속 풍차']);   // no path leads to the eye cave; the stage opens straight onto the plaza (connector below) (a 270-long spur used to cut through the mountain forest to it)
   const REACH = {'관람차': 84};                                       // the wheel's queue waits at the foot of its hill
-  const NO_SPUR = new Set(['관람차']);
+  const NO_SPUR = new Set(['관람차', '직원 숙소']);   /* the staff village has its own lanes: an automatic spur ran through a cottage */
   const nearest = (x, z)=>{ let best = null, bd = Infinity; pathSamples.forEach(([px,pz])=>{ const d = (px-x)*(px-x) + (pz-z)*(pz-z); if(d < bd){ bd = d; best = [px, pz]; } }); return [best, Math.sqrt(bd)]; };
   const zero = new THREE.Matrix4().makeScale(0, 0, 0);
   const fc = islRoot.userData.flowerClusters; let fcDirty = false;
