@@ -163,7 +163,7 @@ def live_pos():
 
 def state():
     return {'version': DB['version'], 'subs': DB['subs'], 'hidden': DB['hidden'], 'auto': bool(DB.get('auto', True)), 'reset': int(DB.get('reset', 0)),
-            'quests': DB.get('quests', {}), 'vikings': DB.get('vikings', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'coords': DB.get('coords', {}), 'now': now_ms()}
+            'quests': DB.get('quests', {}), 'vikings': DB.get('vikings', {}), 'pairs': pair_status(), 'pos': live_pos(), 'notice': DB.get('notice'), 'coords': DB.get('coords', {}), 'trev': DB.get('trev', {}), 'now': now_ms()}
 
 
 # ---------- Scaniverse 링크 → 스플랫 자동 변환 ----------
@@ -386,7 +386,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto, '/api/void/admin/coords': self.admin_coords,
             '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
-            '/api/void/admin/skip': self.admin_skip, '/api/void/admin/viking_clear': self.admin_viking_clear,
+            '/api/void/admin/skip': self.admin_skip, '/api/void/admin/stage': self.admin_stage, '/api/void/admin/viking_clear': self.admin_viking_clear,
         }
         fn = routes.get(path)
         if not fn:
@@ -637,6 +637,57 @@ class Handler(BaseHTTPRequestHandler):
                     'splat': {'skip': True, 'caption': '운영자 건너뜀', 'points': 0},
                 })
                 save()
+            self.send_json(state())
+
+    # 운영자: 한 조를 흐름의 특정 시점으로 맞춘다 (2026-11-13). zones = 복구된 캠퍼스 기록, done = 끝낸 섬 미션, act = 본 막.
+    # 그 조의 다른 제출은 지우고, 모자란 기록은 「운영자 건너뜀」으로 채우고, 조의 모든 태블릿 칸을 같은 진행으로 덮어쓴다.
+    # trev[조] 도장이 바뀌면 그 조 태블릿은 기기에 남은 진행을 지우고 새로 연다.
+    def admin_stage(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('조 번호가 없습니다.')
+        zones = [str(z) for z in (b.get('zones') or []) if MISSION_ID.match(str(z))][:5]
+        done = [str(x) for x in (b.get('done') or []) if QUEST_ID.match(str(x))]
+        try:
+            act = max(0, min(3, int(b.get('act') or 0)))
+        except (TypeError, ValueError):
+            act = 0
+        tut = b.get('tut', True) is not False
+        with lock:
+            now = now_ms()
+            DB['subs'] = [s for s in DB['subs'] if s['team'] != team or s['mission'] in zones]
+            for z in zones:
+                if not any(s['team'] == team and s['mission'] == z and is_done(s) for s in DB['subs']):
+                    sid = uuid.uuid4().hex[:12]
+                    DB['subs'].append({'id': sid, 'scanId': 'skip' + sid, 'kind': 'skip', 'url': '', 'mission': z, 'team': team,
+                                       'note': '', 'caption': '운영자 건너뜀', 'author': '', 'status': 'ok', 'createdAt': now,
+                                       'splat': {'skip': True, 'caption': '운영자 건너뜀', 'points': 0}})
+            tq = DB.setdefault('quests', {}).get(str(team), {})
+            if any(k.startswith('q') or k in ('act', 'tut') for k in tq):
+                tq = {'a': dict(tq, dev='legacy')}
+            for l, cur in list(tq.items()):
+                if not isinstance(cur, dict):
+                    continue
+                new = {'dev': cur.get('dev'), 'seen': cur.get('seen') or now}
+                for x in done:
+                    new[x] = now
+                if act:
+                    new['act'] = act
+                if tut:
+                    new['tut'] = cur.get('tut') or now
+                if done:
+                    new['story'] = 3
+                    new['records'] = {k: now for k in ('q1', 'q2') if k in done}
+                if 'q1' in done:
+                    new['power'] = now
+                tq[l] = new
+            if tq:
+                DB['quests'][str(team)] = tq
+            if 'q4' not in done and str(team) in DB.get('vikings', {}):
+                DB['vikings'].pop(str(team), None)
+                vik_remove(team)
+            DB.setdefault('trev', {})[str(team)] = now
+            save()
             self.send_json(state())
 
     # 운영자: 자체 스캔을 복구됨으로 확정(ok=false면 다시 확인 대기로)

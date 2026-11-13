@@ -1624,8 +1624,13 @@ function checkReset(st){
   if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
   toast('초기화됐습니다. 조를 다시 고르세요');
 }
+let TREV_SEEN = null;
+function checkStage(st){ if(!TEAM || SCREEN || LOCAL) return false; const cur = +((st.trev || {})[TEAM] || 0); let stored = 0; try{ stored = +localStorage.getItem('void-trev-' + TEAM) || 0; }catch(e){}
+  if(cur > stored) try{ localStorage.setItem('void-trev-' + TEAM, String(cur)); }catch(e){}
+  if(TREV_SEEN === null){ TREV_SEEN = cur; if(cur > stored){ let left = false; try{ left = Object.keys(localStorage).some(k=> /^void-(quest|records|mini)-/.test(k)); }catch(e){} if(left){ hardRestart(false); return true; } } return false; }   /* a page opened after the move already has the server's state: it only drops stale memories */
+  if(cur > TREV_SEEN){ TREV_SEEN = cur; hardRestart(false); return true; } return false; }
 function applyState(st){
-  checkReset(st);
+  checkReset(st); if(RESTARTING || checkStage(st)) return;
   if(st.version === STATE_VER) return; STATE_VER = st.version;
   SUBS = st.subs || []; if(st.now) SNOW = st.now;
   if(!LOCAL){ VIK_STATE = st.vikings || {}; if(window.__vikReady){ VIKINGS = VIK_STATE; vikingSync(); } }
@@ -1792,6 +1797,14 @@ function announceChanges(){
 function missionById(id){ return MISSION_E.find(m=>m.id===id) || (typeof MI !== 'undefined' ? MI.find(m=>m.id===id) : null) || null; }
 let ADM_FILTER = 'all';                       // 제출 기록 필터: all | need | <조 번호> (2026-11-10)
 const ADM_OPEN = new Set(['notice']);         // 오른쪽 접이식 칸 중 펼친 것. 15초마다 다시 그려도 유지
+/* a team can be put at any point of the flow (user, 2026-11-13). zones = campus records restored, done = island missions finished, act = acts seen */
+const ADM_STAGES = [
+  ['튜토리얼 직후 (기록 1 찍기 전)', [], [], 0], ['기록 1 제출 직후 (1막 시작)', ['z1'], [], 0], ['미션 1 시작 전', ['z1'], [], 1], ['미션 2 시작 전', ['z1'], ['q1'], 1],
+  ['기록 2 찍기 전', ['z1'], ['q1','q2'], 1], ['기록 2 제출 직후 (2막 시작)', ['z1','z2'], ['q1','q2'], 1], ['미션 3 시작 전', ['z1','z2'], ['q1','q2'], 2], ['미션 4 시작 전', ['z1','z2'], ['q1','q2','q4'], 2],
+  ['기록 3 찍기 전', ['z1','z2'], ['q1','q2','q4','q5'], 2], ['기록 3 제출 직후 (3막 시작)', ['z1','z2','z3'], ['q1','q2','q4','q5'], 2], ['미션 5 시작 전', ['z1','z2','z3'], ['q1','q2','q4','q5'], 3], ['미션 5 끝 (환원 직전)', ['z1','z2','z3'], ['q1','q2','q4','q5','q3'], 3]];
+async function adminStage(team, k){ const g = ADM_STAGES[k]; if(!team || !g) return;
+  if(!confirm(`${team}조를 「${g[0]}」 시점으로 옮깁니다.\n그 조의 제출·섬 미션 진행이 이 시점에 맞게 바뀌고, 조 태블릿은 15초 안에 새로 열립니다.`)) return;
+  try{ const st = await api('/admin/stage', {team, zones:g[1], done:g[2], act:g[3]}, true); if(team === TEAM) questPending.clear(); STATE_VER = -1; applyState(st); renderAdmin(); toast(`${team}조 → ${g[0]}`); }catch(e){ toast(e.message); } }
 function adminHTML(){
   const isDone = s => inMap.has(s.scanId) || subDone(s);
   const stOf = s => isDone(s) ? ['ok', '복구됨'] : s.splat ? ['wait', '확인 대기'] : s.error ? ['err', '변환 실패'] : ['run', '변환 중'];
@@ -1807,7 +1820,7 @@ function adminHTML(){
   const teamRow = t=>{ const zs = teamZones(t, rows), ok = zs.filter(z=> z.st === 'ok').length, ls = teamDevs(t), sq = SQUESTS[t] || {};
     const tabs = ls.length ? ls.map(l=>{ const d = sq[l] || {}; return `<span class="tab"><b title="${esc(l)}">${esc(l)}</b>${d.tut ? (d.act ? `<em>${d.act}막</em>` : '') : '<em>튜토리얼 전</em>'}<button type="button" data-aq="${t}:${l}:*:0" title="이 태블릿을 조에서 뺍니다" aria-label="${t}조 태블릿 ${esc(l)} 빼기">×</button></span>`; }).join('') : '<small class="none">태블릿 없음</small>';
     const cells = zs.map(z=> z.p.quest ? `<td class="qcell">${ls.length ? ls.map(l=>{ const on = devQuests(t, l).includes(z.p.quest.quest); return `<button type="button" class="qc ${on ? 'on' : ''}" data-aq="${t}:${l}:${z.p.quest.quest}:${on ? 0 : 1}" title="${on ? `${esc(l)} 완료를 되돌립니다` : `${esc(l)}를 완료로 처리합니다`}">${esc(l)}${on ? ' ✓' : ''}</button>`; }).join('') : '<span class="none">-</span>'}</td>` : `<td><span class="st ${z.st}">${z.st === 'ok' ? '복구됨' : z.st === 'pend' ? '처리 중' : '미제출'}</span></td>`).join('');
-    return `<tr class="${ok === rows.length ? 'full' : ''}"><td class="tc"><b>${t}조</b><div class="tabs">${tabs}</div></td>${cells}<td><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td><td class="act"><button type="button" class="mini" data-aq="${t}:*:*:0" ${ls.length ? '' : 'hidden'}>조 초기화</button></td></tr>`; };
+    return `<tr class="${ok === rows.length ? 'full' : ''}"><td class="tc"><b>${t}조</b><div class="tabs">${tabs}</div></td>${cells}<td><div class="rate"><i style="width:${ok*20}%"></i><span>${ok*20}%</span></div></td><td class="act"><select class="mini" data-astage="${t}" aria-label="${t}조 시점 이동" ${ls.length ? '' : 'hidden'}><option value="">시점 이동</option>${ADM_STAGES.map((g, k)=> `<option value="${k}">${esc(g[0])}</option>`).join('')}</select><button type="button" class="mini" data-aq="${t}:*:*:0" ${ls.length ? '' : 'hidden'}>조 초기화</button></td></tr>`; };
   const table = rows.length ? `<div class="tw"><table class="qt big v2"><thead><tr><th>조</th>${head}<th>복구율</th><th></th></tr></thead><tbody>${teams.length ? teams.map(teamRow).join('') : `<tr><td colspan="${rows.length + 3}" class="empty">아직 조를 고른 태블릿이 없습니다</td></tr>`}</tbody></table></div>` : '';
   // 제출 기록: 조별 묶음 대신 한 표(최근 것 위), 조·처리 필요 필터
   const need = s=> !isDone(s) && (s.splat || s.error);
@@ -1861,7 +1874,7 @@ function renderAdmin(){ const b = $('adminBody'); if(!b || $('adminDlg').hidden)
   b.querySelectorAll('input[data-keep]').forEach(i=>{ if(i.dataset.keep in keep){ i.value = keep[i.dataset.keep]; i.dataset.dirty = '1'; } if(fk && i.dataset.keep === fk) i.focus(); }); }
 function openAdmin(){ $('adminDlg').hidden = false; document.body.classList.add('admin'); renderAdmin(); rescan(); }
 if(QS.get('admin') === '1'){ try{ sessionStorage.getItem('void-admin') && setTimeout(()=> $('adminBtn').click(), 1500); }catch(e){} }   // ?admin=1 opens the dashboard on a logged-in device
-document.addEventListener('change', e=>{ const v = e.target.closest('[data-aview]'); if(!v) return; VIEW_ADMIN = +v.value || 0; try{ sessionStorage.setItem('void-view', String(VIEW_ADMIN)); }catch(e){} rescan(); });
+document.addEventListener('change', e=>{ const sg = e.target.closest('[data-astage]'); if(sg){ const k = sg.value; sg.value = ''; if(k !== '') adminStage(+sg.dataset.astage, +k); return; } const v = e.target.closest('[data-aview]'); if(!v) return; VIEW_ADMIN = +v.value || 0; try{ sessionStorage.setItem('void-view', String(VIEW_ADMIN)); }catch(e){} rescan(); });
 function closeAdmin(){ $('adminDlg').hidden = true; document.body.classList.remove('admin'); }
 // clipboard with a fallback for browsers that refuse writeText (http, denied permission): a hidden textarea + execCommand
 async function copyText(txt){ try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
@@ -2615,6 +2628,8 @@ const trackR = a => {
   // south-west: swings round the outside of the coaster instead of cutting through its southern hills
   const cu = COASTER_C[0]*Math.cos(a) + COASTER_C[1]*sn, disc = COASTER_CLEAR*COASTER_CLEAR - (COASTER_C[0]*COASTER_C[0] + COASTER_C[1]*COASTER_C[1]) + cu*cu;
   if(disc > 0){ const arc = cu + Math.sqrt(disc), ss = (x0, x1, x)=>{ const t = Math.min(1, Math.max(0, (x - x0)/(x1 - x0))); return t*t*(3 - 2*t); }, w = ss(1.9, 2.04, a)*(1 - ss(2.56, 2.7, a)); if(arc > r) r += (arc - r)*w; }
+  /* north-east: round the outside of the Ferris wheel's hill, which it used to cut through (user, 2026-11-13) */
+  { const fx = 160*1.35, fz = -180*1.35, FC = 90, fu = fx*Math.cos(a) + fz*sn, fd = FC*FC - (fx*fx + fz*fz) + fu*fu; if(fd > 0){ const s0 = Math.sqrt(fd), far = fu + s0; if(r > fu - s0 && r < far) r = Math.min(far, islR(a) - 20); } }
   return r; };
 const coveAt = (a, dr) => { const r = islR(a) + dr; return new THREE.Vector3(Math.cos(a)*r, 0, Math.sin(a)*r); };
 const CLIFF_TOP = 17;
@@ -8943,7 +8958,7 @@ function buildStation(){ if(STATION) return; const c = TRAIN.curve, N = 360; let
   add(g, BOX(6, 0.8, 16), mat(0xe9e4dc), px, p.y - 1.2, pz).rotation.y = Math.atan2(ux, uz); add(g, BOX(6.4, 0.3, 16.4), mat(0xffd400), px, p.y - 0.4, pz).rotation.y = Math.atan2(ux, uz);
   for(let i=0;i<8;i++){ const k = i/7, sx = px + inx*(4 + k*12), sz = pz + inz*(4 + k*12); add(g, BOX(4, 1.2, 2.2), mat(0xe9e4dc), sx, p.y - 1.6 - k*(p.y - 1.6 - G), sz).rotation.y = Math.atan2(inx, inz); }
   [[-6, 0], [6, 0]].forEach(([s])=> add(g, CYL(0.5, 0.6, p.y - G - 1.2, 8), mat(0xe9e4dc), px + ux*s, G, pz + uz*s));
-  const post = add(g, CYL(0.35, 0.4, 9, 8), mat(0x1d2f55), px + inx*17, G, pz + inz*17); add(g, new THREE.PlaneGeometry(9, 1.8), new THREE.MeshBasicMaterial({map:signTex('SKY LOOP', {bg:'#1d2f55', fg:'#ffd400', size:84, w:512, h:110}), side:THREE.DoubleSide}), px + inx*17, G + 8, pz + inz*17, false).rotation.y = Math.atan2(inx, inz) + Math.PI;
+  const post = add(g, CYL(0.35, 0.4, 9, 8), mat(0x1d2f55), px + inx*17, G, pz + inz*17); { const sm = new THREE.MeshBasicMaterial({map:signTex('SKY LOOP', {bg:'#1d2f55', fg:'#ffd400', size:84, w:512, h:110})}); [0, Math.PI].forEach(tw=>{ const th = Math.atan2(inx, inz) + Math.PI + tw; add(g, new THREE.PlaneGeometry(9, 1.8), sm, px + inx*17 + Math.sin(th)*0.46, G + 8, pz + inz*17 + Math.cos(th)*0.46, false).rotation.y = th; }); add(g, BOX(9, 1.8, 0.86), mat(0x1d2f55), px + inx*17, G + 7.1, pz + inz*17).rotation.y = Math.atan2(inx, inz); }   /* one face each way, the post between them (user, 2026-11-13: the back read mirrored) */
   STATION = {u:bu, spot:freeSpot(px + inx*19, pz + inz*19), board:[px + inx*3, pz + inz*3], g};
   if(TRAIN.mode === 'stop') TRAIN.u = bu; }
 function rideSpots(){ const c = TRAIN.curve, a0 = Math.atan2(TRAIN.curve.getPointAt(STATION.u).z, TRAIN.curve.getPointAt(STATION.u).x), names = ['서쪽 숲 가장자리','캠퍼스 기록 2','미로 정원','캠퍼스 기록 3'];
@@ -9189,6 +9204,11 @@ function remDraw(){ const G2 = REM.game; if(!G2) return; const R = [118, 88, 58]
   $('rmSvg').innerHTML = `<circle cx="150" cy="150" r="26" fill="#ff6a4e" opacity="${(0.55 + 0.4*Math.abs(Math.sin(performance.now()/160))).toFixed(2)}"/><circle cx="150" cy="150" r="36" fill="none" stroke="#ff6a4e" stroke-opacity=".35" stroke-width="2"/>`
     + R.map((r, k)=> k < G2.ring ? '' : `<path d="${remArc(r, G2.a[k], REM_GAP)}" fill="none" stroke="${k === G2.ring ? '#ffd84a' : '#5d6670'}" stroke-width="${k === G2.ring ? 14 : 10}" stroke-linecap="round"/>`).join('')
     + `<path d="M150 6 L140 -10 L160 -10 Z" transform="translate(0 16)" fill="#9ff6ff"/><line x1="150" y1="22" x2="150" y2="${150 - R[G2.ring < 3 ? G2.ring : 2] + 12}" stroke="#9ff6ff" stroke-opacity=".35" stroke-dasharray="4 5"/>`; }
+/* Space on the PC (user, 2026-11-13: it did nothing here): the timing button of the remnant game, and the hold button on the Sky Loop */
+document.addEventListener('keydown', e=>{ if(e.code !== 'Space' || vn || $('voidVn').dataset.on) return; const rd = $('remDlg');
+  if(rd && rd.dataset.on){ e.preventDefault(); e.stopImmediatePropagation(); if(!e.repeat) remTap(); return; }
+  const hunt = mini && mini.kind === 'device' && mini.phase === 'hunt'; if((ride || hunt) && !miniBox.hidden){ e.preventDefault(); e.stopImmediatePropagation(); if(ride) ride.press = true; else mini.press = true; } }, true);
+document.addEventListener('keyup', e=>{ if(e.code !== 'Space') return; if(ride) ride.press = false; if(mini) mini.press = false; }, true);
 function remGame(i){ const d = remDlg(); mini.phase = 'game';
   REM.game = {i, ring:0, a:[Math.random()*6.28, Math.random()*6.28, Math.random()*6.28], sp:reduce ? [0.9, -1.2, 1.5] : [1.4, -2.0, 2.6], boost:0, last:performance.now(), done:false};
   $('rmP').textContent = '노란 고리의 틈이 위쪽 표시에 닿을 때 「지금!」'; d.dataset.on = '1'; sfx('open');
