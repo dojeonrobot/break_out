@@ -54,7 +54,10 @@ async def main():
     if not await pg.evaluate('__parkWake()'):break
     await asyncio.sleep(.5)
   on=await pg.evaluate('__dbg.rideState()');assert all(x['on'] and x['s']==1 for x in on.values()),on
-  await asyncio.sleep(.5);await pg.evaluate('()=>{for(let i=0;i<40&&__dbg.quest().vn();i++)__dbg.quest().next()}');await asyncio.sleep(.3)
+  await asyncio.sleep(.5)
+  for _ in range(8):   # 2026-11-17: 전원 대사 → 경보(1.5초) → 네이티가 사라진 대사로 나뉨
+    await pg.evaluate('()=>{for(let i=0;i<40&&__dbg.quest().vn();i++)__dbg.quest().next()}');await asyncio.sleep(.6)
+    if 'q1' in await pg.evaluate('__dbg.qdone()'):break
   assert await pg.evaluate('__dbg.power().on') and await pg.evaluate('__dbg.power().clock')>0
   print('OK after 계속 the park wakes up (rides start slowly, reach full speed) before Xylo speaks',flush=True)
   print('OK solving all 20 cells restores island power without increasing record count; success waits for input',flush=True)
