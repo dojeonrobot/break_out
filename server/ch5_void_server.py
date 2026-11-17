@@ -486,6 +486,7 @@ class Handler(BaseHTTPRequestHandler):
             DB.setdefault('quests', {}).pop(str(team), None)
             DB.setdefault('vikings', {}).pop(str(team), None)
             vik_remove(team)
+            DB.setdefault('trev', {})[str(team)] = now_ms()   # 꺼져 있던 태블릿도 다시 켜질 때 기기에 남은 진행을 지우게 (2026-11-17)
             save()
             self.send_json(state())
 
@@ -513,10 +514,13 @@ class Handler(BaseHTTPRequestHandler):
             if any(k.startswith('q') or k in ('act', 'tut') for k in tq):      # 글자 없이 저장된 옛 형식
                 tq = {'a': dict(tq, dev='legacy')}
             if b.get('clear'):
+                if not rewind_records:   # 지우기는 운영자 경로(/admin/quest)에서만 (2026-11-17)
+                    raise ValueError('권한이 없습니다.')
                 if letter:
                     tq.pop(letter, None)
                 else:
                     tq = {}
+                    DB.setdefault('trev', {})[str(team)] = now_ms()   # 꺼져 있던 태블릿도 옛 미션 중간으로 이어가지 않게
             else:
                 if not letter and dev:
                     letter = next((l for l, v in tq.items() if v.get('dev') == dev), None) or next((l for l in 'abcdefghij' if l not in tq), None)

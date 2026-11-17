@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-tap-highlight-color:transparent}
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-tap-highlight-color:transparent}
 *{-webkit-tap-highlight-color:transparent}
 #voidVn,#vn,#recDone,#qReward,#teamPick,#walkPick,#restoreDlg,#simDone,#callDlg{-webkit-user-select:none;user-select:none}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 body.island .lbl{border-radius:6px;font-size:11.5px;font-weight:500;padding:4px 8px;box-shadow:0 2px 6px -4px rgba(20,30,20,.22)}
@@ -47,7 +47,7 @@ body.cavestory #walkHud,body.cavestory #walkPad,body.cavestory #questHud,body.ca
 .mk.ok{padding:3px;box-shadow:none}.mk.ok em{margin:0}body.walk .mk.ok{display:none!important}
 #remAim{position:fixed;left:0;top:0;z-index:20;width:88px;height:88px;border-radius:50%;border:4px solid #ffe14a;background:none;padding:0;box-shadow:0 0 0 3px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.4);touch-action:manipulation;cursor:pointer}#remAim[hidden]{display:none}
 #sliceDlg{position:fixed;inset:0;z-index:34;display:none;place-items:center;background:#05080f;-webkit-user-select:none;user-select:none;touch-action:none}#sliceDlg[data-on]{display:grid}#sliceDlg .in{display:grid;grid-template-rows:auto 1fr;gap:12px;width:min(1100px,96vw);height:min(760px,92dvh)}#sliceDlg .hd{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:16px;color:#eaf7ff;padding:0 4px}#sliceDlg h1{margin:0;font-size:22px;font-weight:800}#sliceDlg p{margin:0;font-size:15px;color:#b9cbe0}#sliceDlg b{font-size:26px;font-variant-numeric:tabular-nums;color:#8cecff}#slCv{width:100%;height:100%;border-radius:14px;border:2px solid #2a3a55;background:#061426;touch-action:none;cursor:crosshair}@media (max-width:600px){#sliceDlg .hd{grid-template-columns:1fr auto}#sliceDlg p{grid-column:1 / -1;grid-row:2}}
-</style></head><body>
+html,body{overscroll-behavior:none;touch-action:pan-x pan-y}#voidVn img{pointer-events:none;-webkit-user-drag:none}@media (pointer:coarse){body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}}</style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1745,7 +1745,7 @@ function boardRow(p){
 }
 // board rows in activity order: the two island missions sit where they happen between the campus zones
 const flowRows = ps => { const qz = typeof MI !== 'undefined' ? MI.filter(m=> m.quest) : [], by = id => { const m = qz.find(x=> x.quest === id); return m ? {quest:m, island:m} : null; }, c = id => ps.find(p=> p.campus.id === id);
-  return [c('z1'), by('q1'), c('z2'), by('q2'), c('z3'), ...ps.filter(p=> !['z1', 'z2', 'z3'].includes(p.campus.id))].filter(Boolean); };
+  return [c('z1'), by('q1'), c('z2'), by('q5') || by('q2'), c('z3'), ...ps.filter(p=> !['z1', 'z2', 'z3'].includes(p.campus.id))].filter(Boolean); };
 const RATE = ()=> (typeof MI !== 'undefined' ? MI.filter(m=> m.b && zoneDone(m)).length : M.filter(zoneDone).length)*20;   // the same count as the simulator HUD (SIM_LIT)   // 복구율: 20% per zone, campus 3 + island 2
 function teamZones(t, rows){ return rows.map(r=>{ if(r.quest){ const ok = islandRecord(r.quest.quest,t); return {p:r, st: ok ? 'ok' : 'void'}; }
   const ids = pairIds(r.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)), ok = mine.filter(subDone); return {p:r, st: ok.length ? 'ok' : mine.length ? 'pend' : 'void'}; }); }   // 2026-10-28: 20% per step in flow order, campus 3 + island 2
@@ -1805,7 +1805,7 @@ const ADM_STAGES = [
   ['기록 2 찍기 전', ['z1'], ['q1','q2'], 1], ['기록 2 제출 직후 (2막 시작)', ['z1','z2'], ['q1','q2'], 1], ['미션 3 시작 전', ['z1','z2'], ['q1','q2'], 2], ['미션 4 시작 전', ['z1','z2'], ['q1','q2','q4'], 2],
   ['기록 3 찍기 전', ['z1','z2'], ['q1','q2','q4','q5'], 2], ['기록 3 제출 직후 (3막 시작)', ['z1','z2','z3'], ['q1','q2','q4','q5'], 2], ['미션 5 시작 전', ['z1','z2','z3'], ['q1','q2','q4','q5'], 3], ['미션 5 끝 (환원 직전)', ['z1','z2','z3'], ['q1','q2','q4','q5','q3'], 3]];
 async function adminStage(team, k){ const g = ADM_STAGES[k]; if(!team || !g) return;
-  if(!confirm(`${team}조를 「${g[0]}」 시점으로 옮깁니다.\n그 조의 제출·섬 미션 진행이 이 시점에 맞게 바뀌고, 조 태블릿은 15초 안에 새로 열립니다.`)) return;
+  if(!confirm(`${team}조를 「${g[0]}」 시점으로 옮깁니다.\n그 조의 제출·섬 미션 진행이 이 시점에 맞게 바뀌고, 조 태블릿은 15초 안에 새로 열립니다.\n앞 시점으로 되돌리면 그 뒤에 낸 스캔 제출과 바이킹 모델은 지워집니다.`)) return;
   try{ const st = await api('/admin/stage', {team, zones:g[1], done:g[2], act:g[3]}, true); if(team === TEAM) questPending.clear(); STATE_VER = -1; applyState(st); renderAdmin(); toast(`${team}조 → ${g[0]}`); }catch(e){ toast(e.message); } }
 function adminHTML(){
   const isDone = s => inMap.has(s.scanId) || subDone(s);
@@ -1913,7 +1913,7 @@ async function adminQuest(spec){
     let st;
     if(l === '*'){ if(!confirm(`${team}조의 섬 미션을 모든 태블릿에서 처음으로 되돌립니다.`)) return; st = await api('/admin/quest', {team, clear:true}, true); }
     else if(id === '*'){ if(!confirm(`${team}조-${l} 태블릿을 조에서 뺍니다. 그 태블릿이 다시 접속하면 새 글자로 들어옵니다.`)) return; st = await api('/admin/quest', {team, letter:l, clear:true}, true); }
-    else { const d = new Set(devQuests(team, l)); if(on === '1'){ for(const q of QUESTS){ d.add(q.id); if(q.id === id) break; } } else { let hit = false; for(const q of QUESTS){ if(q.id === id) hit = true; if(hit) d.delete(q.id); } }   // the chain stays in order: done up to here, undone from here
+    else { if(on !== '1' && !confirm(`${team}조-${l} 태블릿의 섬 미션 완료를 되돌립니다.\n그 태블릿은 이 미션부터 다시 하게 됩니다.`)) return; const d = new Set(devQuests(team, l)); if(on === '1'){ for(const q of QUESTS){ d.add(q.id); if(q.id === id) break; } } else { let hit = false; for(const q of QUESTS){ if(q.id === id) hit = true; if(hit) d.delete(q.id); } }   // the chain stays in order: done up to here, undone from here
       st = await api('/admin/quest', {team, letter:l, done:[...d]}, true); }
     if(team === TEAM) questPending.clear();
     applyState(st); renderAdmin(); toast(l === '*' ? `${team}조 섬 미션 초기화` : id === '*' ? `${team}조-${l} 뺌` : on === '1' ? `${team}조-${l} 미션 완료 처리` : `${team}조-${l} 미션 되돌림`);
@@ -2152,7 +2152,7 @@ function pick(e){
   return o ? o.userData.i : -1;
 }
 let down=null;
-renderer.domElement.addEventListener('pointerdown', e=>{ down=[e.clientX,e.clientY]; fly=null; });
+renderer.domElement.addEventListener('pointerdown', e=>{ down=[e.clientX,e.clientY]; if(!(actBusy || STAGED)) fly=null; });
 renderer.domElement.addEventListener('pointerup', e=>{
   if(down && Math.hypot(e.clientX-down[0], e.clientY-down[1])<5){ if(inside) insideClick(e); else { const i=pick(e); select(i, i>=0 && !walk); } }
   down=null;
@@ -7958,7 +7958,7 @@ function mazeFloorAt(x, z){ const f = islRoot.userData.mazeDeck; if(!f) return n
 function groundY(x, z){ let y = G; for(const [mx, mz, r, h] of (islRoot.userData.mounds || [])){ const d = Math.hypot(x - mx, z - mz); if(d < r*0.96) y = Math.max(y, G - 1.2 + h*Math.sqrt(1 - (d/r)*(d/r))); } const floor = mazeFloorAt(x, z); return floor ? Math.max(y, floor.top) : y; }
 function characterGroundY(x, z){ const floor = mazeFloorAt(x, z), y = groundY(x, z); if(!floor) return y; return y + 0.025; }
 let walkBlocks = null;
-const WALK_BLOCKS = ()=> walkBlocks || (walkBlocks = IB.filter(b=> b.label === '미러 레이크' || b.label === '키즈 라군').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20)*0.9})));   // water only: rides are in the walk grid by their real footprint (2026-11-02)
+const WALK_BLOCKS = ()=> walkBlocks || (walkBlocks = IB.filter(b=> b.label === '미러 레이크' || b.label === '키즈 라군').map(b=> ({cx:b.cx, cz:b.cz, rr:(b.r || 20)*0.9})).concat(IB.filter(b=> b.label === '하모니아').map(b=> ({cx:b.cx, cz:b.cz, rr:50}))))   /* + the stepped dais under Harmonia: its sloped rim is no wall for the grid (2026-11-17) */;   // water only: rides are in the walk grid by their real footprint (2026-11-02)
 function caveBlocked(x, z){   // the eye cave is a rock arch over a dark face: the rock legs stop the walker and nothing walks through the face into the mountain
   const cx = cave.position.x, cz = cave.position.z, r = cave.rotation.y, dx = x - cx, dz = z - cz, lx = dx*Math.cos(r) - dz*Math.sin(r), lz = dx*Math.sin(r) + dz*Math.cos(r);
   if(Math.abs(lx) > 22) return false; if(lz < -4.5) return true; return lz < 5 && Math.abs(lx) > 8.5; }
@@ -7983,22 +7983,33 @@ function buildWalkGrid(){
       const g = m.geometry, pos = g.attributes.position, ix = g.index, M = m.matrixWorld, n = ix ? ix.count : pos.count;
       for(let i = 0; i + 2 < n; i += 3){ const i0 = ix ? ix.getX(i) : i, i1 = ix ? ix.getX(i + 1) : i + 1, i2 = ix ? ix.getX(i + 2) : i + 2;
         va.fromBufferAttribute(pos, i0).applyMatrix4(M); vb.fromBufferAttribute(pos, i1).applyMatrix4(M); vc.fromBufferAttribute(pos, i2).applyMatrix4(M);
-        const ymin = Math.min(va.y, vb.y, vc.y), ymax = Math.max(va.y, vb.y, vc.y); if(ymin > G + 1.6 || ymax < G + 2.3) continue;
+        const ymin = Math.min(va.y, vb.y, vc.y), ymax = Math.max(va.y, vb.y, vc.y); if(ymax < G + 1.05 || ymin > G + 12) continue;
         nm.copy(e1.subVectors(vb, va)).cross(e2.subVectors(vc, va)); const L = nm.length(); if(!L || Math.abs(nm.y/L) > 0.6) continue;
+        if(ymin > G + 1.6 || ymax < G + 2.3){ const gy = groundY((va.x + vb.x + vc.x)/3, (va.z + vb.z + vc.z)/3); if(Math.min(ymax, gy + 1.5) - Math.max(ymin, gy + 0.9) < 0.15) continue; }   /* body-height walls: hedges, planters, a dais, fence rails (2026-11-17) */
         seg(va.x, va.z, vb.x, vb.z); seg(vb.x, vb.z, vc.x, vc.z); seg(vc.x, vc.z, va.x, va.z); } });
+    /* instanced things stand in the way too (2026-11-17, user: 벽 통과): path hedges, tree trunks, bushes, fence posts and rails, lamp posts, benches */
+    { const rideRoots = new Set(); IB.forEach(b=>{ if(b.c === 'ride' && b.mesh) rideRoots.add(b.mesh); }); const ib = new THREE.Box3(), pv = new THREE.Vector3();
+      root.traverse(m=>{ if(!m.isInstancedMesh || /^(park-visitors|queue-visitors)/.test(m.name) || skipped(m)) return; for(let p = m; p; p = p.parent) if(rideRoots.has(p) || (p.userData && p.userData.dynamic) || /^(park-visitors|queue-visitors)/.test(p.name || '')) return;
+        const g = m.geometry; if(!g || !g.attributes.position) return; if(!g.boundingBox) g.computeBoundingBox(); const lb = g.boundingBox, ly = (lb.min.y + lb.max.y)/2;
+        for(let k = 0; k < m.count; k++){ m.getMatrixAt(k, _wgM); _wgM.premultiply(m.matrixWorld); ib.copy(lb).applyMatrix4(_wgM); const wx = ib.max.x - ib.min.x, wz = ib.max.z - ib.min.z; if(!(wx > 1e-6) || wx > 14 || wz > 14) continue;
+          const gy = groundY((ib.min.x + ib.max.x)/2, (ib.min.z + ib.max.z)/2); if(Math.min(ib.max.y, gy + 1.5) - Math.max(ib.min.y, gy + 0.9) < 0.15) continue; if(ib.min.y > gy + 1.0 && Math.max(wx, wz) > 5) continue;   /* a crown overhead is not a wall */
+          const e = _wgM.elements, sx = Math.hypot(e[0], e[2])*(lb.max.x - lb.min.x), sz = Math.hypot(e[8], e[10])*(lb.max.z - lb.min.z), nx = Math.max(1, Math.ceil(sx/0.5)), nz = Math.max(1, Math.ceil(sz/0.5)), pad = Math.max(sx, sz) > 3 ? 0.12 : 0;
+          for(let i = 0; i <= nx; i++) for(let j = 0; j <= nz; j++){ const u = pad + (1 - 2*pad)*i/nx, v = pad + (1 - 2*pad)*j/nz; pv.set(lb.min.x + (lb.max.x - lb.min.x)*u, ly, lb.min.z + (lb.max.z - lb.min.z)*v).applyMatrix4(_wgM); if(inb(pv.x, pv.z)) a[at(pv.x, pv.z)] = 1; } } }); }
     // rides (2026-11-02, user: "이유 없이 못 가는 곳"): the old r+6 circles swallowed 675 path points (스카이 크루즈 alone 123 m). Now every ride piece that
     // stands on the ground (pillar, fence, platform, car) fills its own box; the flood below closes whatever those pieces fence in.
     const fillBox = (x0, z0, x1, z1)=>{ for(let z = Math.floor(z0); z <= Math.ceil(z1); z++) for(let x = Math.floor(x0); x <= Math.ceil(x1); x++) if(inb(x, z)) a[at(x, z)] = 1; };
     const bx = new THREE.Box3();
     IB.forEach(b=>{ if(b.c !== 'ride' || !b.mesh) return; b.mesh.traverse(m=>{ if(!(m.isMesh || m.isInstancedMesh) || !m.visible) return;
       if(m.isInstancedMesh){ for(let k = 0; k < m.count; k++){ m.getMatrixAt(k, _wgM); _wgM.premultiply(m.matrixWorld); if(!m.geometry.boundingBox) m.geometry.computeBoundingBox(); bx.copy(m.geometry.boundingBox).applyMatrix4(_wgM); if(bx.min.y < G + 2.3 && bx.max.y > G + 0.6 && (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) < 3000) fillBox(bx.min.x - 0.6, bx.min.z - 0.6, bx.max.x + 0.6, bx.max.z + 0.6); } return; }
-      bx.setFromObject(m); if(bx.isEmpty()) return; if(bx.min.y < G + 2.3 && bx.max.y > G + 0.6 && (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) < 3000) fillBox(bx.min.x - 0.6, bx.min.z - 0.6, bx.max.x + 0.6, bx.max.z + 0.6); }); });
+      bx.setFromObject(m); if(bx.isEmpty()) return; if(bx.min.y < G + 2.3 && bx.max.y > G + 0.6 && (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) < 400) fillBox(bx.min.x - 0.6, bx.min.z - 0.6, bx.max.x + 0.6, bx.max.z + 0.6); }); });
     // ...and the outline of each ride (convex hull of its low pieces) is filled whole, so open rides — a lattice coaster, a carousel deck, a wheel on its hill —
     // are not walked into between their parts. Elevated rides (the cable car) keep only their towers. Paths are carved back afterwards, as always.
     const ELEVATED = new Set(['스카이 크루즈']);
     IB.forEach(b=>{ if(b.c !== 'ride' || !b.mesh || ELEVATED.has(b.label)) return; const base = groundY(b.cx, b.cz), pts = [];
-      const boxes = []; let low = 1e9; b.mesh.traverse(m=>{ if(!m.isMesh || !m.visible) return; bx.setFromObject(m); if(bx.isEmpty() || (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) > 40000) return; boxes.push(bx.clone()); low = Math.min(low, bx.min.y); });
-      boxes.forEach(q=>{ if(q.min.y > Math.max(low, base) + 8) return; pts.push([q.min.x, q.min.z], [q.max.x, q.min.z], [q.max.x, q.max.z], [q.min.x, q.max.z]); });   // the lowest piece is the ground of a ride on a hill (관람차)
+      const boxes = []; let low = 1e9; b.mesh.traverse(m=>{ if(!m.isMesh || !m.visible) return; bx.setFromObject(m); if(bx.isEmpty() || (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) > 40000) return; const q = bx.clone(); q.m = m; boxes.push(q); low = Math.min(low, bx.min.y); });
+      boxes.forEach(q=>{ const top = Math.max(low, base) + 8; if(q.min.y > top) return;
+        const pos = q.m.geometry && q.m.geometry.attributes.position; if(pos && !q.m.isInstancedMesh && (q.max.x - q.min.x)*(q.max.z - q.min.z) >= 400){ const st = Math.max(1, Math.floor(pos.count/1500)); let n = 0; for(let i = 0; i < pos.count; i += st){ va.fromBufferAttribute(pos, i).applyMatrix4(q.m.matrixWorld); if(va.y <= top){ pts.push([va.x, va.z]); n++; } } if(n >= 3) return; }   /* a merged piece: its real outline, not its box (2026-11-17) */
+        pts.push([q.min.x, q.min.z], [q.max.x, q.min.z], [q.max.x, q.max.z], [q.min.x, q.max.z]); });   // the lowest piece is the ground of a ride on a hill (관람차)
       if(pts.length < 3) return; pts.sort((p, q)=> p[0] - q[0] || p[1] - q[1]); const cr = (o, a, c)=> (a[0] - o[0])*(c[1] - o[1]) - (a[1] - o[1])*(c[0] - o[0]); const lo = [], hi = [];
       for(const p of pts){ while(lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
       for(let i = pts.length - 1; i >= 0; i--){ const p = pts[i]; while(hi.length >= 2 && cr(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
@@ -8271,7 +8282,7 @@ function walkerOpen(name){ if(flowFree()) return true; const q = questFor(name);
 const walkerWhy = name => { const q = questFor(name); if(name === PAIR){ if(!q || questDone(q)) return '환원이 끝난 뒤'; return q.id === 'q1' ? '첫 기록을 찾은 뒤' : q.id === 'q2' ? '섬의 전원을 되살린 뒤' : q.id==='q4' ? '두 번째 캠퍼스 기록을 찾은 뒤' : q.id==='q5' ? '바이킹을 다시 세운 뒤' : '다섯 기록을 찾은 뒤'; } return '환원이 끝난 뒤'; };
 const flowFree = ()=> SCREEN || document.body.classList.contains('admin') || RESTORED_LOCAL || !!myEntry().restored || (QDONE.has('q3')&&!QDONE.has('q4')&&!myEntry().story);   // the dashboard and the finished team roam freely
 // which world the next step is in: an open mission → the island; otherwise the next record → the campus; null = no lock
-function stepWorld(){ if(flowFree() || !TEAM || AUX || (tutStep >= 0 && tutStep < TUT.length)) return null; const q = QUESTS.find(q=> chainOpen(q) && !questDone(q)); return q ? 'island' : 'erica'; }
+function stepWorld(){ if(flowFree() || QDONE.has('q3') || !TEAM || AUX || (tutStep >= 0 && tutStep < TUT.length)) return null; const q = QUESTS.find(q=> chainOpen(q) && !questDone(q)); return q ? 'island' : 'erica'; }
 function flowLockUI(){ const sw = stepWorld(); document.querySelectorAll('#worlds button').forEach(b=>{ const lock = !!sw && b.dataset.w !== sw; b.classList.toggle('lock', lock); b.setAttribute('aria-disabled', lock); }); }
 
 // where the targets hide: 자일로 just outside the coaster lot, 코덱스 in the heart of the maze, the cave mouth on the north shore
@@ -8577,7 +8588,7 @@ function voidShow(text, pose='say', ms=0){ (window.__voidLog ||= []).push([Math.
   clearTimeout(voidHold); if(ms) voidHold = setTimeout(voidHide, ms + text.length*24);
 }
 function voidHide(){ if($('voidVn').dataset.on) VN_CLOSED = performance.now(); if(voidAudio){ voidAudio.pause(); voidAudio = null; } $('voidCard').innerHTML = ''; clearTimeout(voidHold); if(voidTyping){ clearInterval(voidTyping); voidTyping = null; } delete $('voidVn').dataset.on; $('tutDots').innerHTML = ''; $('tutPrev').hidden = true; }
-function voidSay(text, ms=5200, pose='say'){ voidLast = text; if(tutStep >= 0 && tutStep < 99) return; voidShow(text, pose, ms); }
+function voidSay(text, ms=5200, pose='say'){ voidLast = text; if(tutStep >= 0 && tutStep < 99) return; if(voidWait) return; voidShow(text, pose, ms); }
 let voidWait = null;
 function voidAsk(text, pose='say'){ voidLast = text; if(ffOn()) return Promise.resolve(); voidShow(text, pose, 0); return new Promise(r=>{ voidWait = r; }); }   // nothing moves until the child advances the line
 $('voidNext').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 다음' : 'Space ▸ 다음'; $('ydContinue').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 계속' : 'Space ▸ 계속';
@@ -8666,6 +8677,7 @@ function saveAct(n){ ACT_LOCAL = Math.max(ACT_LOCAL, n); if(LOCAL || !TEAM || AU
 const campusZone = n => MISSION_E.find(m=> m.id === 'z' + n);   // the n-th campus record (M's order is not the flow order)
 function actCheck(){
   if(!TEAM || SCREEN || LOCAL || AUX || actBusy || actPending || typeof MI === 'undefined' || intro || document.body.classList.contains('admin')) return; if(!tutDone() || (tutStep >= 0 && tutStep < 99)) return;
+  if(vn || $('voidVn').dataset.on || qRewardEl.dataset.on){ clearTimeout(actCheck.t); actCheck.t = setTimeout(actCheck, 1200); return; }
   const seen = actSeen();
   for(let n = 1; n <= 3; n++){ if(seen >= n) continue; const z = campusZone(n); if(!z || !zoneMine(z) || zoneLocked(z)) return; playAct(n); return; }
 }
@@ -8800,7 +8812,7 @@ const tutWorld = goWorld;
 const miniRoot = new THREE.Group(); islRoot.add(miniRoot);
 const miniBox = $('miniBox'), miniGo = $('miniGo'), miniDoneBtn = $('miniDone'), miniDots = $('miniDots');
 let ride = null, labGame = null, LAB_DOOR = null, STATION = null;
-function miniClear(){ if(caveKeep) caveLeave();if(qRewardEl?.dataset.route){delete qRewardEl.dataset.on;delete qRewardEl.dataset.route;} if(yard?.timer) clearTimeout(yard.timer); yard = null; $('yardDlg').classList.remove('win'); while(miniRoot.children.length) miniRoot.remove(miniRoot.children[0]); if(ride) rideEnd(false); mini = null; if(chase || NATY.userData.run){ chase = null; NATY.userData.run = null; chaseBig(false); chaseTrailStep(null, null, true); } { const cf = $('chaseFail'); if(cf) cf.hidden = true; } $('questHud').classList.remove('far'); miniBox.hidden = true; ['yardDlg', 'labDlg', 'caveDlg', 'rideDlg', 'deviceDlg'].forEach(id=> delete $(id).dataset.on); labStop(); NATY.userData.hold = null; if(MAZE){ MAZE.marks.count = 0; MAZE.marks.instanceMatrix.needsUpdate = true; MAZE.seen.clear(); } }
+function miniClear(){ if(caveKeep) caveLeave();if(qRewardEl?.dataset.route){delete qRewardEl.dataset.on;delete qRewardEl.dataset.route;} if(yard?.timer) clearTimeout(yard.timer); yard = null; $('yardDlg').classList.remove('win'); while(miniRoot.children.length) miniRoot.remove(miniRoot.children[0]); if(ride) rideEnd(false); mini = null; try{ if(REM.game){ REM.game.done = true; REM.game = null; } }catch(e){} if(chase || NATY.userData.run){ chase = null; NATY.userData.run = null; chaseBig(false); chaseTrailStep(null, null, true); } { const cf = $('chaseFail'); if(cf) cf.hidden = true; } $('questHud').classList.remove('far'); miniBox.hidden = true; ['yardDlg', 'labDlg', 'caveDlg', 'rideDlg', 'deviceDlg'].forEach(id=> delete $(id).dataset.on); labStop(); NATY.userData.hold = null; if(MAZE){ MAZE.marks.count = 0; MAZE.marks.instanceMatrix.needsUpdate = true; MAZE.seen.clear(); } }
 function flash(){ const f = $('flash'); f.animate([{opacity:0.95}, {opacity:0}], {duration:420, easing:'ease-out'}); }
 function miniHud(step, title, hint){ if(questLive) $('qhStep').previousSibling.textContent = `미션 ${QUESTS.indexOf(questLive) + 1} `;   /* resumed missions kept the bare 「MISSION」 label */ { const lb = $('questHud').querySelector('.nav small'); if(lb) lb.textContent = mini?.kind === 'chase' ? '네이티까지' : '남은 거리'; } $('qhStep').textContent = `${step} / ${mini?.kind==='loop'||mini?.kind==='maze'?4:mini?.kind==='viking'?2:3}`; $('qhT').textContent = title; $('qhHint').textContent = hint; $('questHud').hidden = false; placeQuestHud(); }
 function miniWalkTo(step, title, hint, target, r, onArrive){ mini.phase = 'walk'; mini.target = target; mini.r = r; mini.onArrive = onArrive; mini.arrived = false; miniBox.hidden = true; miniHud(step, title, hint); }
@@ -9287,8 +9299,8 @@ function sliceGame(){ return new Promise(done=>{ if(ffOn()){ done(); return; }
     else { S.n++; if(S.cover.length) S.cover.splice(Math.floor(Math.random()*S.cover.length), 1); S.strokeN = (S.strokeN || 0) + 1; if(S.strokeN === 3){ S.msg = 1.1; $('slP').textContent = '한 번에 셋! 잘했어요'; } sfx('tap'); }
     $('slN').textContent = `${Math.min(S.n, NEED)} / ${NEED}`; if(S.n >= NEED && !S.done) win(); };
   const pos = e=>{ const r = cv.getBoundingClientRect(); return [(e.clientX - r.left)/r.width*S.w, (e.clientY - r.top)/r.height*S.h]; };
-  const move = e=>{ if(!S.down || S.done) return; const [x, y] = pos(e), p = S.trail[S.trail.length - 1]; S.trail.push({x, y, t:S.t}); if(!p) return; const a = Math.atan2(y - p.y, x - p.x); if(Math.hypot(x - p.x, y - p.y) < 2) return; S.items.forEach(it=>{ if(!it.dead && hit(p.x, p.y, x, y, it)) cut(it, a); }); };
-  const dn = e=>{ e.preventDefault(); S.down = true; S.strokeN = 0; S.trail = []; const [x, y] = pos(e); S.trail.push({x, y, t:S.t}); try{ cv.setPointerCapture(e.pointerId); }catch(er){} }, up = ()=>{ S.down = false; };
+  const move = e=>{ if(!S.down || S.done || (S.pid != null && e.pointerId !== S.pid)) return; const [x, y] = pos(e), p = S.trail[S.trail.length - 1]; S.trail.push({x, y, t:S.t}); if(!p) return; const a = Math.atan2(y - p.y, x - p.x); if(Math.hypot(x - p.x, y - p.y) < 2) return; S.items.forEach(it=>{ if(!it.dead && hit(p.x, p.y, x, y, it)) cut(it, a); }); };
+  const dn = e=>{ e.preventDefault(); if(S.down && S.pid != null && S.pid !== e.pointerId) return; S.pid = e.pointerId; S.down = true; S.strokeN = 0; S.trail = []; const [x, y] = pos(e); S.trail.push({x, y, t:S.t}); try{ cv.setPointerCapture(e.pointerId); }catch(er){} }, up = e=>{ if(e && S.pid != null && e.pointerId != null && e.pointerId !== S.pid) return; S.down = false; S.pid = null; };
   cv.addEventListener('pointerdown', dn); cv.addEventListener('pointermove', move); ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev=> cv.addEventListener(ev, up));
   const finish = ()=>{ cancelAnimationFrame(S.raf); removeEventListener('resize', fit); cv.removeEventListener('pointerdown', dn); cv.removeEventListener('pointermove', move); delete d.dataset.on; SLICE = null; done(); };
   function win(){ S.done = true; S.cover = []; $('slP').textContent = '화면이 깨끗해졌어요'; sfx('success'); setTimeout(finish, reduce ? 300 : 1300); }
@@ -9706,7 +9718,7 @@ function admSkipWhat(){
   return null;
 }
 /* one step of the mission that is being walked (user, 2026-11-12): go to the place, then each game inside it; null = nothing finer, skip the mission */
-function admStep(q){ const w = walk; if(!w) return null; if(typeof PARK_WAKE !== 'undefined' && PARK_WAKE) return false;   /* the power-on scene plays out: no skip offered */ const dl = id => { const el = document.getElementById(id); return !!(el && el.dataset.on); }, go = (t, p)=> p ? {t, run:()=>{ w.x = p[0]; w.z = p[1]; }} : null;
+function admStep(q){ { let G2 = null; try{ G2 = REM.game; }catch(e){} if(G2 && !G2.done) return {t:'잔재 부수기 건너뛰기', run:()=>{ if(!G2.done){ G2.done = true; remFinish(G2.i); } }}; } const w = walk; if(!w) return null; if(typeof PARK_WAKE !== 'undefined' && PARK_WAKE) return false;   /* the power-on scene plays out: no skip offered */ const dl = id => { const el = document.getElementById(id); return !!(el && el.dataset.on); }, go = (t, p)=> p ? {t, run:()=>{ w.x = p[0]; w.z = p[1]; }} : null;
   if(dl('yardDlg')) return yard && yard.done ? {t:'전원 연출 보기', run:()=> $('ydContinue').click()} : {t:'배전선 퍼즐 풀기', run:()=>{ if(yard && !yard.done){ yard.tiles = yard.sol.map(r=> r.map(c=> new Set(c))); yardPaint(); } }};
   if(dl('remDlg')) return {t:'잔재 해체 건너뛰기', run:()=>{ const G2 = REM.game; if(G2 && !G2.done){ G2.done = true; cancelAnimationFrame(G2.raf); remFinish(G2.i); } }};
   if(dl('caveDlg') || dl('deviceDlg') || dl('labDlg')) return null;
@@ -9727,9 +9739,16 @@ function admSkipQuest(q){ const n = QUESTS.indexOf(q) + 1; FF_ACT = true; FF_UNT
   if(actSeen() < q.act) saveAct(q.act);   // the act that leads here counts as seen, or actCheck would play it on the campus afterwards
   questComplete(q); toast(`미션 ${n} 건너뜀 (관리자)`); }
 async function admSkipZone(z, n){ try{ const st = await api('/admin/skip', {team:TEAM, mission:z.id}, true); STATE_VER = -1; applyState(st); toast(`기록 ${n} 스캔 건너뜀 (관리자)`); }catch(e){ toast(e.message); } }
+/* touch helpers (2026-11-17 checkup): no long-press menu, a second finger's tap still presses buttons while the pad is held, and the tap that closed a dialogue does not press what appears under it */
+{ const COARSE = matchMedia('(pointer:coarse)').matches; let SYN = null;
+  document.addEventListener('contextmenu', e=>{ if(COARSE && !(e.target.closest && e.target.closest('input,textarea,a'))) e.preventDefault(); });
+  document.addEventListener('pointerup', e=>{ if(e.isPrimary || e.pointerType !== 'touch' || !e.target.closest) return; const b = e.target.closest('button') || e.target.closest('#vn,#voidVn,#recDone'); if(!b || b.disabled) return; SYN = {t:performance.now(), el:b}; b.click(); }, true);
+  document.addEventListener('click', e=>{ if(!e.isTrusted || !e.target.closest) return; const now = performance.now();
+    if(SYN && now - SYN.t < 500 && (SYN.el === e.target || SYN.el.contains(e.target))){ e.stopPropagation(); e.preventDefault(); return; }
+    if(e.pointerType === 'touch' && now - VN_CLOSED < 350 && e.target.closest('button') && !e.target.closest('#vn,#voidVn,#admSkip,#adminDlg')){ e.stopPropagation(); e.preventDefault(); } }, true); }
 $('admSkip').onclick = e=>{ e.stopPropagation(); e.preventDefault(); const w = admSkipWhat(); if(!w) return; sfx('tap'); try{ w.run(); }catch(err){ toast(err.message); } };
 setInterval(()=>{ try{ questPillTick(); }catch(e){}
-  if(ADMIN_KEY && TEAM){ let at = 0; try{ at = +sessionStorage.getItem('void-admin-at') || 0; }catch(e){} if(at && Date.now() - at > ADMIN_TTL){ try{ adminAct('logout'); toast('관리자 로그인이 30분이 지나 자동으로 풀렸습니다'); }catch(e){} } } if(FF_ACT && !actBusy) FF_ACT = false; document.body.classList.toggle('admkey', !!ADMIN_KEY); document.body.classList.toggle('teamdev', !!TEAM);
+  if(ADMIN_KEY && TEAM && QS.get('admin') !== '1'){ let at = 0; try{ at = +sessionStorage.getItem('void-admin-at') || 0; }catch(e){} if(at && Date.now() - at > ADMIN_TTL){ try{ adminAct('logout'); toast('관리자 로그인이 30분이 지나 자동으로 풀렸습니다'); }catch(e){} } } if(FF_ACT && !actBusy) FF_ACT = false; document.body.classList.toggle('admkey', !!ADMIN_KEY); document.body.classList.toggle('teamdev', !!TEAM);
   let w = null; try{ w = admSkipWhat(); }catch(e){} $('admSkip').hidden = !w; if(w) $('admSkipT').textContent = w.t;
   if(window.__dbg && !window.__dbg.skip){ window.__dbg.skip = ()=>{ const w = admSkipWhat(); if(w) w.run(); return w ? w.t : null; }; window.__dbg.skipWhat = ()=>{ const w = admSkipWhat(); return w ? w.t : null; }; } }, 300);
 if(SCREEN){ document.body.classList.add('screen'); controls.autoRotate = true; controls.autoRotateSpeed = 0.4; }
