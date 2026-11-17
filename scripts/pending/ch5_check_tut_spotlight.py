@@ -42,7 +42,7 @@ async def main():
                 await pg.evaluate("document.getElementById('voidNext').click()"); await asyncio.sleep(.4)
             on = sorted(k for k, v in seen.items() if v['on'])
             print(name, '짚은 단계', on, '끝난 뒤 남음', await pg.evaluate("!!document.querySelector('.tut-zoom') || (document.getElementById('tutSpot') && !document.getElementById('tutSpot').hidden)"), errs, flush=True)
-            if on != [15, 19, 21, 23]: fails.append((name, 'steps', on))
+            if on != [15, 19, 21, 22, 23]: fails.append((name, 'steps', on))
             if errs: fails.append((name, 'pageerror', errs[:2]))
             await ctx.close()
         await br.close()

@@ -59,7 +59,7 @@ async def main():
         check(await ev("__dbg.quest().live?.id") == 'q2', 'mission 2 is live')
         # to the maze entrance, in, to the heart
         await ev('__dbg.walkTo(...__dbg.target())'); await wf("!!__dbg.quest().vn()", 30); await drain()
-        await ev('__dbg.walkTo(...__dbg.target())'); await wf("!!__dbg.quest().vn()", 30)
+        await ev('__dbg.walkTo(...__dbg.target())'); await asyncio.sleep(1.2); await pg.keyboard.press('Space'); await wf("!!__dbg.quest().vn()", 30)
         lines = await ev("__dbg.quest().vn().lines.map(l=>l.text)")
         check(any('미로 밖으로 날아간다' in l for l in lines) and any('자취를 따라가면' in l for l in lines), 'found dialogue ends with Naty leaving and the void proposing to follow its trail')
         await shot('1_found'); await drain()

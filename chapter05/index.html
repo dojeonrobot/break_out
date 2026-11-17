@@ -47,7 +47,7 @@ body.cavestory #walkHud,body.cavestory #walkPad,body.cavestory #questHud,body.ca
 .mk.ok{padding:3px;box-shadow:none}.mk.ok em{margin:0}body.walk .mk.ok{display:none!important}
 #remAim{position:fixed;left:0;top:0;z-index:20;width:88px;height:88px;border-radius:50%;border:4px solid #ffe14a;background:none;padding:0;box-shadow:0 0 0 3px rgba(0,0,0,.4),inset 0 0 0 3px rgba(0,0,0,.4);touch-action:manipulation;cursor:pointer}#remAim[hidden]{display:none}
 #sliceDlg{position:fixed;inset:0;z-index:34;display:none;place-items:center;background:#05080f;-webkit-user-select:none;user-select:none;touch-action:none}#sliceDlg[data-on]{display:grid}#sliceDlg .in{display:grid;grid-template-rows:auto 1fr;gap:12px;width:min(1100px,96vw);height:min(760px,92dvh)}#sliceDlg .hd{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:16px;color:#eaf7ff;padding:0 4px}#sliceDlg h1{margin:0;font-size:22px;font-weight:800}#sliceDlg p{margin:0;font-size:15px;color:#b9cbe0}#sliceDlg b{font-size:26px;font-variant-numeric:tabular-nums;color:#8cecff}#slCv{width:100%;height:100%;border-radius:14px;border:2px solid #2a3a55;background:#061426;touch-action:none;cursor:crosshair}@media (max-width:600px){#sliceDlg .hd{grid-template-columns:1fr auto}#sliceDlg p{grid-column:1 / -1;grid-row:2}}
-html,body{overscroll-behavior:none;touch-action:pan-x pan-y}#voidVn img{pointer-events:none;-webkit-user-drag:none}@media (pointer:coarse){body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}}</style></head><body>
+html,body{overscroll-behavior:none;touch-action:pan-x pan-y}#voidVn img{pointer-events:none;-webkit-user-drag:none}@media (pointer:coarse){body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}}#tutStill{position:fixed;inset:0;z-index:36;opacity:0;pointer-events:none;transition:opacity .45s ease;background:#2f86c8}#tutStill[data-on]{opacity:1;pointer-events:auto}#tutStill img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease}#tutStill img[data-on]{opacity:1}@media (prefers-reduced-motion:reduce){#tutStill,#tutStill img{transition:none}}</style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2139,7 +2139,7 @@ function select(i, move){
   if(phoneUI()) closePanel();
 }
 $('iX').onclick = ()=>select(-1);
-addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(walk){ stopWalk(true); return; } if(!$('cinema').hidden){ $('cinemaX').onclick(); return; } if($('restoreDlg').dataset.on){ delete $('restoreDlg').dataset.on; return; } if($('walkPick').dataset.on){ delete $('walkPick').dataset.on; return; } if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
+addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(walk){ if(flowHeld()) return; stopWalk(true); return; } if(!$('cinema').hidden){ $('cinemaX').onclick(); return; } if($('restoreDlg').dataset.on){ delete $('restoreDlg').dataset.on; return; } if($('walkPick').dataset.on){ delete $('walkPick').dataset.on; return; } if($('simDone').dataset.on){ delete $('simDone').dataset.on; return; } if(!$('adminDlg').hidden){ closeAdmin(); return; } if(typeof inside!=='undefined' && inside) exitInterior(); else if(!$('viewer').hidden) closeScan(); else select(-1); } });
 
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e){
@@ -7130,7 +7130,7 @@ function rescan(revealIds, arrive){
   rebuildIndex(); if(window.__vikReady) vikingSync();
   MISSION_E.forEach(m=> m.scans = scansFor(m.id)); MI.forEach(m=> m.scans = scansFor(m.id));
   updateProgress(); refreshSubUI(); renderBoard(); applyVoidView(); buildSim(revealIds);
-  const arriving = false;
+  const arriving = !!(arrive && revealIds && revealIds.length) && (SCREEN || !TEAM);
   if(arriving) arriveFx(revealIds.filter(id=> MI.some(m=> m.id === id && zoneDone(m))));
   try{ rideSync(); }catch(e){ if(!(e instanceof ReferenceError)) throw e; }   // the rides are set up after batching, below the first rescan
   maybeRestore(arriving ? 5600 : 1500);
@@ -7326,12 +7326,12 @@ function ridePowerQuiet(m){
 }
 // A record coming back, seen in the park (not the simulator): a beam from the sky over the zone, a shock ring on the ground, sparks rising,
 // the ride drawing itself in (rideSweep) and the camera moving to watch it — then the power-up (powerSteps). One chain per zone.
-function arriveFx(ids){
+function arriveFx(ids, force){
   if(!ids.length) return; sfx('sparkle');
   if(W.id !== 'island'){ const zs = ids.map(id=> MI.find(m=> m.id === id)).filter(Boolean); if(zs.length) toast(`${zs.map(z=> z.name).join('·')} 구역의 기록이 돌아왔습니다`); return; }   // never switch the screen on its own (user): on the campus the void says it, the island shows it when the child goes there
   if(simOn) return;   // the vein sweep is the arrival there
   const zones = ids.map(id=> MI.find(m=> m.id === id)).filter(m=> m && m.b);
-  if(actBusy || vn || $('voidVn').dataset.on || $('recDone').dataset.on || walk) return;   // never during a dialogue, a scene or a walk (rideSync powers it up later)
+  if(!force && (actBusy || vn || $('voidVn').dataset.on || $('recDone').dataset.on || walk)) return;   // never during a dialogue, a scene or a walk (rideSync powers it up later); an act calls it itself (force)
   if(reduce){ zones.forEach(m=> rideSet(m.id, true)); toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`); return; }
   if(zones.length === 1){ const b = zones[0].b, R = (b.r || 24); flyTo(new THREE.Vector3(b.cx + R*2.6 + 90, 150 + R*1.6, b.cz + R*3.2 + 140), new THREE.Vector3(b.cx, G + 12, b.cz), 1300); }
   else flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1300);
@@ -7361,11 +7361,14 @@ function arriveFx(ids){
       {n:'wait', tick:k=> k >= i*(many ? 1.1 : 0)},
       {n:'draw', start(r){ g.visible = true; const fl = $('arrFlash'); fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on'); r.side.push(beamSide(r.clock)); },
         tick(k){ if(sw) sw.tick(k); return k >= (sw ? sw.until : 1.2); }, end(){ if(sw) sw.end(); }},
-      ...powerSteps(m, ()=> w)];
+      ...(parkPowerOn() ? powerSteps(m, ()=> w) : [])];   /* no power, no lights and no motion: the ride only draws itself in (2026-11-17) */
     RD.chain = fxChain('arrive:' + m.id, steps); const me = RD.chain; me.onEnd = ()=>{ if(RD.chain === me) RD.chain = null; };
   });
-  toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`);
+  if(!force) toast(zones.length === 1 ? `${zones[0].name} 구역의 기록이 돌아왔습니다` : `${zones.length}개 구역의 기록이 돌아왔습니다`);
 }
+/* the act shows the record coming back on the island: light pillar, rings, the ride drawing itself in — and waits for it (user, 2026-11-17) */
+async function arriveShow(id){ const R = RIDE[id]; if(!R || reduce || W.id !== 'island' || simOn || ffOn()) return; try{ rideSet(id, false); arriveFx([id], true); }catch(e){ console.warn('arrive', e); return; }
+  const t0 = Date.now(); while(R.chain && Date.now() - t0 < 16000){ if(ffOn()){ rideSet(id, parkPowerOn()); return; } await new Promise(r=> setTimeout(r, 200)); } if(R.chain) rideSet(id, parkPowerOn()); await wait(500); }
 window.__dbg && Object.assign(window.__dbg, {
   sweep:(id)=>{ const m = MI.find(x=> x.id === id); if(!m || !m.b) return null; rideSet(id, false); arriveFx([id]); return !!RIDE[id].chain; },
   fxlog:()=> FXLOG.slice(), fxClear:()=>{ FXLOG.length = 0; },
@@ -7411,7 +7414,7 @@ function setSim(on){
     if(W.id === 'island') flyTo(SIM_VIEW.pos.clone(), SIM_VIEW.tgt.clone(), 1800); }   // low oblique view: the glyph and the island's underside
   else { clearTimeout(simDoneT); simFlyOn = false; islandTheme(); updateSun(); caveEye.material.color.set(0xffffff); }
 }
-$('simBtn').onclick = ()=> setSim(!simOn);
+$('simBtn').onclick = ()=>{ if(actBusy || vn || $('voidVn').dataset.on) return; setSim(!simOn); };
 $('simDoneX').onclick = ()=>{ delete $('simDone').dataset.on; if(restoreNext){ const f = restoreNext; restoreNext = null; f(); } };
 // ---------- characters ----------
 const SKIN = 0xf8d5bd;
@@ -8052,7 +8055,7 @@ function heroApply(){ const w = walk; if(!w || w.name !== PAIR) return; const c 
   if(c !== w.c){ w.home.forEach(h=>{ h.g.position.copy(h.p); h.g.rotation.y = h.r; }); (w.hid || []).forEach(h=>{ h.g.visible = h.v; }); w.mates.forEach(m=>{ m.g.visible = true; });
     w.c = c; w.mates = [c]; w.home = [{g:c.g, p:c.g.position.clone(), r:c.g.rotation.y}]; heroHide(w); c.g.userData.fx = null; }
   w.fp = FPV; w.pitch = FPV ? -0.05 : -0.32; w.snap = true; $('walkName').textContent = HERO; }
-$('walkWho').onclick = ()=>{ if(walk && walk.name === PAIR && !vn) heroPick(null); };
+$('walkWho').onclick = ()=>{ if(walk && walk.name === PAIR && !vn && !chase && !(mini && mini.kind !== 'chase' && !$('miniBox').hidden)) heroPick(null); };
 function startWalk(name){
   const lead = name === PAIR ? (heroLoad() || '제로') : name, c = CHAR.find(c=> c.n === lead); if(!c || walk) return;
   if(AUX){ toast('미션은 조 태블릿에서 이어져요'); return; }
@@ -8240,7 +8243,7 @@ renderer.domElement.addEventListener('pointermove', e=>{ if(!walk || !walk.drag 
 $('wpSkip').onclick = ()=>{ delete $('walkPick').dataset.on; };
 $('lWalk').onclick = ()=>{ if(walkerOpen(PAIR)) startWalk(PAIR); else toast(`탐험은 ${walkerWhy(PAIR)} 열립니다`); };
 $('questPill').onclick = ()=>{ const q = dueQuest(); if(!q) return; sfx('tap'); $('questPill').hidden = true; startWalk(PAIR); };
-$('walkX').onclick = ()=> stopWalk(true);
+$('walkX').onclick = ()=>{ if(flowHeld()){ toast('미션을 끝내면 나갈 수 있어요'); return; } stopWalk(true); };
 // ---------- the mission chain: walk the island as a character, find the target, receive ERICA coordinates ----------
 // 제로·리코 look for 자일로 → his two coordinates; once both zones are restored 네이티 opens and looks for the hidden 코덱스 → one coordinate;
 // once that zone is restored 코덱스 opens and enters the eye cave → the last two. The chain is remembered per team on this device.
@@ -8293,9 +8296,11 @@ function vikSpot(){ if(vikSpot.p) return vikSpot.p; const b = VIK_B, R0 = b.r ||
   return vikSpot.p = [p[0], p[1], Math.atan2(p[0] - x[0], p[1] - x[1]), x[0], x[1]]; }   /* [길 x, 길 z, 자일로 방향, 자일로 x, 자일로 z] */
 function codexWait(){ return codexWait.p || (codexWait.p = freeSpot(CAVE_MOUTH[0] + 7, CAVE_MOUTH[1] + 19)); }   /* clear of the boulders at the mouth (user, 2026-11-12) */
 function questTarget(q){ if(mini && mini.q === q){ const t = miniTarget(); if(t) return t; } return q.id === 'q1' ? XYLO_HIDE : q.id === 'q2' ? (q.mazeEntered?NATY_HIDE:mazeEntrance()) : q.id==='q4' ? vikSpot().slice(3) : q.id==='q5' ? (buildLabDoor(), LAB_DOOR) : codexWait(); }
-function questApply(){ try{ flowLockUI(); if(collectorModel)collectorSync(); }catch(e){} try{ if(QDONE.has('q4') || QDONE.has('q5')) labGateBuild(); }catch(e){}   /* the lab's way down stays open for a team that has been there */
+function questApply(){ try{ NATY.userData.park = (questDone(QUESTS[0]) && !questDone(QUESTS[1]) && TEAM && !flowFree()) ? [NATY_HIDE[0], NATY_HIDE[1], G + 2.6] : null; }catch(e){}   /* before the early return below: a team that went straight on from mission 1 found the maze empty (2026-11-17) */
+  try{ flowLockUI(); if(collectorModel)collectorSync(); }catch(e){} try{ if(QDONE.has('q4') || QDONE.has('q5')) labGateBuild(); }catch(e){}   /* the lab's way down stays open for a team that has been there */
   if(typeof actBusy!=='undefined'&&(actBusy||STAGED||vn)){renderWalkPick();return;}
-  if(!XYLO_HIDE){ const c = IB.find(b=> b.label === '롤러코스터'); const cx = c ? c.cx : -270, cz = c ? c.cz : 257, rr = (c ? c.r : 128) + 10, a = Math.atan2(200 - cz, -190 - cx); XYLO_HIDE = freeSpot(cx + Math.cos(a)*rr, cz + Math.sin(a)*rr); XYLO_HIDE.push(Math.atan2(cx - XYLO_HIDE[0], cz - XYLO_HIDE[1])); }
+  if(!XYLO_HIDE){ const c = IB.find(b=> b.label === '롤러코스터'); const cx = c ? c.cx : -270, cz = c ? c.cz : 257, rr = (c ? c.r : 128) + 10, a = Math.atan2(200 - cz, -190 - cx); { let best = null, bd = 1e9; for(const [px, pz] of pathSamples){ const d = Math.hypot(px - cx, pz - cz); if(d > rr - 8 && d < bd){ bd = d; best = [px, pz]; } }   /* on the path that leads to the coaster: the lawn spot stood beside a big tree (user, 2026-11-17) */
+      XYLO_HIDE = best ? [best[0], best[1]] : freeSpot(cx + Math.cos(a)*rr, cz + Math.sin(a)*rr); XYLO_HIDE.push(Math.atan2(0 - XYLO_HIDE[0], 128 - XYLO_HIDE[1])); } }
   if(questDone(QUESTS[1]) && !questDone(QUESTS[2]) && needsBack(QUESTS[2]) && TEAM && !flowFree()){ const vs = vikSpot(); XYLO.position.set(vs[3], G, vs[4]); XYLO.rotation.y = vs[2]; }   /* mission 3: 자일로 waits at the viking site */
   else if(questDone(QUESTS[0])){ XYLO.position.set(XYLO_HOME[0], G, XYLO_HOME[1]); XYLO.rotation.y = XYLO_HOME[2]; } else { XYLO.position.set(XYLO_HIDE[0], G, XYLO_HIDE[1]); XYLO.rotation.y = XYLO_HIDE[2]; }
   // the Sky Loop sleeps until mission 1 brings its line back (a visitor without a team, the dashboard and the admin see it running)
@@ -8388,7 +8393,7 @@ function miniResume(q, cp){ const w = walk; if(!w) return false;
     else{midCheck(q);return true;}}
   else if(q.mini === 'cave'){ mini = {q, kind:'cave'}; caveStory(q); return true; }
   else return false;
-  qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say'); return true; }
+  qPop('미션 이어하기'); voidSay(STEP_LINE[st] || STEP_LINE.found, 6000, 'say', true); return true; }
 // the island pill: the mission that is due, to start or resume without going through 탐험 → 캐릭터 (user, 2026-11-02)
 const dueQuest = ()=> QUESTS.find(q=> chainOpen(q) && !questDone(q)) || null;
 function questPillTick(){ const el = $('questPill'); if(!el) return; let q = null;
@@ -8398,18 +8403,22 @@ const qRewardEl = $('qReward');
 function questOnWalk(name){
   const q = questFor(name); questLive = null; $('questHud').hidden = true; qNavHide();
   if(!q || questDone(q) || !questOpen(q)) return;
-  q.mazeEntered=false;delete q.cellD;
+  q.mazeEntered=false;delete q.cellD;q.ask=false;q.talk=false;
   { const saved=miniLoad(),cp=saved?.q===q.id?saved:null;if(cp){try{if(miniResume(q,cp))return;}catch(e){console.warn('mission resume',e);}} }
   questLive = q; q.found = false; QUEST_FOUND[q.id](name).forEach(L=>{ const im = new Image(); im.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; }); $('qhT').textContent = q.title0 || q.title; $('qhHint').textContent = q.hint; $('qhStep').previousSibling.textContent = `미션 ${QUESTS.indexOf(q) + 1} `; $('qhStep').textContent = q.mini === 'loop' ? '1 / 4' : q.mini === 'viking' ? '1 / 2' : '1 / 3'; { const lb = $('questHud').querySelector('.nav small'); if(lb) lb.textContent = '남은 거리'; } $('questHud').classList.remove('near'); $('qhDist').textContent = ''; $('questHud').hidden = false; placeQuestHud();
   const key = `void-vn-${q.id}-${TEAM || 0}`; let seen = false; try{ seen = !!sessionStorage.getItem(key); }catch(e){}
   if(!seen){ try{ sessionStorage.setItem(key, '1'); }catch(e){} setTimeout(()=>{ if(walk && questLive === q && !vn) say(QUEST_INTRO[q.id](name)); }, 700); }
 }
+function natyAsk(q, on){ if(!!q.ask === on) return; q.ask = on; if(on){ miniGo.textContent = '말 걸기'; miniGo.disabled = false; miniGo.classList.remove('hot'); miniDoneBtn.hidden = true; miniDots.innerHTML = ''; miniBox.hidden = false; $('qhHint').textContent = matchMedia('(pointer:coarse)').matches ? '「말 걸기」를 눌러요' : 'Space를 눌러 말을 걸어요'; sfx('open'); } else { miniBox.hidden = true; $('qhHint').textContent = '붉은 화살표가 가리키는 곳까지 가기'; } }
+function natyTalk(){ const q = questLive; if(!q || !q.ask || q.found || mini || vn || !walk) return false; q.ask = false; q.talk = true; miniBox.hidden = true; sfx('tap'); questTick(); return true; }
+addEventListener('keydown', e=>{ if(e.code !== 'Space' || e.repeat || !questLive || !questLive.ask) return; if(e.target.matches && e.target.matches('input,textarea,select')) return; if(natyTalk()){ e.preventDefault(); e.stopImmediatePropagation(); } }, true);
 function questTick(){
   const q = questLive; if(!q || !walk || vn || q.found || mini) return;
   if(q.mini==='maze'&&q.mazeEntered)mazeGuide(walk,performance.now());
-  const [tx, tz] = questTarget(q); if(Math.hypot(walk.x - tx, walk.z - tz) > q.r) return;
+  const [tx, tz] = questTarget(q); if(Math.hypot(walk.x - tx, walk.z - tz) > q.r){ if(q.ask) natyAsk(q, false); return; }
   if(q.mini==='maze'&&!q.mazeEntered){q.mazeEntered=true;miniSave('maze');$('questHud').hidden=true;qNavHide();say(STORY.mazeEntrance,()=>{$('qhT').textContent='네이티를 찾아라';$('qhHint').textContent='붉은 화살표가 가리키는 곳까지 가기';$('qhStep').textContent='2 / 3';$('questHud').hidden=false;});return;}
-  if(q.mini === 'maze' && !mazeHeart(walk.x, walk.z)) return;   // through a hedge from the next corridor does not count (user, 2026-11-02)
+  if(q.mini === 'maze' && !mazeHeart(walk.x, walk.z)){ natyAsk(q, false); return; }   // through a hedge from the next corridor does not count (user, 2026-11-02)
+  if(q.mini === 'maze' && !q.talk){ natyAsk(q, true); return; }   /* the child speaks to 네이티: Space, or the button on a tablet (user, 2026-11-17) */
   q.found = true; miniSave('found');
   const tg = q.id === 'q1' || q.id === 'q4' ? XYLO : q.id === 'q3' ? CODEX : null;
   if(tg){ const gx = tg.position.x, gz = tg.position.z; let dx = walk.x - gx, dz = walk.z - gz, d = Math.hypot(dx, dz);   /* never inside the one who was found: step back to 4.5 and face them (user, 2026-11-12) */
@@ -8588,7 +8597,8 @@ function voidShow(text, pose='say', ms=0){ (window.__voidLog ||= []).push([Math.
   clearTimeout(voidHold); if(ms) voidHold = setTimeout(voidHide, ms + text.length*24);
 }
 function voidHide(){ if($('voidVn').dataset.on) VN_CLOSED = performance.now(); if(voidAudio){ voidAudio.pause(); voidAudio = null; } $('voidCard').innerHTML = ''; clearTimeout(voidHold); if(voidTyping){ clearInterval(voidTyping); voidTyping = null; } delete $('voidVn').dataset.on; $('tutDots').innerHTML = ''; $('tutPrev').hidden = true; }
-function voidSay(text, ms=5200, pose='say'){ voidLast = text; if(tutStep >= 0 && tutStep < 99) return; if(voidWait) return; voidShow(text, pose, ms); }
+function flowHeld(){ try{ return !ADMIN_KEY && !!walk && !!questLive && !questDone(questLive); }catch(e){ return false; } }   /* a mission is being walked: nothing else until it is done (user, 2026-11-17) */
+function voidSay(text, ms=5200, pose='say', own){ voidLast = text; if(tutStep >= 0 && tutStep < 99) return; if(voidWait) return; if(!own && flowHeld()) return; voidShow(text, pose, ms); }
 let voidWait = null;
 function voidAsk(text, pose='say'){ voidLast = text; if(ffOn()) return Promise.resolve(); voidShow(text, pose, 0); return new Promise(r=>{ voidWait = r; }); }   // nothing moves until the child advances the line
 $('voidNext').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 다음' : 'Space ▸ 다음'; $('ydContinue').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 계속' : 'Space ▸ 계속';
@@ -8706,6 +8716,7 @@ $('recDone').addEventListener('click', e=>{ e.stopPropagation(); if(rdWait && pe
 let rdShownAt = 0; new MutationObserver(()=>{ if($('recDone').dataset.on) rdShownAt = performance.now(); }).observe($('recDone'), {attributes:true, attributeFilter:['data-on']});
 document.addEventListener('keydown', e=>{ if($('recDone').dataset.on && (e.code === 'Space' || e.code === 'Enter')){ e.preventDefault(); e.stopImmediatePropagation(); if(rdWait && performance.now() - rdShownAt > 900) rdWait(); } }, true);
 async function playAct(n){
+  if(ADMIN_KEY && TEAM && VIEW_ADMIN !== TEAM){ VIEW_ADMIN = TEAM; try{ sessionStorage.setItem('void-view', String(TEAM)); }catch(e){} try{ rescan(); }catch(e){} }   /* another team's view showed the simulator empty (2026-11-17) */
   voidHist = []; actBusy = true; delete $('callPill').dataset.on; delete $('callDlg').dataset.on;
   // 1. the record is in: a clear completion on the campus first (user, 2026-10-28), then the void takes the child to the island itself
   await recDone(n);
@@ -8724,6 +8735,7 @@ async function playAct(n){
   // 4. the island calls, as a dialogue; the child is already here, so straight on to the zone (no 「조금 뒤에」)
   saveAct(n);
   if(simOn) setSim(false); await wait(250);
+  await arriveShow(ACT_ZONE[n]);
   await wait(250);
   stageAt(ACT_STAGE[n], ACT_CAST[n]()); await wait(900);
   say(ACT_STORY[n], ()=>{ actBusy = false; startWalk(ACT_WALKER[n]); });
@@ -8782,7 +8794,11 @@ const TUT = [
   {t:"막히면 왼쪽 아래 「보이드」 버튼으로 나를 찾아. 자, 첫 번째 기록을 찍으러 가 보자!",pose:'joy',world:'erica', do:()=>{ $('lMe').classList.remove('pulse'); tutSpot($('restoreBtn')); }, undo:()=>{ $('restoreBtn').classList.remove('hl'); }}];
 // a taste of 내 시점 during the tutorial: the arrow stands near the first record and the camera drops to street height; no GPS involved
 let tutMeOn = false;
-function tutMePreview(on){ const m = MISSION_E.find(x=> x.id === 'z1'); if(!m || !m.b) return; if(on === tutMeOn) return; tutMeOn = on;
+function tutCoordDemo(on){ const el = $('meCoord'), m = MISSION_E.find(x=> x.id === 'z1'); if(!on){ if(follow){ try{ showMeCoord(); }catch(e){} } else el.hidden = true; return; } if(!m || m.lat == null) return;
+  const la = m.lat - 0.00027, ln = m.lng + 0.00029, sg = v=> `<b class="${v > 0 ? 'pos' : 'neg'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(6)}</b>`;   /* an example spot 40 m from the first record */
+  $('meCoordV').textContent = `${la.toFixed(6)}, ${ln.toFixed(6)}`; $('meCoordA').textContent = ''; $('meGoal').hidden = $('meDiff').hidden = false; $('meGoalV').textContent = coordText(m); $('meGoalN').textContent = '';
+  $('meDiffV').innerHTML = `${sg(m.lat - la)}, ${sg(m.lng - ln)}`; $('meDiffM').textContent = '북30m 서26m · 40m 남음'; $('meTrend').textContent = ''; el.hidden = false; }
+function tutMePreview(on){ const m = MISSION_E.find(x=> x.id === 'z1'); if(!m || !m.b) return; if(on === tutMeOn) return; tutMeOn = on; try{ tutCoordDemo(on); if(on) setTimeout(()=>{ if(tutMeOn) tutSpot($('meCoord')); }, 120); }catch(e){}
   if(on){ const b = m.b, x = b.cx + 26, z = b.cz + 30; meArrow.visible = true; meArrow.position.set(x, 0.4, z); meArrow.rotation.y = Math.atan2(b.cx - x, b.cz - z); meArrow.scale.setScalar(0.55);
     flyTo(new THREE.Vector3(x + 40, 60, z + 70), new THREE.Vector3(x, 2, z), 1400); }
   else { if(!follow) meArrow.visible = false; flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1200); } }
@@ -8798,8 +8814,12 @@ function tutSpot(target, label){ tutSpotOff(); const el = typeof target === 'str
     else tutSpotEl.style.opacity = 0;
     tutSpotRaf = requestAnimationFrame(tick); }; tick(); }
 function tutSpotOff(){ cancelAnimationFrame(tutSpotRaf); if(tutSpotTarget) tutSpotTarget.classList.remove('tut-zoom'); tutSpotTarget = null; delete $('voidVn').dataset.top; if(tutSpotEl){ tutSpotEl.style.opacity = 0; tutSpotEl.hidden = true; } }
-function tutShow(){ tutSpotOff(); const st = TUT[tutStep]; TUT.forEach((x, i)=>{ if(i !== tutStep && x.undo && x._on){ x._on = false; try{ x.undo(); }catch(e){} } }); if(st.undo) st._on = true; if(TUT_SPOT && tutStep < 13){ TUT_SPOT = null; paint(); } if(st.world && W.id !== st.world) tutWorld(st.world); voidShow(typeof st.t === 'function' ? st.t() : st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do) try{ st.do(); }catch(e){} }
-function tutEnd(){ tutSpotOff(); voidHide(); setTimeout(()=>{ try{ flowLockUI(); }catch(e){} }, 0); $('tutSkip').hidden = true; TUT_SPOT = null; try{ paint(); tutMePreview(false); $('panel').classList.remove('hl'); $('restoreBtn').classList.remove('hl'); document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); TUT.forEach(x=>{ x._on = false; }); }catch(e){} if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
+/* the island in the tutorial is two pictures, not the live 3D island (user, 2026-11-17: the first switch lagged badly; with the power out nothing moves there anyway) */
+const TUT_STILL = {home:'img/tut_island.jpg', harmonia:'img/tut_harmonia.jpg'};
+function tutStill(k){ let el = $('tutStill'); if(!el){ el = document.createElement('div'); el.id = 'tutStill'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = Object.keys(TUT_STILL).map(n=> `<img data-k="${n}" src="${TUT_STILL[n]}" alt="">`).join(''); document.body.appendChild(el); void el.offsetWidth; }
+  el.querySelectorAll('img').forEach(i=>{ if(i.dataset.k === k) i.dataset.on = '1'; else delete i.dataset.on; }); if(k) el.dataset.on = '1'; else delete el.dataset.on; }
+function tutShow(){ tutSpotOff(); const st = TUT[tutStep]; const still = st.world === 'island' && W.id !== 'island'; TUT.forEach((x, i)=>{ if(i !== tutStep && x.undo && x._on){ x._on = false; try{ x.undo(); }catch(e){} } }); if(st.undo) st._on = true; if(TUT_SPOT && tutStep < 13){ TUT_SPOT = null; paint(); } if(still) tutStill(tutStep === 12 ? 'harmonia' : 'home'); else { if(tutStep < 7 || $('tutStill')) tutStill(null); if(st.world && W.id !== st.world) tutWorld(st.world); } voidShow(typeof st.t === 'function' ? st.t() : st.t, st.pose); $('tutPrev').hidden = !(tutStep > 0); $('voidCard').innerHTML = st.card || ''; $('tutDots').innerHTML = TUT.map((_, i)=> `<i class="${i <= tutStep ? 'on' : ''}"></i>`).join(''); if(st.do && !still) try{ st.do(); }catch(e){} }
+function tutEnd(){ tutSpotOff(); voidHide(); try{ if($('tutStill')) tutStill(null); }catch(e){} setTimeout(()=>{ try{ flowLockUI(); }catch(e){} }, 0); $('tutSkip').hidden = true; TUT_SPOT = null; try{ paint(); tutMePreview(false); $('panel').classList.remove('hl'); $('restoreBtn').classList.remove('hl'); document.querySelectorAll('.coord.hl').forEach(c=> c.classList.remove('hl')); TUT.forEach(x=>{ x._on = false; }); }catch(e){} if(W.id !== 'erica') tutWorld('erica'); TUT_LOCAL = true; tutStep = 99; setTimeout(()=>{ try{ actCheck(); }catch(e){} }, 800); document.querySelectorAll('.cardsub input.pulse').forEach(f=> f.classList.remove('pulse')); if(!LOCAL && TEAM) api('/quest', {team:TEAM, dev:DEV, tut:true}).then(applyState).catch(()=>{}); }
 // the tutorial shows each space by actually going there: a short fade, then a swoop down onto the home view (user, 2026-10-28: the words 「왼쪽·오른쪽」 alone meant nothing on screen)
 function goWorld(id){ return new Promise(res=>{ if(W.id === id){ res(); return; } if(ffOn()){ setWorld(id, true); res(); return; } const wipe = $('tutWipe'); wipe.dataset.on = '1';
   setTimeout(()=>{ setWorld(id, true); let ms = 0; if(!reduce){ const far = camera.position.clone().sub(controls.target).multiplyScalar(1.7).add(controls.target); far.y += 420; camera.position.copy(far); flyTo(HOME.pos.clone(), HOME.tgt.clone(), 1700); ms = 1700; } delete wipe.dataset.on; setTimeout(res, ms + 200); }, 360); }); }
@@ -8811,6 +8831,7 @@ const tutWorld = goWorld;
 // q3: decode the cave wall, test order and amount, then confirm actual restoration.
 const miniRoot = new THREE.Group(); islRoot.add(miniRoot);
 const miniBox = $('miniBox'), miniGo = $('miniGo'), miniDoneBtn = $('miniDone'), miniDots = $('miniDots');
+miniGo.addEventListener('click', ()=>{ natyTalk(); });
 let ride = null, labGame = null, LAB_DOOR = null, STATION = null;
 function miniClear(){ if(caveKeep) caveLeave();if(qRewardEl?.dataset.route){delete qRewardEl.dataset.on;delete qRewardEl.dataset.route;} if(yard?.timer) clearTimeout(yard.timer); yard = null; $('yardDlg').classList.remove('win'); while(miniRoot.children.length) miniRoot.remove(miniRoot.children[0]); if(ride) rideEnd(false); mini = null; try{ if(REM.game){ REM.game.done = true; REM.game = null; } }catch(e){} if(chase || NATY.userData.run){ chase = null; NATY.userData.run = null; chaseBig(false); chaseTrailStep(null, null, true); } { const cf = $('chaseFail'); if(cf) cf.hidden = true; } $('questHud').classList.remove('far'); miniBox.hidden = true; ['yardDlg', 'labDlg', 'caveDlg', 'rideDlg', 'deviceDlg'].forEach(id=> delete $(id).dataset.on); labStop(); NATY.userData.hold = null; if(MAZE){ MAZE.marks.count = 0; MAZE.marks.instanceMatrix.needsUpdate = true; MAZE.seen.clear(); } }
 function flash(){ const f = $('flash'); f.animate([{opacity:0.95}, {opacity:0}], {duration:420, easing:'ease-out'}); }
@@ -8857,7 +8878,7 @@ function chaseBegin(q){ const w = walk; if(!w) return; const R = chasePath(); q.
   chase = {q, R, s:CHASE.lead, x:p[0], z:p[1], seg:0, last:performance.now(), over:false, max:0, tries:(chase && chase.q === q ? chase.tries : 0) + 1};
   NATY.userData.run = [p[0], p[1], 3, p[2]]; chaseBig(true); chaseTrailStep(p[0], p[1], true); const f = $('chaseFail'); if(f) f.hidden = true; $('questHud').classList.remove('far');
   miniHud(3, '네이티를 놓치지 마라', COARSE ? '멀어지면 놓쳐요 · 「달리기」를 누르면 달려요' : '멀어지면 놓쳐요 · Shift를 누르면 달려요'); qPop('네이티를 쫓아라!'); }
-function chaseTick(now){ const c = chase, w = walk; if(!c || !w) return; const dt = Math.min(0.05, Math.max(0, (now - c.last)/1000)); c.last = now; if(c.over || vn) return;
+function chaseTick(now){ const c = chase, w = walk; if(!c || !w) return; const dt = Math.min(0.05, Math.max(0, (now - c.last)/1000)); c.last = now; if(c.over || vn || $('voidVn').dataset.on) return;   /* nothing runs while a line covers the screen */
   const gap = Math.hypot(w.x - c.x, w.z - c.z), seg = c.s < c.R.len/3 ? 0 : c.s < c.R.len*2/3 ? 1 : 2; c.max = Math.max(c.max, gap);
   if(seg !== c.seg){ c.seg = seg; sfx('sparkle'); qPop(seg === 1 ? '네이티가 더 빨라졌다!' : '네이티가 또 빨라졌다!'); }
   if(c.s < c.R.len){ const v = gap < CHASE.near ? Math.max(CHASE.speed[seg], CHASE.spurt) : CHASE.speed[seg]; c.s = Math.min(c.R.len, c.s + v*dt); const p = chaseAt(c.R, c.s); c.x = p[0]; c.z = p[1]; NATY.userData.run = [p[0], p[1], 3, p[2]]; }
@@ -8957,12 +8978,13 @@ function parkWake(done){
   const src = new THREE.Vector3(walk.x, G, walk.z), ctr = new THREE.Vector3(10, G, 30);
   go();
   const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.5, 8, 128).rotateX(Math.PI/2), glowMat(0xffe27a, 0.9, true)); ring.material.depthWrite = false; ring.position.set(src.x, G + 1.5, src.z); ring.renderOrder = 9; sceneI.add(ring);
-  PARK_WAKE = {k:0, dur:6.2, sp:0, src, ctr, ring, done, p0:camera.position.clone(), t0:controls.target.clone()};
+  const tour = ['하모니아', '갤럭시 스윙', '매직 티컵'].map(l=> IB.find(b=> b && b.label === l)).filter(Boolean).map((b, i)=> ({x:b.cx, z:b.cz, D:(b.r || 24)*1.1 + 55, H:26 + (b.r || 24)*0.35, a:0.5 + i*1.9}));   /* seen close up, running (user, 2026-11-17) */
+  PARK_WAKE = {k:0, dur:6.2 + tour.length*2.8, sp:0, src, ctr, ring, done, tour, dt:0, cp:null, ct:null, p0:camera.position.clone(), t0:controls.target.clone()};
   MI.forEach(m=>{ const R = RIDE[m.id]; if(R){ R.s = 0; R.U.uLv.value = G - 6; } }); PARK_U.uLv.value = G - 6; sfx('power');
 }
 const _pwP = new THREE.Vector3(), _pwT = new THREE.Vector3();
 function parkWakeTick(dt){
-  const w = PARK_WAKE; if(!w) return; w.k += Math.min(dt, 1/20); const k = w.k, sm = x=>{ x = Math.min(1, Math.max(0, x)); return x*x*(3 - 2*x); };
+  const w = PARK_WAKE; if(!w) return; w.dt = Math.min(dt, 1/20); w.k += w.dt; const k = w.k, sm = x=>{ x = Math.min(1, Math.max(0, x)); return x*x*(3 - 2*x); };
   w.sp = sm((k - 1.4)/3.2);
   const lv = G - 6 + sm((k - 0.7)/2.6)*160; PARK_U.uLv.value = lv;
   MI.forEach(m=>{ const R = RIDE[m.id]; if(R && R.on){ R.s = w.sp; R.U.uLv.value = lv; } });
@@ -8974,6 +8996,8 @@ function parkWakeCam(){   /* after the walk camera each frame: rise to a high vi
   const w = PARK_WAKE; if(!w) return; const k = w.k, sm = x=>{ x = Math.min(1, Math.max(0, x)); return x*x*(3 - 2*x); };
   const up = sm(k/1.6)*(1 - sm((k - (w.dur - 1.1))/1.1)), a = 0.6 + k*0.07;
   _pwT.copy(w.src).lerp(w.ctr, 0.55); _pwP.set(_pwT.x + Math.sin(a)*430, G + 300, _pwT.z + Math.cos(a)*430);
+  { const hi = 5.1, n = w.tour ? w.tour.length : 0; if(n && k > hi - 0.5){ const i = Math.min(n - 1, Math.max(0, Math.floor((k - hi)/2.8))), sp = w.tour[i], aa = sp.a + (k - hi - i*2.8)*0.14; _pwP.set(sp.x + Math.sin(aa)*sp.D, G + sp.H, sp.z + Math.cos(aa)*sp.D); _pwT.set(sp.x, G + 12, sp.z); }
+    if(!w.cp){ w.cp = _pwP.clone(); w.ct = _pwT.clone(); } const f = 1 - Math.exp(-w.dt*3.4); w.cp.lerp(_pwP, f); w.ct.lerp(_pwT, f); _pwP.copy(w.cp); _pwT.copy(w.ct); }
   camera.position.lerp(_pwP, up); _pwT.lerpVectors(controls.target, _pwT, up); camera.lookAt(_pwT); controls.target.copy(_pwT);
 }
 // ----- q1 · the Sky Loop lap: the marked target along the elevated loop; hold 「기록」 while the train is inside a ring -----
@@ -9722,6 +9746,7 @@ function admStep(q){ { let G2 = null; try{ G2 = REM.game; }catch(e){} if(G2 && !
   if(dl('yardDlg')) return yard && yard.done ? {t:'전원 연출 보기', run:()=> $('ydContinue').click()} : {t:'배전선 퍼즐 풀기', run:()=>{ if(yard && !yard.done){ yard.tiles = yard.sol.map(r=> r.map(c=> new Set(c))); yardPaint(); } }};
   if(dl('remDlg')) return {t:'잔재 해체 건너뛰기', run:()=>{ const G2 = REM.game; if(G2 && !G2.done){ G2.done = true; cancelAnimationFrame(G2.raf); remFinish(G2.i); } }};
   if(dl('caveDlg') || dl('deviceDlg') || dl('labDlg')) return null;
+  if(!mini && q.ask) return {t:'말 걸기', run:()=> natyTalk()};
   if(!mini) return q.found ? null : go(q.mini === 'maze' && q.mazeEntered ? '미로 한가운데로 이동' : q.mini === 'maze' ? '미로 입구로 이동' : '목적지로 이동', questTarget(q));
   if(mini.kind === 'chase') return chase && !chase.over ? {t:'추격 건너뛰기', run:()=>{ const e = chase.R && chase.R.pts ? chase.R.pts[chase.R.pts.length - 1] : null; if(e){ chase.x = e[0]; chase.z = e[1]; w.x = e[0] - 3; w.z = e[1] - 3; } chaseWin(); }} : null;
   if(mini.kind === 'viking' && mini.phase === 'upload') return {t:'바이킹 올리기 건너뛰기', run:()=> vikWon(false)};
@@ -9747,7 +9772,7 @@ async function admSkipZone(z, n){ try{ const st = await api('/admin/skip', {team
     if(SYN && now - SYN.t < 500 && (SYN.el === e.target || SYN.el.contains(e.target))){ e.stopPropagation(); e.preventDefault(); return; }
     if(e.pointerType === 'touch' && now - VN_CLOSED < 350 && e.target.closest('button') && !e.target.closest('#vn,#voidVn,#admSkip,#adminDlg')){ e.stopPropagation(); e.preventDefault(); } }, true); }
 $('admSkip').onclick = e=>{ e.stopPropagation(); e.preventDefault(); const w = admSkipWhat(); if(!w) return; sfx('tap'); try{ w.run(); }catch(err){ toast(err.message); } };
-setInterval(()=>{ try{ questPillTick(); }catch(e){}
+setInterval(()=>{ try{ questPillTick(); }catch(e){} try{ $('walkX').hidden = flowHeld(); }catch(e){}
   if(ADMIN_KEY && TEAM && QS.get('admin') !== '1'){ let at = 0; try{ at = +sessionStorage.getItem('void-admin-at') || 0; }catch(e){} if(at && Date.now() - at > ADMIN_TTL){ try{ adminAct('logout'); toast('관리자 로그인이 30분이 지나 자동으로 풀렸습니다'); }catch(e){} } } if(FF_ACT && !actBusy) FF_ACT = false; document.body.classList.toggle('admkey', !!ADMIN_KEY); document.body.classList.toggle('teamdev', !!TEAM);
   let w = null; try{ w = admSkipWhat(); }catch(e){} $('admSkip').hidden = !w; if(w) $('admSkipT').textContent = w.t;
   if(window.__dbg && !window.__dbg.skip){ window.__dbg.skip = ()=>{ const w = admSkipWhat(); if(w) w.run(); return w ? w.t : null; }; window.__dbg.skipWhat = ()=>{ const w = admSkipWhat(); return w ? w.t : null; }; } }, 300);
