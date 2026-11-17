@@ -50,18 +50,20 @@ async def main():
         box = await ev("(()=>{ const r = document.getElementById('slCv').getBoundingClientRect(); return [r.left, r.top, r.width, r.height]; })()"); await asyncio.sleep(1.2)
         if OUT: await pg.screenshot(path=os.path.join(OUT, 'slice_start.png'))
         # 보이드 얼굴을 한 번 벤다(수가 줄어야 함)
-        bad_done = False; shots = 0; t0 = asyncio.get_event_loop().time()
-        while asyncio.get_event_loop().time() - t0 < 150:
+        bad_done = False; fails_seen = False; shots = 0; t0 = asyncio.get_event_loop().time()
+        while asyncio.get_event_loop().time() - t0 < 300:
             st = await ev('__slice()')
             if not st or st['done']: break
+            if st.get('failed'): fails_seen = True; await pg.click('#slRetry'); await asyncio.sleep(1.6); continue
+            if st.get('hold'): await asyncio.sleep(.1); continue
             tgt = None
             for x, y, bad in st['items']:
                 if 0.12 < y < 0.8 and (bad == 0 or (not bad_done and st['n'] >= 6)): tgt = (x, y, bad); break
             if not tgt: await asyncio.sleep(.05); continue
-            x, y, bad = tgt; px, py = box[0] + x*box[2], box[1] + y*box[3]; n0 = st['n']
+            x, y, bad = tgt; px, py = box[0] + x*box[2], box[1] + y*box[3]; n0 = st['n']; l0 = st['life']
             await pg.mouse.move(px - 70, py - 50); await pg.mouse.down(); await pg.mouse.move(px, py, steps=3); await pg.mouse.move(px + 70, py + 50, steps=3); await pg.mouse.up()
             if bad:
-                st2 = await ev('__slice()'); bad_done = True; check(st2 and st2['n'] < n0, f"보이드 얼굴을 베면 수가 줄어든다 ({n0} → {st2['n'] if st2 else '?'})")
+                st2 = await ev('__slice()'); bad_done = True; check(st2 and st2['life'] < l0, f"보이드 얼굴을 베면 목숨이 준다 ({l0} → {st2['life'] if st2 else '?'})")   # 2026-11-17: 세 판·목숨 3개
                 if OUT: await pg.screenshot(path=os.path.join(OUT, 'slice_void.png'))
             elif OUT and shots == 0 and n0 >= 12: shots = 1; await pg.screenshot(path=os.path.join(OUT, 'slice_mid.png'))
         el = asyncio.get_event_loop().time() - t0; st = await ev('__slice()'); print(f'  걸린 시간 {el:.0f}초', st and {'n': st['n'], 'cover': st['cover']})

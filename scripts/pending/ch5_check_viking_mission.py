@@ -129,7 +129,8 @@ async def main():
         hud = await ev("document.getElementById('questHud').innerText"); check('스카이 루프 역' in hud, f'the mission box points to the station ({hud!r})'); await shot(pg, 'vm5c_station')
         await ev(f"__dbg.walkTo({st[0]}, {st[1]})"); await wf(pg, '!!__dbg.quest().vn()', 20); said = await drain(pg); print('board', said)
         await wf(pg, "!!__rem().ride", 20); check(await ev("document.getElementById('miniGo').textContent") == '탐지', 'on the train: the 「탐지」 button'); await asyncio.sleep(1.5); await shot(pg, 'vm5c_riding')
-        await ev('__remBoost(6)'); await pg.keyboard.down('Space'); found = 0
+        await ev('__remBoost(6)'); found = 0   # 2026-11-17: 탐지는 바로 옆에서 한 번 누르기 → 버튼이 달아오른 순간에만 Space
+        await ev("()=>{ window.__autoDet = setInterval(()=>{ const b = document.getElementById('miniGo'), r = __rem().ride; if(b && b.classList.contains('hot') && r && !r.pause){ document.body.dispatchEvent(new KeyboardEvent('keydown', {code:'Space', bubbles:true})); setTimeout(()=> document.body.dispatchEvent(new KeyboardEvent('keyup', {code:'Space', bubbles:true})), 50); } }, 70); }")
         for i in range(3):
             if i == 0:
                 await wf(pg, '!!(__rem().ride && __rem().ride.pause)', 60); await asyncio.sleep(1.3); await shot(pg, 'vm5c_found')
@@ -148,8 +149,7 @@ async def main():
                 if i == 0 and k == 2: await shot(pg, 'vm5c_game_mid')
             await wf(pg, "!__rem().game", 30); await asyncio.sleep(.5); await drain(pg); found += 1
             if i == 0:
-                await asyncio.sleep(2.5); r2 = await ev('__rem()'); print('  back on the train', r2['down'], r2['cam']); check(not r2['down'] and r2['cam'][1] > 20, 'after it the view is back on the train'); await shot(pg, 'vm5c_back')
-            await pg.keyboard.down('Space')
+                await asyncio.sleep(1.0); r2 = await ev('__rem()'); print('  back on the train', r2['down'], r2['cam']); check(not r2['down'] and r2['cam'][1] > 20, 'after it the view is back on the train'); await shot(pg, 'vm5c_back')
             print('  remnant', i + 1, await ev("[__rem().models, __rem().mini?.got, __rem().ride]"), flush=True)
         check(found == 3 and await ev("(__rem().mini?.got || []).length") == 3, 'three remnants found from the train and dismantled')
         await pg.keyboard.up('Space'); said = []
