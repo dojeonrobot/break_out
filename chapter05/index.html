@@ -9363,7 +9363,8 @@ function remDots(){ const got = mini ? mini.got || [] : [], life = ride && ride.
 function remRail(){ buildStation(); remBuild(); const got = mini.got = mini.got || []; REM.models.forEach((m, i)=>{ if(got.includes(i) && m.state !== 2) remCollapse(m, true); });
   TRAIN.wait = true; if(TRAIN.mode !== 'ride'){ TRAIN.mode = 'stop'; TRAIN.u = STATION.u; }   /* waiting at the platform (user, 2026-11-18) */
   miniSave('rail', {got}); miniWalkTo(2, '숨겨진 잔재를 찾아라', '아일랜드 익스프레스 역에서 열차 타기', STATION.spot, 7, remBoard); }
-function remBoard(){ const w = walk; if(!w || !mini || mini.kind !== 'device' || ride) return; sfx('ride');
+const BOARD_VIEW = {side:-0.85, pitch:0.1};
+function remBoard(){ const w = walk; if(!w || !mini || mini.kind !== 'device' || ride) return; sfx('ride'); if(STATION){ const b = STATION.board, sp = sceneSpot(b[0], b[1], 20, Math.atan2(-b[0], -b[1]) + BOARD_VIEW.side); w.x = sp[0]; w.z = sp[1]; w.yaw = Math.atan2(b[0] - sp[0], b[1] - sp[1]); w.pitch = BOARD_VIEW.pitch; w.snap = true; w.imx = w.imz = 0; }   /* an open view of the platform for the boarding lines, not the foot of the stairs (user, 2026-11-18) */
   say(STORY.remRail, ()=>{ if(!walk || !mini || mini.kind !== 'device' || ride) return;
     ride = {rem:true, q:mini.q, u:STATION.u, spots:remSpots().map((sp, i)=> ({i, u:sp.u, x:sp.x, z:sp.z, hold:0, wasIn:false})), life:3, press:false, pause:false, look:null, lookK:0, beepAt:0};
     mini.phase = 'ride'; TRAIN.wait = false; TRAIN.mode = 'ride'; TRAIN.u = ride.u; walk.ride = ride; walk.snap = true; $('walkPad').hidden = true;
