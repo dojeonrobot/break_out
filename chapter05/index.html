@@ -7946,7 +7946,7 @@ function setIntroI(t){
 }
 IB.forEach(b=>{ b.delay = b.c==='char' ? 3.1 + (b.i%7)*0.12 : 1.7 + Math.hypot(b.cx, b.cz-40)/420*1.2 + (b.mission ? 0.3 : 0); });
 function infoI(i, move){
-  const b = IB[i], m = b.mission;
+  const b = IB[i], m = b.mission; if(b.c === 'char') return;   /* 2026-11-18 (user): no character description card at all */
   $('iN').textContent = b.label;
   const back = m && zoneDone(m);
   $('iS').style.background = back ? 'var(--restored)' : CATS_I[b.c].color;
@@ -9683,7 +9683,7 @@ const WORLDS = [
    credit:$('credit').innerHTML, introSmall:'DOROLAND · CHAPTER 5', introTitle:'보이드의 기록', introSub:'사라진 캠퍼스의 기록을 되살리세요'},
   {id:'island', scene:sceneI, M:MI, B:IB, pickables:IB.map(b=>b.mesh), markers:markersI, named:namedI, lblEls:lblI, HOME:HOME_I, CATS:CATS_I, CAT_ORDER:['ride','char','place','shop'], fx:fxI,
    setIntro:setIntroI, update:updateI, info:infoI, paint:()=>{},
-   sub:'도로랜드 섬 디지털 트윈', aria:'도로랜드 섬 3D 지도', tabB:'명소', searchL:'명소 · 등장인물 찾기', searchP:'예: 하모니아, 코덱스', lblBtn:'위치 표시',
+   sub:'도로랜드 섬 디지털 트윈', aria:'도로랜드 섬 3D 지도', tabB:'명소', searchL:'명소 찾기', searchP:'예: 하모니아, 사파리', lblBtn:'위치 표시',
    credit:'도로랜드 세계관(웹툰 · 소설 챕터 1~5)으로 재구성한 섬',
    introSmall:'DOROLAND · ISLAND', introTitle:'도로랜드 섬', introSub:'다섯 챕터의 이야기가 잠든 섬'}
 ];
