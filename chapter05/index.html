@@ -1943,7 +1943,7 @@ document.addEventListener('submit', e=>{
   e.preventDefault();
   const m = M.find(x=>x.id===form.dataset.sub); if(!m) return;
   const input = form.querySelector('input.scanid'), noteEl = form.querySelector('input[data-draft^="n-"]');
-  const say = (text, kind)=>{ MSG[m.id] = {text, kind}; refreshSubUI(); };
+  const say = (text, kind)=>{ try{ sfx(kind === 'err' ? 'error' : 'scan'); }catch(e){} MSG[m.id] = {text, kind}; refreshSubUI(); };
   const hit = scanIdFrom(input.value);
   if(!hit) return say('scaniverse.com/scan/ 뒤의 16자 코드(영문 소문자·숫자)만 입력하세요.', 'err');
   const scanId = hit[1].toLowerCase(), url = `https://scaniverse.com/scan/${scanId}`, note = (noteEl ? noteEl.value : '').trim();
@@ -1956,10 +1956,10 @@ document.addEventListener('submit', e=>{
     return say(ok ? '제출했습니다. 이 구역이 "복구 중"으로 바뀌었습니다.' : '제출했지만 이 브라우저에 저장할 수 없어 새로고침하면 사라집니다.', ok ? 'ok' : 'err');
   }
   if(!TEAM) return say('위에서 우리 조를 먼저 고르세요.', 'err');
-  const btn = form.querySelector('button[type=submit]'); btn.disabled = true;
+  const btn = form.querySelector('button[type=submit]'); btn.disabled = true; sfx('send');
   api('/submit', {scanId, url, mission:m.id, team:TEAM, note})
-    .then(st=>{ sfx('open'); clear(); STATE_VER = -1; applyState(st); say(`제출했습니다. 서버가 스캔을 3D로 바꾸는 중입니다. 1~2분 뒤 기록이 세워집니다. (${TEAM}조)`, 'ok'); })
-    .catch(err=>{ sfx('error'); say(err.message, 'err'); if(/링크/.test(err.message)) voidSay('이 링크로는 기록을 읽을 수 없어. Scaniverse에서 「공유 → 링크 복사」를 다시 해 줘.', 8000, 'idle'); });
+    .then(st=>{ clear(); STATE_VER = -1; applyState(st); say(`제출했습니다. 서버가 스캔을 3D로 바꾸는 중입니다. 1~2분 뒤 기록이 세워집니다. (${TEAM}조)`, 'ok'); })
+    .catch(err=>{ say(err.message, 'err'); if(/링크/.test(err.message)) voidSay('이 링크로는 기록을 읽을 수 없어. Scaniverse에서 「공유 → 링크 복사」를 다시 해 줘.', 8000, 'idle'); });
 });
 function statusHTML(m){
   const s = zoneState(m);
@@ -2071,7 +2071,7 @@ $('q').addEventListener('input', renderList);
 
 // shared click handling: copy, open scan, open mission
 let toastT;
-function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),1800); }
+function toast(t){ try{ sfx('pop'); }catch(e){} const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),1800); }
 document.addEventListener('click', e=>{
   const en = e.target.closest('[data-enter]'); if(en){ enterInterior(en.dataset.enter); return; }
   const gq = e.target.closest('[data-goquest]'); if(gq){ if(walkerOpen(PAIR)) startWalk(PAIR); else { if(W.id !== 'island') setWorld('island'); toast(`탐험은 ${walkerWhy(PAIR)} 열립니다`); } return; }
@@ -2358,7 +2358,7 @@ function onGeo(p){
     if(zoneDone(m) || zoneLocked(m) || m.id === 'z1') return;   // on the island too (2026-11-10): a tablet that just finished the island mission and walks off still on the island screen must hear 도착
     const r = 10, g = geoMemo[m.id] || (geoMemo[m.id] = {}), inTut = tutStep >= 0 && tutStep < 99;
     if(d <= r){
-      if(!inTut && (!g.here || Date.now() - (g.hereAt || 0) > 90000)){ g.here = true; g.hereAt = Date.now(); voidSay(ZONE_OBJ[m.id] ? `도착했어! 이 자리의 기록은 ${ZONE_OBJ[m.id]}이야. 여기 근처를 한 바퀴 돌면서 꼼꼼하게 담아 줘.` : '도착했어! 여기야. 이 자리 근처에 있는 걸 한 바퀴 돌면서 꼼꼼하게 담아 줘.', 10000, 'joy'); }
+      if(!inTut && (!g.here || Date.now() - (g.hereAt || 0) > 90000)){ g.here = true; g.hereAt = Date.now(); try{ sfx('arrive'); }catch(e){} voidSay(ZONE_OBJ[m.id] ? `도착했어! 이 자리의 기록은 ${ZONE_OBJ[m.id]}이야. 여기 근처를 한 바퀴 돌면서 꼼꼼하게 담아 줘.` : '도착했어! 여기야. 이 자리 근처에 있는 걸 한 바퀴 돌면서 꼼꼼하게 담아 줘.', 10000, 'joy'); }
       if(!zoneFound(m)){ try{ localStorage.setItem(`void-found-${m.id}`, '1'); }catch(e){} renderList(); refreshZones(); if(m.bi != null && W.id === 'erica') select(m.bi, true); }
       g.near = true; }
     else if(d < r + 30){ if(!g.near){ g.near = true; voidSay('거의 다 왔어. 주변을 둘러봐.', 6000); } }   // g.here stays: a fix wobbling across 20 m does not repeat 도착
@@ -8637,7 +8637,7 @@ function sndCtx(){
 function sndUnlock(){
   const c = sndCtx(); if(!c) return;
   if(c.state === 'suspended') c.resume().catch(()=>{});
-  if(!SND.unlocked){ SND.unlocked = true; setTimeout(()=>{ sfx('open'); }, 60); setInterval(bgmTick, 100); }
+  if(!SND.unlocked){ SND.unlocked = true; setTimeout(()=>{ sfx('intro'); }, 60); setInterval(bgmTick, 100); }
 }
 addEventListener('pointerdown', sndUnlock, {capture:true, passive:true}); addEventListener('keydown', sndUnlock, {capture:true});
 document.addEventListener('visibilitychange', ()=>{ const c = SND.ctx; if(!c) return; if(document.hidden) c.suspend().catch(()=>{}); else if(SND.unlocked) c.resume().catch(()=>{}); });
@@ -8647,6 +8647,7 @@ function sndSet(on){
   const c = SND.ctx; if(c && SND.master){ SND.master.gain.cancelScheduledValues(c.currentTime); SND.master.gain.setTargetAtTime(on ? 1 : 0, c.currentTime, .08); }
 }
 { const b = $('sndBtn'); if(b){ b.onclick = ()=>{ sndSet(!SND.on); sndUnlock(); if(SND.on) sfx('tap'); }; sndSet(SND.on); } }
+addEventListener('click', e=>{ const el = e.target && e.target.closest ? e.target.closest('button, select, summary, a[href], [data-copy], [data-enter], [role="button"], input[type="checkbox"], input[type="radio"]') : null; if(!el || el.id === 'sndBtn' || el.disabled) return; sfx('click'); });   /* a click on anything pressable (user, 2026-11-18) */
 // --- 합성 재료
 function tone(o){   // {f, f2, type, t0, dur, a, g, lp, dest}
   const c = SND.ctx, t0 = o.t0 ?? c.currentTime, dur = o.dur || .3;
@@ -8665,9 +8666,17 @@ function noise(o){  // {t0, dur, g, a, f0, f1, q, dest}
 }
 // --- 효과음
 function sfx(name){
+  if(SND.log){ SND.log.push(name); if(SND.log.length > 200) SND.log.shift(); }   /* checks only */
   const c = SND.ctx; if(!c || !SND.unlocked || !SND.on) return;
   const t = c.currentTime;
   try{ switch(name){
+    case 'intro':     [[72, 0], [76, .16], [79, .32], [84, .48], [79, .72], [84, .88], [88, 1.04]].forEach(([m, d], i)=> tone({f:midiHz(m), type:'triangle', t0:t + d, dur:i === 6 ? 1.5 : .34, g:.13})); [48, 55, 64].forEach(m=> tone({f:midiHz(m), t0:t, a:.25, dur:2.6, g:.06})); [60, 67, 72, 76].forEach(m=> tone({f:midiHz(m), t0:t + 1.04, a:.12, dur:1.6, g:.05})); for(let i = 0; i < 6; i++) tone({f:2200 + Math.random()*2600, t0:t + 1.1 + i*.07, dur:.3, g:.04}); break;
+    case 'click':     if(t - SND.lastTap < .06) return; SND.lastTap = t; tone({f:920, f2:640, type:'triangle', dur:.06, g:.07}); break;
+    case 'pop':       tone({f:660, f2:990, dur:.1, g:.08}); break;
+    case 'send':      tone({f:520, f2:1040, type:'triangle', dur:.14, g:.1}); tone({f:780, f2:1560, type:'triangle', t0:t + .1, dur:.16, g:.08}); break;
+    case 'scan':      noise({f0:700, f1:5200, dur:.55, g:.07, q:3}); [79, 84, 88, 91].forEach((m, i)=> tone({f:midiHz(m), type:'triangle', t0:t + .28 + i*.1, dur:i === 3 ? .9 : .3, g:.12})); [60, 67].forEach(m=> tone({f:midiHz(m), t0:t + .58, a:.08, dur:1.1, g:.05})); break;
+    case 'void':      if(t - (SND.lastVoid || 0) < .3) return; SND.lastVoid = t; tone({f:1320, dur:.06, g:.045}); tone({f:1760, t0:t + .07, dur:.08, g:.04}); break;
+    case 'arrive':    SND.lastVoid = t; [84, 88, 91].forEach((m, i)=> tone({f:midiHz(m), type:'triangle', t0:t + i*.13, dur:.6, g:.12})); tone({f:midiHz(96), t0:t + .39, dur:.9, g:.06}); break;
     case 'tap':       if(t - SND.lastTap < .06) return; SND.lastTap = t; tone({f:1200, f2:700, dur:.07, g:.1}); break;
     case 'whoosh':    noise({f0:300, f1:2400, dur:.45, g:.16, q:.8}); break;
     case 'open':      [523, 659, 784].forEach((f, i)=> tone({f, type:'triangle', t0:t + i * .09, dur:.38, g:.14})); break;
@@ -8725,7 +8734,7 @@ let voidAudio = null;
 function voidVoice(text){ if(voidAudio){ voidAudio.pause(); voidAudio = null; } const f = VOICE[text]; if(!f) return null; const a = new Audio(`voice/${f}.mp3?v=20261028c`); a.play().catch(()=>{}); voidAudio = a; return a; }
 let voidLast = '', voidTyping = null, voidFull = '', voidHold = 0, tutStep = -1, STAGED = false, voidHist = [], voidView = -1;
 const VOID_POSE = {say:'void', joy:'void_joy', shy:'void', idle:'void_idle'};
-function voidShow(text, pose='say', ms=0){ (window.__voidLog ||= []).push([Math.round(performance.now()/100)/10, text.slice(0, 24)]);
+function voidShow(text, pose='say', ms=0){ try{ sfx('void'); }catch(e){} (window.__voidLog ||= []).push([Math.round(performance.now()/100)/10, text.slice(0, 24)]);
   const el = $('voidVn'), p = $('voidTxt'); if(voidTyping) clearInterval(voidTyping);
   $('voidImg').src = `img/chars/${VOID_POSE[pose] || 'void'}.png?v=20261028c`; el.dataset.on = '1'; $('voidNext').hidden = false; voidFull = text; p.textContent = ''; let k = 0;
   if(!(tutStep >= 0 && tutStep < 99)){ if(voidHist[voidHist.length - 1] !== text) voidHist.push(text); if(voidHist.length > 12) voidHist.shift(); voidView = -1; $('tutPrev').hidden = voidHist.length < 2; }
