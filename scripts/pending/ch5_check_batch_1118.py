@@ -36,6 +36,8 @@ async def slice_(br):
     for z in ('z1', 'z2'): await post('admin/skip', {'team': T, 'mission': z}, True)
     await post('quest', {'team': T, 'dev': 'slc', 'done': ['q1', 'q2', 'q4'], 'act': 2, 'tut': True, 'story': 3, 'power': True})
     pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)[:200])); ev = pg.evaluate
+    src = (ROOT / 'chapter05/index.html').read_text(encoding='utf-8'); src = src.replace(HOOK, HOOK + " window.__t = new Proxy({}, {get:(_, k)=> eval(String(k))});")
+    await pg.route('**/chapter05/index.html*', lambda rt: rt.fulfill(status=200, content_type='text/html; charset=utf-8', body=src))
     await pg.goto(f'{BASE}/chapter05/index.html?team={T}', wait_until='domcontentloaded', timeout=120000); await ready(pg)
     await asyncio.sleep(8); await ev("__dbg.setWorld('island', true)"); await asyncio.sleep(2); await ev("__dbg.startWalk('리코·제로')"); await asyncio.sleep(2.5)
     said = []; VN = "document.getElementById('vn').dataset.on ? document.getElementById('vnName').textContent + ': ' + document.getElementById('vnText').textContent : ''"
@@ -82,6 +84,23 @@ async def slice_(br):
         if await ev("!!document.getElementById('missionCard') && !!document.getElementById('missionCard').dataset.on"): break
         await asyncio.sleep(.5)
     print('mission card after lab', await ev("(()=>{ const c = document.getElementById('missionCard'); return c && c.dataset.on ? c.innerText.replace(/\\s+/g, ' ') : null; })()"), '(자동 점검에서는 카드가 뜨지 않을 수 있음)')
+    # 2026-11-18: 걷는 중 관리자 버튼, 연구실로 돌아온 뒤(잔재 셋을 부순 것으로 두고) 노이즈가 사라지고 다시 계산하고 마지막 위치를 알려 주는 장면
+    await asyncio.sleep(2); await drain(); await pg.screenshot(path=os.path.join(OUT, 'walk_admin.png'))
+    print('admin button while walking', await ev("(()=>{ const b = document.getElementById('adminBtn'), r = b.getBoundingClientRect(); return {shown:getComputedStyle(b).display !== 'none', x:Math.round(r.left), y:Math.round(r.top), walk:document.body.classList.contains('walk')}; })()"))
+    await ev("(()=>{ const f = __t['()=>{ mini.got = [0, 1, 2]; remRerun(); }']; f(); })()")
+    seen = set()
+    for i in range(140):
+        st = await ev("__labRoom()"); t = await ev(VN)
+        if st and st['on']:
+            key = ('noise' if st['noise'] else 'ping' if st['ping'] else 'calm') + '|' + st['stat']
+            if key not in seen: seen.add(key); print('  lab', st, '|', t[:40]); await asyncio.sleep(.5); await pg.screenshot(path=os.path.join(OUT, f'rerun_{len(seen)}.png'))
+        if t:
+            if not said or said[-1] != t: said.append(t)
+            await ev('__dbg.quest().next()'); await asyncio.sleep(.2)
+        if await ev("!!document.getElementById('qReward').dataset.on"): break
+        await asyncio.sleep(.35)
+    print('reward', await ev("(()=>{ const c = document.getElementById('qReward'); return c.dataset.on ? c.innerText.replace(/\s+/g, ' ').slice(0, 160) : null; })()"))
+    print('rerun lines', [t for t in said if '노이즈' in t or '관람차 근처' in t or '흔들리지' in t])
     print('slice errs', errs[:3]); await ctx.close()
 
 async def main():
