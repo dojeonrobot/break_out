@@ -12,7 +12,7 @@ STAGES = [([], [], 0), (['z1'], [], 0), (['z1'], [], 1), (['z1'], ['q1'], 1), ([
 SNAP = r"""()=>{ const on = id=>{ const e = document.getElementById(id); return !!e && !!e.dataset.on; }, tx = id=>{ const e = document.getElementById(id); return e ? (e.innerText || '').replace(/\s+/g, ' ').trim() : ''; }, vis = id=>{ const e = document.getElementById(id); return !!e && !e.hidden && e.getClientRects().length > 0; };
   const a = document.getElementById('admSkip'), s = __dbg.simState(), q = __dbg.quest ? __dbg.quest() : {};
   return {vn:on('vn') ? (document.getElementById('vnName').textContent || '(해설)') + ': ' + document.getElementById('vnText').textContent : '', vnTyping:!!document.getElementById('vn').dataset.typing,
-    void:on('voidVn') ? tx('voidTxt') : '', mcard:on('missionCard') ? tx('missionCard') : '', rec:on('recDone') ? tx('recDone') : '', reward:on('qReward') ? tx('qReward') : '', simDone:on('simDone') ? tx('simDone') : '', call:on('callDlg') ? tx('callDlg') : '', restore:on('restoreDlg') ? tx('restoreDlg') : '',
+    void:on('voidVn') ? tx('voidTxt') : '', mcard:on('missionCard') ? tx('missionCard') : '', ctrl:on('ctrlCard') ? tx('ctrlCard') : '', rec:on('recDone') ? tx('recDone') : '', reward:on('qReward') ? tx('qReward') : '', simDone:on('simDone') ? tx('simDone') : '', call:on('callDlg') ? tx('callDlg') : '', restore:on('restoreDlg') ? tx('restoreDlg') : '',
     choice:window.__choice ? __choice() : null, slice:window.__slice ? __slice() : null, rem:window.__remGame ? __remGame() : null, lab:window.__labRoom ? __labRoom() : null, labset:window.__labSet ? __labSet() : null, fx:window.__restoreFx ? __restoreFx() : null,
     skip:a && !a.hidden && a.getClientRects().length ? a.innerText.replace(/\s+/g, ' ') : '', hud:vis('questHud') ? tx('questHud') : '', mini:vis('miniBox') ? tx('miniBox') : '', toast:vis('toast') ? tx('toast') : '', pill:vis('questPill') ? tx('questPill') : '',
     world:__dbg.tutState().world, sim:s.simOn, lit:s.lit, walk:s.walk, busy:s.busy, cinema:!document.getElementById('cinema').hidden, live:q.live ? q.live.id : null, board:tx('board').slice(0, 80), simHud:on('simHud') || document.body.classList.contains('sim') ? tx('simHud') : '',
@@ -49,7 +49,8 @@ async def main():
                 if k == 'mini' and s[k] and last.get('shotmini') != s[k]: last['shotmini'] = s[k]; await asyncio.sleep(1.2); await shot('mini')
             acted = True
             if s['cinema']: w('CINEMA', '영상 시작'); await shot('cinema'); break
-            if s['mcard']: w('MCARD', s['mcard']); await asyncio.sleep(1.0); await shot('mcard'); await pg.keyboard.press('Space'); await asyncio.sleep(.5)
+            if s['ctrl']: w('CTRL', s['ctrl']); await asyncio.sleep(1.0); await shot('ctrl'); await pg.keyboard.press('Space'); await asyncio.sleep(.5)
+            elif s['mcard']: w('MCARD', s['mcard']); await asyncio.sleep(1.0); await shot('mcard'); await pg.keyboard.press('Space'); await asyncio.sleep(.5)
             elif s['choice']:
                 k = await pg.evaluate("(()=>{ const q = __choice().q, c = __t_choice(q); return c; })()") if False else None
                 ok = await pg.evaluate("(q=>{ try{ return window.__choiceOk ? __choiceOk(q) : 0; }catch(e){ return 0; } })", s['choice']['q']); w('CHOICE', f"{s['choice']['q']} (믿음 {s['choice']['trust']}) → {ok + 1}번"); await shot('choice') if s['choice']['trust'] == 0 else None; await pg.keyboard.press(f'Digit{ok + 1}'); await asyncio.sleep(.5)
