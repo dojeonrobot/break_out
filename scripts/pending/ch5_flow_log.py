@@ -75,7 +75,7 @@ async def main():
             elif s['rem'] and not s['rem']['done']: w('GAME', f"잔재 부수기 종류 {s['rem']['kind']}"); await asyncio.sleep(1.2); await shot(f"rem{s['rem']['kind']}"); await pg.evaluate("__remWin()"); await asyncio.sleep(1.5)
             elif s['skip'] and any(k in s['skip'] for k in STEP_SKIPS):   # only moves and puzzles: talk, scenes and whole missions are played as the child sees them
                 if last.get('skip') != s['skip']: last['skip'] = s['skip']; w('SKIP', s['skip'])
-                await pg.click('#admSkip'); await asyncio.sleep(1.0)
+                await pg.click('#admSkip'); await asyncio.sleep(1.4); await shot('after_skip')
             else:
                 acted = False
                 if s['skip'] and last.get('skipseen') != s['skip']: last['skipseen'] = s['skip']; w('(skip)', '누르지 않음: ' + s['skip'])
