@@ -41,6 +41,13 @@ async def main():
             if await ev("!!document.getElementById('sliceDlg') && !!document.getElementById('sliceDlg').dataset.on"): break
             await asyncio.sleep(.4)
         await asyncio.sleep(1.2); await ev("(n)=>{ const h = document.querySelector('#sliceDlg h1'); if(h) h.textContent = n; }", NAME)
+        if NAME == 'bg':   # 2026-11-19 배경 시안 A·B·C와 깬 뒤 창이 걷히는 장면
+            for _ in range(4):
+                await ev("(()=>{ const b = document.getElementById('slTut'); if(b && !b.hidden) b.click(); })()"); await asyncio.sleep(.5)
+            for k in ('A', 'B', 'C'):
+                await ev("(()=>{ document.querySelector('#sliceDlg h1').textContent = '아이콘 베기'; const r = document.getElementById('slRetry'); if(r) r.click(); })()")
+                await ev(f"__sliceBg('{k}')"); await asyncio.sleep(2.0); await pg.screenshot(path=os.path.join(OUT, f'bg_{k}.png')); print('shot', k)
+            await ev('__sliceWin()'); await asyncio.sleep(1.5); await pg.screenshot(path=os.path.join(OUT, 'bg_win_fade.png')); await asyncio.sleep(1.2); await pg.screenshot(path=os.path.join(OUT, 'bg_win_after.png')); await br.close(); return
         for k, css in VAR.items():
             await ev("(c)=>{ let s = document.getElementById('sianCss'); if(!s){ s = document.createElement('style'); s.id = 'sianCss'; document.head.appendChild(s); } s.textContent = c; }", css)
             await asyncio.sleep(.5); await pg.screenshot(path=os.path.join(OUT, f'sian_{k}.png')); print('shot', k)

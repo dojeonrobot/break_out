@@ -4,9 +4,10 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[2]; OUT = sys.argv[1]; PRE = sys.argv[2] if len(sys.argv) > 2 else 'parade'; os.makedirs(OUT, exist_ok=True)
 HOOK = r"""
-;window.__pr = (k, dist, up)=>{ PARK_HOLD = false; const a = parade.userData.audit, o = k < 0 ? a.band[4] : a.floats[k], p = o.getWorldPosition(new THREE.Vector3()), s = Math.sign(p.x) || 1;
+;window.__PR = ()=> IB.find(b=> b && b.label === "도로랜드 퍼레이드").mesh;
+window.__pr = (k, dist, up)=>{ PARK_HOLD = false; const a = __PR().userData.audit, o = k < 0 ? a.band[4] : a.floats[k], p = o.getWorldPosition(new THREE.Vector3()), s = Math.sign(p.x) || 1;
   controls.minDistance = 3; controls.enabled = false; camera.position.set(p.x + s*dist, p.y + up, p.z + dist*0.35); controls.target.set(p.x, p.y + 2.6, p.z); camera.lookAt(controls.target); return [Math.round(p.x), Math.round(p.z)]; };
-window.__prAll = ()=>{ const a = parade.userData.audit, p = a.floats[1].getWorldPosition(new THREE.Vector3()), s = Math.sign(p.x) || 1; camera.position.set(p.x + s*34, p.y + 9, p.z + 4); controls.target.set(p.x, p.y + 2, p.z + 4); camera.lookAt(controls.target); return 1; };
+window.__prAll = ()=>{ const a = __PR().userData.audit, p = a.floats[1].getWorldPosition(new THREE.Vector3()), s = Math.sign(p.x) || 1; camera.position.set(p.x + s*46, p.y + 12, p.z + 8); controls.target.set(p.x, p.y + 3, p.z + 8); camera.lookAt(controls.target); return 1; };
 """
 async def main():
     async with async_playwright() as pw:
@@ -24,13 +25,13 @@ async def main():
         await asyncio.sleep(9)
         await pg.evaluate("""()=>{ const cv = document.querySelector('canvas'); const keep = new Set(); for(let p = cv; p; p = p.parentElement) keep.add(p); document.querySelectorAll('body *').forEach(e=>{ if(!keep.has(e) && !cv.contains(e)) e.style.setProperty('visibility', 'hidden', 'important'); }); }""")
         for _ in range(60):   # 수레들이 곧은 구간에 있을 때까지 기다린다
-            ok = await pg.evaluate("(()=>{ PARK_HOLD = false; const a = parade.userData.audit; if(!a) return false; return a.floats.every(f=> f.position.z > a.north + 12 && f.position.z < a.south - 12) && new Set(a.floats.map(f=> Math.sign(f.position.x))).size === 1; })()")
+            ok = await pg.evaluate("(()=>{ PARK_HOLD = false; const a = __PR().userData.audit; if(!a) return false; return a.floats.every(f=> f.position.z > a.north + 12 && f.position.z < a.south - 12) && new Set(a.floats.map(f=> Math.sign(f.position.x))).size === 1; })()")
             if ok: break
             await asyncio.sleep(1)
         async def snap(name, js):
             await pg.evaluate(js); await asyncio.sleep(.15); await pg.evaluate(js); await asyncio.sleep(.1); await pg.screenshot(path=f'{OUT}/{PRE}_{name}.png')
         await snap('all', "__prAll()")
-        for k in range(4): await snap(f'f{k + 1}', f"__pr({k}, 11, 4.5)")
+        for k in range(4): await snap(f'f{k + 1}', f"__pr({k}, 15, 6)")
         await snap('band', "__pr(-1, 8, 3)")
         print('errs', errs[:3]); await br.close()
 asyncio.run(main())
