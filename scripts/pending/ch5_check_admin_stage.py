@@ -51,7 +51,7 @@ async def main():
                 except Exception: pass
                 await asyncio.sleep(.5)
             print('   ', last); check(both == 0 and last.get('tut') in (-1, 99) and not last.get('walk'), '다시 열린 뒤 대사 겹침·튜토리얼·걷기 잔재 없음'); check(last.get('due') == due, f'다음 할 미션 {last.get("due")} (기대 {due})')
-        await move('미션 3 시작 전', ['z1', 'z2'], ['q1', 'q2'], 2, 'q4')
-        await move('미션 1 시작 전', ['z1'], [], 1, 'q1')
+        await move('⑦ 섬 · 미션 3 바이킹 모델 올리기', ['z1', 'z2'], ['q1', 'q2'], 2, 'q4')
+        await move('③ 섬 · 미션 1 자일로 찾아가 전원 복구', ['z1'], [], 1, 'q1')
         check(not tab.errs and not adm.errs, f'페이지 오류 없음 {tab.errs[:1]} {adm.errs[:1]}'); await br.close(); print('FAILS', fails)
 asyncio.run(main())
