@@ -6,7 +6,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from playwright.async_api import async_playwright
 BASE = 'http://127.0.0.1:8096'; ADM = {'content-type': 'application/json', 'X-Admin-Key': '0101'}; T = 9
 OUT = sys.argv[1]; os.makedirs(OUT, exist_ok=True); START = int(sys.argv[2]) if len(sys.argv) > 2 else 0; LIMIT = float(os.environ.get('LIMIT', '1500'))
-SHOT_SAY = ('됐다! 우리가 만든', '잘 움직이네요')
+SHOT_SAY = ('됐다! 우리가 만든', '잘 움직이네요', '이 모양, 코덱스 문양이잖아', '관람차에서 사파리까지', '마지막 기록까지 들어왔군요', '환원 시뮬레이션이 성공했어요')
 STEP_SKIPS = ('스캔 건너뛰기', '이동', '퍼즐 풀기', '네이티를 찾았다', '바이킹 올리기', '잔재 찾기', '따라잡기', '추격')
 STAGES = [([], [], 0), (['z1'], [], 0), (['z1'], [], 1), (['z1'], ['q1'], 1), (['z1'], ['q1', 'q2'], 1), (['z1', 'z2'], ['q1', 'q2'], 1), (['z1', 'z2'], ['q1', 'q2'], 2), (['z1', 'z2'], ['q1', 'q2', 'q4'], 2), (['z1', 'z2'], ['q1', 'q2', 'q4', 'q5'], 2), (['z1', 'z2', 'z3'], ['q1', 'q2', 'q4', 'q5'], 2), (['z1', 'z2', 'z3'], ['q1', 'q2', 'q4', 'q5'], 3), (['z1', 'z2', 'z3'], ['q1', 'q2', 'q4', 'q5', 'q3'], 3)]
 SNAP = r"""()=>{ const on = id=>{ const e = document.getElementById(id); return !!e && !!e.dataset.on; }, tx = id=>{ const e = document.getElementById(id); return e ? (e.innerText || '').replace(/\s+/g, ' ').trim() : ''; }, vis = id=>{ const e = document.getElementById(id); return !!e && !e.hidden && e.getClientRects().length > 0; };
@@ -86,9 +86,9 @@ async def main():
             if acted: idle = 0
             else:
                 idle += 1
-                if idle == 40: w('WAIT', f"20초째 멈춤: dlg={s['dlg']} busy={s['busy']} walk={s['walk']} live={s['live']} hud={s['hud'][:60]} mini={s['mini'][:60]} pill={s['pill'][:40]}"); await shot('stuck')
+                if idle == 110: w("WAIT", f"55초째 멈춤: dlg={s['dlg']} busy={s['busy']} walk={s['walk']} live={s['live']} hud={s['hud'][:60]} mini={s['mini'][:60]} pill={s['pill'][:40]}"); await shot('stuck')
                 if idle == 40 and s['pill']: await pg.click('#questPill'); w('ACT', '미션 알약 누름')
-                elif idle == 40 and s['skip']: await pg.click('#admSkip'); w('FALLBACK', '20초 멈춰서 누름: ' + s['skip'])
+                elif idle == 110 and s["skip"]: await pg.click("#admSkip"); w("FALLBACK", "55초 멈춰서 누름: " + s['skip'])
                 elif idle == 80 and s['skip']: await pg.click('#admSkip'); w('FALLBACK', '40초 멈춰서 누름: ' + s['skip'])
                 if idle >= 120: w('STUCK', '60초 동안 진행 없음, 끝냄'); break
                 await asyncio.sleep(.5)
