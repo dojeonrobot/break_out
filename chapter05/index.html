@@ -2168,11 +2168,12 @@ function pick(e){
 let down=null;
 renderer.domElement.addEventListener('pointerdown', e=>{ down=[e.clientX,e.clientY]; if(!(actBusy || STAGED)) fly=null; });
 renderer.domElement.addEventListener('pointerup', e=>{
-  if(down && Math.hypot(e.clientX-down[0], e.clientY-down[1])<5){ if(inside) insideClick(e); else { const i=pick(e); select(i, i>=0 && !walk); } }
+  if(down && Math.hypot(e.clientX-down[0], e.clientY-down[1])<5){ if(walk || actBusy || STAGED){ /* nothing is picked while walking or in a scene */ } else if(inside) insideClick(e); else { const i=pick(e); select(i, i>=0 && !walk); } }
   down=null;
 });
 renderer.domElement.addEventListener('pointermove', e=>{
   if(e.pointerType!=='mouse' || e.buttons || inside) return;
+  if(walk){ if(hovered !== -1){ hovered = -1; renderer.domElement.style.cursor = ''; paint(); } return; }
   const i = pick(e);
   if(i!==hovered){ hovered=i; renderer.domElement.style.cursor = i>=0?'pointer':''; paint(); }
 });
@@ -2181,7 +2182,7 @@ renderer.domElement.addEventListener('pointermove', e=>{
 // the day runs on its own: 1 real minute = 20 island minutes (a 6:00–21:00 day in 45 minutes), starting from the real clock.
 // Dragging the slider sets the time and the day keeps flowing from there; ?hour=N freezes it.
 const flowing = !QS.get('hour');
-let flowHour = QS.get('hour') ? +QS.get('hour') : (new Date().getHours() + new Date().getMinutes()/60);
+let flowHour = QS.get('hour') ? +QS.get('hour') : 12;   /* the island opens at its brightest (user, 2026-11-19); it used to open at the real clock, so an afternoon class began in a dim park */
 if(flowHour < 6 || flowHour > 21) flowHour = 6;
 $('hr').step = 'any'; $('hr').value = flowHour;
 $('hr').addEventListener('input', ()=>{ flowHour = +$('hr').value; updateSun(); });
@@ -8107,7 +8108,19 @@ function buildWalkGrid(){
     // ...and the outline of each ride (convex hull of its low pieces) is filled whole, so open rides — a lattice coaster, a carousel deck, a wheel on its hill —
     // are not walked into between their parts. Elevated rides (the cable car) keep only their towers. Paths are carved back afterwards, as always.
     const ELEVATED = new Set(['스카이 크루즈']);
-    IB.forEach(b=>{ if(b.c !== 'ride' || !b.mesh || ELEVATED.has(b.label)) return; const base = groundY(b.cx, b.cz), pts = [];
+    const TIGHT = new Set(['롤러코스터']);   /* a long open ride: its convex hull also took the ground beside it (user, 2026-11-19) */
+    const tightFill = b=>{ const R = 5, P = []; let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+      b.mesh.traverse(m=>{ if(!(m.isMesh || m.isInstancedMesh) || !m.visible || !m.geometry || !m.geometry.attributes.position) return; const pos = m.geometry.attributes.position, n = m.isInstancedMesh ? m.count : 1;
+        for(let k = 0; k < n; k++){ if(m.isInstancedMesh){ m.getMatrixAt(k, _wgM); _wgM.premultiply(m.matrixWorld); } else _wgM.copy(m.matrixWorld);
+          for(let i = 0; i < pos.count; i++){ va.fromBufferAttribute(pos, i).applyMatrix4(_wgM); const gy = groundY(va.x, va.z); if(va.y > gy + 0.3 && va.y < gy + 2.5){ const px = Math.floor(va.x), pz = Math.floor(va.z); P.push(px, pz); if(px < x0) x0 = px; if(px > x1) x1 = px; if(pz < z0) z0 = pz; if(pz > z1) z1 = pz; } } } });
+      if(P.length < 6) return false; const ox = x0 - R - 2, oz = z0 - R - 2, w = x1 - x0 + 2*R + 5, h = z1 - z0 + 2*R + 5, fat = new Uint8Array(w*h), out = new Uint8Array(w*h), disc = [];
+      for(let dz = -R; dz <= R; dz++) for(let dx = -R; dx <= R; dx++) if(dx*dx + dz*dz <= R*R) disc.push(dx, dz);
+      for(let i = 0; i < P.length; i += 2){ const cx = P[i] - ox, cz = P[i + 1] - oz; if(fat[cz*w + cx] === 2) continue; fat[cz*w + cx] = 2; for(let d = 0; d < disc.length; d += 2){ const j = (cz + disc[d + 1])*w + cx + disc[d]; if(!fat[j]) fat[j] = 1; } }
+      const st = []; const put = i=>{ if(!fat[i] && !out[i]){ out[i] = 1; st.push(i); } }; for(let x = 0; x < w; x++){ put(x); put((h - 1)*w + x); } for(let z = 0; z < h; z++){ put(z*w); put(z*w + w - 1); }
+      while(st.length){ const i = st.pop(), x = i % w; if(x > 0) put(i - 1); if(x < w - 1) put(i + 1); if(i >= w) put(i - w); if(i + w < w*h) put(i + w); }
+      for(let z = R; z < h - R; z++) for(let x = R; x < w - R; x++){ let near = false; for(let d = 0; d < disc.length && !near; d += 2) if(out[(z + disc[d + 1])*w + x + disc[d]]) near = true; if(!near && inb(x + ox, z + oz)) a[at(x + ox, z + oz)] = 1; }
+      return true; };
+    IB.forEach(b=>{ if(b.c !== 'ride' || !b.mesh || ELEVATED.has(b.label)) return; if(TIGHT.has(b.label) && tightFill(b)) return; const base = groundY(b.cx, b.cz), pts = [];
       const boxes = []; let low = 1e9; b.mesh.traverse(m=>{ if(!m.isMesh || !m.visible) return; bx.setFromObject(m); if(bx.isEmpty() || (bx.max.x - bx.min.x)*(bx.max.z - bx.min.z) > 40000) return; const q = bx.clone(); q.m = m; boxes.push(q); low = Math.min(low, bx.min.y); });
       boxes.forEach(q=>{ const top = Math.max(low, base) + 8; if(q.min.y > top) return;
         const pos = q.m.geometry && q.m.geometry.attributes.position; if(pos && !q.m.isInstancedMesh && (q.max.x - q.min.x)*(q.max.z - q.min.z) >= 400){ const st = Math.max(1, Math.floor(pos.count/1500)); let n = 0; for(let i = 0; i < pos.count; i += st){ va.fromBufferAttribute(pos, i).applyMatrix4(q.m.matrixWorld); if(va.y <= top){ pts.push([va.x, va.z]); n++; } } if(n >= 3) return; }   /* a merged piece: its real outline, not its box (2026-11-17) */
@@ -8174,7 +8187,7 @@ function startWalk(name){
   fly = null; if(follow) setFollow(false); hovered = -1; renderer.domElement.style.cursor = '';
   camera.near = 0.2; camera.fov = 68; camera.updateProjectionMatrix(); controls.enabled = false;
   document.body.classList.add('walk'); $('walkName').textContent = name === PAIR ? '제로·리코' : name; $('walkWho').hidden = true; $('walkHud').setAttribute('aria-label', `${name} 시점`);
-  $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '패드로 걷기 · 끝까지 밀면 달리기 · 화면 끌어 둘러보기' : '방향키로 걷기 · Shift 달리기 · 화면 끌어 둘러보기';
+  $('walkHint').textContent = matchMedia('(pointer:coarse)').matches ? '패드로 걷기 · 끝까지 밀면 달리기 · 화면 끌어 둘러보기' : '방향키로 걷기 · Shift 달리기 · Space 점프 · 화면 끌어 둘러보기';
   $('walkHint').hidden = true; $('walkHelp').setAttribute('aria-expanded', 'false');
   $('walkHud').hidden = false; $('walkPad').hidden = false; markers.forEach(mk=> mk.el.style.display = 'none'); placeQuestHud();
   if(phoneUI()) closePanel();
@@ -8213,7 +8226,8 @@ function walkTick(now){
   }
   w.pitch = Math.max(-1.2, Math.min(0.45, w.pitch));
   const gy = groundY(w.x, w.z), moving = w.x !== oldX || w.z !== oldZ;
-  const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : 0;
+  if(w.jv != null){ w.jy += w.jv*dt; w.jv -= 24*dt; if(w.jy <= 0){ w.jy = 0; w.jv = null; sfx('land'); } }
+  const lift = w.fly ? 1.2 + Math.sin(now/520)*0.35 : (w.jy || 0);
   // third person: the characters stand where you walk and face the way you go (side by side for the pair); the camera follows from behind and above
   const inMazeNow = mazeInside(w.x, w.z, w.mazeCamera ? 4 : 1), inMaze = inMazeNow && !w.fp; w.mazeCamera = inMazeNow;   // in the maze the pair walk close, one a step behind the other, and never stand in a hedge
   w.mates.forEach((m, i)=>{ const k = i - (w.mates.length - 1)/2; let side = k*(inMaze ? 0.9 : 2.4), back = inMaze ? Math.abs(k)*1.6 : 0;
@@ -8326,7 +8340,8 @@ function questNav(){
   const m = Math.round(d); if(questNav.last !== m){ questNav.last = m; $('qhDist').textContent = d < (q.mini === 'maze' && q.mazeEntered ? 5 : 14) ? '바로 앞' : `${m} m`; $('questHud').classList.toggle('near', d < 40); }
 }
 function qPop(text){ const el = $('qPop'), b = el.querySelector('b'); b.textContent = text; el.hidden = false; if(qPop.a) qPop.a.cancel(); qPop.a = b.animate([{opacity:0, transform:'scale(.6)'}, {opacity:1, transform:'scale(1.08)', offset:.18}, {opacity:1, transform:'scale(1)', offset:.3}, {opacity:1, offset:.8}, {opacity:0, transform:'translateY(-20px)'}], {duration:1700, easing:'cubic-bezier(.16,1,.3,1)', fill:'forwards'}); clearTimeout(qPop.t); qPop.t = setTimeout(()=> el.hidden = true, 1700); }
-document.addEventListener('keydown', e=>{ if(!walk || e.target.matches('input,textarea,select')) return; WALK_KEYS[e.code] = true; if(/^Arrow|^Key[WASDQE]$|^Space$/.test(e.code)) e.preventDefault(); });
+document.addEventListener('keydown', e=>{ if(!walk || e.target.matches('input,textarea,select')) return; WALK_KEYS[e.code] = true; if(e.code === 'Space' && !e.repeat && !e.defaultPrevented) walkJump(); if(/^Arrow|^Key[WASDQE]$|^Space$/.test(e.code)) e.preventDefault(); });
+function walkJump(){ const w = walk; if(!w || w.ride || w.fly || w.jv != null) return; if(vn || CTRL || MCARD || $('voidVn').dataset.on || qRewardEl.dataset.on || $('heroPick').dataset.on || performance.now() - VN_CLOSED < 250) return; if(mini && !$('miniBox').hidden) return; w.jv = 7.6; w.jy = 0; sfx('jump'); }   /* Space jumps (user, 2026-11-19); walls stay walls, only the height changes */
 document.addEventListener('keyup', e=>{ delete WALK_KEYS[e.code]; });
 addEventListener('blur', ()=>{ for(const k in WALK_KEYS) delete WALK_KEYS[k]; });
 renderer.domElement.addEventListener('pointerdown', e=>{ if(walk && !walk.drag) walk.drag = {id:e.pointerId, x:e.clientX, y:e.clientY}; });
@@ -8455,7 +8470,7 @@ function vnNext(){
   const L = vn.lines[vn.i], img = $('vnImg'); $('vn').dataset.speaker = L.who || ''; img.src = `img/chars/${L.img || VN_IMG[L.who] || 'zero'}.png?v=20261028c`; img.alt = L.who || ''; img.hidden = !L.who;
   $('vnName').textContent = L.nar ? '' : L.who || ''; $('vnName').hidden = !L.who || !!L.nar;   /* a narration line keeps the portrait, not the name tag */ $('vnPrev').hidden = vn.i === 0; $('vnDots').innerHTML = vn.lines.map((_, j)=> `<i class="${j <= vn.i ? 'on' : ''}"></i>`).join(''); const p = $('vnText'); p.classList.toggle('nar', !!L.nar); p.textContent = ''; $('vnNext').hidden = false;
   vn.full = L.text; let k = 0;
-  $('vn').dataset.typing = '1'; const vnTotal = dlShow(p, L.text, 0); vn.typing = setInterval(()=>{ k++; dlShow(p, L.text, k); if(k >= vnTotal){ clearInterval(vn.typing); vn.typing = null; delete $('vn').dataset.typing; } }, 26);
+  $('vn').dataset.typing = '1'; const vnTotal = dlShow(p, L.text, 0); SND.tf = ({'자일로':340, '코덱스':235, '리코':640, '제로':500, '네이티':880})[L.who] || 520; vn.typing = setInterval(()=>{ k++; if(!L.nar && k % 3 === 1) sfx('type'); dlShow(p, L.text, k); if(k >= vnTotal){ clearInterval(vn.typing); vn.typing = null; delete $('vn').dataset.typing; } }, 26);
 }
 $('vn').addEventListener('click', e=>{ e.stopPropagation(); if(e.target.closest('#vnPrev')){ if(e.detail) $('vnPrev').blur(); if(vn && vn.i > 0){ if(vn.typing) clearInterval(vn.typing); vn.typing = null; vn.i -= 2; vnNext(); } return; } if(e.target.closest('#vnSkip')){ if(vn){ if(vn.typing) clearInterval(vn.typing); vn.i = vn.lines.length - 1; vn.typing = null; vnNext(); } return; } vnNext(); });
 $('vnNext').textContent = matchMedia('(pointer:coarse)').matches ? '탭 ▸ 다음' : 'Space ▸ 다음';
@@ -8619,18 +8634,18 @@ const VOICE = {};   // voice lines off (user, 2026-10-28: the trial voice was to
 const SND = {ctx:null, master:null, sfxGain:null, bgmGain:null, on:true, unlocked:false, mode:'off', set:null, next:0, step:0, bar:-1, lastTap:0};
 try{ SND.on = localStorage.getItem('void-sound') !== '0'; }catch(e){}
 const BGM_SETS = {   // chords = 베이스(midi) 기준 반음 간격, base = 미디 번호(48 = C3)
-  campus: {bpm:72,  base:48, chords:[[0,4,7,11],[9,12,16,19],[5,9,12,16],[7,11,14,17]], div:2, pad:'triangle', lp:900,  padG:.07, arpG:.06, arpType:'triangle', skip:.35, bass:false, level:.32},
-  island: {bpm:100, base:48, chords:[[5,9,12],[7,11,14],[9,12,16],[0,4,7]],             div:2, pad:'triangle', lp:1400, padG:.05, arpG:.07, arpType:'triangle', skip:.2,  bass:true,  level:.32},
-  dark:   {bpm:56,  base:36, chords:[[9,12,16],[5,8,12],[9,12,16],[7,10,14]],           div:1, pad:'sine',     lp:500,  padG:.1,  arpG:.045, arpType:'sine',    skip:.5,  bass:true,  level:.36, drone:true},
-  sim:    {bpm:112, base:48, chords:[[2,5,9],[10,14,17],[5,9,12],[0,4,7]],              div:4, pad:'sawtooth', lp:700,  padG:.035, arpG:.05, arpType:'sawtooth', skip:0,   bass:true,  level:.3, pulse:true}
+  campus: {bpm:72,  base:48, chords:[[0,4,7,11],[9,12,16,19],[5,9,12,16],[7,11,14,17]], div:2, pad:'triangle', lp:900,  padG:.07, arpG:.06, arpType:'triangle', skip:.35, bass:false, level:1.5},
+  island: {bpm:100, base:48, chords:[[5,9,12],[7,11,14],[9,12,16],[0,4,7]],             div:2, pad:'triangle', lp:1400, padG:.05, arpG:.07, arpType:'triangle', skip:.2,  bass:true,  level:1.5},
+  dark:   {bpm:56,  base:36, chords:[[9,12,16],[5,8,12],[9,12,16],[7,10,14]],           div:1, pad:'sine',     lp:500,  padG:.1,  arpG:.045, arpType:'sine',    skip:.5,  bass:true,  level:1.4, drone:true},
+  sim:    {bpm:112, base:48, chords:[[2,5,9],[10,14,17],[5,9,12],[0,4,7]],              div:4, pad:'sawtooth', lp:700,  padG:.035, arpG:.05, arpType:'sawtooth', skip:0,   bass:true,  level:1.2, pulse:true}
 };
 const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
 window.SND = SND; window.sfx = (n)=> sfx(n);   // 점검·디버그용
 function sndCtx(){
   if(SND.ctx) return SND.ctx; const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null;
   const c = new AC(); SND.ctx = c;
-  SND.master = c.createGain(); SND.master.gain.value = SND.on ? 1 : 0; SND.master.connect(c.destination);
-  SND.sfxGain = c.createGain(); SND.sfxGain.gain.value = .55; SND.sfxGain.connect(SND.master);
+  SND.master = c.createGain(); SND.master.gain.value = SND.on ? 1 : 0; SND.lim = c.createDynamicsCompressor(); SND.lim.threshold.value = -9; SND.lim.knee.value = 8; SND.lim.ratio.value = 10; SND.lim.attack.value = .004; SND.lim.release.value = .2; SND.master.connect(SND.lim); SND.lim.connect(c.destination);   /* louder overall, the limiter keeps stacked notes from clipping (user, 2026-11-19: nothing was audible) */
+  SND.sfxGain = c.createGain(); SND.sfxGain.gain.value = 2.4; SND.sfxGain.connect(SND.master);
   SND.bgmGain = c.createGain(); SND.bgmGain.gain.value = 0; SND.bgmGain.connect(SND.master);
   return c;
 }
@@ -8666,7 +8681,7 @@ function noise(o){  // {t0, dur, g, a, f0, f1, q, dest}
 }
 // --- 효과음
 function sfx(name){
-  if(SND.log){ SND.log.push(name); if(SND.log.length > 200) SND.log.shift(); }   /* checks only */
+  if(SND.log && name !== 'type' && name !== 'vtype'){ SND.log.push(name); if(SND.log.length > 200) SND.log.shift(); }   /* checks only */
   const c = SND.ctx; if(!c || !SND.unlocked || !SND.on) return;
   const t = c.currentTime;
   try{ switch(name){
@@ -8676,6 +8691,11 @@ function sfx(name){
     case 'send':      tone({f:520, f2:1040, type:'triangle', dur:.14, g:.1}); tone({f:780, f2:1560, type:'triangle', t0:t + .1, dur:.16, g:.08}); break;
     case 'scan':      noise({f0:700, f1:5200, dur:.55, g:.07, q:3}); [79, 84, 88, 91].forEach((m, i)=> tone({f:midiHz(m), type:'triangle', t0:t + .28 + i*.1, dur:i === 3 ? .9 : .3, g:.12})); [60, 67].forEach(m=> tone({f:midiHz(m), t0:t + .58, a:.08, dur:1.1, g:.05})); break;
     case 'void':      if(t - (SND.lastVoid || 0) < .3) return; SND.lastVoid = t; tone({f:1320, dur:.06, g:.045}); tone({f:1760, t0:t + .07, dur:.08, g:.04}); break;
+    case 'type':      tone({f:(SND.tf || 520) * (1 + Math.random()*.07), type:'triangle', dur:.045, g:.035}); break;   /* a line being typed: one soft tick every few letters, pitched by who speaks */
+    case 'vtype':     tone({f:1480 + Math.random()*260, type:'square', dur:.024, g:.026, lp:3200}); break;
+    case 'voidIn':    SND.lastVoid = t; [[76, 0], [83, .07], [88, .14], [95, .23]].forEach(([m, d], i)=> tone({f:midiHz(m), type:i === 3 ? 'sine' : 'triangle', t0:t + d, dur:i === 3 ? .55 : .14, g:i === 3 ? .07 : .09})); tone({f:300, f2:1500, type:'square', dur:.2, g:.02, lp:2600}); for(let i = 0; i < 4; i++) tone({f:2400 + Math.random()*2200, t0:t + .26 + i*.05, dur:.2, g:.03}); break;   /* Void's window opening */
+    case 'jump':      tone({f:300, f2:620, type:'triangle', dur:.16, g:.06}); break;
+    case 'land':      noise({f0:260, f1:120, dur:.09, g:.07, q:1}); break;
     case 'arrive':    SND.lastVoid = t; [84, 88, 91].forEach((m, i)=> tone({f:midiHz(m), type:'triangle', t0:t + i*.13, dur:.6, g:.12})); tone({f:midiHz(96), t0:t + .39, dur:.9, g:.06}); break;
     case 'tap':       if(t - SND.lastTap < .06) return; SND.lastTap = t; tone({f:1200, f2:700, dur:.07, g:.1}); break;
     case 'whoosh':    noise({f0:300, f1:2400, dur:.45, g:.16, q:.8}); break;
@@ -8734,12 +8754,12 @@ let voidAudio = null;
 function voidVoice(text){ if(voidAudio){ voidAudio.pause(); voidAudio = null; } const f = VOICE[text]; if(!f) return null; const a = new Audio(`voice/${f}.mp3?v=20261028c`); a.play().catch(()=>{}); voidAudio = a; return a; }
 let voidLast = '', voidTyping = null, voidFull = '', voidHold = 0, tutStep = -1, STAGED = false, voidHist = [], voidView = -1;
 const VOID_POSE = {say:'void', joy:'void_joy', shy:'void', idle:'void_idle'};
-function voidShow(text, pose='say', ms=0){ try{ sfx('void'); }catch(e){} (window.__voidLog ||= []).push([Math.round(performance.now()/100)/10, text.slice(0, 24)]);
+function voidShow(text, pose='say', ms=0){ try{ sfx($('voidVn').dataset.on ? 'void' : 'voidIn'); }catch(e){} (window.__voidLog ||= []).push([Math.round(performance.now()/100)/10, text.slice(0, 24)]);
   const el = $('voidVn'), p = $('voidTxt'); if(voidTyping) clearInterval(voidTyping);
   $('voidImg').src = `img/chars/${VOID_POSE[pose] || 'void'}.png?v=20261028c`; el.dataset.on = '1'; $('voidNext').hidden = false; voidFull = text; p.textContent = ''; let k = 0;
   if(!(tutStep >= 0 && tutStep < 99)){ if(voidHist[voidHist.length - 1] !== text) voidHist.push(text); if(voidHist.length > 12) voidHist.shift(); voidView = -1; $('tutPrev').hidden = voidHist.length < 2; }
   const au = voidVoice(text), step = au ? 44 : 24;   // with a voice the text runs at roughly speaking pace
-  el.dataset.typing = '1'; const voidTotal = dlShow(p, text, 0); voidTyping = setInterval(()=>{ k++; dlShow(p, text, k); if(k >= voidTotal){ clearInterval(voidTyping); voidTyping = null; delete el.dataset.typing; } }, step);
+  el.dataset.typing = '1'; const voidTotal = dlShow(p, text, 0); voidTyping = setInterval(()=>{ k++; if(k % 3 === 1) try{ sfx('vtype'); }catch(e){} dlShow(p, text, k); if(k >= voidTotal){ clearInterval(voidTyping); voidTyping = null; delete el.dataset.typing; } }, step);
   clearTimeout(voidHold); if(ms) voidHold = setTimeout(voidHide, ms + text.length*24);
 }
 function voidHide(){ if($('voidVn').dataset.on) VN_CLOSED = performance.now(); if(voidAudio){ voidAudio.pause(); voidAudio = null; } $('voidCard').innerHTML = ''; clearTimeout(voidHold); if(voidTyping){ clearInterval(voidTyping); voidTyping = null; } delete $('voidVn').dataset.on; $('tutDots').innerHTML = ''; $('tutPrev').hidden = true; }
@@ -9567,7 +9587,7 @@ let SLICE = null;
 function sliceDlg(){ let d = $('sliceDlg'); if(d && d.querySelector('#slFail')) return d; if(d) d.remove(); d = document.createElement('div'); d.id = 'sliceDlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'slT');
   d.innerHTML = '<div class="in"><div class="hd"><h1 id="slT">게임 지우기</h1><span id="slStage"></span><span id="slLife" aria-label="목숨"></span><b id="slN">0 / 10</b><p id="slP">아이콘을 그어서 베세요</p><div id="slBar" aria-hidden="true"><i></i></div></div><div class="stg"><canvas id="slCv" aria-hidden="true"></canvas><div id="slFail" hidden><h2>게임 오버</h2><p id="slWhy"></p><button type="button" id="slRetry">다시 하기</button></div><button type="button" id="slTut" hidden></button></div></div>'; document.body.appendChild(d); return d; }
 function sliceGame(gate){ return new Promise(done=>{ if(ffOn()){ done(); return; }
-  const d = sliceDlg(), cv = $('slCv'), g = cv.getContext('2d'), STG = [{need:12, time:26, gap:0.9, bad:0.15, v:1}, {need:15, time:26, gap:0.7, bad:0.22, v:1.12}, {need:18, time:26, gap:0.55, bad:0.3, v:1.25}], NEED = STG.reduce((a, b)=> a + b.need, 0), COLS = 6, ROWS = 5, face = new Image(); face.src = 'img/chars/void_face.png?v=20261028d';
+  const d = sliceDlg(), cv = $('slCv'), g = cv.getContext('2d'), STG = [{need:11, time:29, gap:0.9, bad:0.135, v:0.9}, {need:14, time:29, gap:0.7, bad:0.2, v:1.0}, {need:16, time:29, gap:0.55, bad:0.27, v:1.12}],   /* every stage about 10% easier: fewer to cut, more time, fewer Void faces, slower (user, 2026-11-19: 개어렵네) */ NEED = STG.reduce((a, b)=> a + b.need, 0), COLS = 6, ROWS = 5, face = new Image(); face.src = 'img/chars/void_face.png?v=20261028d';
   const S = SLICE = {n:0, sn:0, stage:0, life:3, time:STG[0].time, hold:1.4, banner:'STAGE 1', failed:false, items:[], halves:[], trail:[], cover:Array.from({length:COLS*ROWS}, (_, i)=> i), t:0, spawn:0.4, last:performance.now(), down:false, done:false, msg:0, shake:0, raf:0};
   const fit = ()=>{ const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr); S.w = cv.width; S.h = cv.height; S.k = cv.width/900; }; d.dataset.on = '1'; fit(); addEventListener('resize', fit);
   const COL = ['#e2574c', '#f39a3b', '#ffd400', '#58b368', '#5aa0e6', '#b07ad8'];

@@ -10,14 +10,14 @@ HOOK = "const tutWorld = goWorld;"
 async def main():
     async with async_playwright() as pw:
         br = await pw.chromium.launch(args=GPU)
-        pg = await br.new_page(viewport={'width': 1600, 'height': 1000}); errs = []
+        pg = await br.new_page(viewport={'width': 1600, 'height': 1000}, device_scale_factor=2); errs = []   # 2배로 찍어 2560x1600으로 저장(태블릿에서 흐리지 않게, 사용자 2026-11-19)
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.route('**/api/void/**', lambda rt: rt.abort())
         src = (ROOT / 'chapter05/index.html').read_text(encoding='utf-8'); assert src.count(HOOK) == 1
         src = src.replace(HOOK, HOOK + " window.__cap = {camera, controls, HOME, MI, G, THREE, power:()=> parkPowerOn()};")
         await pg.route('**/chapter05/index.html*', lambda rt: rt.fulfill(status=200, content_type='text/html; charset=utf-8', body=src))
         await pg.add_init_script("localStorage.setItem('void-sound','0');localStorage.setItem('void-reset','9999999999999');")
-        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?world=island&team=1', wait_until='domcontentloaded', timeout=120000)
+        await pg.goto('http://127.0.0.1:8097/chapter05/index.html?world=island&team=1&hour=12', wait_until='domcontentloaded', timeout=120000)
         for _ in range(480):
             try:
                 if await pg.evaluate("typeof window.__dbg!=='undefined' && !!window.__dbg.rideState && !!window.__cap"): break
@@ -29,7 +29,7 @@ async def main():
         await pg.evaluate("""()=>{ const cv = document.querySelector('#stage canvas') || document.querySelector('canvas'); const keep = new Set(); for(let p = cv; p; p = p.parentElement) keep.add(p);
           document.querySelectorAll('body *').forEach(e=>{ if(!keep.has(e) && !cv.contains(e)) e.style.setProperty('visibility', 'hidden', 'important'); }); }""")
         async def shot(name):
-            await asyncio.sleep(2.5); png = await pg.screenshot(type='png'); im = Image.open(io.BytesIO(png)).convert('RGB'); p = OUT / name; im.save(p, 'JPEG', quality=84, optimize=True, progressive=True); print(name, im.size, p.stat().st_size)
+            await asyncio.sleep(2.5); png = await pg.screenshot(type='png'); im = Image.open(io.BytesIO(png)).convert('RGB').resize((2560, 1600), Image.LANCZOS); p = OUT / name; im.save(p, 'JPEG', quality=88, optimize=True, progressive=True); print(name, im.size, p.stat().st_size)
         await pg.evaluate("()=>{ const c = __cap; c.camera.position.copy(c.HOME.pos); c.controls.target.copy(c.HOME.tgt); c.controls.update(); }")
         await shot('tut_island.jpg')
         await pg.evaluate("()=>{ const c = __cap, b = c.MI.find(x=> x.id === 'dl-harmonia').b; c.controls.minDistance = 3; c.camera.position.set(b.cx + 95, c.G + 120, b.cz + 150); c.controls.target.set(b.cx, c.G + 20, b.cz); c.controls.update(); }")
