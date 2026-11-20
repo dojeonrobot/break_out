@@ -24,6 +24,10 @@ async def main():
                 q = r.request; res = await rq.fetch(q.url.replace(STATIC, API), method=q.method, data=q.post_data_buffer, headers={k: v for k, v in q.headers.items() if k not in ['host', 'origin', 'referer']})
                 await r.fulfill(status=res.status, body=await res.body(), headers={'content-type': res.headers.get('content-type', 'application/json')})
             await ctx.route(re.compile(r'.*/api/void/.*'), route)
+            async def hook(r):   # 2026-11-20: 점검용 창구를 페이지 파일이 아니라 받아 온 본문에만 끼운다(잔재 부수기 한 판 끝내기)
+                res = await r.fetch(); body = (await res.text()).replace('window.__remAim = ', 'window.__remWin = ()=>{ const G2 = REM.game; if(G2 && !G2.done){ G2.done = true; remFinish(G2.i); return true; } return false; };\nwindow.__remAim = ', 1)
+                await r.fulfill(response=res, body=body)
+            await ctx.route(re.compile(r'.*/chapter05/index\.html.*'), hook)
             await ctx.add_init_script(f"localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','{dev}');localStorage.setItem('void-sound','0');")
             pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)[:300]))
             return ctx, rq, pg
@@ -75,7 +79,7 @@ async def main():
         await ev("__dbg.startWalk('리코·제로')"); await asyncio.sleep(2); said = await drain(pg); print('intro', said)
         check(await ev("__dbg.quest().live?.id") == 'q4', 'mission 3 is live')
         hud = await ev("document.getElementById('questHud').innerText"); print('hud', repr(hud))
-        check('바이킹을 다시 세워라' in hud and '1 / 2' in hud, 'the mission box names the viking mission, step 1 / 2')
+        check('바이킹 공사장으로 가기' in hud, 'the mission box sends the pair to the viking site')   # 2026-11-20: 가는 길에는 「이동」 상자, 도착 뒤 「미션 3 · 2 / 2」
         q = await ev('__vikQ()'); print('vikQ', q)
         d = ((q['spot'][3] - q['xylo'][0])**2 + (q['spot'][4] - q['xylo'][1])**2)**.5
         check(d < 1, f'자일로 stands at the viking site (off by {d:.1f})')
@@ -103,13 +107,13 @@ async def main():
         said = await drain(pg); print('done', said); check(any('우리가 만든 바이킹' in t for t in said), 'the completion dialogue plays')
         await wf(pg, "!!document.getElementById('qReward').dataset.on", 20)
         rw = await ev("document.getElementById('qReward').innerText"); print('reward', repr(rw)); await shot(pg, 'vm5_reward')
-        check('MISSION 3' in rw and '바이킹 복구' in rw and '미션 4 · 숨겨진 잔재를 찾아라' in rw and '37.' not in rw, 'reward card: mission 3, the viking, straight on to mission 4 (no coordinate yet)')
+        check('MISSION 3' in rw and '바이킹 복구' in rw and '연구실로 가기' in rw and '37.' not in rw, 'reward card: mission 3, the viking, straight on to mission 4 (no coordinate yet)')
         check('q4' in await ev('__dbg.quest().done'), 'mission 3 is saved as done')
         v = await ev('__vik()'); check(v['on'] and v['asm'], f"the uploaded assembly is up (asm {v['asm']}, parts {v['parts']})")
         # 4b) mission 4: the lab under the wheel, the measurement, three remnants, the last coordinate
         await ev("document.getElementById('qrMap').click()"); await asyncio.sleep(2.5); said = await drain(pg); print('m4 intro', said)
         check(await ev("__dbg.quest().live?.id") == 'q5', 'mission 4 (the lab) is live right after the viking')
-        hud = await ev("document.getElementById('questHud').innerText"); print('hud', repr(hud)); check('미션 4' in hud and '연구실' in hud, 'the mission box points to the lab')
+        hud = await ev("document.getElementById('questHud').innerText"); print('hud', repr(hud)); check('연구실로 가기' in hud, 'the mission box points to the lab')
         await ev('__dbg.walkTo(...__dbg.labDoor())'); await wf(pg, '!!__dbg.quest().vn()', 20); said = []
         for _ in range(240):
             said += [t for t in await drain(pg) if t not in said]
@@ -126,7 +130,7 @@ async def main():
         r0 = await ev('__rem()'); st = r0['station']; ws = await ev('__dbg.walkState()'); dist = ((ws['x'] - st[0])**2 + (ws['z'] - st[1])**2)**.5
         check(r0['mini'] and r0['mini']['phase'] == 'walk' and dist < 40, f'after the measurement the pair stand by the Sky Loop station ({dist:.0f} away) and walk to it')
         check(min(r0['edge']) > 400, f"the three remnants sit on the outskirts, just outside the track (distance from the centre {r0['edge']}; the track is not a circle)")
-        hud = await ev("document.getElementById('questHud').innerText"); check('스카이 루프 역' in hud, f'the mission box points to the station ({hud!r})'); await shot(pg, 'vm5c_station')
+        hud = await ev("document.getElementById('questHud').innerText"); check('아일랜드 익스프레스 역' in hud, f'the mission box points to the station ({hud!r})'); await shot(pg, 'vm5c_station')
         await ev(f"__dbg.walkTo({st[0]}, {st[1]})"); await wf(pg, '!!__dbg.quest().vn()', 20); said = await drain(pg); print('board', said)
         await wf(pg, "!!__rem().ride", 20); check(await ev("document.getElementById('miniGo').textContent") == '탐지', 'on the train: the 「탐지」 button'); await asyncio.sleep(1.5); await shot(pg, 'vm5c_riding')
         await ev('__remBoost(6)'); found = 0   # 2026-11-17: 탐지는 바로 옆에서 한 번 누르기 → 버튼이 달아오른 순간에만 Space
@@ -147,6 +151,8 @@ async def main():
                 if await ev("!__rem().game || __rem().game.done"): break
                 await ev("__remAim()"); await asyncio.sleep(.12); await ev("document.getElementById('miniGo').click()"); await asyncio.sleep(.25)
                 if i == 0 and k == 2: await shot(pg, 'vm5c_game_mid')
+            if await ev("!!(__rem().game && !__rem().game.done)"):   # 2026-11-20: 부수기는 세 종류(약점·때 맞추기·순서)로 바뀌어 이 점검이 손으로 깨지 못한다 → 점검용 창구로 한 판을 끝내고 흐름만 본다
+                print('  remnant', i + 1, 'finished by the check hook', await ev("__remWin()"))
             await wf(pg, "!__rem().game", 30); await asyncio.sleep(.5); await drain(pg); found += 1
             if i == 0:
                 await asyncio.sleep(1.0); r2 = await ev('__rem()'); print('  back on the train', r2['down'], r2['cam']); check(not r2['down'] and r2['cam'][1] > 20, 'after it the view is back on the train'); await shot(pg, 'vm5c_back')
@@ -161,7 +167,7 @@ async def main():
         check('MISSION 4' in rw and '선대의 잔재 해체' in rw and '기록 3' in rw and '37.' in rw, 'reward card: mission 4, the remnants, the third coordinate')
         check('q5' in await ev('__dbg.quest().done'), 'mission 4 is saved as done')
         await ev("document.getElementById('qrMap').click()"); await wf(pg, "!!document.getElementById('voidVn').dataset.on", 20)
-        vt = await ev("document.getElementById('voidTxt').textContent"); print('campus', repr(vt)); check('마지막 좌표' in vt, 'back on the campus the void points to the last coordinate'); await shot(pg, 'vm6_campus')
+        vt = await ev("document.getElementById('voidTxt').textContent"); print('campus', repr(vt)); check('마지막 기록' in vt, 'back on the campus the void points to the last coordinate'); await shot(pg, 'vm6_campus')
         await ctx.close()
         # 5) another tablet of the same team: the viking is already up
         ctx, rq2, pg2 = await device('viktwo')

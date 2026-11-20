@@ -28,7 +28,13 @@ async def main():
         for i in range(80):
             if await ev("typeof window.__dbg !== 'undefined'"): break
             await asyncio.sleep(0.5)
-        await asyncio.sleep(4); await ev("__dbg.tutEnd()"); await asyncio.sleep(2.5)
+        await asyncio.sleep(4)
+        for i in range(120):   # 2026-11-20: 조 초기화가 닿으면 페이지가 한 번 새로 열린다. 그 사이에 부르면 __dbg가 없다
+            try:
+                if await ev("typeof window.__dbg !== 'undefined' && !!window.__dbg.tutEnd"): break
+            except Exception: pass
+            await asyncio.sleep(0.5)
+        await ev("__dbg.tutEnd()"); await asyncio.sleep(2.5)
         # tablet b joins AFTER this tablet registered (a tablet joining later inherits the team's furthest progress by design, set_quests 2026-10-27)
         await ctx.request.post(API+'/api/void/quest', data=json.dumps({'team':3,'dev':'tabletb','done':['q1'],'act':1,'tut':True}), headers=J); await asyncio.sleep(9)
         ST = """(()=>{ const t = __dbg.tutState(); return {rec:!!document.getElementById('recDone').dataset.on, busy:__dbg.simState().busy, qd:__dbg.qdone(), z2locked:(t.locked.find(x=> x[0] === 'z2') || [])[1], skip:__dbg.skipWhat ? __dbg.skipWhat() : null}; })()"""

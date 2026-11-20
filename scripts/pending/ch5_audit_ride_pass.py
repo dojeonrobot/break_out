@@ -25,8 +25,10 @@ async def main():
             await asyncio.sleep(.25)
         await asyncio.sleep(9); res = await pg.evaluate(JS); await br.close()
     bad = 0
+    # 2026-11-20 그림으로 확인: 통과가 설계인 세 곳은 실패로 세지 않는다. 스카이 크루즈 = 공원 위를 지나는 기구라 아래가 광장·길, 롤러코스터 = 레일 안쪽이 잔디밭(레일 기둥은 막힘), 플라잉 카펫 = 울타리 트인 쪽 통로(2026-11-12 사용자 확인, 막지 않음)
+    OPEN = {'스카이 크루즈': '아래가 광장·길', '롤러코스터': '레일 안쪽 잔디밭', '플라잉 카펫': '울타리 트인 통로'}
     for r in sorted(res, key=lambda r: -r['free']/max(1, r['all'])):
-        share = r['free']/max(1, r['all']); flag = 'FAIL' if (share > 0.12 or not r['centre']) else 'OK  '; bad += flag == 'FAIL'
+        share = r['free']/max(1, r['all']); flag = 'OPEN' if r['label'] in OPEN else 'FAIL' if (share > 0.12 or not r['centre']) else 'OK  '; bad += flag == 'FAIL'
         print(f"{flag} {r['label']:<14} 반지름 {r['r']:>3}  안쪽 {r['all']:>5}칸  통과 {r['free']:>5}칸({share:.0%})  그중 길 {r['path']:>4}  중심 {'막힘' if r['centre'] else '뚫림'}")
         if OUT:
             os.makedirs(OUT, exist_ok=True); rows = r['rows']; im = Image.new('RGB', (len(rows[0]), len(rows)), (40, 40, 40)); px = im.load()

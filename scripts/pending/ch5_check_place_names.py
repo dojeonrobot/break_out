@@ -39,7 +39,7 @@ async def main():
         print('tutorial lines', len(lines)); print('voidLog', await pg.evaluate("(window.__voidLog||[]).map(x=> x[1])"))
         for t in lines: print('  ', t[:110])
         allt = ' '.join(lines)
-        check('37.295655, 126.838475' in allt and '융합교육관이야' in allt, 'coordinate line comes from the live coordinates')
+        check('37.295655, 126.838475' in allt and '지금 네가 있는 건물이지' in allt, 'coordinate line comes from the live coordinates')
         check('이 건물 어딘가에서 반응' in allt, 'tutorial says 건물 어딘가')
         bad=[bn for bn in BAN if bn in allt]
         check(not bad, f'tutorial names no place except 융합교육관: {bad}')

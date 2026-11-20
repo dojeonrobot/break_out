@@ -41,11 +41,11 @@ async def run(pw, T, done, tag):
         await ev(f"(()=>{{ __dbg.walkTo({x}, {z}); const w = __dbg.walkState(); w.yaw = Math.atan2({g['x']} - w.x, {g['z']} - w.z); w.pitch = -0.05; w.snap = true; }})()"); await asyncio.sleep(wait)
         return await ev("(()=>{ const w = __dbg.walkState(), o = __labGate(); return {k:o.k, vis:o.visible, blocked:__dbg.walkBlocked(w.x, w.z), x:Math.round(w.x), z:Math.round(w.z), vn:!!__dbg.quest().vn(), live:__dbg.quest().live && __dbg.quest().live.id}; })()")
     far = await stand(76 + 60, 2.5); print(tag, 'far', far); await shot('1_far')
-    check(far['k'] == 0 and not far['vis'], f'{tag}: 60 떨어진 곳에서는 입구가 안 보인다')
+    check(far['vis'], f'{tag}: 언덕 발치의 옹벽·전기함은 멀리서도 그대로 있다')   # 2026-11-18 결정: 솟아오르는 입구를 없앰. 평범한 옹벽만 있고 가까이 가도 저절로 열리지 않는다
     mid = await stand(76 + 30, 1.0); await shot('2_opening'); print(tag, 'opening', mid)
     await asyncio.sleep(3); mid2 = await ev('__labGate()'); await shot('3_open'); print(tag, 'after 4s', mid2['k'])
     if 'q4' in done:
-        check(0 < mid['k'] < 1, f'{tag}: 다가가면 나오기 시작한다(k={mid["k"]})'); check(mid2['k'] == 1, f'{tag}: 약 4초 뒤 다 열린다')
+        check(mid2['k'] == 0 and not mid['vn'], f'{tag}: 다가가기만 해서는 열리지 않고 대사도 없다')
         sp = g['door'] or g['spot']; print(tag, 'door spot', sp, 'live', mid['live'])
         await ev(f"__dbg.walkTo({sp[0]}, {sp[1]})"); await asyncio.sleep(2.5)
         vn = await ev("(()=>{ const v = __dbg.quest().vn(); return v ? (v.who || '') + ': ' + (v.text || JSON.stringify(v).slice(0, 80)) : null; })()"); print(tag, 'arrival line', vn); await shot('4_arrive')
@@ -55,7 +55,7 @@ async def run(pw, T, done, tag):
         check(rm['mini'] is not None, f'{tag}: 측정 뒤 잔재 수색 단계로 넘어간다')
         if rm['walking']:
             back = await stand(76 + 80, 3.5); print(tag, 'walk away during the mission', back)
-            check(back['k'] == 1, f'{tag}: 미션 4를 하는 동안에는 멀어져도 열려 있다')
+            check(back['live'] == 'q5', f'{tag}: 측정 뒤 멀어져도 미션 4가 이어진다')
     else:
         check(mid2['k'] == 0, f'{tag}: 미션 4가 열리기 전에는 다가가도 안 열린다')
     check(not errs, f'{tag}: 페이지 오류 없음 {errs}')
