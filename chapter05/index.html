@@ -8378,10 +8378,10 @@ function qTrailBuild(route){
   qTrailMesh.count = use.length; qTrailMesh.instanceMatrix.needsUpdate = true; qPhase.needsUpdate = true; }
 function qTrail(w, tx, tz, d){
   const t = performance.now(); if(!qTrailMesh) qTrailInit();
-  if(!QNAV_TRAIL){ qTrailMesh.visible = false; qBeam.visible = d > 18; qBeam.position.set(tx, groundY(tx, tz), tz); qBeam.material.uniforms.uTime.value = t/1000; return; }
+  if(!QNAV_TRAIL){ qTrailMesh.visible = false; qBeam.visible = d > 18 && !(ride && ride.down); qBeam.position.set(tx, groundY(tx, tz), tz); qBeam.material.uniforms.uTime.value = t/1000; return; }
   const stale = !qNav || qNav.tx !== tx || qNav.tz !== tz || Math.hypot(w.x - qNav.fx, w.z - qNav.fz) > 6 || t - qNav.at > 5000;
   if(stale && (!qNav || t - qNav.at > 500)){ qNav = {tx, tz, fx:w.x, fz:w.z, at:t}; qTrailBuild(qRoute(w.x, w.z, tx, tz)); }
-  if(qTrailMesh){ qTrailMesh.visible = d > 6; qTrailMat.uniforms.uTime.value = t/1000; qBeam.visible = d > 18; qBeam.position.set(tx, groundY(tx, tz), tz); qBeam.material.uniforms.uTime.value = t/1000; } }
+  if(qTrailMesh){ qTrailMesh.visible = d > 6; qTrailMat.uniforms.uTime.value = t/1000; qBeam.visible = d > 18 && !(ride && ride.down); qBeam.position.set(tx, groundY(tx, tz), tz); qBeam.material.uniforms.uTime.value = t/1000; } }
 function qMarkPlace(tx, tz, d){
   if(ride && ride.down){ $('qMark').hidden = true; return; }   /* breaking a remnant: no way-marker over it */
   const el = $('qMark'), W = innerWidth, H = innerHeight, hud = $('questHud');
@@ -9548,8 +9548,8 @@ function remRideTick(now, dt){
     $('qhHint').textContent = !best ? '역으로 돌아가는 중' : inside ? '지금! 「탐지」' : k > 0.45 ? `신호가 강해지고 있어요 · 기회 ${R.life}` : `신호가 가장 강한 곳에서 「탐지」 · 기회 ${R.life}`; }
   /* the camera rides behind the locomotive; while a remnant is being dismantled it turns to look at it */
   c.getPointAt(R.u, _rp); c.getPointAt((R.u + 0.004) % 1, _rq); const dx = _rq.x - _rp.x, dz = _rq.z - _rp.z, L = Math.hypot(dx, dz) || 1, ux = dx/L, uz = dz/L;
-  if(R.down){ const sp = R.down, m = REM.models[sp.i], tx = _rp.x - sp.x, tz = _rp.z - sp.z, tl = Math.hypot(tx, tz) || 1, far = 9.5 + Math.max(0, (m.cy || 3.6) - 3.6)*1.3, gx = sp.x + tx/tl*far, gz = sp.z + tz/tl*far, sh = REM.game && REM.game.shake > performance.now() ? 0.4 : 0;
-    _ct.set(gx + (Math.random() - 0.5)*sh, groundY(gx, gz) + 2.6 + (Math.random() - 0.5)*sh, gz); camera.position.lerp(_ct, 1 - Math.pow(0.02, dt)); _wt.set(sp.x, m.y0 + Math.max(3.3, (m.cy || 3.6)*0.72), sp.z); camera.lookAt(_wt); controls.target.copy(_wt);
+  if(R.down){ const sp = R.down, m = REM.models[sp.i], tx = _rp.x - sp.x, tz = _rp.z - sp.z, tl = Math.hypot(tx, tz) || 1, far = m.far || 9.5 + Math.max(0, (m.cy || 3.6) - 3.6)*1.3, gx = sp.x + tx/tl*far, gz = sp.z + tz/tl*far, sh = REM.game && REM.game.shake > performance.now() ? 0.4 : 0;
+    _ct.set(gx + (Math.random() - 0.5)*sh, groundY(gx, gz) + 2.6 + (Math.random() - 0.5)*sh, gz); camera.position.lerp(_ct, 1 - Math.pow(0.02, dt)); _wt.set(sp.x, m.y0 + (m.look || Math.max(3.3, (m.cy || 3.6)*0.72)), sp.z); camera.lookAt(_wt); controls.target.copy(_wt);
     w.mates.forEach((mt, i)=>{ const k = i ? 2.4 : -2.4, sx = gx + tz/tl*k - tx/tl*2.5, sz = gz - tx/tl*k - tz/tl*2.5; mt.g.position.set(sx, groundY(sx, sz), sz); mt.g.rotation.y = Math.atan2(sp.x - sx, sp.z - sz); if(mt.g.userData.legL) walkPose(mt.g, 0, 1); });
     w.x = _rp.x; w.z = _rp.z; return; }   /* off the train and down beside the remnant (user, 2026-11-13); the train waits on the rail above */
   _ct.set(_rp.x - ux*15, _rp.y + 12.5, _rp.z - uz*15); if(w.snap){ camera.position.copy(_ct); w.snap = false; } else camera.position.lerp(_ct, 1 - Math.pow(0.001, dt));   /* higher than the old ride camera: the cab must not fill the view */
@@ -9567,27 +9567,64 @@ function remRideFound(sp){ const R = ride, m = REM.models[sp.i]; if(!R || !m) re
 function remRideEnd(){ const R = ride; if(!R) return; ride = null; const w = walk; if(w){ w.ride = null; w.snap = true; w.x = STATION.spot[0]; w.z = STATION.spot[1]; w.pitch = w.fp ? -0.05 : -0.2; }
   miniGo.classList.remove('hot'); miniBox.hidden = true; remPulse(0); $('walkPad').hidden = false; TRAIN.wait = false; TRAIN.mode = 'run'; TRAIN.u = STATION.u; miniSave('device-return', {got:mini.got || [0, 1, 2]});
   setTimeout(()=>{ if(mini && mini.kind === 'device') remRerun(); }, 600); }
-function remBuild(){ if(REM.models.length) return; remSpots().forEach((s, i)=>{
+function remBuild(){ if(REM.models.length) return;
+  try{ const Z0 = new THREE.Matrix4().makeScale(0, 0, 0); let hit = false; remSpots().forEach(s=>{ roundSpots.forEach(([tx, tz], k)=>{ if(Math.hypot(tx - s.x, tz - s.z) < 11){ roundTree.setMatrixAt(k, Z0); trunkI.setMatrixAt(k, Z0); hit = true; } }); pineSpots.forEach(([tx, tz], k)=>{ if(Math.hypot(tx - s.x, tz - s.z) < 11){ pineTree.setMatrixAt(k*2, Z0); pineTree.setMatrixAt(k*2 + 1, Z0); trunkI.setMatrixAt(roundSpots.length + k, Z0); hit = true; } }); });
+    if(hit){ roundTree.instanceMatrix.needsUpdate = true; pineTree.instanceMatrix.needsUpdate = true; trunkI.instanceMatrix.needsUpdate = true; } }catch(e){ console.warn('remnant trees', e); }
+  remSpots().forEach((s, i)=>{
   const g = new THREE.Group(); g.name = 'remnant-' + i; g.userData.dynamic = true; const y0 = groundY(s.x, s.z) - 0.2; g.position.set(s.x, y0 - 7, s.z); g.visible = false; islRoot.add(g);
   /* 2026-11-18 (user): each remnant looks different. 0 a collector with three slabs, 1 a leaning pylon wound with coils, 2 a squat claw gripping the ground */
-  const kind = i % 3, tone = k=> mat(k % 2 ? 0x6e7570 : 0x7b7264), ringM = ()=> mat(0x9aa0a6); let parts, core, rings, cy;
-  if(kind === 0){ add(g, CYL(3.2, 3.8, 0.8, 10), mat(0x5d5f5a)); cy = 3.6;
-    parts = [[-1.6, 0.8, -0.6, 0.25], [1.5, 0.9, 0.4, -0.3], [0, 1.1, 1.4, 0.1]].map(([x, y, z, r], k)=>{ const p = add(g, BOX(2.2, 2, 1.6), tone(k), x, y, z); p.rotation.z = r; return p; });
-    core = add(g, new THREE.IcosahedronGeometry(0.9, 0), glowMat(0xff6a4e, 0.9), 0, cy, 0, false);
-    rings = [2.4, 1.9, 1.4].map((r, k)=>{ const m = add(g, new THREE.TorusGeometry(r, 0.13, 6, 28), ringM(), 0, cy, 0, false); m.rotation.x = Math.PI/2 + k*0.5; return m; }); }
-  else if(kind === 1){ add(g, CYL(2.6, 3.3, 0.8, 8), mat(0x5d5f5a)); cy = 6.0; const lean = 0.1;   /* was 10.4 high: out of the picture (user, 2026-11-18) */
-    parts = [[2.0, 2.4, 1.9, 0.8], [1.5, 1.9, 1.7, 2.7], [1.0, 1.4, 1.3, 4.4]].map(([rt, rb, h, y], k)=>{ const p = add(g, CYL(rt, rb, h, 6), tone(k), -y*lean, y, 0); p.rotation.z = lean; return p; });
-    core = add(g, new THREE.OctahedronGeometry(1.05, 0), glowMat(0xff6a4e, 0.9), -cy*lean, cy, 0, false);
-    rings = [2.2, 3.7, 5.0].map((y, k)=>{ const m = add(g, new THREE.TorusGeometry(2.5 - k*0.5, 0.15, 6, 24), ringM(), -y*lean, y, 0, false); m.rotation.x = Math.PI/2; return m; }); }
-  else { add(g, CYL(4.4, 4.9, 0.6, 10), mat(0x5d5f5a)); cy = 2.5;
-    parts = [0, 1, 2, 3].map(k=>{ const a = k*Math.PI/2 + 0.4, p = add(g, BOX(1.2, 3.6, 1.2), tone(k), Math.cos(a)*3.3, 0.5, Math.sin(a)*3.3); p.rotation.set(Math.sin(a)*0.55, 0, -Math.cos(a)*0.55); return p; });
-    core = add(g, new THREE.DodecahedronGeometry(1.0, 0), glowMat(0xff6a4e, 0.9), 0, cy, 0, false);
-    rings = [0, 1, 2].map(k=>{ const m = add(g, new THREE.TorusGeometry(1.8 + k*0.9, 0.14, 6, 28), ringM(), 0, 0.9 + k*0.2, 0, false); m.rotation.x = Math.PI/2; return m; }); }
-  REM.models.push({g, parts, core, rings, s, y0, state:0, kind, cy}); });
-  islAnim.push(t=> REM.models.forEach((m, i)=>{ if(m.state !== 1) return; m.core.rotation.y = t*2; m.rings.forEach((r, k)=>{ if(r.visible) r.rotation.z = t*(0.8 + k*0.5)*(k%2 ? -1 : 1); }); m.core.material.opacity = 0.55 + 0.4*Math.abs(Math.sin(t*6 + i)); })); }
+  /* 2026-11-20 (user picked all three mock-ups, one each): 0 a rusted research rig (drum, warning band, gauges, aerial, cables into the ground),
+     1 a device set into old stone (mossy plinth, leaning slabs with red carvings, bronze rings round a red crystal), 2 an Ilua collector (glass tank, brass funnel, suction hoses).
+     parts = the chunks that topple when it breaks (groups with their origin on the ground), rings = what falls away hit by hit, core = the red heart */
+  const kind = i % 3, v3 = (x, y, z)=> new THREE.Vector3(x, y, z), grp = (x = 0, y = 0, z = 0)=>{ const o = new THREE.Group(); o.position.set(x, y, z); g.add(o); return o; };
+  const tube = (P2, pts, r, mt, seg = 20)=> add(P2, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=> v3(...p))), seg, r, 7), mt), tor = (P2, R, r, mt, x, y, z)=>{ const o = add(P2, new THREE.TorusGeometry(R, r, 8, 28), mt, x, y, z); o.rotation.x = Math.PI/2; return o; };
+  const red = ()=> glowMat(0xff5a3c, 0.95), redA = ()=> glowMat(0xff6a4e, 0.5, true); let parts, core, rings, cy, wr = 2.7, far = 0, look = 0;
+  if(kind === 0){ const steel = flat(0x5b6d74), dark = flat(0x2c3439), rust = flat(0xa2582f), yel = flat(0xe3b22c), pale = flat(0xcfd6d8), slab = flat(0x6a6b66); cy = 2.3; wr = 3.6; far = 15; look = 4.7;
+    add(g, CYL(3.7, 4.1, 0.45, 10), slab); const drum = grp(), top = grp(0, 3.3, 0), cab = grp(), box = grp(-3.3, 0, -1.6), mast = grp(2.1, 3.3, -0.6);
+    add(drum, CYL(2.5, 2.7, 3.0, 14), steel, 0, 0.45, 0); add(drum, CYL(2.78, 2.78, 0.5, 14), yel, 0, 1.0, 0);
+    for(let k = 0; k < 10; k++){ const an = k/10*6.283, bl = add(drum, BOX(0.42, 0.52, 0.08), dark, Math.cos(an)*2.8, 0.99, Math.sin(an)*2.8); bl.rotation.y = -an + 1.57; bl.rotation.z = 0.5; }
+    [[1.9, 2.3, 1.75, 0.9, 0.7], [-2.2, 1.9, 1.3, 0.7, 1.0], [0.3, 2.9, -2.55, 1.1, 0.5]].forEach(([x, y, z, w, h])=>{ const p = add(drum, BOX(w, h, 0.12), rust, x, y, z); p.rotation.y = Math.atan2(x, z); });
+    [[-0.9, 2.35], [0.55, 2.35]].forEach(([x, y])=>{ add(drum, CYL(0.52, 0.52, 0.16, 14).rotateX(Math.PI/2), dark, x, y, 2.62); add(drum, CYL(0.42, 0.42, 0.18, 14).rotateX(Math.PI/2), pale, x, y, 2.64); const n = add(drum, BOX(0.06, 0.34, 0.05), red(), x, y - 0.02, 2.76, false); n.rotation.z = x < 0 ? 0.8 : -0.5; });
+    add(top, CYL(2.72, 2.72, 0.22, 14), rust); add(top, CYL(1.5, 2.5, 0.8, 14), steel, 0, 0.15, 0); add(top, CYL(1.6, 1.6, 0.25, 14), dark, 0, 0.95, 0);
+    for(let k = 0; k < 12; k++){ const an = k/12*6.283; add(top, SPH(0.11, 6, 5), dark, Math.cos(an)*2.74, 0.12, Math.sin(an)*2.74); }
+    [0, 1, 2, 3].forEach(k=>{ const an = k*1.571 + 0.78; add(top, CYL(0.09, 0.09, 1.9, 6), dark, Math.cos(an)*1.25, 1.2, Math.sin(an)*1.25); });
+    core = add(g, new THREE.IcosahedronGeometry(0.85, 0), red(), 0, 5.4, 0, false); add(core, SPH(1.5, 14, 10), redA(), 0, 0, 0, false);
+    rings = [3.1, 2.1, 1.1].map((y, k)=> tor(g, 1.3 + (k === 1 ? 0.08 : 0), 0.1, dark, 0, 3.3 + y, 0));
+    add(mast, CYL(0.07, 0.1, 3.4, 6), dark); add(mast, SPH(0.2, 8, 6), red(), 0, 3.45, 0, false); add(mast, BOX(0.9, 0.06, 0.06), dark, 0, 2.7, 0); add(mast, BOX(0.6, 0.06, 0.06), dark, 0, 2.2, 0);
+    [[2.4, 1.2, 0.9, 4.6, 0.3, 2.2], [-2.5, 1.5, 0.4, -4.8, 0.3, 1.4], [-1.2, 1.3, -2.3, -2.6, 0.3, -4.4]].forEach(([x, y, z, ex, ey, ez])=>{ tube(cab, [[x, y, z], [x*1.35, y + 0.5, z*1.35], [(x + ex)/2, 0.9, (z + ez)/2], [ex, ey, ez], [ex*1.06, -0.4, ez*1.06]], 0.2, dark); add(g, CYL(0.42, 0.5, 0.35, 8), slab, ex*1.04, 0, ez*1.04); });
+    add(box, BOX(1.3, 1.5, 0.9), steel, 0, 0.2, 0); add(box, BOX(1.0, 0.5, 0.06), yel, 0, 1.0, 0.47); add(box, SPH(0.13, 8, 6), red(), 0.35, 1.45, 0.48, false);
+    parts = [drum, top, mast, box, cab]; }
+  else if(kind === 1){ const stone = flat(0x8d9084), stoneD = flat(0x6d7168), moss = flat(0x6f9450), bronze = flat(0xb48a45), bronzeD = flat(0x7d6233); cy = 3.2; far = 14.5; look = 4.5;
+    [[0, 0, 3.4, 0.55], [2.6, 1.4, 1.5, 0.5], [-2.7, 1.0, 1.7, 0.45], [-1.6, -2.6, 1.6, 0.5], [2.0, -2.3, 1.4, 0.55]].forEach(([x, z, r, sy], k)=>{ const o = add(g, new THREE.IcosahedronGeometry(r, 0), k ? stoneD : stone, x, r*sy*0.5, z); o.scale.y = sy; o.rotation.y = k*1.3; });
+    const plinth = grp(); add(plinth, CYL(2.3, 2.7, 1.3, 7), stone, 0, 0.9, 0); add(plinth, CYL(2.0, 2.3, 0.35, 7), stoneD, 0, 2.2, 0);
+    [[2.3, 1.0, 1.2, 0.9], [-2.4, 0.8, 0.8, 1.1], [-0.6, 2.5, 1.5, 0.8], [1.4, 0.7, -2.2, 1.0]].forEach(([x, y, z, r])=>{ const o = add(g, SPH(r, 8, 6), moss, x, y, z); o.scale.y = 0.35; });
+    const slabs = [[-2.9, 0.42, 0.3], [2.9, -0.36, -0.2], [0.2, 0.1, -3.0]].map(([x, rz, z], k)=>{ const sg = grp(x, 0.2, z); sg.rotation.z = rz*0.5; sg.rotation.y = k*0.9; const h = 4.6 - k*0.7; add(sg, BOX(1.5, h, 1.0), k % 2 ? stoneD : stone);
+      [1.2, 2.0, 2.8].forEach((y, j)=>{ const l = add(sg, BOX(0.9 - j*0.2, 0.1, 0.06), red(), 0, y, 0.52, false); l.rotation.z = j % 2 ? 0.25 : -0.2; }); add(sg, BOX(0.1, 1.9, 0.06), red(), 0, 1.1, 0.52, false); const cap = add(sg, SPH(0.8, 8, 6), moss, 0, h, 0); cap.scale.y = 0.3; return sg; });
+    const claws = grp(0, 2.45, 0); [0, 1, 2].forEach(k=>{ const an = k*2.094 + 0.5, c = add(claws, BOX(0.28, 1.9, 0.28), bronze, Math.cos(an)*1.25, 0, Math.sin(an)*1.25); c.rotation.set(Math.sin(an)*0.5, 0, -Math.cos(an)*0.5); });
+    tor(plinth, 2.5, 0.2, bronze, 0, 2.0, 0); tor(plinth, 1.7, 0.16, bronzeD, 0, 2.6, 0);
+    rings = [[2.3, 0.14, bronze, 1.1, 0], [1.9, 0.12, bronzeD, 0.5, 0.9], [1.55, 0.1, bronze, 2.0, 0.4]].map(([R, r, mt, rx, ry])=>{ const o = add(g, new THREE.TorusGeometry(R, r, 8, 28), mt, 0, 4.4, 0); o.rotation.set(rx, ry, 0); return o; });
+    core = add(g, new THREE.OctahedronGeometry(0.95, 0), red(), 0, 4.4, 0, false); core.scale.y = 1.6; add(core, SPH(1.7, 14, 10), redA(), 0, 0, 0, false).scale.y = 1/1.6;
+    [0, 1, 2, 3, 4, 5].forEach(k=>{ const an = k*1.047; add(g, BOX(0.08, 0.05, 1.5), red(), Math.cos(an)*3.9, 0.3, Math.sin(an)*3.9, false).rotation.y = -an + 1.57; });
+    const vines = grp(); tube(vines, [[-2.9, 3.6, 0.3], [-2.2, 3.0, 0.9], [-1.4, 2.4, 1.6], [-0.8, 1.2, 2.5], [-0.6, 0.2, 3.1]], 0.09, moss); tube(vines, [[2.9, 3.4, -0.2], [2.0, 2.7, 0.6], [1.7, 1.4, 1.9], [2.1, 0.2, 2.6]], 0.08, moss);
+    parts = [plinth, ...slabs, claws, vines]; }
+  else { const brass = flat(0xc0903c), brassD = flat(0x8a6427), iron = flat(0x3a4046), glass = new THREE.MeshLambertMaterial({color:0xbff3f6, transparent:true, opacity:0.3, depthWrite:false, side:THREE.DoubleSide}); cy = 3.2; far = 16.5; look = 4.4;
+    add(g, CYL(3.4, 3.8, 0.4, 12), flat(0x6a6b66)); add(g, CYL(2.5, 2.8, 0.7, 16), brassD, 0, 0.4, 0); add(g, CYL(2.2, 2.5, 0.35, 16), brass, 0, 1.1, 0);
+    const tank = grp(0, 1.4, 0), lid = grp(0, 5.0, 0), hoses = grp(), pump = grp(-3.0, 0, 1.9);
+    add(tank, new THREE.CylinderGeometry(1.9, 1.9, 3.6, 20, 1, true).translate(0, 1.8, 0), glass, 0, 0, 0, false); [0, 1, 2, 3].forEach(k=>{ const an = k*1.571 + 0.4; add(tank, CYL(0.1, 0.1, 3.6, 6), brassD, Math.cos(an)*1.98, 0, Math.sin(an)*1.98); });
+    core = add(g, new THREE.IcosahedronGeometry(1.2, 1), glowMat(0xff5a3c, 0.9), 0, 2.4, 0, false);
+    [[0.6, 0.9, 0.3, 0.8, 0xff7a4e, 0.8], [-0.5, 1.6, -0.2, 0.6, 0xff9a6a, 0.7], [0.2, 2.3, 0.3, 0.4, 0x8cecff, 0.8], [-0.7, -0.4, 0.5, 0.45, 0x8cecff, 0.7]].forEach(([x, y, z, r, c, o])=> add(core, new THREE.IcosahedronGeometry(r, 1), glowMat(c, o), x, y, z, false));
+    add(lid, CYL(2.1, 2.2, 0.45, 16), brass); add(lid, CYL(1.2, 2.0, 0.6, 16), brassD, 0, 0.45, 0); add(lid, new THREE.CylinderGeometry(2.3, 0.9, 1.3, 16, 1, true).translate(0, 0.65, 0), new THREE.MeshLambertMaterial({color:0xc0903c, flatShading:true, side:THREE.DoubleSide}), 0, 1.0, 0); add(lid, SPH(0.55, 10, 8), glowMat(0x8cecff, 0.85), 0, 1.5, 0, false);
+    rings = [tor(g, 1.98, 0.09, brass, 0, 4.6, 0), tor(g, 1.98, 0.09, brass, 0, 3.2, 0), tor(g, 1.98, 0.09, brass, 0, 1.8, 0)];
+    [[2.0, 0.8, 4.6, 2.4], [-2.2, 0.5, -4.8, 1.2], [0.4, -2.2, 1.6, -4.9]].forEach(([x, z, ex, ez], k)=>{ tube(hoses, [[x, 5.1, z], [x*1.7, 5.6, z*1.7], [(x + ex)*0.62, 3.6, (z + ez)*0.62], [ex*0.95, 1.6, ez*0.95], [ex, 0.5, ez]], 0.26, iron, 26);
+      add(g, CYL(0.5, 0.75, 0.9, 10), brassD, ex, 0, ez); const d = add(g, new THREE.CircleGeometry(1.6, 24).rotateX(-Math.PI/2), glowMat(k === 2 ? 0xff6a4e : 0x8cecff, 0.45, true), ex, 0.32, ez, false); d.renderOrder = 4; });
+    add(pump, CYL(0.55, 0.55, 1.5, 10), brass, 0, 0.3, 0); add(pump, SPH(0.55, 10, 8), brass, 0, 1.8, 0); add(pump, CYL(0.32, 0.32, 0.12, 12).rotateX(Math.PI/2), flat(0xe9eef0), 0, 1.2, 0.56);
+    parts = [tank, lid, hoses, pump]; }
+  { let fx = -s.x, fz = -s.z; try{ const rp = TRAIN.curve.getPointAt(s.u); fx = rp.x - s.x; fz = rp.z - s.z; }catch(e){} g.rotation.y = Math.atan2(fx, fz); }   /* its face looks at the spot on the track where the train stops and the view comes down */ g.traverse(o=>{ o.userData.dynamic = true; });
+  REM.models.push({g, parts, core, rings, s, y0, state:0, kind, cy, wr, far, look}); });
+  islAnim.push(t=> REM.models.forEach((m, i)=>{ if(m.state !== 1) return; m.core.rotation.y = t*2; if(m.kind === 1) m.rings.forEach((r, k)=>{ if(r.visible) r.rotation.z = t*(0.8 + k*0.5)*(k%2 ? -1 : 1); });   /* only the bronze rings turn; the cage and the tank hoops stand still */ m.core.material.opacity = 0.55 + 0.4*Math.abs(Math.sin(t*6 + i)); })); }
 function remTween(ms, f){ if(reduce){ f(1); return; } const t0 = performance.now(); const step = ()=>{ const k = Math.min(1, (performance.now() - t0)/ms); f(k); if(k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
 function remCollapse(m, instant){ m.state = 2; m.g.visible = true; m.core.visible = false; m.rings.forEach(r=> r.visible = false);
-  const from = m.parts.map(p=> [p.position.y, p.rotation.z]); const end = (p, k, i)=>{ p.position.y = from[i][0]*(1 - k) + 0.5*k; p.rotation.z = from[i][1] + k*(i%2 ? -1.2 : 1.1); };
+  const from = m.parts.map(p=> [p.position.y, p.rotation.z]); const end = (p, k, i)=>{ p.position.y = from[i][0]*(1 - k) + (from[i][0] > 1 ? 0.9 : 0.1)*k; p.rotation.z = from[i][1] + k*(i%2 ? -1.2 : 1.1); };   /* chunks that sit on the ground only tip over; the upper ones drop */
   if(instant){ m.g.position.y = m.y0; m.parts.forEach((p, i)=> end(p, 1, i)); return; } remTween(900, k=> m.parts.forEach((p, i)=> end(p, k, i))); }
 function remNext(){ const w = walk, got = mini ? mini.got || [] : []; let best = null, bd = 1e9; remSpots().forEach((s, i)=>{ if(got.includes(i)) return; const d = w ? Math.hypot(w.x - s.cx, w.z - s.cz) : i; if(d < bd){ bd = d; best = [s.cx, s.cz]; } }); return best; }
 function remPulseEl(){ let el = $('remPulse'); if(!el){ el = document.createElement('div'); el.id = 'remPulse'; el.setAttribute('aria-hidden', 'true'); document.body.appendChild(el); } return el; }
@@ -9650,7 +9687,7 @@ function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl
     if(!m.weak){ m.weak = add(m.g, SPH(0.55, 12, 10), glowMat(0xffe14a, 0.99), 0, m.cy, 0, false); m.weak.userData.dynamic = true; } m.weak.visible = true;
     const aim = remAimEl(), wp = new THREE.Vector3();
     const loop = ()=>{ if(REM.game !== G2 || G2.done){ aim.hidden = true; return; } const now = performance.now(), dt = Math.min(0.05, (now - G2.last)/1000); G2.last = now;
-      G2.ang = (G2.ang + G2.sp*(1 + G2.hits*0.16)*dt) % (Math.PI*2); const r = 2.7; m.weak.position.set(Math.cos(G2.ang)*r, m.cy + Math.sin(G2.ang*2)*0.7, Math.sin(G2.ang)*r);
+      G2.ang = (G2.ang + G2.sp*(1 + G2.hits*0.16)*dt) % (Math.PI*2); const r = m.wr || 2.7; m.weak.position.set(Math.cos(G2.ang)*r, m.cy + Math.sin(G2.ang*2)*0.7, Math.sin(G2.ang)*r);
       m.weak.getWorldPosition(wp); const cx = m.g.position.x, cz = m.g.position.z, cd = Math.hypot(camera.position.x - cx, camera.position.z - cz) || 1;
       G2.front = ((wp.x - cx)*(camera.position.x - cx) + (wp.z - cz)*(camera.position.z - cz))/(r*cd) > (reduce ? 0.25 : 0.62); m.weak.material.opacity = G2.front ? 0.99 : 0.22; m.weak.scale.setScalar(G2.front ? 1 + 0.25*Math.sin(now/90) : 0.6);
       wp.project(camera); aim.hidden = !G2.front || !!vn; aim.style.transform = `translate(${((wp.x + 1)/2*innerWidth).toFixed(0)}px, ${((1 - wp.y)/2*innerHeight).toFixed(0)}px) translate(-50%, -50%)`;

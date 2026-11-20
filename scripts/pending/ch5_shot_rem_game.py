@@ -5,6 +5,7 @@ from playwright.async_api import async_playwright
 STATIC = 'http://127.0.0.1:8097'; API = 'http://127.0.0.1:8096'; ADM = {'content-type': 'application/json', 'X-Admin-Key': '0101'}
 OUT = sys.argv[1]; MASH = len(sys.argv) > 2 and sys.argv[2] == 'mash'; T = 9
 ST = "(()=>{ const r = __rem(), g = window.__remGame ? __remGame() : null, q = __dbg.quest(); return {game:g && {kind:g.kind, hits:g.hits, need:g.need, done:g.done}, phase:r.mini && r.mini.phase, got:r.mini && r.mini.got, ride:r.ride, down:r.down, vn:!!q.vn(), box:!document.getElementById('miniBox').hidden, go:document.getElementById('miniGo').textContent, play:!document.getElementById('remPlay')?.hidden, pop:(document.getElementById('qPop')||{}).textContent, hud:document.getElementById('qhHint').textContent}; })()"
+TALL = "(()=>{ const out = [], s = REM.models[REM.game.i].g.position, v = new THREE.Vector3(), b = new THREE.Box3(); scene.traverse(o=>{ if(!o.isMesh || !o.visible || o.isInstancedMesh) return; let p = o, vis = true; while(p){ if(!p.visible) vis = false; p = p.parent; } if(!vis) return; o.getWorldPosition(v); if(Math.hypot(v.x - s.x, v.z - s.z) > 12) return; b.setFromObject(o); const h = b.max.y - b.min.y; if(h < 9) return; let n = ''; p = o; while(p && !n){ n = p.name; p = p.parent; } out.push([o.geometry.type, Math.round(h), Math.round(b.max.x - b.min.x), o.material.color ? o.material.color.getHexString() : '', o.material.opacity, n]); }); return out; })()"   # 잔재 둘레의 키 큰 물체(빛기둥 찾기)
 async def main():
     os.makedirs(OUT, exist_ok=True)
     async with async_playwright() as pw:
@@ -14,6 +15,9 @@ async def main():
             q = r.request; res = await rq.fetch(q.url.replace(STATIC, API), method=q.method, data=q.post_data_buffer, headers={k: v for k, v in q.headers.items() if k not in ['host', 'origin', 'referer']})
             await r.fulfill(status=res.status, body=await res.body(), headers={'content-type': res.headers.get('content-type', 'application/json')})
         await ctx.route(re.compile(r'.*/api/void/.*'), route)
+        async def hook(r):   # 점검용 창구(__ev)는 받아 온 본문에만 끼운다
+            res = await r.fetch(); body = (await res.text()).replace('window.__remAim = ', 'window.__ev = s=> eval(s);\nwindow.__remAim = ', 1); await r.fulfill(response=res, body=body)
+        await ctx.route(re.compile(r'.*/chapter05/index[.]html.*'), hook)
         cp = json.dumps({'q': 'q5', 'step': 'rail', 'got': []})
         await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-dev','remgame');localStorage.setItem('void-sound','0');if(!sessionStorage.getItem('rem-set')){localStorage.setItem('void-mini-%d', '%s');}addEventListener('load',()=>setTimeout(()=>sessionStorage.setItem('rem-set','1'),9000));" % (T, cp.replace("'", "\\'")))
         post = lambda path, body, adm=False: rq.post(API + '/api/void/' + path, data=json.dumps(body), headers=ADM if adm else {'content-type': 'application/json'})
@@ -54,6 +58,7 @@ async def main():
                 await asyncio.sleep(.25)
             await asyncio.sleep(2.2); s = await ev(ST); print('GAME', i, s, flush=True); k = s['game']['kind'] if s['game'] else i
             await pg.screenshot(path=os.path.join(OUT, f'rem_kind{k}.png'), timeout=60000)
+            print('  tall', json.dumps(await ev('(s)=> __ev(s)', TALL), ensure_ascii=False)[:900], flush=True)
             if MASH:
                 await ev("()=>{ clearInterval(window.__autoDet); }"); seen = []
                 for n in range(260):   # 약 20초 동안 75ms마다 Space
