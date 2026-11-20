@@ -36,6 +36,7 @@ async def main():
                     await asyncio.sleep(.4)
                     if not await ev("!!document.getElementById('vn').dataset.on"): return
                     continue
+                if OUT and ('죄송' in t or '끝까지' in t or '또 이 게임' in t) and (not said or said[-1] != t): await asyncio.sleep(.9); await pg.screenshot(path=os.path.join(OUT, 'say_%d.png' % len(said)))
                 if not said or said[-1] != t: said.append(t)
                 await ev('__dbg.quest().next()'); await asyncio.sleep(.1)
         await drain(); check(await ev("__dbg.quest().live?.id") == 'q5', '미션 4가 진행 중')

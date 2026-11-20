@@ -9,7 +9,7 @@ async def main():
     async with async_playwright() as pw:
         br = await pw.chromium.launch(args=['--use-gl=angle', '--use-angle=d3d11', '--ignore-gpu-blocklist'])
         pg = await br.new_page(viewport={'width': 1366, 'height': 768}); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)[:300])); await pg.route('**/api/void/**', lambda rt: rt.abort())
-        src = (ROOT / 'chapter05/index.html').read_text(encoding='utf-8'); assert HOOK in src; src = src.replace(HOOK, HOOK + " window.__t = new Proxy({}, {get:(_, k)=> eval(String(k))});")
+        src = (ROOT / 'chapter05/index.html').read_text(encoding='utf-8'); assert HOOK in src; src = src.replace(HOOK, HOOK + " window.__t = new Proxy({}, {get:(_, k)=> eval(String(k))});"); LIT = "const lit = id=>{"; assert LIT in src; src = src.replace(LIT, LIT + " if(window.__litAll) return true;")   # 찍을 때만: 기록이 다 들어온 상태(window.__litAll)로 볼 수 있게
         await pg.route('**/chapter05/index.html*', lambda rt: rt.fulfill(status=200, content_type='text/html; charset=utf-8', body=src))
         await pg.add_init_script("localStorage.setItem('void-sound','0');")
         await pg.goto('http://127.0.0.1:8096/chapter05/index.html?world=island', wait_until='domcontentloaded', timeout=120000)
@@ -30,7 +30,7 @@ async def main():
         await ev("(()=>{ const r = __t.labSet(); r.view('near', 900); r.want = 1; })()"); await asyncio.sleep(1.2); await shot('set_opening'); await asyncio.sleep(1.6); await shot('set_open_near')
         await ev("(()=>{ __t.labSet().view('wide', 0); })()"); await asyncio.sleep(.5); await shot('set_open'); await ev("(()=>{ __t.labSet().view('in', 700); })()"); await asyncio.sleep(1.1); await shot('set_in')
         await ev("(()=>{ __t.labSetLeave(); })()"); await asyncio.sleep(.6); print('left', await ev("__labSet()"))
-        await ev("__t.labRoomOpen(false)"); await asyncio.sleep(.9); await shot('room_calm'); await ev("__t.labRoomNoise(true)"); await asyncio.sleep(.6)
+        await ev("__t.labRoomOpen(false)"); await asyncio.sleep(.9); await shot('room_empty'); await ev("(()=>{ window.__litAll = true; __t.labRoomOpen(false); })()"); await asyncio.sleep(.9); await shot('room_calm'); await ev("__t.labRoomNoise(true)"); await asyncio.sleep(.6)
         await ev("(()=>{ __t.say(__t.STORY.midB.slice(1, 2)); })()"); await asyncio.sleep(1.8); await shot('room_noise')
         await ev("(()=>{ const v = document.getElementById('vn'); for(let k = 0; k < 6 && v.dataset.on; k++) __dbg.quest().next(); __t.labRoomNoise(false); __t.labRoomPing(); })()"); await asyncio.sleep(.8); await shot('room_ping'); print('room', await ev("__labRoom()"))
         for vp in ((1280, 800), (1024, 600), (780, 360), (390, 800)):
