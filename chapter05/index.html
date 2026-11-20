@@ -72,6 +72,10 @@ body #remPlay .bar{height:58px;border-radius:12px}body #remPlay .bar .mk{top:-4p
 body #remPlay .seq{gap:8px}body #remPlay .seq i{flex:0 1 58px;min-width:0;width:58px;height:58px;border-radius:12px;border-width:3px;font-size:32px}body #remPlay .seq i.now{box-shadow:0 0 0 4px rgba(159,246,255,.3)}body #remPlay .tm{height:14px;border-radius:7px}
 body #remPlay.lock{box-shadow:0 0 0 4px #ff7a6e,0 10px 30px rgba(0,0,0,.35)}body #remPlay.lock .bar{opacity:.45}body #remAim{width:112px;height:112px;border-width:5px}body #remAim.lock{border-color:#ff7a6e;opacity:.5}
 @media (max-height:520px){body #remPlay{width:min(640px,94vw);gap:8px;padding:10px 16px 12px}body #remPlay .hd b{font-size:20px}body #rpPips i{width:18px;height:18px}body #remPlay .bar{height:40px}body #remPlay .seq i{flex-basis:42px;width:42px;height:42px;font-size:24px}body #remPlay .tm{height:8px}body #remAim{width:88px;height:88px}}
+/* 2026-11-20 evening (user: 화살표가 블록 밖으로 다 나와 있다): the arrows keep their size and wrap, eight to a row at most */
+body #remPlay .seq{flex-wrap:wrap;max-width:520px;margin:0 auto}body #remPlay .seq i{flex:0 0 58px}
+@media (max-width:620px){body #remPlay .seq{max-width:376px;gap:6px}body #remPlay .seq i{flex-basis:40px;width:40px;height:40px;font-size:22px}}
+@media (max-height:520px){body #remPlay .seq{max-width:392px}body #remPlay .seq i{flex-basis:42px}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5011,7 +5015,7 @@ let TRAIN = null;   // {curve, cars, puffs, mode:'run'|'stop'|'ride', u, station
   islAnim.push(t=>{
     const T = TRAIN, u0 = T.mode === 'ride' ? T.u : T.mode === 'stop' ? T.stationU : (t*0.006) % 1;
     lamps.material.color.set(T.lit || T.mode === 'run' ? 0xffe08a : 0x334455);
-    train.forEach((c,k)=>{ const u = (u0 - k*0.0075 + 1) % 1; const p = curve.getPointAt(u), q = curve.getPointAt((u + 0.002) % 1); c.position.copy(p).y += 0.8; c.lookAt(q.x, p.y + 0.8, q.z); });
+    (T.place = T.place || (uu=>{ train.forEach((c,k)=>{ const u = (uu - k*0.0075 + 1) % 1; const p = curve.getPointAt(u), q = curve.getPointAt((u + 0.002) % 1); c.position.copy(p).y += 0.8; c.lookAt(q.x, p.y + 0.8, q.z); }); }))(u0);
     const head = train[0].localToWorld(_puff.set(0, 0.6, 6.4)), on = T.mode !== 'stop'; puffs.forEach((p,i)=>{ p.visible = on; const ph = (t*0.8 + i/6) % 1; p.position.set(head.x, head.y + 7 + ph*10, head.z);   /* out of the chimney, which sits ahead of the engine's origin now */ p.scale.setScalar(0.6 + ph*1.6); p.material.opacity = 0.7*(1-ph); });
   });
 }
@@ -9534,7 +9538,7 @@ function remMiss(text){ const R = ride; if(!R || !R.rem) return; R.life = Math.m
 function remRideNext(){ if(!ride || !mini) return null; const got = mini.got || []; let best = null, bd = 9; ride.spots.forEach(sp=>{ if(got.includes(sp.i)) return; const d = (sp.u - ride.u + 1) % 1; if(d < bd){ bd = d; best = sp; } }); return best; }
 function remRideTick(now, dt){
   const w = walk, R = ride, c = TRAIN.curve; if(!R || !mini) return; dt *= R.boost || 1;
-  const go = vn || REM.game || R.pause ? 0 : 1, got = mini.got || []; R.u = (R.u + dt/REM_LAP*go*(1 + 0.18*got.length)) % 1; TRAIN.u = R.u;   /* faster with every remnant found */
+  const go = vn || REM.game || R.pause ? 0 : 1, got = mini.got || []; R.u = (R.u + dt/REM_LAP*go*(1 + 0.18*got.length)) % 1; TRAIN.u = R.u; if(TRAIN.place) TRAIN.place(R.u);   /* faster with every remnant found */
   /* the press is read even while a dialogue is open, so the Space that closes it (still held) is not taken as a new press; and nothing counts for half a second after a dialogue (user, 2026-11-18: 「다음」 cost a chance) */
   const raw = !!(R.press || WALK_KEYS.Space), press = go && raw, edge = !!press && !R.wasPress && performance.now() - (typeof VN_CLOSED === 'number' ? VN_CLOSED : 0) > 500; R.wasPress = raw;
   let best = null, bd = 9; R.spots.forEach(sp=>{ if(got.includes(sp.i)) return; const d = ((R.u - sp.u + 1.5) % 1) - 0.5; if(Math.abs(d) < Math.abs(bd)){ bd = d; best = sp; } });
@@ -9548,11 +9552,11 @@ function remRideTick(now, dt){
     $('qhHint').textContent = !best ? '역으로 돌아가는 중' : inside ? '지금! 「탐지」' : k > 0.45 ? `신호가 강해지고 있어요 · 기회 ${R.life}` : `신호가 가장 강한 곳에서 「탐지」 · 기회 ${R.life}`; }
   /* the camera rides behind the locomotive; while a remnant is being dismantled it turns to look at it */
   c.getPointAt(R.u, _rp); c.getPointAt((R.u + 0.004) % 1, _rq); const dx = _rq.x - _rp.x, dz = _rq.z - _rp.z, L = Math.hypot(dx, dz) || 1, ux = dx/L, uz = dz/L;
-  if(R.down){ const sp = R.down, m = REM.models[sp.i], tx = _rp.x - sp.x, tz = _rp.z - sp.z, tl = Math.hypot(tx, tz) || 1, far = m.far || 9.5 + Math.max(0, (m.cy || 3.6) - 3.6)*1.3, gx = sp.x + tx/tl*far, gz = sp.z + tz/tl*far, sh = REM.game && REM.game.shake > performance.now() ? 0.4 : 0;
+  if(R.down){ R.ct = null; const sp = R.down, m = REM.models[sp.i], vp = sp.vp || (sp.vp = c.getPointAt((sp.u - 0.0125 + 1) % 1).clone()), tx = vp.x - sp.x, tz = vp.z - sp.z, tl = Math.hypot(tx, tz) || 1, far = m.far || 9.5 + Math.max(0, (m.cy || 3.6) - 3.6)*1.3, gx = sp.x + tx/tl*far, gz = sp.z + tz/tl*far, sh = REM.game && REM.game.shake > performance.now() ? 0.4 : 0;
     _ct.set(gx + (Math.random() - 0.5)*sh, groundY(gx, gz) + 2.6 + (Math.random() - 0.5)*sh, gz); camera.position.lerp(_ct, 1 - Math.pow(0.02, dt)); _wt.set(sp.x, m.y0 + (m.look || Math.max(3.3, (m.cy || 3.6)*0.72)), sp.z); camera.lookAt(_wt); controls.target.copy(_wt);
     w.mates.forEach((mt, i)=>{ const k = i ? 2.4 : -2.4, sx = gx + tz/tl*k - tx/tl*2.5, sz = gz - tx/tl*k - tz/tl*2.5; mt.g.position.set(sx, groundY(sx, sz), sz); mt.g.rotation.y = Math.atan2(sp.x - sx, sp.z - sz); if(mt.g.userData.legL) walkPose(mt.g, 0, 1); });
     w.x = _rp.x; w.z = _rp.z; return; }   /* off the train and down beside the remnant (user, 2026-11-13); the train waits on the rail above */
-  _ct.set(_rp.x - ux*15, _rp.y + 12.5, _rp.z - uz*15); if(w.snap){ camera.position.copy(_ct); w.snap = false; } else camera.position.lerp(_ct, 1 - Math.pow(0.001, dt));   /* higher than the old ride camera: the cab must not fill the view */
+  _ct.set(_rp.x - ux*15, _rp.y + 12.5, _rp.z - uz*15); if(w.snap){ camera.position.copy(_ct); w.snap = false; } else camera.position.sub(R.ct || _ct).multiplyScalar(Math.pow(0.001, dt)).add(_ct); (R.ct = R.ct || new THREE.Vector3()).copy(_ct);   /* higher than the old ride camera: the cab must not fill the view */
   _wt.set(_rq.x + ux*26, _rq.y + 2, _rq.z + uz*26); R.lookK += ((R.look ? 1 : 0) - R.lookK)*(1 - Math.exp(-dt*3)); if(R.look && R.lookK > 0.001){ _rq.set(R.look.x, groundY(R.look.x, R.look.z) + 4, R.look.z); _wt.lerp(_rq, R.lookK); }
   camera.lookAt(_wt); controls.target.copy(_wt);
   const car = c.getPointAt((R.u - 0.0075 + 1) % 1); w.mates.forEach((m, i)=>{ m.g.position.set(car.x - uz*(i ? 1.3 : -1.3), car.y + 3.0, car.z + ux*(i ? 1.3 : -1.3)); m.g.rotation.y = Math.atan2(ux, uz); if(m.g.userData.legL) walkPose(m.g, 0, 1); });
@@ -9568,7 +9572,9 @@ function remRideEnd(){ const R = ride; if(!R) return; ride = null; const w = wal
   miniGo.classList.remove('hot'); miniBox.hidden = true; remPulse(0); $('walkPad').hidden = false; TRAIN.wait = false; TRAIN.mode = 'run'; TRAIN.u = STATION.u; miniSave('device-return', {got:mini.got || [0, 1, 2]});
   setTimeout(()=>{ if(mini && mini.kind === 'device') remRerun(); }, 600); }
 function remBuild(){ if(REM.models.length) return;
-  try{ const Z0 = new THREE.Matrix4().makeScale(0, 0, 0); let hit = false; remSpots().forEach(s=>{ roundSpots.forEach(([tx, tz], k)=>{ if(Math.hypot(tx - s.x, tz - s.z) < 11){ roundTree.setMatrixAt(k, Z0); trunkI.setMatrixAt(k, Z0); hit = true; } }); pineSpots.forEach(([tx, tz], k)=>{ if(Math.hypot(tx - s.x, tz - s.z) < 11){ pineTree.setMatrixAt(k*2, Z0); pineTree.setMatrixAt(k*2 + 1, Z0); trunkI.setMatrixAt(roundSpots.length + k, Z0); hit = true; } }); });
+  try{ const Z0 = new THREE.Matrix4().makeScale(0, 0, 0); let hit = false; remSpots().forEach(s=>{ let vx = 0, vz = 0; try{ const rp = TRAIN.curve.getPointAt((s.u - 0.0125 + 1) % 1), L = Math.hypot(rp.x - s.x, rp.z - s.z) || 1; vx = (rp.x - s.x)/L; vz = (rp.z - s.z)/L; }catch(e){}
+      const near = (tx, tz)=>{ const dx = tx - s.x, dz = tz - s.z, al = dx*vx + dz*vz; return Math.hypot(dx, dz) < 11 || (al > 0 && al < 24 && Math.abs(dx*vz - dz*vx) < 7); };   /* round the remnant and along the line of sight */
+      roundSpots.forEach(([tx, tz], k)=>{ if(near(tx, tz)){ roundTree.setMatrixAt(k, Z0); trunkI.setMatrixAt(k, Z0); hit = true; } }); pineSpots.forEach(([tx, tz], k)=>{ if(near(tx, tz)){ pineTree.setMatrixAt(k*2, Z0); pineTree.setMatrixAt(k*2 + 1, Z0); trunkI.setMatrixAt(roundSpots.length + k, Z0); hit = true; } }); });
     if(hit){ roundTree.instanceMatrix.needsUpdate = true; pineTree.instanceMatrix.needsUpdate = true; trunkI.instanceMatrix.needsUpdate = true; } }catch(e){ console.warn('remnant trees', e); }
   remSpots().forEach((s, i)=>{
   const g = new THREE.Group(); g.name = 'remnant-' + i; g.userData.dynamic = true; const y0 = groundY(s.x, s.z) - 0.2; g.position.set(s.x, y0 - 7, s.z); g.visible = false; islRoot.add(g);
@@ -9619,8 +9625,9 @@ function remBuild(){ if(REM.models.length) return;
       add(g, CYL(0.5, 0.75, 0.9, 10), brassD, ex, 0, ez); const d = add(g, new THREE.CircleGeometry(1.6, 24).rotateX(-Math.PI/2), glowMat(k === 2 ? 0xff6a4e : 0x8cecff, 0.45, true), ex, 0.32, ez, false); d.renderOrder = 4; });
     add(pump, CYL(0.55, 0.55, 1.5, 10), brass, 0, 0.3, 0); add(pump, SPH(0.55, 10, 8), brass, 0, 1.8, 0); add(pump, CYL(0.32, 0.32, 0.12, 12).rotateX(Math.PI/2), flat(0xe9eef0), 0, 1.2, 0.56);
     parts = [tank, lid, hoses, pump]; }
-  { let fx = -s.x, fz = -s.z; try{ const rp = TRAIN.curve.getPointAt(s.u); fx = rp.x - s.x; fz = rp.z - s.z; }catch(e){} g.rotation.y = Math.atan2(fx, fz); }   /* its face looks at the spot on the track where the train stops and the view comes down */ g.traverse(o=>{ o.userData.dynamic = true; });
+  { let fx = -s.x, fz = -s.z; try{ const rp = TRAIN.curve.getPointAt((s.u - 0.0125 + 1) % 1); fx = rp.x - s.x; fz = rp.z - s.z; }catch(e){} g.rotation.y = Math.atan2(fx, fz); }   /* its face looks at the spot on the track where the train stops and the view comes down */ g.traverse(o=>{ o.userData.dynamic = true; });
   REM.models.push({g, parts, core, rings, s, y0, state:0, kind, cy, wr, far, look}); });
+  islAnim.push(()=>{ const G2 = REM.game, live = G2 && !G2.done; if(!live){ const p = $('remPlay'), a = $('remAim'); if(p && !p.hidden) p.hidden = true; if(a && !a.hidden) a.hidden = true; } REM.models.forEach((m, i)=>{ if(m.weak && m.weak.visible && !(live && G2.kind === 0 && G2.i === i)) m.weak.visible = false; }); });   /* nothing of the game stays on screen once it is over, however it ended (user, 2026-11-20) */
   islAnim.push(t=> REM.models.forEach((m, i)=>{ if(m.state !== 1) return; m.core.rotation.y = t*2; if(m.kind === 1) m.rings.forEach((r, k)=>{ if(r.visible) r.rotation.z = t*(0.8 + k*0.5)*(k%2 ? -1 : 1); });   /* only the bronze rings turn; the cage and the tank hoops stand still */ m.core.material.opacity = 0.55 + 0.4*Math.abs(Math.sin(t*6 + i)); })); }
 function remTween(ms, f){ if(reduce){ f(1); return; } const t0 = performance.now(); const step = ()=>{ const k = Math.min(1, (performance.now() - t0)/ms); f(k); if(k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
 function remCollapse(m, instant){ m.state = 2; m.g.visible = true; m.core.visible = false; m.rings.forEach(r=> r.visible = false);
@@ -9681,7 +9688,7 @@ function remHit(G2, m){ const now = performance.now(); G2.hits++; G2.shake = now
   if(G2.hits >= G2.need){ G2.done = true; REM.quiet = now + (reduce ? 1000 : 2000); cancelAnimationFrame(G2.raf); if(m.weak) m.weak.visible = false; remAimEl().hidden = true; remPlayEl().hidden = true; miniBox.hidden = true; miniGo.classList.remove('hot'); G2.shake = now + 700; flash(); sfx('success'); remDebris(new THREE.Vector3(m.g.position.x, m.y0 + m.cy, m.g.position.z), 26); qPop('부서졌다!'); setTimeout(()=> remFinish(G2.i), reduce ? 200 : 1100); return true; }
   return false; }
 function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl(); remDlg(); mini.phase = 'game'; remPulse(0); miniBox.hidden = true; miniGo.classList.remove('hot'); if(m.beam) m.beam.visible = false;   /* the finding beam would wash the device out */
-  const G2 = REM.game = {i, kind, hits:0, need:kind === 0 ? 6 : kind === 1 ? 4 : 3,   /* 2026-11-20 (user): the bar was the hardest and the arrows the easiest */ ang:Math.random()*6.28, sp:reduce ? 1.1 : 3.2, boost:0,   /* 2026-11-19 (user: 너무 쉬워, 2배 이상): faster weak point and a narrower front window; the bar is twice as fast with about half the band; the arrows are 6-8-10 long with under a second per key */ shake:0, tapAt:0, last:performance.now(), done:false, front:false};
+  const G2 = REM.game = {i, kind, hits:0, need:kind === 0 ? 6 : kind === 1 ? 4 : 5,   /* 2026-11-20 (user): the bar was the hardest and the arrows the easiest */ ang:Math.random()*6.28, sp:reduce ? 1.1 : 3.2, boost:0,   /* 2026-11-19 (user: 너무 쉬워, 2배 이상): faster weak point and a narrower front window; the bar is twice as fast with about half the band; the arrows are 6-8-10 long with under a second per key */ shake:0, tapAt:0, last:performance.now(), done:false, front:false};
   $('rpT').textContent = ['약점 치기', '때 맞춰 치기', '순서대로 누르기'][kind]; remPips(); el.hidden = false; sfx('open');
   if(kind === 0){ $('rpBody').innerHTML = ''; remSay(REM_TOUCH() ? '노란 약점이 앞으로 올 때 약점을 누르세요' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>');
     if(!m.weak){ m.weak = add(m.g, SPH(0.55, 12, 10), glowMat(0xffe14a, 0.99), 0, m.cy, 0, false); m.weak.userData.dynamic = true; } m.weak.visible = true;
@@ -9698,7 +9705,7 @@ function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl
       G2.pos += G2.dir*dt*(reduce ? 0.55 : 1.15 + G2.hits*0.12); if(G2.pos > 1){ G2.pos = 1; G2.dir = -1; } if(G2.pos < 0){ G2.pos = 0; G2.dir = 1; }
       G2.front = Math.abs(G2.pos - G2.zc) <= G2.zw/2; mk.style.left = (G2.pos*100).toFixed(1) + '%'; m.core.scale.setScalar(G2.front ? 1.5 : 1);
       G2.raf = requestAnimationFrame(loop); }; loop(); }
-  else { const round = ()=>{ const n = reduce ? 4 + G2.hits : 8 + G2.hits*2, ks = Object.keys(REM_ARROW); G2.seq = Array.from({length:n}, ()=> ks[Math.floor(Math.random()*4)]); G2.at = 0; G2.t0 = performance.now(); G2.limit = reduce ? 9 + n*0.4 : 2 + n*0.28;
+  else { const round = ()=>{ const n = reduce ? 4 + G2.hits : 6 + G2.hits, ks = Object.keys(REM_ARROW); G2.seq = Array.from({length:n}, ()=> ks[Math.floor(Math.random()*4)]); G2.at = 0; G2.t0 = performance.now(); G2.limit = reduce ? 9 + n*0.4 : 2 + n*0.3;
       $('rpBody').innerHTML = `<div class="seq">${G2.seq.map((k, j)=> `<i class="${j === 0 ? 'now' : ''}">${REM_ARROW[k]}</i>`).join('')}</div><div class="tm"><b></b></div><div class="keys">${['Left', 'Up', 'Down', 'Right'].map(k=> `<button type="button" data-k="${k}" aria-label="${REM_ARROW[k]}">${REM_ARROW[k]}</button>`).join('')}</div>`; };
     G2.round = round; remSay(REM_TOUCH() ? '시간 안에 화살표를 순서대로 누르세요' : '시간 안에 <kbd>←↑↓→</kbd> 화살표 키를 순서대로'); round();
     const loop = ()=>{ if(REM.game !== G2 || G2.done) return; const now = performance.now(), k = 1 - (now - G2.t0)/1000/G2.limit; G2.last = now; const b = el.querySelector('.tm b'); if(b) b.style.transform = `scaleX(${Math.max(0, k).toFixed(3)})`;
@@ -9707,7 +9714,7 @@ function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl
 function remLock(ms){ const el = remPlayEl(), aim = remAimEl(); el.classList.add('lock'); aim.classList.add('lock'); clearTimeout(remLock.t); remLock.t = setTimeout(()=>{ el.classList.remove('lock'); aim.classList.remove('lock'); }, ms); }
 function remTap(){ const G2 = REM.game; if(!G2 || G2.done || vn || G2.kind === 2) return; const m = REM.models[G2.i], now = performance.now(); if(now - G2.tapAt < 170 || now < (G2.lock || 0)) return; G2.tapAt = now;
   /* 2026-11-20 (user: Space 연타하면 버그): mashing won both games in two seconds, as a miss cost nothing. A miss now locks the hit for 0.9 s */
-  if(!G2.front){ G2.lock = now + 900; remLock(900); sfx('error'); remSay(G2.kind === 0 ? '빗나갔어! 잠깐 멈췄다가 약점이 앞에 올 때 쳐' : '빗나갔어! 잠깐 멈췄다가 노란 칸에 들어올 때 쳐'); return; }
+  if(!G2.front){ G2.lock = now + 900; remLock(900); sfx('error'); remSay(G2.kind === 0 ? '빗나갔어! 잠깐 멈췄다가 약점이 앞에 올 때 쳐' : '빗나갔어! 잠깐 멈췄다가 노란 칸에 들어올 때 쳐'); setTimeout(()=>{ if(REM.game === G2 && !G2.done) remSay(G2.kind === 0 ? (REM_TOUCH() ? '노란 약점이 앞으로 올 때 약점을 누르세요' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>') : (REM_TOUCH() ? '흰 표시가 노란 칸에 들어올 때 막대를 누르세요' : '흰 표시가 노란 칸에 들어올 때 <kbd>Space</kbd>')); }, 1300); return; }
   if(remHit(G2, m)) return; remSay(`금이 갔어! 남은 타격 ${G2.need - G2.hits}`);
   if(G2.kind === 0) G2.ang += Math.PI*(0.7 + Math.random()*0.5); else G2.zone(); }
 function remKey(k){ const G2 = REM.game; if(!G2 || G2.done || vn || G2.kind !== 2) return; const m = REM.models[G2.i], el = remPlayEl(), cells = el.querySelectorAll('.seq i');
