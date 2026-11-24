@@ -3,7 +3,7 @@
 import asyncio, sys, os, pathlib, json
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from playwright.async_api import async_playwright
-OUT = sys.argv[1]; os.makedirs(OUT, exist_ok=True); T = 9
+OUT = sys.argv[1]; os.makedirs(OUT, exist_ok=True); T = 9; REC = int(sys.argv[2]) if len(sys.argv) > 2 else 1   # 1 or 3 (record 3: missions 1-4 done, act 2 seen)
 ROOT = pathlib.Path(__file__).resolve().parents[2]; HOOK = "const tutWorld = goWorld;"; API = 'http://127.0.0.1:8096'; ADM = {'content-type': 'application/json', 'X-Admin-Key': '0101'}
 async def main():
     async with async_playwright() as pw:
@@ -12,6 +12,7 @@ async def main():
         await ctx.add_init_script("localStorage.setItem('void-reset','9999999999999');localStorage.setItem('void-sound','0');localStorage.setItem('void-dev','rf1');")
         post = lambda path, body, adm=False: rq.post(API + '/api/void/' + path, data=json.dumps(body), headers=ADM if adm else {'content-type': 'application/json'})
         await post('team_reset', {'team': T, 'confirm': 'AGAIN'}, True); await post('quest', {'team': T, 'dev': 'rf1', 'tut': True})
+        if REC == 3: await post('admin/stage', {'team': T, 'zones': ['z1', 'z2'], 'done': ['q1', 'q2', 'q4', 'q5'], 'act': 2}, True)
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)[:200])); ev = pg.evaluate
         src = (ROOT / 'chapter05/index.html').read_text(encoding='utf-8').replace(HOOK, HOOK + " window.__t = new Proxy({}, {get:(_, k)=> eval(String(k))});")
         await pg.route('**/chapter05/index.html*', lambda rt: rt.fulfill(status=200, content_type='text/html; charset=utf-8', body=src))
@@ -23,16 +24,22 @@ async def main():
             await asyncio.sleep(.25)
         await asyncio.sleep(9)
         await ev("(()=>{ const e = document.getElementById('teamPick'); if(e) delete e.dataset.on; })()")
-        await post('admin/skip', {'team': T, 'mission': 'z1'}, True)
+        await post('admin/skip', {'team': T, 'mission': 'z1' if REC == 1 else 'z3'}, True)
         n = 0; last = ''
-        for k in range(110):
+        launch = None
+        for k in range(150):
             st = await ev("""(()=>{ const on = id=> !!(document.getElementById(id) && document.getElementById(id).dataset.on); const t = __t;
               return {world:t['W'].id, sim:!!t['simOn'], vn:on('vn') ? document.getElementById('vnText').textContent.slice(0, 30) : '', voidv:on('voidVn') ? document.getElementById('voidTxt').textContent.slice(0, 30) : '', rec:on('recDone'), walk:!!t['walk'],
                 chain:Object.entries(__dbg.rideState()).filter(([k, v])=> v.chain).map(([k, v])=> k + ':' + v.chain).join(' '), power:t['parkPowerOn']()}; })()""")
             line = json.dumps(st, ensure_ascii=False)
+            if REC == 3 and st['sim'] and k % 2 == 0: print('   reveal', await ev("(()=>{ const t = performance.now()/1000, T = __t['SIM_REVEAL_T']; return {T: T == null ? null : +(t - T).toFixed(1), lit:__t['SIM_LIT'], rv:__t['REVEALS'].map(r=> (r.zone || r.id || '?') + ':' + (T == null ? 'x' : Math.max(0, Math.min(1, (t - T - r.delay)/r.dur)).toFixed(2)))}; })()"))
             if k % 1 == 0: await pg.screenshot(path=os.path.join(OUT, f'r_{k:03d}.png'))
             if line != last: print(f'{k:03d}', line); last = line
             if st['walk']: break
+            if REC == 3:
+                lb = await ev("window.__simLaunch ? __simLaunch() : ''")
+                if lb == 'button' and launch is None: launch = k; await asyncio.sleep(1); await pg.keyboard.press('Space'); continue
+                if launch is not None and k - launch > 70: break
             # advance only the dialogues (cards wait 1.2 s so the effect shows)
             if st['rec'] and k % 3 == 2: await pg.keyboard.press('Space')
             elif st['voidv'] and k % 3 == 2: await pg.keyboard.press('Space')

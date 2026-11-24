@@ -32,8 +32,7 @@ async def main():
             c = await ev("__choice()")
             if c:
                 picks += 1; trusts.append(c['trust']); k = picks - 1
-                opts = await ev("__t.CAVE_CHOICE.map(c=> c.opts.findIndex(o=> o.ok))")
-                good = opts[k % 4]; pick = good if (picks > 4 or k % 4 == 0) else (good + 1) % 3   # first round: only the first answer right (1 of 4), second round: all right
+                good = await ev("(q=> __choiceOk(q))", c['q']); pick = (good + 1) % 3 if picks == 2 else good   # 2026-11-24: the second answer wrong once -> 「설득 실패」 and the walls start over; then all right
                 await asyncio.sleep(.8)
                 if picks in (1, 2): await pg.screenshot(path=os.path.join(OUT, f'cave_choice_{picks}.png'))
                 await pg.keyboard.press(f'Digit{pick + 1}'); await asyncio.sleep(.5); continue
@@ -44,5 +43,5 @@ async def main():
             if await ev("!!document.getElementById('simDone').dataset.on || __dbg.simState().simOn"): done = 'simulator after the cave'; break
             await asyncio.sleep(.35)
         print('cards', cards, 'choices asked', picks, 'trust shown', trusts, 'end', done)
-        print('retry line', [t for t in said if '아직은' in t or '다시 보면서' in t][:2]); print('last', said[-4:]); print('errs', errs[:3]); await br.close()
+        print('retry line', [t for t in said if '설득에 실패' in t or '처음 벽화부터' in t][:2]); print('last', said[-4:]); print('errs', errs[:3]); await br.close()
 asyncio.run(main())
