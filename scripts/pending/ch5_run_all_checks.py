@@ -9,7 +9,7 @@ TWO = [('ch5_check_1119', []), ('ch5_check_admin_stage', []), ('ch5_check_baked'
        ('ch5_check_reentry', []), ('ch5_check_snd_btn', [S('snd')]), ('ch5_check_lab_gate', [S('labgate')]), ('ch5_check_naty_chase', [S('chase')]), ('ch5_check_coords', [S('coords.png')]), ('ch5_check_found_gap', [S('gap')]),
        ('ch5_check_admin_steps', [S('admsteps')]), ('ch5_check_admin_mode', [])]   # lab_slice(옛 30개 기준)는 뺌: 연구실 게임은 batch_1118이 본다
 if STL: TWO += [('ch5_check_viking_mission', [STL, S('viking')]), ('ch5_check_viking_assembly', [STL])]
-ONE = [('ch5_flow_log', [S('flow')]), ('ch5_check_batch_1118', [S('b1118')]), ('ch5_check_cave_choice', [S('choice')]), ('ch5_check_ctrl_card', [S('ctrl')]), ('ch5_check_maze_solve', ['8096']),
+ONE = [('ch5_flow_log', [S('flow')]), ('ch5_check_batch_1118', [S('b1118')]), ('ch5_check_cave_choice', [S('choice')]), ('ch5_shot_cave_murals', [S('murals')]), ('ch5_check_ctrl_card', [S('ctrl')]), ('ch5_check_maze_solve', ['8096']),
        ('ch5_check_sfx', []), ('ch5_check_sim_chain', [S('simchain')]), ('ch5_check_reward_small', [S('reward')]), ('ch5_audit_blackout', ['8096', S('blackout')]), ('ch5_audit_paths', ['8096', S('paths.json')]),
        ('ch5_audit_walk', ['8096', S('walk.json')]), ('ch5_audit_ride_pass', [S('ridepass')]), ('ch5_audit_track', ['8096'])]
 ENV = dict(os.environ, PYTHONUTF8='1', CH5_ADMIN_KEY='0101', VOID_PORT='8096')
