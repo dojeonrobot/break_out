@@ -49,6 +49,24 @@ async def main():
                 print(name, 'no jump', r0, 'jump', r1, 'bush at', spot['bush'], 'after', spot['after']); print('row', await ev("(()=>{ const G = __t['WGRID'], x0 = Math.floor(" + str(spot['x']) + " - G.X0), z = Math.floor(" + str(spot['z']) + " - G.Z0); return Array.from({length:14}, (_, d)=> G.a[z*G.W + x0 + d]).join(''); })()"), 'walkBlocked at stop', await ev("__dbg.walkBlocked(" + str(r1['x'] + 0.4) + ',' + str(spot['z']) + ')'))
                 ok(r0['maxX'] < spot['bush'], f'{name}: walking stops at the bush')
                 ok(r1['maxX'] > spot['after'], f'{name}: a jump goes over the bush to the far side')
+            # a roadside hedge (connected-path-hedges): walk straight at it from the lawn side, with and without Space
+            hs = await ev("""(()=>{ const t = __t, root = t['islRoot']; let hg = null; root.traverse(o=>{ if(o.name === 'connected-path-hedges') hg = o; }); if(!hg) return {n:0};
+              const M = new t['THREE'].Matrix4(), P = new t['THREE'].Vector3(), Q = new t['THREE'].Quaternion(), S = new t['THREE'].Vector3(); let best = null;
+              for(let k = 0; k < hg.count; k++){ hg.getMatrixAt(k, M); M.premultiply(hg.matrixWorld); M.decompose(P, Q, S); const ry = 2*Math.atan2(Q.y, Q.w), nx = Math.cos(ry), nz = -Math.sin(ry);   /* across the hedge */
+                for(const sg of [1, -1]){ const fx = P.x + nx*sg*5, fz = P.z + nz*sg*5, bx = P.x - nx*sg*5, bz = P.z - nz*sg*5;
+                  if(t['walkBlocked'](fx, fz) || t['walkBlocked'](bx, bz) || t['onPath'](fx, fz)) continue; best = {n:hg.count, x:fx, z:fz, tx:bx, tz:bz, cx:P.x, cz:P.z, cell:t['WGRID'].a[t['gridCell'](P.x, P.z)]}; break; } if(best) break; }
+              return best || {n:hg.count}; })()""")
+            print(name, 'hedge', hs)
+            ok(hs.get('cell') == 2, f'{name}: a roadside hedge is a jumpable cell')
+            if 'x' in hs:
+                HJ = """(async()=>{ const w = __t['walk']; w.x = SX; w.z = SZ; w.yaw = Math.atan2(TX - SX, TZ - SZ); w.snap = true; w.jv = null; w.jy = 0; await new Promise(r=> setTimeout(r, 300));
+                  __t['WALK_KEYS'].KeyW = true; const t0 = performance.now(); let peak = 0;
+                  while(performance.now() - t0 < 3000){ await new Promise(r=> requestAnimationFrame(r)); peak = Math.max(peak, w.jy || 0); if(JUMP && w.jv == null && Math.hypot(w.x - CX, w.z - CZ) < 3.2 && Math.hypot(w.x - SX, w.z - SZ) < 3.5) __t['walkJump'](); }
+                  delete __t['WALK_KEYS'].KeyW; return {past: Math.hypot(w.x - TX, w.z - TZ) < Math.hypot(w.x - SX, w.z - SZ), d:Math.hypot(w.x - CX, w.z - CZ), peak}; })()"""
+                hw = lambda jump: ev(HJ.replace('SX', str(hs['x'])).replace('SZ', str(hs['z'])).replace('TX', str(hs['tx'])).replace('TZ', str(hs['tz'])).replace('CX', str(hs['cx'])).replace('CZ', str(hs['cz'])).replace('JUMP', 'true' if jump else 'false'))
+                h0 = await hw(False); h1 = await hw(True); print(name, 'hedge walk', h0, 'hedge jump', h1)
+                ok(not h0['past'], f'{name}: walking stops at the hedge')
+                ok(h1['past'] and h1['peak'] > 1.45, f'{name}: Space jumps over the hedge (peak {h1["peak"]:.2f})')
             # top-right: walk panel vs sound/admin buttons
             await ev("(()=>{ const w = __t['walk']; w.x = 0; w.z = 470; w.snap = true; })()"); await asyncio.sleep(.8)
             rects = await ev("""(()=>{ const r = id=>{ const e = document.getElementById(id); if(!e) return null; const b = e.getBoundingClientRect(); return getComputedStyle(e).display === 'none' || !b.width ? null : [b.left, b.top, b.right, b.bottom]; }; return {hud:r('walkHud'), snd:r('sndBtn'), adm:r('adminBtn')}; })()""")

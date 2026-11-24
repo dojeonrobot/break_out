@@ -29,8 +29,8 @@ CSS = ("#scvGuide{position:fixed;inset:0;z-index:45;display:none;place-items:cen
 "#scvGuide .row button:disabled{opacity:.35;cursor:default}"
 "#scvGuide .x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:#f4f7ff;font:700 22px var(--sans);cursor:pointer}"
 "#scvGuide button:focus-visible{outline:3px solid #ffd84a;outline-offset:3px}"
-"@media (orientation:portrait),(max-width:700px){#scvGuide .in{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;gap:14px;padding:20px 18px}#scvGuide .shot{height:min(44vh,440px)}#scvGuide .shot.wide{width:min(80vw,380px)}#scvGuide .dots,#scvGuide .row{justify-content:center}}"
-"@media (max-height:520px){#scvGuide{padding:10px}#scvGuide .in{padding:14px 18px;gap:18px}#scvGuide .shot{height:calc(100vh - 60px)}#scvGuide .n{margin:6px 0;height:34px;min-width:34px;font-size:16px}#scvGuide .dots{margin:10px 0}#scvGuide .row button{min-height:44px}}"
+"@media (orientation:portrait){#scvGuide .in{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;gap:14px;padding:20px 18px}#scvGuide .shot{height:min(44vh,440px)}#scvGuide .shot.wide{width:min(80vw,380px)}#scvGuide .dots,#scvGuide .row{justify-content:center}}"
+"@media (max-height:520px){#scvGuide{padding:10px 96px 10px 10px}#scvGuide .in{padding:12px 16px;gap:16px}#scvGuide .shot{height:calc(100vh - 44px)}#scvGuide .shot.wide{width:min(40vw,300px)}#scvGuide h2{font-size:20px;margin-bottom:4px}#scvGuide p{font-size:14px;line-height:1.5}#scvGuide small{font-size:11px}#scvGuide .x{top:6px;right:6px;width:38px;height:38px}#scvGuide .n{margin:6px 0;height:34px;min-width:34px;font-size:16px}#scvGuide .dots{margin:10px 0}#scvGuide .row button{min-height:44px}}"
 "\n")
 MARK = '</style></head><body>'
 if s.count(MARK) != 1: sys.exit('marker')

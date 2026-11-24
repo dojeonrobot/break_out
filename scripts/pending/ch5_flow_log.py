@@ -13,7 +13,7 @@ SNAP = r"""()=>{ const on = id=>{ const e = document.getElementById(id); return 
   const a = document.getElementById('admSkip'), s = __dbg.simState(), q = __dbg.quest ? __dbg.quest() : {};
   return {vn:on('vn') ? (document.getElementById('vnName').textContent || '(해설)') + ': ' + document.getElementById('vnText').textContent : '', vnTyping:!!document.getElementById('vn').dataset.typing,
     void:on('voidVn') ? tx('voidTxt') : '', mcard:on('missionCard') ? tx('missionCard') : '', ctrl:on('ctrlCard') ? tx('ctrlCard') : '', rec:on('recDone') ? tx('recDone') : '', reward:on('qReward') ? tx('qReward') : '', simDone:on('simDone') ? tx('simDone') : '', call:on('callDlg') ? tx('callDlg') : '', restore:on('restoreDlg') ? tx('restoreDlg') : '',
-    choice:window.__choice ? __choice() : null, slice:window.__slice ? __slice() : null, rem:window.__remGame ? __remGame() : null, lab:window.__labRoom ? __labRoom() : null, labset:window.__labSet ? __labSet() : null, fx:window.__restoreFx ? __restoreFx() : null,
+    choice:window.__choice ? __choice() : null, slice:window.__slice ? __slice() : null, rem:window.__remGame ? __remGame() : null, lab:window.__labRoom ? __labRoom() : null, labset:window.__labSet ? __labSet() : null, launch:window.__simLaunch ? __simLaunch() : '', fx:window.__restoreFx ? __restoreFx() : null,
     skip:a && !a.hidden && a.getClientRects().length ? a.innerText.replace(/\s+/g, ' ') : '', hud:vis('questHud') ? tx('questHud') : '', mini:vis('miniBox') ? tx('miniBox') : '', toast:vis('toast') ? tx('toast') : '', pill:vis('questPill') ? tx('questPill') : '',
     world:__dbg.tutState().world, sim:s.simOn, lit:s.lit, walk:s.walk, busy:s.busy, cinema:!document.getElementById('cinema').hidden, live:q.live ? q.live.id : null, board:tx('board').slice(0, 80), simHud:on('simHud') || document.body.classList.contains('sim') ? tx('simHud') : '',
     dlg:[...document.querySelectorAll('[data-on]')].map(e=> e.id).filter(Boolean).join(',')}; }"""
@@ -50,6 +50,7 @@ async def main():
             acted = True
             if s['cinema']: w('CINEMA', '영상 시작'); await shot('cinema'); break
             if s['ctrl']: w('CTRL', s['ctrl']); await asyncio.sleep(1.0); await shot('ctrl'); await pg.keyboard.press('Space'); await asyncio.sleep(.5)
+            elif s.get('launch') == 'button': w('LAUNCH', '시뮬레이션 가동 버튼'); await asyncio.sleep(1.0); await shot('launch'); await pg.keyboard.press('Space'); await asyncio.sleep(.6)
             elif s['mcard']: w('MCARD', s['mcard']); await asyncio.sleep(1.0); await shot('mcard'); await pg.keyboard.press('Space'); await asyncio.sleep(.5)
             elif s['choice']:
                 k = await pg.evaluate("(()=>{ const q = __choice().q, c = __t_choice(q); return c; })()") if False else None
