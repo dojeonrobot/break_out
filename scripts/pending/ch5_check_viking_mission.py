@@ -114,7 +114,7 @@ async def main():
         await ev("document.getElementById('qrMap').click()"); await asyncio.sleep(2.5); said = await drain(pg); print('m4 intro', said)
         check(await ev("__dbg.quest().live?.id") == 'q5', 'mission 4 (the lab) is live right after the viking')
         hud = await ev("document.getElementById('questHud').innerText"); print('hud', repr(hud)); check('연구실로 가기' in hud, 'the mission box points to the lab')
-        await ev('__dbg.walkTo(...__dbg.labDoor())'); await wf(pg, '!!__dbg.quest().vn()', 20); said = []
+        await ev('__dbg.walkTo(...__dbg.labDoor())'); await wf(pg, '!!__dbg.quest().vn()', 20); await asyncio.sleep(2.2); await shot(pg, 'vm5a_lab_arrive'); said = []
         for _ in range(240):
             said += [t for t in await drain(pg) if t not in said]
             await ev("window.__sliceWin && __sliceWin()")

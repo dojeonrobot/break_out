@@ -7,7 +7,7 @@ STL = sys.argv[2] if len(sys.argv) > 2 else None; S = lambda n: os.path.join(OUT
 TWO = [('ch5_check_1119', []), ('ch5_check_admin_stage', []), ('ch5_check_baked', []), ('ch5_check_reach', []), ('ch5_check_park_power', []), ('ch5_check_layout', []), ('ch5_check_place_names', []),
        ('ch5_check_reset_overlap', []), ('ch5_check_tut_spotlight', [S('tut')]), ('ch5_check_flowlock_tut', [S('flowlock')]), ('ch5_check_dialogue_lines', [S('lines')]), ('ch5_check_one_walker', [S('walker')]),
        ('ch5_check_reentry', []), ('ch5_check_snd_btn', [S('snd')]), ('ch5_check_lab_gate', [S('labgate')]), ('ch5_check_naty_chase', [S('chase')]), ('ch5_check_coords', [S('coords.png')]), ('ch5_check_found_gap', [S('gap')]),
-       ('ch5_check_admin_steps', [S('admsteps')]), ('ch5_check_admin_mode', [])]   # lab_slice(옛 30개 기준)는 뺌: 연구실 게임은 batch_1118이 본다
+       ('ch5_check_admin_steps', [S('admsteps')]), ('ch5_check_admin_mode', []), ('ch5_check_hop_bush', [S('hop')])]   # lab_slice(옛 30개 기준)는 뺌: 연구실 게임은 batch_1118이 본다
 if STL: TWO += [('ch5_check_viking_mission', [STL, S('viking')]), ('ch5_check_viking_assembly', [STL])]
 ONE = [('ch5_flow_log', [S('flow')]), ('ch5_check_batch_1118', [S('b1118')]), ('ch5_check_cave_choice', [S('choice')]), ('ch5_shot_cave_murals', [S('murals')]), ('ch5_check_ctrl_card', [S('ctrl')]), ('ch5_check_maze_solve', ['8096']),
        ('ch5_check_sfx', []), ('ch5_check_sim_chain', [S('simchain')]), ('ch5_check_reward_small', [S('reward')]), ('ch5_audit_blackout', ['8096', S('blackout')]), ('ch5_audit_paths', ['8096', S('paths.json')]),
