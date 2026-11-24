@@ -8401,7 +8401,7 @@ function qMarkPlace(tx, tz, d){
   const m = Math.round(d), txt = d < (questLive && questLive.mini === 'maze' && questLive.mazeEntered ? 5 : 14) ? '바로 앞' : `${m} m`; const b = el.lastElementChild; if(b.textContent !== txt) b.textContent = txt; el.hidden = false; }
 function qNavHide(){ $('qMark').hidden = true; if(qTrailMesh){ qTrailMesh.visible = false; qBeam.visible = false; } qNav = null; }
 function questNav(){
-  const q = questLive, w = walk; if(!q || !w || q.found || (mini && mini.phase === 'done')){ qNavHide(); return; }
+  const q = questLive, w = walk; if(!q || !w || q.found || PARK_WAKE || (mini && mini.phase === 'done')){ qNavHide(); return; }   /* power-up cinematic: no way-marker (user, 2026-11-24) */
   const [tx, tz] = questTarget(q), d = Math.hypot(tx - w.x, tz - w.z);
   qMarkPlace(tx, tz, d); qTrail(w, tx, tz, d);
   const m = Math.round(d); if(questNav.last !== m){ questNav.last = m; $('qhDist').textContent = d < (q.mini === 'maze' && q.mazeEntered ? 5 : 14) ? '바로 앞' : `${m} m`; $('questHud').classList.toggle('near', d < 40); }
