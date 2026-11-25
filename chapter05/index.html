@@ -10091,39 +10091,49 @@ function hands(g, seed){ let q = seed; const rn = ()=> (q = (q*16807) % 21474836
   g.restore(); }
 const SCENES = [
   /* 1. 폭풍이 데려온 섬: 토네이도, 부서진 배, 바닷가에 쓰러진 세 사람, (닳은 자리) 그들을 데려가는 원류민 */
-  {worn:[420, 150, 290, 290], base(g){ hands(g, 11); tornado(g, 175, 40, 330, WT); waves(g, 20, 400, 352, WT); boat(g, 210, 344, 1.15, RD, true);
+  {worn:[312, 330, 240, 150], base(g){ hands(g, 11); tornado(g, 175, 40, 330, WT); waves(g, 20, 400, 352, WT); boat(g, 210, 344, 1.15, RD, true);
       fig(g, 300, 440, 110, WT, {lie:-1.5, hair:'#2f5f9a'}); fig(g, 360, 452, 104, WT, {lie:-1.45, hair:OC}); fig(g, 260, 462, 100, WT, {lie:-1.55, hair:DK});
-      [668, 728].forEach((x, i)=> tree(g, x, 250 - i*10, 170, OC)); },
-    gap(g){ fig(g, 480, 430, 170, OC, {kind:'won', legs:'walk', armL:1.2, armR:1.4}); fig(g, 610, 424, 176, OC, {kind:'won', legs:'walk', armL:1.3, armR:1.1, staff:true}); fig(g, 545, 356, 100, WT, {lie:-0.35, hair:'#2f5f9a'}); }},
-  /* 2. 약속: 눈 지팡이를 든 장로와 원류민, 고개 숙인 세 사람, (닳은 자리) 가운데 맞잡은 손과 눈 문양 */
-  {worn:[290, 90, 190, 260], base(g){ hands(g, 23); fig(g, 175, 440, 210, OC, {kind:'won', staff:true, armR:0.45}); fig(g, 72, 440, 150, OC, {kind:'won', legs:'sit', flip:true});
-      fig(g, 520, 440, 170, WT, {armL:0.95, hair:'#2f5f9a'}); fig(g, 606, 440, 164, WT, {armL:0.95, hair:OC}); fig(g, 690, 440, 172, WT, {armL:0.95, hair:DK}); },
-    gap(g){ eye(g, 384, 150, 1.3, YL); limb(g, 316, 300, 384, 274, 13, OC); limb(g, 452, 300, 384, 274, 13, WT); g.fillStyle = YL; g.beginPath(); g.arc(384, 274, 13, 0, 6.3); g.fill(); }},
+      [668, 728].forEach((x, i)=> tree(g, x, 250 - i*10, 170, OC));
+      fig(g, 545, 430, 170, OC, {kind:'won', legs:'walk', armL:1.2, armR:1.4}); fig(g, 655, 424, 176, OC, {kind:'won', legs:'walk', armL:1.3, armR:1.1, staff:true}); fig(g, 600, 356, 100, WT, {lie:-0.35, hair:'#2f5f9a'}); },
+    gap(g){ /* 2026-11-25: the island was already sick before they came — cracked ground and a dried spring (kept inside the soft edge) */
+      const cx = 432, cy = 438; g.fillStyle = DK; g.beginPath(); g.ellipse(cx, cy, 46, 15, 0, 0, 6.3); g.fill(); g.strokeStyle = WT; g.lineWidth = 4; g.beginPath(); g.ellipse(cx, cy, 46, 15, 0, 0, 6.3); g.stroke();
+      g.strokeStyle = '#2b1a10'; g.lineCap = 'round'; g.lineJoin = 'round'; [[[cx - 110, 470], [cx - 86, 462], [cx - 70, 448], [cx - 48, 446]], [[cx + 48, 446], [cx + 70, 456], [cx + 84, 452], [cx + 104, 468]], [[cx - 86, 462], [cx - 92, 478]], [[cx + 84, 452], [cx + 90, 440]], [[cx - 30, 452], [cx - 36, 466], [cx - 26, 478]]].forEach(L=>{ g.lineWidth = 5; g.beginPath(); L.forEach(([x, y], k)=> k ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); });
+      { const x = cx + 4, y = 420; g.strokeStyle = DK; g.lineWidth = 6; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y - 74); g.moveTo(x, y - 30); g.lineTo(x - 26, y - 56); g.moveTo(x, y - 48); g.lineTo(x + 24, y - 70); g.stroke(); }   /* a dead sapling by the dry spring */
+      g.strokeStyle = WT; g.lineWidth = 3; [[cx - 24, cy, cx - 10, cy + 5], [cx + 10, cy - 3, cx + 24, cy + 4]].forEach(([a, b, c, d])=>{ g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.stroke(); }); }},
   /* 3. 함께 걷던 날: 측정기를 든 루나, (닳은 자리) 들꽃을 꽂은 원류민 아이, 물길 끝에서 다리를 그리는 노아 */
   {worn:[255, 210, 150, 240], base(g){ hands(g, 37); [56, 712].forEach((x, i)=> tree(g, x, 300, 190, OC)); fig(g, 190, 440, 190, WT, {legs:'walk', armL:0.9, meter:true, hair:OC});
       g.strokeStyle = CY; g.globalAlpha *= 0.75; g.lineWidth = 12; g.lineCap = 'round'; g.beginPath(); g.moveTo(400, 470); g.bezierCurveTo(470, 400, 560, 420, 620, 330); g.stroke(); g.globalAlpha /= 0.75;
       fig(g, 560, 330, 150, WT, {legs:'sit', armR:1.2, hair:'#2f5f9a'}); g.strokeStyle = WT; g.lineWidth = 7; g.beginPath(); g.moveTo(620, 292); g.quadraticCurveTo(668, 252, 716, 292); g.moveTo(634, 292); g.lineTo(634, 326); g.moveTo(702, 292); g.lineTo(702, 326); g.stroke(); },
     gap(g){ fig(g, 330, 440, 124, OC, {kind:'child', legs:'walk', flower:true, armL:0.5}); }},
-  /* 4. 떠나는 날: 붉게 빛나는 렌의 장치, 섬을 떠나는 배 위의 두 사람, (닳은 자리) 바닷가에 홀로 선 보이드 */
-  {worn:[540, 190, 170, 260], base(g){ hands(g, 41); g.fillStyle = RD; [[110, 450, 170, 100], [132, 350, 126, 100], [156, 250, 78, 90]].forEach(([x, y, w, h])=> g.fillRect(x, y - h, w, h));
-      for(let i = 0; i < 9; i++){ const a = -2.8 + i*0.35; limb(g, 195 + Math.cos(a)*58, 150 + Math.sin(a)*58, 195 + Math.cos(a)*100, 150 + Math.sin(a)*100, 6, RD); }
-      waves(g, 300, 750, 420, WT); boat(g, 430, 392, 1.3, WT, false); fig(g, 392, 384, 100, WT, {armR:1.9, hair:'#2f5f9a'}); fig(g, 468, 384, 98, WT, {armL:1.9, hair:OC}); },
-    gap(g){ robot(g, 625, 440, 170, CY); }},
+  /* 3. 갈라진 길 (2026-11-25): 붉게 빛나는 렌의 장치와 렌, 말라 버린 나무와 떠나는 새 떼, (닳은 자리) 렌 앞을 팔 벌려 막아선 노아와 루나 */
+  {worn:[400, 190, 200, 270], base(g){ hands(g, 29); g.fillStyle = RD; [[70, 450, 170, 100], [92, 350, 126, 100], [116, 250, 78, 90]].forEach(([x, y, w, h])=> g.fillRect(x, y - h, w, h));
+      for(let i = 0; i < 9; i++){ const a = -2.8 + i*0.35; limb(g, 155 + Math.cos(a)*58, 150 + Math.sin(a)*58, 155 + Math.cos(a)*100, 150 + Math.sin(a)*100, 6, RD); }
+      fig(g, 320, 440, 180, WT, {armL:2.2, armR:0.4, hair:DK});
+      [[640, 330], [722, 312]].forEach(([x, y])=>{ g.strokeStyle = DK; g.lineCap = 'round'; g.lineWidth = 8; g.beginPath(); g.moveTo(x, 470); g.lineTo(x, y); g.moveTo(x, y + 40); g.lineTo(x - 34, y + 6); g.moveTo(x, y + 20); g.lineTo(x + 30, y - 8); g.stroke(); });
+      g.strokeStyle = WT; g.lineWidth = 4; [[600, 120], [646, 92], [690, 128], [734, 70], [560, 80]].forEach(([x, y])=>{ g.beginPath(); g.moveTo(x - 16, y - 8); g.quadraticCurveTo(x - 6, y - 12, x, y); g.quadraticCurveTo(x + 6, y - 12, x + 16, y - 8); g.stroke(); }); },
+    gap(g){ fig(g, 450, 440, 176, WT, {armL:1.7, armR:1.7, hair:'#2f5f9a', flip:true}); fig(g, 545, 440, 168, WT, {armL:1.7, armR:1.7, hair:OC, flip:true}); }},
+  /* 4. 떠나는 날: 렌의 장치, 섬을 떠나는 배 위의 두 사람, (닳은 자리) 바닷가에 홀로 선 보이드, (두 번째 닳은 자리, 반전) 그 로봇을 부수는 원류민들 */
+  {worn:[332, 250, 130, 230], worn2:[478, 160, 200, 320], base(g){ hands(g, 41); g.fillStyle = RD; [[96, 300, 96, 70], [110, 230, 68, 60], [124, 170, 40, 50]].forEach(([x, y, w, h])=> g.fillRect(x, y - h, w, h));
+      for(let i = 0; i < 9; i++){ const a = -2.8 + i*0.35; limb(g, 144 + Math.cos(a)*36, 116 + Math.sin(a)*36, 144 + Math.cos(a)*60, 116 + Math.sin(a)*60, 5, RD); }
+      waves(g, 90, 330, 420, WT); boat(g, 210, 392, 1.1, WT, false); fig(g, 176, 384, 92, WT, {armR:1.9, hair:'#2f5f9a'}); fig(g, 244, 384, 90, WT, {armL:1.9, hair:OC}); },
+    gap(g){ robot(g, 396, 450, 140, CY); },
+    gap2(g){ g.save(); g.translate(560, 408); g.rotate(1.35); robot(g, 0, 0, 104, CY); g.restore(); g.fillStyle = CY; [[540, 440, 11], [610, 436, 9], [590, 414, 7], [566, 446, 6]].forEach(([x, y, r])=>{ g.beginPath(); g.arc(x, y, r, 0, 6.3); g.fill(); });
+      fig(g, 492, 440, 160, OC, {kind:'won', armL:0.9, armR:2.2, staff:true}); fig(g, 662, 440, 156, OC, {kind:'won', armL:2.2, armR:0.9}); }},
   /* 5. 마지막 벽: 손을 맞잡은 넷(원류민 하나, 노아·루나를 닮은 둘, 그 뒤 작은 로봇)과 위의 눈 문양 */
   {worn:[0, 0, 0, 0], base(g){ hands(g, 53); eye(g, 384, 92, 1.2, YL);
       fig(g, 210, 450, 200, OC, {kind:'won', armL:0.6, armR:1.45}); fig(g, 330, 450, 194, WT, {armL:1.45, armR:1.45, hair:'#2f5f9a'}); fig(g, 446, 450, 194, WT, {armL:1.45, armR:1.45, hair:OC}); fig(g, 562, 450, 198, WT, {armL:1.45, armR:0.6});
       robot(g, 388, 250, 84, CY); }, gap(){}}];
 root.MURAL_SCENES = SCENES;
 /* the rock under the paint: warm grey with darker grain, cracks and a soft edge (same as the page's soft edge) */
-root.muralPaint = function(g, i, k){ const S = SCENES[i]; g.clearRect(0, 0, 768, 480);
+root.muralPaint = function(g, i, k, k2 = 0){ const S = SCENES[i]; g.clearRect(0, 0, 768, 480);
   const bg = g.createRadialGradient(384, 240, 60, 384, 240, 430); bg.addColorStop(0, '#76665a'); bg.addColorStop(0.72, '#625448'); bg.addColorStop(1, '#4f443a'); g.fillStyle = bg; g.fillRect(0, 0, 768, 480);
   let q = 31 + i*7; const rn = ()=> (q = (q*16807) % 2147483647)/2147483647;
   for(let n = 0; n < 900; n++){ g.fillStyle = n % 3 ? 'rgba(40,32,26,0.16)' : 'rgba(150,132,112,0.14)'; g.beginPath(); g.ellipse(rn()*768, rn()*480, 2 + rn()*9, 1 + rn()*4, rn()*3, 0, 6.3); g.fill(); }
   g.strokeStyle = 'rgba(34,27,22,0.45)'; g.lineWidth = 1.6; for(let c = 0; c < 6; c++){ let x = rn()*768, y = rn()*480; g.beginPath(); g.moveTo(x, y); for(let s = 0; s < 6; s++){ x += (rn() - 0.5)*70; y += (rn() - 0.3)*50; g.lineTo(x, y); } g.stroke(); }
-  g.save(); g.globalAlpha = 0.88; S.base(g); g.globalAlpha = 0.88*k; S.gap(g); g.restore();
+  g.save(); g.globalAlpha = 0.88; S.base(g); g.globalAlpha = 0.88*k; S.gap(g); if(S.gap2){ g.globalAlpha = 0.88*k2; S.gap2(g); } g.restore();
   /* paint sits in the rock: a little grain over it */
   for(let n = 0; n < 500; n++){ g.fillStyle = 'rgba(70,58,48,0.22)'; g.fillRect(rn()*768, rn()*480, 1 + rn()*3, 1 + rn()*2); }
-  const [wx, wy, ww, wh] = S.worn; if(ww && k < 1){ g.globalAlpha = 1 - k; for(let n = 0; n < 420; n++){ const x = wx + rn()*ww, y = wy + rn()*wh, dx = (x - wx - ww/2)/(ww/2), dy = (y - wy - wh/2)/(wh/2); if(dx*dx + dy*dy > 1) continue; g.fillStyle = n % 4 ? 'rgba(118,102,86,0.9)' : 'rgba(138,121,102,0.75)'; g.beginPath(); g.ellipse(x, y, 6 + rn()*12, 4 + rn()*8, rn()*3, 0, 6.3); g.fill(); } g.globalAlpha = 1; }
+  [[S.worn, k], [S.worn2, k2]].forEach(([W, kk])=>{ if(!W) return; const [wx, wy, ww, wh] = W; if(ww && kk < 1){ g.globalAlpha = 1 - kk; for(let n = 0; n < 420; n++){ const x = wx + rn()*ww, y = wy + rn()*wh, dx = (x - wx - ww/2)/(ww/2), dy = (y - wy - wh/2)/(wh/2); if(dx*dx + dy*dy > 1) continue; g.fillStyle = n % 4 ? 'rgba(118,102,86,0.9)' : 'rgba(138,121,102,0.75)'; g.beginPath(); g.ellipse(x, y, 6 + rn()*12, 4 + rn()*8, rn()*3, 0, 6.3); g.fill(); } g.globalAlpha = 1; } });
   g.save(); g.globalCompositeOperation = 'destination-in'; g.translate(384, 240); g.scale(1, 0.66); const fe = g.createRadialGradient(0, 0, 0, 0, 0, 400); fe.addColorStop(0.8, 'rgba(0,0,0,1)'); fe.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = fe; g.fillRect(-384, -364, 768, 728); g.restore(); };
 })(window);
 function muralRoom(){
@@ -10142,9 +10152,9 @@ function muralRoom(){
   /* cave paintings: pigment figures on rock, drawn on a canvas; `k` fills the worn spot (0 = worn away, 1 = whole) */
   const SCENES = MURAL_SCENES;   /* 2026-11-24: the paintings, redrawn (user picked the mock-up) */
   const SP = [-72, -36, 0, 36, 72].map(d=> d*Math.PI/180), MW = 3.9*H, MH = MW*480/768, murals = [];
-  SCENES.forEach((S, i)=>{ const st = {k:0}; const tex = canvasTex(768, 480, g=> muralPaint(g, i, st.k));
+  SCENES.forEach((S, i)=>{ const st = {k:0, k2:0}; const tex = canvasTex(768, 480, g=> muralPaint(g, i, st.k, st.k2));
     const a = SP[i], dir = new THREE.Vector3(Math.sin(a), 0, -Math.cos(a)), mat2 = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}); mat2.color.setScalar(0.3);
-    const m = add(sc, new THREE.PlaneGeometry(MW, MH), mat2, dir.x*R*0.955, 2.35*H, dir.z*R*0.955, false); m.lookAt(0, 2.35*H, 0); murals.push({m, tex, st, dir, lit:0.3, want:0.3, fill:0}); });
+    const m = add(sc, new THREE.PlaneGeometry(MW, MH), mat2, dir.x*R*0.955, 2.35*H, dir.z*R*0.955, false); m.lookAt(0, 2.35*H, 0); murals.push({m, tex, st, dir, lit:0.3, want:0.3, fill:0, fill2:0}); });
   const eye = add(sc, new THREE.PlaneGeometry(1.5*H, 1.5*H), new THREE.MeshBasicMaterial({map:eyeTex('#ffd84a'), transparent:true, depthWrite:false, opacity:0}), murals[4].dir.x*R*0.95, 3.95*H, murals[4].dir.z*R*0.95, false); eye.lookAt(0, 3.95*H, 0);
   const fireTex = (()=>{ const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,246,214,1)'); gr.addColorStop(0.25, 'rgba(255,196,92,0.9)'); gr.addColorStop(0.6, 'rgba(255,110,30,0.35)'); gr.addColorStop(1, 'rgba(255,80,20,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
   const flameGeo = (()=>{ const pts = []; for(let i = 0; i <= 12; i++){ const t = i/12; pts.push(new THREE.Vector2(Math.sin(Math.PI*Math.pow(t, 0.7))*(1 - t*0.35), t*2.4)); } return new THREE.LatheGeometry(pts, 14); })();   /* a teardrop, not a cone */
@@ -10175,15 +10185,16 @@ function muralRoom(){
       cam.p2.set(P.x - d.x*D, 1.85*H, P.z - d.z*D); cam.t2.set(P.x, P.y - 0.55*H, P.z); beam.visible = false;
       _o.set(P.x - d.x*0.9*H, P.y + MH*0.62, P.z - d.z*0.9*H); orb.position.copy(_o); halo.position.copy(_o); orbL.position.copy(_o); if(reduce) cam.snap = true; },
     lamp(on){ orb.visible = halo.visible = on; orbL.intensity = on ? 1.5 : 0; beam.visible = on && focus >= 0; if(!on) murals.forEach(m=>{ m.want = 0.18; }); else murals.forEach((m, n)=>{ m.want = n === focus ? 1 : (n < focus ? 0.55 : 0.3); }); },   /* 보이드 lights the wall only when asked (user, 2026-11-24) */
-    reveal(i){ murals[i].fill = 1; },
-    whole(i){ const m = murals[i]; m.fill = 1; m.st.k = 1; m.tex.userData.redraw(); },
-    reset(){ murals.forEach(m=>{ m.fill = 0; m.st.k = 0; m.lit = m.want = 0.3; m.m.material.color.setScalar(0.3); m.tex.userData.redraw(); }); eye.material.opacity = 0; beam.visible = false; focus = -1; },
-    state:()=> ({focus, k:murals.map(m=> +m.st.k.toFixed(2)), lit:murals.map(m=> +m.lit.toFixed(2))}),
+    reveal(i){ murals[i].fill = 1; }, reveal2(i){ murals[i].fill2 = 1; },
+    torches(n){ torches.forEach((T, k)=>{ T.off = k >= n*2; }); },   /* 2026-11-25: a wrong answer puts out a pair of torches (three lives) */
+    whole(i){ const m = murals[i]; m.fill = m.fill2 = 1; m.st.k = m.st.k2 = 1; m.tex.userData.redraw(); },
+    reset(){ torches.forEach(T=>{ T.off = false; }); murals.forEach(m=>{ m.fill = m.fill2 = 0; m.st.k = m.st.k2 = 0; m.lit = m.want = 0.3; m.m.material.color.setScalar(0.3); m.tex.userData.redraw(); }); eye.material.opacity = 0; beam.visible = false; focus = -1; },
+    state:()=> ({focus, k:murals.map(m=> +m.st.k.toFixed(2)), k2:murals.map(m=> +m.st.k2.toFixed(2)), torches:torches.filter(T=> !T.off).length, lit:murals.map(m=> +m.lit.toFixed(2))}),
     update(t){ const dt = Math.min(0.05, last ? t - last : 0.016); last = t;
-      torches.forEach((T, n)=>{ const p = t + T.ph, k = 1.0 + Math.sin(p*9)*0.12 + Math.sin(p*23)*0.06 + Math.sin(p*3.1)*0.08; T.Lt.intensity = k*1.7;
+      torches.forEach((T, n)=>{ T.fl.visible = !T.off; if(T.off){ T.Lt.intensity = 0; return; } const p = t + T.ph, k = 1.0 + Math.sin(p*9)*0.12 + Math.sin(p*23)*0.06 + Math.sin(p*3.1)*0.08; T.Lt.intensity = k*1.7;
         T.outer.scale.y = 0.22*H*(0.9 + (k - 1)*1.6); T.inner.scale.y = 0.15*H*(0.92 + (k - 1)*1.3); T.outer.rotation.z = Math.sin(p*4.3)*0.08; T.inner.rotation.z = Math.sin(p*5.1 + 1)*0.06; T.outer.rotation.y = p*1.4; T.glow.material.opacity = 0.7 + (k - 1)*0.9; T.glow.scale.setScalar(1.3*H*(0.95 + (k - 1)*0.5));
         T.sd.forEach((q, j)=>{ q.p += dt*q.v*0.8; if(q.p > 1){ q.p -= 1; q.x = (Math.random() - 0.5)*0.16*H; q.z = (Math.random() - 0.5)*0.16*H; } T.sp[j*3] = q.x + Math.sin(p*3 + j)*0.05*H*q.p; T.sp[j*3 + 1] = 0.2*H + q.p*0.9*H; T.sp[j*3 + 2] = q.z; }); T.sg.attributes.position.needsUpdate = true; T.sparks.material.opacity = 0.9; });
-      murals.forEach(m=>{ m.lit += (m.want - m.lit)*(1 - Math.exp(-dt*2.2)); m.m.material.color.setScalar(m.lit); if(m.fill > m.st.k){ m.st.k = Math.min(m.fill, m.st.k + dt/1.5); m.tex.userData.redraw(); } });
+      murals.forEach(m=>{ m.lit += (m.want - m.lit)*(1 - Math.exp(-dt*2.2)); m.m.material.color.setScalar(m.lit); if(m.fill > m.st.k){ m.st.k = Math.min(m.fill, m.st.k + dt/1.5); m.tex.userData.redraw(); } if(m.fill2 > m.st.k2){ m.st.k2 = Math.min(m.fill2, m.st.k2 + dt/1.5); m.tex.userData.redraw(); } });
       eye.material.opacity += ((focus === 4 ? 0.6 + Math.sin(t*1.4)*0.25 : 0) - eye.material.opacity)*(1 - Math.exp(-dt*2));
       halo.scale.setScalar(1 + Math.sin(t*3)*0.12); beam.material.opacity = 0.08 + Math.sin(t*2.3)*0.02;
       if(cam.snap){ cam.pos.copy(cam.p2); cam.tgt.copy(cam.t2); cam.snap = false; } else { const e = 1 - Math.exp(-dt*2.4); cam.pos.lerp(cam.p2, e); cam.tgt.lerp(cam.t2, e); }
@@ -10201,15 +10212,17 @@ function caveLeave(){ if(!caveKeep) return; const k = caveKeep; caveKeep = null;
   document.body.classList.remove('cavestory'); if(walk) walk.snap = true; }
 /* ---------- persuading Codex (user, 2026-11-18): after each mural Codex asks, the child picks what to say; a good answer adds a point of trust; three of four are needed ---------- */
 const CAVE_CHOICE = [{"q": "선대는 그들을 받아들였다. 그 뒤에 섬이 어떻게 됐는지는 너희도 봤을 거다. 할 말이 있나?", "opts": [{"who": "리코", "text": "받아 준 은혜를 저희가 대신 갚고 싶어요. 그래서 여기까지 왔어요.", "ok": true, "re": "……은혜를 갚겠다는 말은 처음 듣는군."}, {"who": "제로", "text": "그건 옛날 일이잖아요. 저희랑은 상관없어요.", "re": "상관없다면 이 벽 앞에 설 이유도 없다."}, {"who": "제로", "text": "그래도 덕분에 도로랜드가 생겼잖아요!", "re": "그 놀이공원 때문에 섬이 이렇게 됐다."}]}, {"q": "섬을 해치지 않겠다는 약속은 깨졌다. 환원하겠다는 말도 약속일 뿐이지 않나.", "opts": [{"who": "제로", "text": "이번엔 진짜예요. 그냥 믿어 주세요!", "re": "그냥 믿으라는 말은 그때도 들었다."}, {"who": "리코", "text": "말로만 약속하지 않을게요. 시뮬레이션으로 먼저 확인한 방법만 쓸 거예요.", "ok": true, "re": "……먼저 확인하고 움직이겠다는 거군."}, {"who": "리코", "text": "약속을 깬 건 렌이지 저희가 아니에요.", "re": "누가 깼는지 따지자는 게 아니다."}]}, {"q": "그때 나는 그들을 믿었다. 나더러 다시 믿으라는 건가.", "opts": [{"who": "리코", "text": "코덱스가 허락하지 않아도 환원은 해야 해요.", "re": "내 뜻과 상관없이 하겠다면 선대와 다를 게 없다."}, {"who": "제로", "text": "어릴 때 일이니까 이제 잊어요.", "re": "잊으라는 말로는 아무것도 달라지지 않는다."}, {"who": "제로", "text": "루나가 코덱스에게 먼저 물어봤던 것처럼, 저희도 코덱스에게 먼저 물어볼게요.", "ok": true, "re": "……루나는 늘 그렇게 했지."}]}, {"q": "환원이 잘못되면 섬은 가라앉는다. 그 두려움을 너희가 아나.", "opts": [{"who": "리코", "text": "저희도 무서워요. 그래서 기록을 다 채우고, 잔재를 부수고, 조금씩 환원하는 방법을 찾았어요.", "ok": true, "re": "……두렵다고 말하는 쪽이 더 믿을 만하군."}, {"who": "제로", "text": "걱정 마세요. 절대 실패 안 해요!", "re": "두려움을 모르는 자에게 섬을 맡길 수는 없다."}, {"who": "제로", "text": "부수는 것보다는 낫잖아요.", "re": "낫다는 말만으로는 부족하다."}]}];
+const CAVE_TRIAL = [{"intro": "mural1", "objector": "리코", "claim": ["그들이 오기 전까지 이 섬은 아무 탈이 없었다.", "우리 선대는 쓰러진 그들을 거두어 주었다.", "그런데 그들은 도와준다는 명목하에 섬을 망가뜨렸다."], "lie": 0, "claimRe": ["", "벽에 그려진 그대로다. 우리가 그들을 데려갔다.", "그건 너희도 큐브에서 봤을 거다."], "light": [{"who": "보이드", "text": "오른쪽 아래가 닳아 있어. 내 기록이랑 겹쳐 볼게."}], "ev": [{"who": "제로", "text": "부서진 배 조각이요!", "re": "배가 부서진 건 그들 사정이다."}, {"who": "제로", "text": "원류민에게 들려 가는 세 사람이요!", "re": "그래. 우리가 그들을 데려갔다. 그래서?"}, {"who": "리코", "text": "갈라진 땅이랑 말라 버린 샘이요!", "ok": true}], "win": [{"who": "리코", "text": "땅이 벌써 갈라져 있어요. 샘도 말라 있고요."}, {"who": "리코", "text": "세 사람이 오기 전부터 섬이 아팠던 거예요."}, {"who": "코덱스", "text": "……일루아가 약해지는 해였다. 백 년에 한 번 오는."}, {"who": "보이드", "text": "그래서 토네이도가 섬 안까지 들어올 수 있었던 거야. 원래는 바깥 사람이 들어올 수 없는 섬이니까."}, {"who": "코덱스", "text": "섬이 먼저 그들을 들인 셈이군."}]}, {"intro": [{"who": "", "nar": true, "text": "측정기를 든 루나가 숲을 걷고, 노아가 물길 끝에 앉아 무언가를 그린다. 루나 옆자리가 닳아 있다."}, {"who": "코덱스", "text": "그들이 섬을 재고 다니던 때다."}], "objector": "제로", "claim": ["인간들은 숲을 제멋대로 헤집고 다녔다.", "우리에게는 한 번도 묻지 않았다.", "재고, 적고, 가져갔을 뿐이다."], "lie": 1, "claimRe": ["숲을 걸은 건 맞다. 벽에도 그려져 있지.", "", "측정기를 든 게 보이지 않나."], "light": [{"who": "보이드", "text": "루나 옆자리, 내 기록에 뭔가 남아 있어. 비춰 볼게."}], "ev": [{"who": "리코", "text": "측정기를 든 루나요!", "re": "그게 바로 섬을 쟀다는 증거다."}, {"who": "리코", "text": "물길에 다리를 그리는 노아요!", "re": "다리를 그렸다고 우리에게 물은 건 아니다."}, {"who": "제로", "text": "루나 옆에 꽃 꽂은 아이요!", "ok": true}], "win": [{"who": "제로", "text": "루나가 이 아이한테 뭔가 물어보고 있어요. 머리에 꽃 꽂은 아이요."}, {"who": "보이드", "text": "루나는 값이 이상하면 이 아이한테 먼저 물었어. 아이가 고개를 끄덕여야 적었지."}, {"who": "제로", "text": "이 아이, 누구예요?"}, {"who": "코덱스", "text": "……나다."}, {"who": "코덱스", "text": "고개를 끄덕인 건 나였군. 잊고 있었다."}]}, {"intro": [{"who": "", "nar": true, "text": "붉게 빛나는 커다란 장치 옆에 렌이 서 있다. 나무는 말라 있고, 새 떼가 섬을 떠난다."}, {"who": "코덱스", "text": "렌의 장치다. 섬이 무너지기 시작한 때지."}], "objector": "리코", "claim": ["렌의 장치는 날마다 커졌다.", "샘이 마르고 새들이 떠났다.", "나머지 둘은 그걸 보고만 있었다."], "lie": 2, "claimRe": ["벽에 그대로 있지 않나.", "새들이 떠난 건 나도 봤다.", ""], "light": [{"who": "보이드", "text": "장치 앞이 닳아 있어. 비춰 볼게."}], "ev": [{"who": "제로", "text": "붉게 빛나는 장치요!", "re": "그래, 그게 섬을 망가뜨렸다. 그래서?"}, {"who": "제로", "text": "섬을 떠나는 새 떼요!", "re": "새들이 떠난 건 둘이 막지 않았다는 뜻이기도 하다."}, {"who": "리코", "text": "렌 앞을 막아선 노아랑 루나요!", "ok": true}], "win": [{"who": "리코", "text": "노아랑 루나가 렌 앞을 막고 있어요. 보고만 있던 게 아니에요."}, {"who": "보이드", "text": "내 기록에 그날 목소리가 남아 있어. 「렌. 여기서 멈춰야 해.」"}, {"who": "보이드", "text": "렌은 이렇게 대답했어. 「조금만 더 하면 돼. 시스템이 완성되면 다 지킬 수 있어.」"}, {"who": "코덱스", "text": "렌도 섬을 지키려 했다는 건가."}, {"who": "리코", "text": "지키려는 마음은 같았는데, 혼자서 다 정하려고 한 거예요."}, {"who": "코덱스", "text": "……그날 숲이 유난히 시끄러웠지."}]}, {"intro": [{"who": "", "nar": true, "text": "렌의 장치를 뒤로하고, 두 사람이 배를 타고 섬을 떠난다. 바닷가 쪽이 크게 닳아 있다."}, {"who": "코덱스", "text": "그들이 떠난 날이다."}], "objector": "제로", "claim": ["렌을 막지 못하자 둘은 배를 탔다.", "섬에는 아무것도 남기지 않았다.", "그날 나는 그들이 섬을 버렸다고 생각했다."], "lie": 1, "claimRe": ["배를 탄 건 벽에도 그려져 있다.", "", "그건 내 마음이다. 벽이 대신 말해 줄 수는 없다."], "light": [{"who": "보이드", "text": "바닷가 쪽…… 내 기록이랑 같은 자리야. 비춰 볼게."}], "ev": [{"who": "리코", "text": "섬을 떠나는 배요!", "re": "떠났다는 증거일 뿐이다."}, {"who": "리코", "text": "붉게 빛나는 장치요!", "re": "그건 렌이 남긴 것이다. 둘이 남긴 게 아니다."}, {"who": "제로", "text": "바닷가의 작은 로봇이요!", "ok": true}], "win": [{"who": "제로", "text": "바닷가에 보이드가 있어요!"}, {"who": "보이드", "text": "노아와 루나는 떠나기 전에 나를 만들었어. 섬에 무슨 일이 생기는지 기록해 두고, 언젠가 누군가에게 전하라고."}, {"who": "리코", "text": "버리고 간 게 아니었어요. 기록을 남기고 간 거예요."}], "twistPre": [{"who": "", "nar": true, "text": "보이드의 불빛이 옆 벽에 닿다가 멈춘다."}, {"who": "보이드", "text": "……이 옆은 비추고 싶지 않아."}, {"who": "제로", "text": "보이드?"}, {"who": "", "nar": true, "text": "코덱스가 지팡이로 직접 벽을 밝힌다."}], "twist": [{"who": "", "nar": true, "text": "원류민들이 작은 로봇을 둘러싸고 부수고 있다."}, {"who": "코덱스", "text": "……그 로봇을 부순 건 우리였다."}, {"who": "코덱스", "text": "기술이 다시 시작될까 두려웠다. 그래서 진실을 남긴 눈을 우리 손으로 묻었다."}, {"who": "제로", "text": "그래서 보이드가 코덱스를 그렇게 무서워했구나……"}, {"who": "보이드", "text": "괜찮아. 제로가 날 다시 고쳐 줬잖아. 그래서 지금 이걸 보여 줄 수 있는 거야."}, {"who": "코덱스", "text": "끝까지 읽지 않은 건 나였군."}]}], CAVE_FAIL = [{"who": "코덱스", "text": "……됐다. 벽도 제대로 읽지 못하는군."}, {"who": "", "nar": true, "text": "코덱스가 등을 돌린다. 꺼졌던 횃불이 다시 타오른다."}, {"who": "보이드", "text": "다시 보자. 닳은 자리에 답이 있어."}];   /* 2026-11-25 개편안 2 (docs/보이드의기록_동굴대사.md) */
 const CAVE_NEED = 4;   /* every answer must be right; one wrong answer starts the walls over (user, 2026-11-24) */ let CHOICE_PICK = null;
 function choiceDlg(){ let d = $('choiceDlg'); if(d) return d; d = document.createElement('div'); d.id = 'choiceDlg'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'chQ');
-  d.innerHTML = '<div class="trust">코덱스 설득<span id="chTrust"></span></div><div class="in"><div class="q"><span class="face"><img src="img/chars/codex.png?v=20261028c" alt=""></span><p><small>코덱스</small><span id="chQ"></span></p></div><div class="opts" id="chOpts"></div></div>'; document.body.appendChild(d);
+  d.innerHTML = '<div class="trust">횃불<span id="chTrust"></span></div><div class="in"><div class="q"><span class="face"><img src="img/chars/codex.png?v=20261028c" alt=""></span><p><small>코덱스</small><span id="chQ"></span></p></div><div class="opts" id="chOpts"></div></div>'; document.body.appendChild(d);
   d.addEventListener('click', e=>{ e.stopPropagation(); const b = e.target.closest('#chOpts button'); if(b && CHOICE_PICK) CHOICE_PICK(+b.dataset.k); });
   addEventListener('keydown', e=>{ if(!d.dataset.on || !CHOICE_PICK) return; const k = ['Digit1', 'Digit2', 'Digit3', 'Numpad1', 'Numpad2', 'Numpad3'].indexOf(e.code); if(k < 0){ if(e.code === 'Space') { e.preventDefault(); e.stopImmediatePropagation(); } return; } e.preventDefault(); e.stopImmediatePropagation(); CHOICE_PICK(k % 3); }, true); return d; }
-function choiceAsk(c, trust){ if(ffOn()) return Promise.resolve(c.opts.findIndex(o=> o.ok)); const d = choiceDlg(); $('chQ').textContent = c.q; $('chTrust').innerHTML = Array.from({length:CAVE_CHOICE.length}, (_, i)=> `<i class="${i < trust ? 'ok' : ''}"></i>`).join('');
+let CHOICE_CUR = null;
+function choiceAsk(c, trust, of = CAVE_CHOICE.length){ CHOICE_CUR = c; if(ffOn()) return Promise.resolve(c.opts.findIndex(o=> o.ok)); const d = choiceDlg(); $('chQ').textContent = c.q; d.querySelector('.q small').textContent = c.label || '코덱스'; $('chTrust').innerHTML = Array.from({length:of}, (_, i)=> `<i class="${i < trust ? 'ok' : ''}"></i>`).join('');
   $('chOpts').innerHTML = c.opts.map((o, k)=> `<button type="button" data-k="${k}"><span class="who"><img src="img/chars/${VN_IMG[o.who] || 'zero'}.png?v=20261028c" alt="">${esc(o.who)}<b>${k + 1}</b></span><span>${esc(o.text)}</span></button>`).join(''); d.dataset.on = '1'; sfx('open'); const at = performance.now();
   return new Promise(r=>{ CHOICE_PICK = k=>{ if(performance.now() - at < 600 || !c.opts[k]) return; CHOICE_PICK = null; delete d.dataset.on; sfx('tap'); r(k); }; }); }
-window.__choiceOk = q=>{ const c = CAVE_CHOICE.find(c=> c.q === q); return c ? c.opts.findIndex(o=> o.ok) : 0; }; window.__choice = ()=> $('choiceDlg') && $('choiceDlg').dataset.on ? {q:$('chQ').textContent, n:$('chOpts').children.length, trust:$('chTrust').querySelectorAll('.ok').length} : null; window.__choicePick = k=>{ if(CHOICE_PICK) CHOICE_PICK(k); };
+window.__choiceOk = q=>{ const c = CHOICE_CUR && CHOICE_CUR.q === q ? CHOICE_CUR : CAVE_CHOICE.find(c=> c.q === q); return c ? c.opts.findIndex(o=> o.ok) : 0; }; window.__choice = ()=> $('choiceDlg') && $('choiceDlg').dataset.on ? {q:$('chQ').textContent, n:$('chOpts').children.length, trust:$('chTrust').querySelectorAll('.ok').length} : null; window.__choicePick = k=>{ if(CHOICE_PICK) CHOICE_PICK(k); };
 /* 2026-11-24 (user): at the cave mouth 네이티 floats beside 코덱스, red; while 코덱스 says the Ilua cannot hold, it shakes (alarm edge, its unsteady sound) */
 function natyBeside(){ const c = codexWait(); NATY.userData.run = [c[0] + 3.2, c[1] - 2.4, 3.2, Math.atan2(-c[0], -c[1])]; NATY.userData.heal = null; NATY.userData.hold = {color:0xe05a4e, t:performance.now(), keep:true}; NATY.visible = true; }
 let NATY_SHAKE = null;
@@ -10231,18 +10244,28 @@ async function caveStory(q){ const tok = ++caveTok, dead = ()=> tok !== caveTok 
   caveTok = tok;   /* caveEnter does not change the token; kept explicit */
   await wait(reduce ? 200 : 900); if(dead()) return; await talk(STORY.caveIn); if(dead()) return;
   room.lamp(true); sfx('sparkle'); await wait(reduce ? 200 : 900); if(dead()) return;
-  let trust = 0, round = 0, failed = false; const ask = async i=>{ const c = CAVE_CHOICE[i]; await talk([{who:'코덱스', text:c.q}]); if(dead()) return; const k = await choiceAsk(c, trust); if(dead()) return; const o = c.opts[k]; if(o.ok){ trust++; sfx('sparkle'); } else { failed = true; sfx('error'); }
-    await talk([{who:o.who, text:o.text}, {who:'코덱스', img:o.ok ? 'codex' : 'codex_dark', text:o.re}, {who:'', nar:true, text:o.ok ? ['코덱스가 말없이 벽화를 다시 바라본다.', '코덱스의 목소리가 조금 누그러진다.', '코덱스가 잠시 눈을 감는다.', '코덱스가 처음으로 너희 쪽을 똑바로 본다.'][Math.min(trust, 4) - 1] : '코덱스의 표정이 굳는다.'}]); };
-  const steps = [[0, null, STORY.mural1], [1, null, STORY.mural2], [2, STORY.mural3a, STORY.mural3], [3, STORY.mural4a, STORY.mural4]];
-  for(const [i, before, after] of steps){
+  const MARK = ['①', '②', '③'];
+  const trial = async i=>{ const T = CAVE_TRIAL[i]; let lives = 3; room.torches(3);
+    await talk(typeof T.intro === 'string' ? STORY[T.intro] : T.intro); if(dead()) return;
+    await talk([{who:'코덱스', text:'내 말을 잘 들어라.'}, ...T.claim.map((c, n)=> ({who:'코덱스', text:`${MARK[n]} ${c}`}))]); if(dead()) return;
+    await talk(T.light); if(dead()) return; room.reveal(i); sfx('sparkle'); await wait(reduce ? 200 : 1700); if(dead()) return;
+    const miss = async re=>{ lives--; room.torches(lives); sfx('error'); await talk([{who:'코덱스', img:'codex_dark', text:re}, {who:'', nar:true, text:lives > 0 ? `횃불이 꺼진다. 남은 횃불 ${lives}개.` : '마지막 횃불이 꺼진다.'}]); if(dead()) return;
+      if(lives <= 0){ qPop('설득 실패!'); await talk(CAVE_FAIL); lives = 3; room.torches(3); } };
+    for(;;){ if(dead()) return;
+      const a = await choiceAsk({q:'내 말 중에 벽화와 다른 게 있다면 짚어 봐라.', label:'코덱스의 증언', opts:T.claim.map((c, n)=> ({who:'코덱스', text:`${MARK[n]} ${c}`, ok:n === T.lie}))}, lives, 3); if(dead()) return;
+      if(a !== T.lie){ await miss(T.claimRe[a]); continue; }
+      await talk([{who:T.objector, text:`이의 있어요! 「${T.claim[T.lie]}」 이 말, 벽화랑 달라요.`}]); if(dead()) return;
+      const b = await choiceAsk({q:'어디가 다르다는 거지? 벽에서 찾아 봐라.', label:'증거', opts:T.ev}, lives, 3); if(dead()) return;
+      if(!T.ev[b].ok){ await miss(T.ev[b].re); continue; }
+      sfx('sparkle'); qPop('반박 성공!'); break; }
+    await talk(T.win); if(dead()) return;
+    if(T.twist){ await talk(T.twistPre); if(dead()) return; room.reveal2(i); sfx('dark'); await wait(reduce ? 200 : 1900); if(dead()) return; await talk(T.twist); } };
+  for(let i = 0; i < CAVE_TRIAL.length; i++){
     if(i > 0){ await cut(()=> room.place(i, row)); if(dead()) return; } else room.place(0, row);
     await wait(reduce ? 200 : 1300); if(dead()) return;
     room.zoom(i); await wait(reduce ? 200 : 1500); if(dead()) return;
-    if(before){ await talk(before); if(dead()) return; }
-    room.reveal(i); sfx('sparkle'); await wait(reduce ? 200 : 1700); if(dead()) return;
-    await talk(after); if(dead()) return; await ask(i); if(dead()) return; if(failed) break; }
-  while(failed){ round++; qPop('설득 실패!'); await talk([{who:'코덱스', img:'codex_dark', text:'……됐다. 역시 너희도 다르지 않군.'}, {who:'', nar:true, text:'코덱스가 등을 돌린다. 설득에 실패했다.'}, {who:'보이드', text:'처음 벽화부터 다시 보자. 코덱스가 무엇을 두려워하는지 생각하면서.'}]); if(dead()) return; trust = 0; failed = false;
-    for(let i = 0; i < CAVE_CHOICE.length; i++){ await cut(()=>{ room.place(i, row); room.zoom(i); }); if(dead()) return; await wait(reduce ? 200 : 900); if(dead()) return; await ask(i); if(dead()) return; if(failed) break; } }
+    await trial(i); if(dead()) return; }
+  room.torches(3);
   await cut(()=> room.place(4, row)); if(dead()) return; await wait(reduce ? 200 : 1300); if(dead()) return;
   room.zoom(4); await wait(reduce ? 200 : 1500); if(dead()) return;
   await talk(STORY.caveEnd); if(dead()) return;
