@@ -30,6 +30,8 @@ async def main():
         for i in range(900):
             if await ev("!!document.getElementById('missionCard') && !!document.getElementById('missionCard').dataset.on"):
                 cards += 1; txt = await ev("document.getElementById('missionCard').innerText.replace(/\\s+/g, ' ')"); print('mission card:', txt); await asyncio.sleep(1.0); await pg.screenshot(path=os.path.join(OUT, 'cave_card.png')); await pg.keyboard.press('Space'); await asyncio.sleep(.6); continue
+            if await ev("window.__simLaunch && __simLaunch() === 'button'"):   # 2026-11-25: the lab button that starts the real restoration
+                said.append('[환원 버튼] ' + await ev("document.getElementById('lrLaunch').innerText")); await pg.screenshot(path=os.path.join(OUT, 'restore_button.png')); await pg.keyboard.press('Space'); await asyncio.sleep(1); continue
             c = await ev("__choice()")
             if c:
                 picks += 1; trusts.append(c['trust']); k = picks - 1
@@ -43,6 +45,7 @@ async def main():
                 await ev('__dbg.quest().next()'); await asyncio.sleep(.12); continue
             if await ev("!!document.getElementById('simDone').dataset.on || __dbg.simState().simOn"): done = 'simulator after the cave'; break
             await asyncio.sleep(.35)
+        await asyncio.sleep(3); print('lWalk', await ev("document.getElementById('lWalk').textContent"), 'restoreFx', await ev("window.__restoreFx && __restoreFx()"))
         print('cards', cards, 'choices asked', picks, 'trust shown', trusts, 'end', done)
         print('retry line', [t for t in said if '등을 돌린다' in t or '닳은 자리에 답' in t][:2]); open(os.path.join(OUT, 'said.txt'), 'w', encoding='utf-8').write('\n'.join(said)); print('last', said[-4:]); print('errs', errs[:3]); await br.close()
 asyncio.run(main())
