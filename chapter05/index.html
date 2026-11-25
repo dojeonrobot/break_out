@@ -10511,6 +10511,15 @@ setInterval(()=>{ try{ questPillTick(); }catch(e){} try{ $('walkX').hidden = flo
 if(SCREEN){ document.body.classList.add('screen'); controls.autoRotate = true; controls.autoRotateSpeed = 0.4; }
 lastSig = pairSig();
 syncState(); setInterval(syncState, SCREEN ? 8000 : 15000); document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) syncState(); });
+/* 2026-11-25 (user): the first trip to the island froze ~1 s while its shaders, meshes and textures went up to the GPU (2nd trip: no freeze). Draw the island once
+   now, behind the opening cover, with the island's light set and every mesh unculled, so that upload is already done. The next frame draws the campus again */
+(function islandPrewarm(){ if(scene === sceneI) return; const culled = [];
+  try{ const fv = fill.visible; sceneI.add(sun, sun.target, hemi, fill, fill.target); fill.visible = false;
+    sceneI.traverse(o=>{ if(o.frustumCulled){ culled.push(o); o.frustumCulled = false; } });
+    renderer.shadowMap.needsUpdate = true; renderer.render(sceneI, camera);
+    fill.visible = fv; scene.add(sun, sun.target, hemi, fill, fill.target); }
+  catch(e){ console.warn('island prewarm', e); scene.add(sun, sun.target, hemi, fill, fill.target); }
+  culled.forEach(o=> o.frustumCulled = true); shadowDirty = labelsDirty = true; })();
 startIntro(false);
 if(!intro) askTeamLater();   // reduced motion: no entrance, ask right away
 $('loading').hidden = true;
