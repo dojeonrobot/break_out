@@ -4755,7 +4755,7 @@ function visitorBatch(parent,count,prefix){
 }
 // Visitors share the final path network, with width-aware lanes and connected junctions.
 {
-  const NW=PHONE?320:COARSE?400:640,walkers=[],nodes=[],edges=[],buckets=new Map(),positions=[];
+  const NW=250,walkers=[],nodes=[],edges=[],buckets=new Map(),positions=[];
   const guests=visitorBatch(islRoot,NW,'park-visitors'),{body,head}=guests;
   function node(p){
     const bx=Math.floor(p.x/3),bz=Math.floor(p.z/3);
@@ -4777,11 +4777,17 @@ function visitorBatch(parent,count,prefix){
         if(portFenceBlocked((a.p.x+b.p.x)/2,(a.p.z+b.p.z)/2))continue;const e={a,b,length:a.p.distanceTo(b.p),width:r.width,kind:r.kind};a.edges.push(e);b.edges.push(e);edges.push(e);}
       if(r.kind!=='public')ns[ns.length-1].stop=r.kind;
     });
+    /* 250 visitors spread over the whole park (user, 2026-11-25): starts are dealt round-robin over 40 m cells of the path network and each walker keeps to a short
+       loop near its start, so nobody piles up at the busy junctions */
+    const usable=nodes.filter(n=>n.edges.length),cellMap=new Map();
+    usable.forEach(n=>{const k=Math.floor(n.p.x/40)+','+Math.floor(n.p.z/40);if(!cellMap.has(k))cellMap.set(k,[]);cellMap.get(k).push(n);});
+    let cs=97;const crand=()=>{cs=(Math.imul(cs,1664525)+1013904223)>>>0;return cs/4294967296;};
+    const cells=[...cellMap.values()];for(let i=cells.length-1;i>0;i--){const j=Math.floor(crand()*(i+1));[cells[i],cells[j]]=[cells[j],cells[i]];}
     for(let i=0;i<NW;i++){
       let seed=i+731;const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
-      const usable=nodes.filter(n=>n.edges.length);let n=usable[Math.floor(rand()*usable.length)],prev=null,total=0;const legs=[],speed=1.25+rand()*.65;
+      const cell=cells[i%cells.length];let n=cell[Math.floor(rand()*cell.length)],prev=null,total=0;const legs=[],speed=1.25+rand()*.65;
       // A closed itinerary allows deterministic animation and repeatable checks.
-      for(let k=0;k<90;k++){
+      for(let k=0;k<24;k++){
         const choices=n.edges.filter(e=>(e.a===n?e.b:e.a)!==prev),e=(choices.length?choices:n.edges)[Math.floor(rand()*(choices.length||n.edges.length))];
         if(!e)break;const next=e.a===n?e.b:e.a,duration=e.length/speed,wait=n.stop?4+rand()*7:n.edges.length===1?1.3:rand()<.03?2+rand()*5:0;
         legs.push({a:n.p,b:next.p,width:e.width,start:total,wait,duration});total+=wait+duration;prev=n;n=next;
@@ -4799,7 +4805,7 @@ function visitorBatch(parent,count,prefix){
   islAnim.push(t=>{
     if(!walkers.length)init(); vFrame++; const half=vFrame&1;
     walkers.forEach((w,i)=>{
-      if((i&1)!==half) return;   // alternate halves: 320 visitors per frame instead of 640 (2026-11-02)
+      if((i&1)!==half) return;   // alternate halves: half the visitors per frame (2026-11-02)
       const clock=(t+w.phase)%w.total,l=w.legs.find(l=>clock<l.start+l.wait+l.duration)||w.legs[w.legs.length-1],u=Math.max(0,Math.min(1,(clock-l.start-l.wait)/l.duration));
       const dx=l.b.x-l.a.x,dz=l.b.z-l.a.z,len=Math.hypot(dx,dz)||1,hw=Math.max(0,l.width/2-.7),off=hw*Math.max(-1,Math.min(1,w.lane+.45*Math.sin(t*w.sway+w.sph)));   /* anywhere across the path, drifting slowly (user, 2026-11-12) */
       let x=l.a.x+dx*u-dz/len*off,z=l.a.z+dz*u+dx/len*off;
