@@ -113,7 +113,12 @@ body #walkRun[aria-pressed=true]{background:linear-gradient(180deg,#25b06d,#127a
 body #walkRun:active,body #walkJump:active{transform:translateY(5px);box-shadow:0 1px 0 #0a111d,0 4px 10px rgba(0,0,0,.35)}
 body #walkJump:active{box-shadow:0 1px 0 #8c2c06,0 4px 10px rgba(0,0,0,.35)}
 #walkRun svg,#walkJump svg{width:22px;height:22px;flex:none}
-body.cavestory #simBtn,body:has(#labRoom[data-on]) #simBtn{display:none!important}   /* no simulator switch in the machine room, the lab or the cave (user, 2026-11-25) */
+body.cavestory #simBtn,body:has(#labRoom[data-on]) #simBtn{display:none!important}
+body #remPlay .hit{justify-self:center;display:flex;align-items:center;justify-content:center;gap:10px;width:min(360px,100%);height:76px;margin-top:4px;border-radius:18px;color:#fff;font:900 28px/1 var(--sans);letter-spacing:.1em;background:linear-gradient(180deg,#5b6578,#3a4252);border:2px solid #7d879a;box-shadow:0 7px 0 #1d222c,0 10px 20px rgba(0,0,0,.35);transition:transform .06s,box-shadow .06s,background .12s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+body #remPlay .hit svg{width:30px;height:30px}
+body #remPlay .hit.hot{background:linear-gradient(180deg,#ff8a3d,#e0531a);border-color:#ffd08a;box-shadow:0 7px 0 #8c2c06,0 0 0 6px rgba(255,170,80,.35),0 10px 20px rgba(0,0,0,.35)}
+body #remPlay .hit:active{transform:translateY(6px);box-shadow:0 1px 0 #1d222c}
+@media (max-height:520px){body #remPlay .hit{height:56px;font-size:22px}}   /* no simulator switch in the machine room, the lab or the cave (user, 2026-11-25) */
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9658,7 +9663,7 @@ function remBoard(){ const w = walk; if(!w || !mini || mini.kind !== 'device' ||
     ride = {rem:true, q:mini.q, u:STATION.u, spots:remSpots().map((sp, i)=> ({i, u:sp.u, x:sp.x, z:sp.z, hold:0, wasIn:false})), life:3, press:false, pause:false, look:null, lookK:0, beepAt:0};
     mini.phase = 'ride'; TRAIN.wait = false; TRAIN.mode = 'ride'; TRAIN.u = ride.u; walk.ride = ride; walk.snap = true; $('walkPad').hidden = true;
     miniGo.textContent = '탐지'; miniGo.disabled = false; miniDoneBtn.hidden = true; remDots(); miniBox.hidden = false; miniHud(2, '숨겨진 잔재를 찾아라', '보이드의 신호가 강해지는 곳 찾기'); }); }
-function remMiss(text){ const R = ride; if(!R || !R.rem) return; R.life = Math.max(0, (R.life == null ? 3 : R.life) - 1); qPop(text); sfx('error'); remDots(); if(R.life > 0) return;
+function remMiss(text){ const R = ride; if(!R || !R.rem || ((mini && mini.got) || []).length >= 3) return; R.life = Math.max(0, (R.life == null ? 3 : R.life) - 1); qPop(text); sfx('error'); remDots(); if(R.life > 0) return;
   R.pause = true; miniBox.hidden = true; remPulse(0); say([{who:'', nar:true, text:'탐지 기회를 모두 썼습니다. 역에서 다시 출발합니다.'}], ()=>{ if(ride !== R) return; R.u = STATION.u; TRAIN.u = R.u; R.life = 3; R.wasPress = false; R.spots.forEach(sp=>{ sp.wasIn = false; }); R.pause = false; miniBox.hidden = false; remDots(); if(walk) walk.snap = true; }); }
 function remRideNext(){ if(!ride || !mini) return null; const got = mini.got || []; let best = null, bd = 9; ride.spots.forEach(sp=>{ if(got.includes(sp.i)) return; const d = (sp.u - ride.u + 1) % 1; if(d < bd){ bd = d; best = sp; } }); return best; }
 function remRideTick(now, dt){
@@ -9806,6 +9811,9 @@ function remPlayEl(){ let el = $('remPlay'); if(el) return el; el = document.cre
   el.innerHTML = '<div class="hd"><b id="rpT"></b><span id="rpPips" aria-hidden="true"></span></div><p id="rpP"></p><div id="rpBody"></div>'; document.body.appendChild(el);
   el.addEventListener('pointerdown', e=>{ const G2 = REM.game; if(!G2 || G2.done) return; const k = e.target.closest('.keys button'); if(k){ e.preventDefault(); remKey(k.dataset.k); return; } if(G2.kind !== 2){ e.preventDefault(); remTap(); } }); return el; }
 const REM_ARROW = {Up:'↑', Down:'↓', Left:'←', Right:'→'}, REM_TOUCH = ()=> matchMedia('(pointer:coarse)').matches;
+/* 2026-11-25 (user: on the tablet nothing said where to touch): a big 「치기」 key under the game, lit when the timing is right. The whole panel already took the tap; now it shows */
+const REM_HITBTN = '<button type="button" class="hit" aria-label="치기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>치기</button>';
+function remHitHot(on){ const b = $('remPlay') && $('remPlay').querySelector('.hit'); if(b) b.classList.toggle('hot', !!on); }
 function remPips(){ const G2 = REM.game; if(!G2) return; $('rpPips').innerHTML = Array.from({length:G2.need}, (_, k)=> `<i class="${k < G2.hits ? 'on' : ''}"></i>`).join(''); }
 function remSay(t){ $('rpP').innerHTML = t; let tip = $('remTip'); if(!tip){ tip = document.createElement('p'); tip.id = 'remTip'; tip.setAttribute('aria-hidden', 'true'); remPlayEl().after(tip); } tip.innerHTML = t; }   /* the same line, large, in a band near the top (user picked 시안 A, 2026-11-19: a small line was not read) */
 function remHit(G2, m){ const now = performance.now(); G2.hits++; G2.shake = now + 260; sfx('chain'); remDebris(m.core.getWorldPosition(new THREE.Vector3()), 7); remPips();
@@ -9815,20 +9823,20 @@ function remHit(G2, m){ const now = performance.now(); G2.hits++; G2.shake = now
 function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl(); remDlg(); mini.phase = 'game'; remPulse(0); miniBox.hidden = true; miniGo.classList.remove('hot'); if(m.beam) m.beam.visible = false;   /* the finding beam would wash the device out */
   const G2 = REM.game = {i, kind, hits:0, need:kind === 0 ? 6 : kind === 1 ? 4 : 5,   /* 2026-11-24 (user: 조금만 더 어렵게): weak point 3.2 → 3.6 and a narrower front 0.62 → 0.7, bar band 20% → 17% (min 12%) and speed 1.15 → 1.35, arrows 2 + n×0.3 → 1.8 + n×0.26 s. 2026-11-20 (user): the bar was the hardest and the arrows the easiest */ ang:Math.random()*6.28, sp:reduce ? 1.1 : 3.6, boost:0,   /* 2026-11-19 (user: 너무 쉬워, 2배 이상): faster weak point and a narrower front window; the bar is twice as fast with about half the band; the arrows are 6-8-10 long with under a second per key */ shake:0, tapAt:0, last:performance.now(), done:false, front:false};
   $('rpT').textContent = ['약점 치기', '때 맞춰 치기', '순서대로 누르기'][kind]; remPips(); el.hidden = false; sfx('open');
-  if(kind === 0){ $('rpBody').innerHTML = ''; remSay(REM_TOUCH() ? '노란 약점이 앞으로 올 때 약점을 누르세요' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>');
+  if(kind === 0){ $('rpBody').innerHTML = REM_TOUCH() ? REM_HITBTN : ''; remSay(REM_TOUCH() ? '노란 약점이 앞으로 오면 아래 「치기」 버튼!' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>');
     if(!m.weak){ m.weak = add(m.g, SPH(0.55, 12, 10), glowMat(0xffe14a, 0.99), 0, m.cy, 0, false); m.weak.userData.dynamic = true; } m.weak.visible = true;
     const aim = remAimEl(), wp = new THREE.Vector3();
     const loop = ()=>{ if(REM.game !== G2 || G2.done){ aim.hidden = true; return; } const now = performance.now(), dt = Math.min(0.05, (now - G2.last)/1000); G2.last = now;
       G2.ang = (G2.ang + G2.sp*(1 + G2.hits*0.16)*dt) % (Math.PI*2); const r = m.wr || 2.7; m.weak.position.set(Math.cos(G2.ang)*r, m.cy + Math.sin(G2.ang*2)*0.7, Math.sin(G2.ang)*r);
       m.weak.getWorldPosition(wp); const cx = m.g.position.x, cz = m.g.position.z, cd = Math.hypot(camera.position.x - cx, camera.position.z - cz) || 1;
-      G2.front = ((wp.x - cx)*(camera.position.x - cx) + (wp.z - cz)*(camera.position.z - cz))/(r*cd) > (reduce ? 0.25 : 0.7); m.weak.material.opacity = G2.front ? 0.99 : 0.22; m.weak.scale.setScalar(G2.front ? 1 + 0.25*Math.sin(now/90) : 0.6);
+      G2.front = ((wp.x - cx)*(camera.position.x - cx) + (wp.z - cz)*(camera.position.z - cz))/(r*cd) > (reduce ? 0.25 : 0.7); m.weak.material.opacity = G2.front ? 0.99 : 0.22; m.weak.scale.setScalar(G2.front ? 1 + 0.25*Math.sin(now/90) : 0.6); remHitHot(G2.front);
       wp.project(camera); aim.hidden = !G2.front || !!vn; aim.style.transform = `translate(${((wp.x + 1)/2*innerWidth).toFixed(0)}px, ${((1 - wp.y)/2*innerHeight).toFixed(0)}px) translate(-50%, -50%)`;
       G2.raf = requestAnimationFrame(loop); }; loop(); }
-  else if(kind === 1){ $('rpBody').innerHTML = '<div class="bar"><div class="zn"></div><div class="mk"></div></div>'; remSay(REM_TOUCH() ? '흰 표시가 노란 칸에 들어올 때 막대를 누르세요' : '흰 표시가 노란 칸에 들어올 때 <kbd>Space</kbd>');
+  else if(kind === 1){ $('rpBody').innerHTML = '<div class="bar"><div class="zn"></div><div class="mk"></div></div>' + (REM_TOUCH() ? REM_HITBTN : ''); remSay(REM_TOUCH() ? '흰 표시가 노란 칸에 들어오면 아래 「치기」 버튼!' : '흰 표시가 노란 칸에 들어올 때 <kbd>Space</kbd>');
     const zn = el.querySelector('.zn'), mk = el.querySelector('.mk'); G2.pos = 0; G2.dir = 1; const zone = ()=>{ G2.zw = reduce ? Math.max(0.1, 0.24 - G2.hits*0.03) : Math.max(0.12, 0.17 - G2.hits*0.015); G2.zc = 0.14 + Math.random()*0.72; zn.style.left = ((G2.zc - G2.zw/2)*100).toFixed(1) + '%'; zn.style.width = (G2.zw*100).toFixed(1) + '%'; }; G2.zone = zone; zone();
     const loop = ()=>{ if(REM.game !== G2 || G2.done) return; const now = performance.now(), dt = Math.min(0.05, (now - G2.last)/1000); G2.last = now;
       G2.pos += G2.dir*dt*(reduce ? 0.55 : 1.35 + G2.hits*0.13); if(G2.pos > 1){ G2.pos = 1; G2.dir = -1; } if(G2.pos < 0){ G2.pos = 0; G2.dir = 1; }
-      G2.front = Math.abs(G2.pos - G2.zc) <= G2.zw/2; mk.style.left = (G2.pos*100).toFixed(1) + '%'; m.core.scale.setScalar(G2.front ? 1.5 : 1);
+      G2.front = Math.abs(G2.pos - G2.zc) <= G2.zw/2; mk.style.left = (G2.pos*100).toFixed(1) + '%'; remHitHot(G2.front); m.core.scale.setScalar(G2.front ? 1.5 : 1);
       G2.raf = requestAnimationFrame(loop); }; loop(); }
   else { const round = ()=>{ const n = reduce ? 4 + G2.hits : 6 + G2.hits, ks = Object.keys(REM_ARROW); G2.seq = Array.from({length:n}, ()=> ks[Math.floor(Math.random()*4)]); G2.at = 0; G2.t0 = performance.now(); G2.limit = reduce ? 9 + n*0.4 : 1.8 + n*0.26;
       $('rpBody').innerHTML = `<div class="seq">${G2.seq.map((k, j)=> `<i class="${j === 0 ? 'now' : ''}">${REM_ARROW[k]}</i>`).join('')}</div><div class="tm"><b></b></div><div class="keys">${['Left', 'Up', 'Down', 'Right'].map(k=> `<button type="button" data-k="${k}" aria-label="${REM_ARROW[k]}">${REM_ARROW[k]}</button>`).join('')}</div>`; };
@@ -9839,7 +9847,7 @@ function remGame(i){ const m = REM.models[i], kind = m.kind || 0, el = remPlayEl
 function remLock(ms){ const el = remPlayEl(), aim = remAimEl(); el.classList.add('lock'); aim.classList.add('lock'); clearTimeout(remLock.t); remLock.t = setTimeout(()=>{ el.classList.remove('lock'); aim.classList.remove('lock'); }, ms); }
 function remTap(){ const G2 = REM.game; if(!G2 || G2.done || vn || G2.kind === 2) return; const m = REM.models[G2.i], now = performance.now(); if(now - G2.tapAt < 170 || now < (G2.lock || 0)) return; G2.tapAt = now;
   /* 2026-11-20 (user: Space 연타하면 버그): mashing won both games in two seconds, as a miss cost nothing. A miss now locks the hit for 0.9 s */
-  if(!G2.front){ G2.lock = now + 900; remLock(900); sfx('error'); remSay(G2.kind === 0 ? '빗나갔어! 잠깐 멈췄다가 약점이 앞에 올 때 쳐' : '빗나갔어! 잠깐 멈췄다가 노란 칸에 들어올 때 쳐'); setTimeout(()=>{ if(REM.game === G2 && !G2.done) remSay(G2.kind === 0 ? (REM_TOUCH() ? '노란 약점이 앞으로 올 때 약점을 누르세요' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>') : (REM_TOUCH() ? '흰 표시가 노란 칸에 들어올 때 막대를 누르세요' : '흰 표시가 노란 칸에 들어올 때 <kbd>Space</kbd>')); }, 1300); return; }
+  if(!G2.front){ G2.lock = now + 900; remLock(900); sfx('error'); remSay(G2.kind === 0 ? '빗나갔어! 잠깐 멈췄다가 약점이 앞에 올 때 쳐' : '빗나갔어! 잠깐 멈췄다가 노란 칸에 들어올 때 쳐'); setTimeout(()=>{ if(REM.game === G2 && !G2.done) remSay(G2.kind === 0 ? (REM_TOUCH() ? '노란 약점이 앞으로 오면 아래 「치기」 버튼!' : '노란 약점이 앞으로 올 때 <kbd>Space</kbd>') : (REM_TOUCH() ? '흰 표시가 노란 칸에 들어오면 아래 「치기」 버튼!' : '흰 표시가 노란 칸에 들어올 때 <kbd>Space</kbd>')); }, 1300); return; }
   if(remHit(G2, m)) return; remSay(`금이 갔어! 남은 타격 ${G2.need - G2.hits}`);
   if(G2.kind === 0) G2.ang += Math.PI*(0.7 + Math.random()*0.5); else G2.zone(); }
 function remKey(k){ const G2 = REM.game; if(!G2 || G2.done || vn || G2.kind !== 2) return; const m = REM.models[G2.i], el = remPlayEl(), cells = el.querySelectorAll('.seq i');
@@ -9854,7 +9862,7 @@ window.__remWin = ()=>{ const G2 = REM.game; if(G2 && !G2.done){ G2.hits = G2.ne
 miniGo.addEventListener('click', ()=>{ if(REM.game && !REM.game.done) remTap(); });
 function remFinish(i){ delete $('remDlg').dataset.on; REM.game = null; const m = REM.models[i]; remCollapse(m, false); const got = mini.got = [...new Set([...(mini.got || []), i])]; miniSave('hunt', {got});
   if(REM.rings[i]){ miniRoot.remove(REM.rings[i]); REM.rings[i] = null; } const left = 3 - got.length; if(m.beam) m.beam.visible = false;
-  if(ride && ride.rem){ const R = ride; remDots(); say([{who:'보이드', text: left ? `잔재 하나를 부쉈어. 남은 건 ${left}개야.` : '마지막 잔재까지 부쉈어. 역으로 돌아가서 연구실에서 다시 확인하자.'}], ()=>{ if(!mini || ride !== R) return; REM.quiet = performance.now() + 800; mini.phase = 'ride'; R.down = null; R.pause = false; R.look = null; miniGo.textContent = '탐지'; miniGo.classList.remove('hot'); remDots(); miniBox.hidden = false; }); return; }
+  if(ride && ride.rem){ const R = ride; remDots(); say([{who:'보이드', text: left ? `잔재 하나를 부쉈어. 남은 건 ${left}개야.` : '마지막 잔재까지 부쉈어. 역으로 돌아가서 연구실에서 다시 확인하자.'}], ()=>{ if(!mini || ride !== R) return; REM.quiet = performance.now() + 800; mini.phase = 'ride'; R.down = null; R.pause = false; R.look = null; miniGo.textContent = '탐지'; miniGo.classList.remove('hot'); remDots(); miniBox.hidden = !left; if(!left){ R.boost = 2.5; miniHud(2, '역으로 돌아가기', '열차가 역으로 돌아가는 중'); } }); return; }   /* all three broken: no 탐지 any more, the train runs back to the station (user, 2026-11-25) */
   say([{who:'보이드', text: left ? `잔재 하나를 부쉈어. 남은 건 ${left}개야.` : '마지막 잔재까지 부쉈어. 연구실로 돌아가서 다시 확인하자.'}], ()=>{ if(!mini) return; if(left){ mini.phase = 'hunt'; remHud(); } else remBack(); }); }
 function remBack(){ buildLabDoor(); remPulse(0); const got = mini.got || [0, 1, 2]; REM.models.forEach((m, i)=>{ if(got.includes(i) && m.state !== 2) remCollapse(m, true); }); miniSave('device-return', {got});
   miniWalkTo(3, '연구실로 돌아가기', '관람차 언덕 아래', LAB_DOOR, 8, remRerun); }
