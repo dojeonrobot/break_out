@@ -8344,7 +8344,7 @@ function stopWalk(byUser){ if(MAZE) MAZE.clip.constant = 1e6; document.body.clas
   if(!walk) return;
   if(left && byUser) setTimeout(()=>{ try{ voidSay('미션 진행은 저장해 뒀어. 왼쪽 아래 「미션 이어하기」를 누르면 하던 데서 다시 시작해.', 7000, 'say'); }catch(e){} }, 400);
   (walk.hid || []).forEach(h=>{ h.g.visible = h.v; }); walk.mates.forEach(m=>{ m.g.visible = true; }); delete $('heroPick').dataset.on;
-  walk.home.forEach(h=>{ h.g.position.copy(h.p); h.g.rotation.y = h.r; }); walk = null; for(const k in WALK_KEYS) delete WALK_KEYS[k]; walkPad.dx = walkPad.dz = 0; walkPad.run = false; walkPad.id = null; $('walkPad').classList.remove('run'); $('walkPad').querySelector('i').style.transform = '';
+  walk.home.forEach(h=>{ h.g.position.copy(h.p); h.g.rotation.y = h.r; }); walk = null; for(const k in WALK_KEYS) delete WALK_KEYS[k]; walkPad.dx = walkPad.dz = 0; walkPad.run = false; walkPad.lock = false; $('walkRun').setAttribute('aria-pressed', 'false'); walkPad.id = null; $('walkPad').classList.remove('run'); $('walkPad').querySelector('i').style.transform = '';
   camera.near = walkSaved.near; camera.fov = mapFov(); camera.updateProjectionMatrix();
   camera.position.copy(walkSaved.pos); controls.target.copy(walkSaved.tgt); controls.enabled = true;
   document.body.classList.remove('walk'); $('walkHud').hidden = true; $('walkPad').hidden = true;
@@ -8360,7 +8360,7 @@ function walkTick(now){
   w.yaw += turn*1.8*dt;
   let mx = fwd - walkPad.dz*hold, mz = strafe + walkPad.dx*hold; const len = Math.hypot(mx, mz); if(len > 1){ mx /= len; mz /= len; }
   { const ek = 1 - Math.exp(-dt*(len ? 9 : 13)); w.imx = (w.imx || 0) + (mx - (w.imx || 0))*ek; w.imz = (w.imz || 0) + (mz - (w.imz || 0))*ek; if(Math.hypot(w.imx, w.imz) < 0.02){ w.imx = 0; w.imz = 0; } mx = w.imx; mz = w.imz; }   /* ease in and out of a walk */
-  const speed = (k.ShiftLeft || k.ShiftRight || walkPad.run || walkPad.lock ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
+  const speed = (k.ShiftLeft || k.ShiftRight || walkPad.lock ? 11 : 5.5)*(w.fly ? 1.4 : 1), sy = Math.sin(w.yaw), cy = Math.cos(w.yaw);
   const dx = (sy*mx - cy*mz)*speed*dt, dz = (cy*mx + sy*mz)*speed*dt;   // right = forward × up = (-cy, sy): pad right / E goes screen-right (2026-10-30, was mirrored)
   const oldX = w.x, oldZ = w.z;
   if(dx || dz){
@@ -8495,9 +8495,9 @@ renderer.domElement.addEventListener('pointermove', e=>{ if(!walk || !walk.drag 
 { const rb = $('walkRun'), wp = $('walkPad'); rb.onclick = e=>{ e.stopPropagation(); walkPad.lock = !walkPad.lock; rb.setAttribute('aria-pressed', walkPad.lock ? 'true' : 'false'); sfx('tap'); };
   /* tablets had no way to jump (Space only); a jump button opposite the joystick, shown with it (user, 2026-11-25) */
   const jb = $('walkJump'); jb.onclick = e=>{ e.stopPropagation(); walkJump(); };
-  new MutationObserver(()=>{ rb.hidden = jb.hidden = wp.hidden; if(wp.hidden){ walkPad.lock = false; rb.setAttribute('aria-pressed', 'false'); } }).observe(wp, {attributes:true, attributeFilter:['hidden']}); }   /* a run button for the tablets (user, 2026-11-13) */
+  new MutationObserver(()=>{ rb.hidden = jb.hidden = wp.hidden; rb.setAttribute('aria-pressed', walkPad.lock ? 'true' : 'false'); }).observe(wp, {attributes:true, attributeFilter:['hidden']}); }   /* a run button for the tablets (user, 2026-11-13) */
 { const pad = $('walkPad'), nub = pad.querySelector('i'), R = 44;
-  const move = e=>{ const r = pad.getBoundingClientRect(); let x = e.clientX - (r.left + r.width/2), y = e.clientY - (r.top + r.height/2); const d = Math.hypot(x, y); walkPad.run = d > R*(chase && !chase.over ? 0.82 : 1.15); pad.classList.toggle('run', walkPad.run); if(d > R){ x *= R/d; y *= R/d; } walkPad.dx = x/R; walkPad.dz = y/R; nub.style.transform = `translate(${x}px,${y}px)`; };
+  const move = e=>{ const r = pad.getBoundingClientRect(); let x = e.clientX - (r.left + r.width/2), y = e.clientY - (r.top + r.height/2); const d = Math.hypot(x, y); /* no sprint from pushing the stick to the edge: only the RUN button runs (user, 2026-11-25) */ if(d > R){ x *= R/d; y *= R/d; } walkPad.dx = x/R; walkPad.dz = y/R; nub.style.transform = `translate(${x}px,${y}px)`; };
   pad.addEventListener('pointerdown', e=>{ if(walkPad.id != null) return; walkPad.id = e.pointerId; try{ pad.setPointerCapture(e.pointerId); }catch(err){} move(e); e.preventDefault(); });
   pad.addEventListener('pointermove', e=>{ if(e.pointerId === walkPad.id) move(e); });
   ['pointerup', 'pointercancel'].forEach(ev=> pad.addEventListener(ev, e=>{ if(e.pointerId !== walkPad.id) return; walkPad.id = null; walkPad.dx = walkPad.dz = 0; walkPad.run = false; pad.classList.remove('run'); nub.style.transform = ''; })); }
