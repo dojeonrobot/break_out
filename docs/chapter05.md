@@ -1002,3 +1002,12 @@ sudo cp dorogram.service /etc/systemd/system/ && sudo systemctl daemon-reload &&
 - 서버 상태: `DB.assign[round][team] = {truth, topicId, title, doc, brief}`, `DB.quiz = {round, order, idx, open, revealed}`. API: `/admin/quiz {action: start|close|next|prev|reopen}`, `/admin/reassign {team}`. `state`에 `assignment`(내 조), `quiz`(total·idx·open·revealed·postId·voted·done), `roundScores`, 관리자는 `assignments`. 판별은 `quiz.open`이고 현재 문제일 때만 받는다. `POSTS_PER_ROUND = 1`.
 - 자료실 v2(`archive-data.js`, 42건): 사건 기록부가 중심이다. `complete: true` 문서는 전수(여기 없으면 세계에 없음). 예시와 주제 풀의 숫자는 전부 여기서 나온다. 세계의 사실(야간개장은 할로윈 금·토만, 관람차 야간 운행 없음, 사자 없음, 올해 정지 6건·부상 0 등)을 바꾸려면 기록부·주제·예시를 같이 고친다.
 - 예시 24개 `scripts/pending/feed_rebuild_v4.py`. 검증 `scratchpad e2e_v4.py`(배정·강제 truth·퀴즈 진행·투표 제한·공개·점수·관리자 표, 전부 통과).
+
+
+## 2026-11-25 태블릿 겹침 6건 (노션 「scan break」 체크 필요)
+- 보이드 대화창: 단계 카드(`#voidCard`)가 있으면 상자 아래 여백 50px → ‹ 이전·탭 ▸ 다음과 카드가 겹치지 않음.
+- 지도 조 이름표: `placeLabels`가 내 조를 먼저 놓고 맨 위(z-index 3)에 둔다. 다른 조 이름표가 겹치면 아래로 비켜 쌓는다(4조 이름표가 8조 밑에 깔리던 문제).
+- 달리기 버튼: 점프 왼쪽(오른쪽 아래)으로 옮김, `OFF`/`ON` 꼬리표. 조이스틱과 겹치는 좁은 화면이면 점프 위로.
+- layout guard(본문 끝 `<script>`): 0.5초마다·화면 크기가 바뀔 때 떠 있는 UI 겹침을 재고 비켜 세운다. 좌표 카드 `#meCoord`는 옆 버튼 사이로 옮기거나 위로, 건물 카드 `#info`는 아래 막대·버튼 위로, `#panel`·`#board`는 그 위에서 끝나게(max-height), 화면 전환 `#worlds`와 겹치면 패널을 아래로, 관리자 `#admSkip`은 시뮬레이터·미션 머리띠 아래로. 겹침이 없으면 아무것도 바꾸지 않는다(PC 1920 화면 그대로).
+- 점검: `scripts/pending/ch5_check_tablet_1125.py <폴더> [desk tabL tabP phoneP phoneL]`(API 8096 + 정적 8097). 1280x690·800x1170·1920x1000에서 겹침 0. 휴대폰 가로(844x340)는 좌표 카드가 8조 이름표를 가림(높이가 모자람, 폰은 보조 기기).
+- 패치 `scripts/pending/ch5_patch_tablet_1125.py`. 7번 「시간 설정」(섬 하루 시각 슬라이더)은 질문이라 손대지 않음.
