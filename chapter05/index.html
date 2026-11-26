@@ -121,6 +121,7 @@ body #remPlay .hit:active{transform:translateY(6px);box-shadow:0 1px 0 #1d222c}
 @media (max-height:520px){body #remPlay .hit{height:56px;font-size:22px}}   /* no simulator switch in the machine room, the lab or the cave (user, 2026-11-25) */
 /* tablet overlaps (노션 scan break 체크 필요, 2026-11-25) */#voidVn .box:has(#voidCard:not(:empty)){padding-bottom:50px}.mk.team{z-index:1}.mk.team.me{z-index:3}body #walkRun{left:auto;right:calc(24px + var(--jumpW,132px) + 12px)}body #walkRun::after{content:'OFF';font:800 11px/1 var(--mono);letter-spacing:.06em;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.16);color:rgba(255,255,255,.75)}body #walkRun[aria-pressed=true]::after{content:'ON';background:#fff;color:#127a48}
 /* board collapse = small minus in the top-right corner (user, 2026-11-26) */#board #bMin{position:absolute;top:8px;right:8px;width:30px;height:30px;min-width:0;min-height:0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:0;cursor:pointer;z-index:1}@media (hover:hover){#board #bMin:hover{background:var(--line);color:var(--fg)}}#board #bMin:focus-visible{outline:2px solid currentColor;outline-offset:1px}#board #bMin::before,#board #bMin::after{content:'';position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;border-radius:1px;background:currentColor}#board #bMin::after{display:none;transform:rotate(90deg)}#board.closed #bMin::after{display:block}#board #bMin{top:6px;right:6px;width:28px;height:28px}#board .bh .acts{padding-top:22px}@media (pointer:coarse){#board #bMin{width:40px;height:40px;top:2px;right:2px}#board .bh .acts{padding-top:30px}}
+#pSub{display:none!important}.team .tlabel{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--fg)}.team .tlabel b{font-size:14px}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -720,9 +721,7 @@ body.island #panel,body.sim #panel{display:none}
   </div>
   <div id="iluaBox"></div>
   <div class="team">
-    <label for="teamSel">우리 조
-      <select id="teamSel"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
-    </label>
+    <span class="tlabel">우리 조 <b id="teamTxt"></b><button id="teamPickBtn" class="mini" type="button" hidden>조 고르기</button></span><select id="teamSel" hidden aria-hidden="true" tabindex="-1"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
     <span class="tacts"><button id="againBtn" class="mini" type="button" hidden>처음부터</button></span>
   </div>
   <div class="auxnote" id="auxNote" hidden>폰: 스캔·좌표·현황 확인 / 미션: 조 태블릿</div>
@@ -1702,7 +1701,7 @@ function checkReset(st){
   try{ localStorage.removeItem('void-team'); }catch(e){}
   if(!SCREEN){ hardRestart(true); return; }
   TEAM = 0;
-  const sel = $('teamSel'); if(sel) sel.value = '';
+  const sel = $('teamSel'); if(sel) sel.value = ''; try{ teamLabel(); }catch(e){}
   if(!SCREEN){ const tp = $('teamPick'); if(tp) tp.dataset.on = '1'; }
   toast('초기화됐습니다. 조를 다시 고르세요');
 }
@@ -2113,8 +2112,10 @@ $('tV').onclick=()=>setTab('v'); $('tR').onclick=()=>setTab('r'); $('tB').onclic
 $('adminX').onclick = closeAdmin;
 // team picker (remembered on this device) and the admin entry (password checked by the server)
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
+function teamLabel(){ $('teamTxt').textContent = TEAM ? TEAM + '조' : ''; $('teamPickBtn').hidden = !!TEAM || SCREEN || LOCAL; }   /* team is fixed once picked (user, 2026-11-26): kids must not hop between teams; 「처음부터」 (teacher password) frees it */
+teamLabel(); $('teamPickBtn').onclick = ()=>{ $('teamPick').dataset.on = '1'; };
 function helloTeam(){ if(LOCAL || !TEAM || SCREEN || ADMIN_KEY || AUX) return; api('/quest', {team:TEAM, dev:DEV}).then(applyState).catch(()=>{}); }
-teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; $('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
+teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; teamLabel(); $('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
 // first open: pick a team (after the map's entrance), then ask for the position
 var ASK_TEAM = false;
 { const tp = $('teamPick');
