@@ -122,6 +122,7 @@ body #remPlay .hit:active{transform:translateY(6px);box-shadow:0 1px 0 #1d222c}
 /* tablet overlaps (노션 scan break 체크 필요, 2026-11-25) */#voidVn .box:has(#voidCard:not(:empty)){padding-bottom:50px}.mk.team{z-index:1}.mk.team.me{z-index:3}body #walkRun{left:auto;right:calc(24px + var(--jumpW,132px) + 12px)}body #walkRun::after{content:'OFF';font:800 11px/1 var(--mono);letter-spacing:.06em;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.16);color:rgba(255,255,255,.75)}body #walkRun[aria-pressed=true]::after{content:'ON';background:#fff;color:#127a48}
 /* collapse buttons = white square with −/+ in each card's top-right corner (user picked A, 2026-11-26) */#board #bMin,#panel #toggle{position:absolute;top:10px;right:10px;width:32px;height:32px;min-width:0;min-height:0;padding:0;margin:0;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(20,30,40,.08);color:var(--fg);font-size:0;cursor:pointer;z-index:1;grid-row:auto;grid-column:auto}@media (hover:hover){#board #bMin:hover,#panel #toggle:hover{background:#f1f4f7}}#board #bMin:focus-visible,#panel #toggle:focus-visible{outline:2px solid currentColor;outline-offset:2px}#board #bMin::before,#board #bMin::after,#panel #toggle::before,#panel #toggle::after{content:'';position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:1px;background:currentColor}#board #bMin::after,#panel #toggle::after{display:none;transform:rotate(90deg)}#board.closed #bMin::after,#panel.closed #toggle::after{display:block}#panel .ph{position:relative;padding-right:54px!important}#board .bh{position:relative;padding-right:54px!important}#board.closed .bh small,#board.closed #bN{display:none}#board.closed .bh{padding-bottom:14px}#panel.closed #iluaBox,#panel.closed .auxnote{display:none!important}#panel.closed{width:max-content!important;max-width:calc(100vw - 24px)}@media (pointer:coarse){#board #bMin,#panel #toggle{width:40px;height:40px;top:6px;right:6px}#panel .ph,#board .bh{padding-right:58px!important}}.recs{margin-top:10px;display:flex;flex-direction:column;gap:6px}.rec{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:10px;background:color-mix(in srgb,var(--restored,#1a9a5a) 8%,transparent)}.rec .th{width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--restored,#1a9a5a);color:#fff;display:grid;place-items:center;font-weight:700}.rec .th img{width:100%;height:100%;object-fit:cover;display:block}.rec h4{margin:0;font-size:13.5px;font-weight:600}.rec p{margin:2px 0 0;font-size:12px;color:var(--muted)}
 #pSub{display:none!important}.team .tlabel{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--fg)}.team .tlabel b{font-size:14px}
+#syncDlg{position:fixed;inset:0;z-index:35;display:none;place-items:center;background:rgba(20,26,34,.45)}#syncDlg[data-on]{display:grid}#syncDlg .in{display:grid;gap:12px;width:min(420px,calc(100vw - 32px));padding:22px 20px;border-radius:16px;background:var(--panel-solid,#fff);color:var(--fg);box-shadow:0 24px 60px -20px rgba(20,30,40,.45)}#syncDlg h2{margin:0;font-size:20px}#syncDlg p{margin:0;font-size:13px;line-height:1.55;color:var(--muted);word-break:keep-all}#syList{display:grid;gap:8px}.syrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}.syrow>div{display:grid;gap:2px;min-width:0}.syrow b{font-size:14px}.syrow small{font-size:12px;color:var(--muted)}.syrow .mini{margin-left:auto;white-space:nowrap}.syrow.me{background:color-mix(in srgb,currentColor 5%,transparent);border-style:dashed}.syrow.ahead{border-color:var(--restored,#1a9a5a)}.syrow.ahead small{color:var(--restored,#1a9a5a)}#syClose{justify-self:end}.syempty{text-align:center}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -722,7 +723,7 @@ body.island #panel,body.sim #panel{display:none}
   <div id="iluaBox"></div>
   <div class="team">
     <span class="tlabel">우리 조 <b id="teamTxt"></b><button id="teamPickBtn" class="mini" type="button" hidden>조 고르기</button></span><select id="teamSel" hidden aria-hidden="true" tabindex="-1"><option value="">선택</option><option value="1">1조</option><option value="2">2조</option><option value="3">3조</option><option value="4">4조</option><option value="5">5조</option><option value="6">6조</option><option value="7">7조</option><option value="8">8조</option><option value="9">9조</option><option value="10">10조</option><option value="11">11조</option><option value="12">12조</option></select>
-    <span class="tacts"><button id="againBtn" class="mini" type="button" hidden>처음부터</button></span>
+    <span class="tacts"><button id="syncBtn" class="mini" type="button" hidden>진도 맞추기</button><button id="againBtn" class="mini" type="button" hidden>처음부터</button></span>
   </div>
   <div class="auxnote" id="auxNote" hidden>폰: 스캔·좌표·현황 확인 / 미션: 조 태블릿</div>
   <div class="tabs" role="tablist">
@@ -802,6 +803,7 @@ body.island #panel,body.sim #panel{display:none}
 <div id="qPop" hidden><b></b></div><div id="qMark" hidden aria-hidden="true"><i></i><b></b></div>
 <div id="vn" aria-live="polite"><button type="button" id="vnSkip">건너뛰기 ›</button><div class="in"><img id="vnImg" alt=""><div class="box"><b id="vnName"></b><span class="dots" id="vnDots"></span><p id="vnText"></p><span class="nav"><button type="button" id="vnPrev" hidden>‹ 이전</button><i id="vnNext">Space</i></span></div></div></div>
 <div id="qReward" role="dialog" aria-modal="true" aria-labelledby="qrT"><div class="in"><small id="qrS">MISSION CLEAR</small><h1 id="qrT">좌표를 받았습니다</h1><p id="qrP"></p><p id="qrCount" role="status" hidden></p><div class="zs" id="qrList"></div><ol class="steps"><li><i>1</i>ERICA 지도 열기</li><li><i>2</i>좌표 자리 찾아가기</li><li><i>3</i>사진 찍고 스캔하기</li></ol><div class="row"><button type="button" class="go" id="qrMap">ERICA 지도에서 보기</button><button type="button" class="later" id="qrStay">계속 탐험</button></div></div></div>
+<div id="syncDlg" role="dialog" aria-modal="true" aria-labelledby="syT"><div class="in"><h2 id="syT">진도 맞추기</h2><p>같은 조 다른 기기의 진도를 이 기기로 가져옵니다.<br>더 나아간 쪽 진도로 합쳐집니다.</p><div id="syList"></div><button type="button" class="mini" id="syClose">닫기</button></div></div>
 <div id="teamPick" role="dialog" aria-modal="true" aria-labelledby="tpT"><div class="in">
   <small>DOROLAND · CHAPTER 5</small><h2 id="tpT">몇 조인가요?</h2>
   <div class="grid" id="tpGrid"></div>
@@ -2119,8 +2121,9 @@ $('adminX').onclick = closeAdmin;
 const teamSel = $('teamSel'); teamSel.value = TEAM || '';
 function teamLabel(){ $('teamTxt').textContent = TEAM ? TEAM + '조' : ''; $('teamPickBtn').hidden = !!TEAM || SCREEN || LOCAL; }   /* team is fixed once picked (user, 2026-11-26): kids must not hop between teams; 「처음부터」 (teacher password) frees it */
 teamLabel(); $('teamPickBtn').onclick = ()=>{ $('teamPick').dataset.on = '1'; };
-function helloTeam(){ if(LOCAL || !TEAM || SCREEN || ADMIN_KEY || AUX) return; api('/quest', {team:TEAM, dev:DEV}).then(applyState).catch(()=>{}); }
-teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; teamLabel(); $('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
+const DEV_KIND = (()=>{ try{ if(!matchMedia('(pointer:coarse)').matches) return 'laptop'; return Math.min(screen.width, screen.height) < 600 ? 'phone' : 'tablet'; }catch(e){ return 'tablet'; } })();
+function helloTeam(){ if(LOCAL || !TEAM || SCREEN || ADMIN_KEY || AUX) return; api('/quest', {team:TEAM, dev:DEV, kind:DEV_KIND}).then(applyState).catch(()=>{}); }
+teamSel.onchange = ()=>{ TEAM = +teamSel.value || 0; teamLabel(); $('againBtn').hidden = $('syncBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; setTimeout(helloTeam, 300); try{ localStorage.setItem('void-team', TEAM || ''); }catch(e){} rescan(); setTimeout(()=>{ try{ maybeGuide(); actCheck(); }catch(e){} }, 900); if(TEAM && !SCREEN) startGeo(); };
 // first open: pick a team (after the map's entrance), then ask for the position
 var ASK_TEAM = false;
 { const tp = $('teamPick');
@@ -9054,7 +9057,20 @@ async function voidHelp(){ if($('voidVn').dataset.on || actBusy || vn) return;
   else if(next){const q=dueQuest();if(q)await voidAsk(activityHelp(q),'idle');else await voidAsk('같은 조의 다른 태블릿을 기다리는 중이야. 끝나면 다음 활동을 안내할게.','idle');}
   else await voidAsk('캠퍼스의 기록은 다 모았어. 섬에서 나머지를 이어가자.', 'joy'); }
 // 처음부터: a team wipes its own work (a wrong link, or they want another go) — submissions and mission progress on the server, every memory on this tablet
-$('againBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; $('auxNote').hidden = !AUX;
+$('againBtn').hidden = $('syncBtn').hidden = !TEAM || SCREEN || LOCAL || AUX; $('auxNote').hidden = !AUX;
+/* progress sync between a team's devices (user, 2026-11-26): tablet outside → laptop for the STL upload → back. Pull only, merged on the server; press on each device that should catch up */
+{ const KIND = {tablet:'태블릿', laptop:'노트북', phone:'휴대폰'}, qn = e=> Object.keys(e || {}).filter(k=> QID.test(k)).length, qt = ()=> typeof QUESTS !== 'undefined' ? QUESTS.length : 5;
+  const devName = (l, e)=> `${KIND[e.kind] || '기기'} ${l.toUpperCase()}`, when = t=> t ? new Date(t).toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'}) : '-';
+  const line = (e, me)=> `미션 ${qn(e)} / ${qt()} 완료${me ? '' : ` · 마지막 사용 ${when(e.seen)}`}`;
+  function syncOpen(){ const d = SQUESTS[TEAM] || {}, mine = myLetter(), me = d[mine] || {}, others = Object.keys(d).filter(l=> l !== mine && d[l] && typeof d[l] === 'object').sort((a, b)=> (d[b].seen || 0) - (d[a].seen || 0));
+    $('syList').innerHTML = `<div class="syrow me"><div><b>이 기기${mine ? ` · ${devName(mine, Object.assign({kind:DEV_KIND}, me))}` : ''}</b><small>${line(me, true)}</small></div></div>`
+      + (others.length ? others.map(l=>{ const e = d[l], ahead = qn(e) > qn(me) || (+e.act || 0) > (+me.act || 0); return `<div class="syrow${ahead ? ' ahead' : ''}"><div><b>${devName(l, e)}</b><small>${line(e)}${ahead ? ' · 더 나아감' : ''}</small></div><button type="button" class="mini" data-sy="${l}">가져오기</button></div>`; }).join('')
+        : '<p class="syempty">같은 조의 다른 기기가 아직 없습니다.<br>다른 기기에서 같은 조로 들어오면 여기에 보입니다.</p>');
+    $('syncDlg').dataset.on = '1'; }
+  $('syncBtn').onclick = ()=>{ sfx('tap'); if(LOCAL || !TEAM) return; api('/state?team=' + TEAM + '&dev=' + DEV).then(st=>{ applyState(st); syncOpen(); }).catch(()=> syncOpen()); };
+  $('syClose').onclick = ()=>{ delete $('syncDlg').dataset.on; };
+  $('syList').onclick = e=>{ const b = e.target.closest('[data-sy]'); if(!b) return; b.disabled = true; b.textContent = '가져오는 중';
+    api('/sync', {team:TEAM, dev:DEV, from:b.dataset.sy}).then(()=>{ toast('진도를 가져왔습니다. 화면을 다시 엽니다'); setTimeout(()=> hardRestart(false), 700); }).catch(err=>{ b.disabled = false; b.textContent = '가져오기'; toast(err.message); }); }; }
 $('againBtn').onclick = async ()=>{
   if(!TEAM) return;
   const mine = SUBS.filter(s=> s.team === TEAM).length;

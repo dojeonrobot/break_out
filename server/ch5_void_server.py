@@ -385,7 +385,7 @@ class Handler(BaseHTTPRequestHandler):
             '/api/void/admin/delete': self.admin_delete, '/api/void/admin/reset': self.admin_reset,
             '/api/void/admin/unhide': self.admin_unhide, '/api/void/admin/approve': self.admin_approve,
             '/api/void/admin/auto': self.admin_auto, '/api/void/admin/coords': self.admin_coords,
-            '/api/void/quest': self.quest, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
+            '/api/void/quest': self.quest, '/api/void/sync': self.sync, '/api/void/admin/quest': self.admin_quest, '/api/void/team_reset': self.team_reset,
             '/api/void/admin/skip': self.admin_skip, '/api/void/admin/stage': self.admin_stage, '/api/void/admin/viking_clear': self.admin_viking_clear,
         }
         fn = routes.get(path)
@@ -497,6 +497,39 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError('우리 조를 먼저 고르세요.')
         self.set_quests(team, b)
 
+    # 학생: 같은 조 다른 기기의 진도를 이 기기로 가져온다 (2026-11-26 사용자: 태블릿으로 야외 진행 → 노트북으로 STL 올리기 → 다시 태블릿).
+    # 합치기만 한다(끝낸 미션·본 막·기록은 둘 중 더 나아간 쪽). 이 기기 칸만 바뀌고, 상대 기기는 그 기기에서 다시 누르면 맞춰진다.
+    def sync(self, b):
+        team = clean_team(b.get('team'))
+        if not team:
+            raise ValueError('우리 조를 먼저 고르세요.')
+        dev = re.sub(r'[^a-z0-9]', '', str(b.get('dev') or ''))[:16]
+        src = str(b.get('from') or '')
+        with lock:
+            tq = DB.setdefault('quests', {}).get(str(team), {})
+            mine = next((l for l, v in tq.items() if isinstance(v, dict) and v.get('dev') == dev), None)
+            if not dev or not mine:
+                raise ValueError('이 기기의 진도가 아직 없습니다. 잠시 뒤 다시 눌러 주세요.')
+            other = tq.get(src)
+            if src == mine or not isinstance(other, dict):
+                raise ValueError('가져올 기기를 다시 골라 주세요.')
+            cur = dict(tq[mine])
+            for k, val in other.items():
+                if QUEST_ID.match(k) or k in ('tut', 'power', 'restored'):
+                    cur[k] = cur.get(k) or val
+                elif k == 'story':
+                    cur['story'] = max(int(cur.get('story') or 0), int(val or 0))
+                elif k == 'act':
+                    cur['act'] = max(int(cur.get('act') or 0), int(val or 0))
+                elif k == 'records' and isinstance(val, dict):
+                    cur['records'] = dict(val, **(cur.get('records') or {}))
+            cur['seen'] = now_ms()
+            cur['synced'] = now_ms()
+            tq[mine] = cur
+            DB['quests'][str(team)] = tq
+            save()
+            self.send_json(state())
+
     # 운영자: 어느 조든 미션 완료 처리·되돌리기·초기화({team, done:[...]} 또는 {team, clear:true})
     def admin_quest(self, b):
         team = clean_team(b.get('team'))
@@ -542,6 +575,8 @@ class Handler(BaseHTTPRequestHandler):
                                 cur['act'] = max(int(cur.get('act') or 0), int(val or 0))
                 if dev:
                     cur['dev'] = dev
+                if b.get('kind') in ('tablet', 'laptop', 'phone'):
+                    cur['kind'] = b['kind']
                 cur['seen'] = now_ms()
                 if isinstance(b.get('done'), list):
                     done = [str(x) for x in b['done'] if QUEST_ID.match(str(x))]
