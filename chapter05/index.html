@@ -120,7 +120,7 @@ body #remPlay .hit.hot{background:linear-gradient(180deg,#ff8a3d,#e0531a);border
 body #remPlay .hit:active{transform:translateY(6px);box-shadow:0 1px 0 #1d222c}
 @media (max-height:520px){body #remPlay .hit{height:56px;font-size:22px}}   /* no simulator switch in the machine room, the lab or the cave (user, 2026-11-25) */
 /* tablet overlaps (노션 scan break 체크 필요, 2026-11-25) */#voidVn .box:has(#voidCard:not(:empty)){padding-bottom:50px}.mk.team{z-index:1}.mk.team.me{z-index:3}body #walkRun{left:auto;right:calc(24px + var(--jumpW,132px) + 12px)}body #walkRun::after{content:'OFF';font:800 11px/1 var(--mono);letter-spacing:.06em;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.16);color:rgba(255,255,255,.75)}body #walkRun[aria-pressed=true]::after{content:'ON';background:#fff;color:#127a48}
-/* board collapse = small minus in the top-right corner (user, 2026-11-26) */#board #bMin{position:absolute;top:8px;right:8px;width:30px;height:30px;min-width:0;min-height:0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:0;cursor:pointer;z-index:1}@media (hover:hover){#board #bMin:hover{background:var(--line);color:var(--fg)}}#board #bMin:focus-visible{outline:2px solid currentColor;outline-offset:1px}#board #bMin::before,#board #bMin::after{content:'';position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;border-radius:1px;background:currentColor}#board #bMin::after{display:none;transform:rotate(90deg)}#board.closed #bMin::after{display:block}#board #bMin{top:6px;right:6px;width:28px;height:28px}#board .bh .acts{padding-top:22px}@media (pointer:coarse){#board #bMin{width:40px;height:40px;top:2px;right:2px}#board .bh .acts{padding-top:30px}}
+/* collapse buttons = white square with −/+ in each card's top-right corner (user picked A, 2026-11-26) */#board #bMin,#panel #toggle{position:absolute;top:10px;right:10px;width:32px;height:32px;min-width:0;min-height:0;padding:0;margin:0;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:8px;background:#fff;box-shadow:0 1px 2px rgba(20,30,40,.08);color:var(--fg);font-size:0;cursor:pointer;z-index:1;grid-row:auto;grid-column:auto}@media (hover:hover){#board #bMin:hover,#panel #toggle:hover{background:#f1f4f7}}#board #bMin:focus-visible,#panel #toggle:focus-visible{outline:2px solid currentColor;outline-offset:2px}#board #bMin::before,#board #bMin::after,#panel #toggle::before,#panel #toggle::after{content:'';position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:1px;background:currentColor}#board #bMin::after,#panel #toggle::after{display:none;transform:rotate(90deg)}#board.closed #bMin::after,#panel.closed #toggle::after{display:block}#panel .ph{position:relative;padding-right:54px!important}#board .bh{position:relative;padding-right:54px!important}#board.closed .bh small,#board.closed #bN{display:none}#board.closed .bh{padding-bottom:14px}#panel.closed #iluaBox,#panel.closed .auxnote{display:none!important}#panel.closed{width:max-content!important;max-width:calc(100vw - 24px)}@media (pointer:coarse){#board #bMin,#panel #toggle{width:40px;height:40px;top:6px;right:6px}#panel .ph,#board .bh{padding-right:58px!important}}.recs{margin-top:10px;display:flex;flex-direction:column;gap:6px}.rec{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:10px;background:color-mix(in srgb,var(--restored,#1a9a5a) 8%,transparent)}.rec .th{width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--restored,#1a9a5a);color:#fff;display:grid;place-items:center;font-weight:700}.rec .th img{width:100%;height:100%;object-fit:cover;display:block}.rec h4{margin:0;font-size:13.5px;font-weight:600}.rec p{margin:2px 0 0;font-size:12px;color:var(--muted)}
 #pSub{display:none!important}.team .tlabel{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--fg)}.team .tlabel b{font-size:14px}
 </style></head><body>
 <title>보이드의 기록</title>
@@ -717,7 +717,7 @@ body.island #panel,body.sim #panel{display:none}
   <div class="ph">
     <h1>보이드의 기록</h1>
     <p id="pSub">한양대학교 ERICA캠퍼스 디지털 트윈</p>
-    <button id="toggle" aria-expanded="true">접기</button>
+    <button id="toggle" type="button" aria-expanded="true" aria-label="접기" title="접기"></button>
   </div>
   <div id="iluaBox"></div>
   <div class="team">
@@ -1828,6 +1828,11 @@ const flowRows = ps => { const qz = typeof MI !== 'undefined' ? MI.filter(m=> m.
 const RATE = ()=> Math.round(recordCount()/3*100);   // the same count as the simulator HUD (SIM_LIT)   // 복구율: 20% per zone, campus 3 + island 2
 function teamZones(t, rows){ return rows.map(r=>{ if(r.quest){ const ok = islandRecord(r.quest.quest,t); return {p:r, st: ok ? 'ok' : 'void'}; }
   const ids = pairIds(r.campus.id), mine = SUBS.filter(s=> s.team === t && ids.includes(s.mission)), ok = mine.filter(subDone); return {p:r, st: ok.length ? 'ok' : mine.length ? 'pend' : 'void'}; }); }   // 2026-10-28: 20% per step in flow order, campus 3 + island 2
+function recList(){ const items = ['z1', 'z2', 'z3'].map(id=> MISSION_E.find(m=> m.id === id)).filter(z=> z && zoneMine(z));   /* secured records only (user, 2026-11-26) */
+  if(!items.length) return '';
+  return `<div class="recs">${items.map(z=>{ const pr = PAIRS().find(x=> x.campus.id === z.id), isl = pr ? pr.island.name : '', sub = SUBS.find(s=> s.team === TEAM && pairIds(z.id).includes(s.mission) && s.status === 'ok') || SUBS.find(s=> s.team === TEAM && pairIds(z.id).includes(s.mission));
+    const th = sub && !LOCAL ? `<img src="${esc(subThumb(sub))}" alt="" loading="lazy" onerror="this.replaceWith('✓')">` : z.scans[0] ? `<img src="${esc(z.scans[0].thumb)}" alt="">` : '✓';
+    return `<div class="rec"><span class="th">${th}</span><div><h4>${esc(zoneName(z))}</h4>${isl ? `<p>${esc(isl)} 복구</p>` : ''}</div></div>`; }).join('')}</div>`; }
 function questRow(r){ const m = r.quest, st = zoneDone(m) ? 'ok' : 'void', q = typeof QUESTS === 'object' ? QUESTS.find(x=> x.id === m.quest) : null;
   return `<button type="button" class="brow is-${st}" data-zone="${esc(m.id)}"><span class="th qth">${st === 'ok' ? '✓' : '섬'}</span><span><h4>${esc(m.recordName||m.name)}</h4><div class="pair">${st === 'ok' ? '섬에서 기록 수집 완료' : '섬에서 직접 기록하기'}</div></span></button>`; }
 // the big screen's gallery (2026-10-29, 지시서 9절): every returned record, newest first, the ones that just arrived outlined
@@ -1853,7 +1858,7 @@ function renderBoard(){
   const ok = rows.filter(r=> r.quest ? zoneDone(r.quest) : zoneState(r.campus) === 'ok').length;
   /* a team's board (user, 2026-11-13): how much is back, not which places */
   const bk = recordCount(), bT = 3;   /* records only (user, 2026-11-26): missions are done on the island, not shown here */ $('board').classList.add('solo'); $('bN').textContent = `${Math.round(bk/bT*100)}%`; $('bFill').style.width = `${bk/bT*100}%`;   /* the same count as everywhere else: filled records out of five, 20% each */
-  $('bRows').innerHTML = `<div class="bseg" role="img" aria-label="확보한 기록 ${bk} / ${bT}">${Array.from({length:bT}, (_, k)=> `<i class="${k < bk ? 'ok' : ''}"></i>`).join('')}</div><p class="bcount">확보한 기록 <b>${bk}</b> / ${bT}</p>`; return;
+  $('bRows').innerHTML = `<div class="bseg" role="img" aria-label="확보한 기록 ${bk} / ${bT}">${Array.from({length:bT}, (_, k)=> `<i class="${k < bk ? 'ok' : ''}"></i>`).join('')}</div>${recList()}`; return;
   const cut = rows.findIndex(r=> r.quest ? !zoneDone(r.quest) : zoneState(r.campus) !== 'ok');   // one step at a time (user, 2026-10-28): later steps are not listed yet
   $('bRows').innerHTML = (cut < 0 ? rows : rows.slice(0, cut + 1)).map(r=> r.quest ? questRow(r) : boardRow(r)).join('');
 }
@@ -2277,7 +2282,7 @@ if(!IOS && document.documentElement.requestFullscreen && !/[?&](view=screen|admi
     if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); };
   addEventListener('pointerup', fsFirst, true); addEventListener('keydown', fsFirst, true); }
 // fold / unfold the two side panels (tablets were mostly covered by them); the choice is remembered on this device
-function setPanel(open, save=true){ $('panel').classList.toggle('closed', !open); $('toggle').setAttribute('aria-expanded', open); $('toggle').textContent = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-panel', open ? 'open' : 'closed'); }catch(e){} } }
+function setPanel(open, save=true){ $('panel').classList.toggle('closed', !open); $('toggle').setAttribute('aria-expanded', open); $('toggle').setAttribute('aria-label', open ? '접기' : '펼치기'); $('toggle').title = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-panel', open ? 'open' : 'closed'); }catch(e){} } }
 function closePanel(){ setPanel(false, false); }
 $('toggle').onclick = ()=> setPanel($('panel').classList.contains('closed'));
 function setBoard(open, save=true){ $('board').classList.toggle('closed', !open); $('bMin').setAttribute('aria-expanded', open); $('bMin').setAttribute('aria-label', open ? '접기' : '펼치기'); $('bMin').title = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-board', open ? 'open' : 'closed'); }catch(e){} } }
