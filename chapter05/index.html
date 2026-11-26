@@ -120,6 +120,7 @@ body #remPlay .hit.hot{background:linear-gradient(180deg,#ff8a3d,#e0531a);border
 body #remPlay .hit:active{transform:translateY(6px);box-shadow:0 1px 0 #1d222c}
 @media (max-height:520px){body #remPlay .hit{height:56px;font-size:22px}}   /* no simulator switch in the machine room, the lab or the cave (user, 2026-11-25) */
 /* tablet overlaps (노션 scan break 체크 필요, 2026-11-25) */#voidVn .box:has(#voidCard:not(:empty)){padding-bottom:50px}.mk.team{z-index:1}.mk.team.me{z-index:3}body #walkRun{left:auto;right:calc(24px + var(--jumpW,132px) + 12px)}body #walkRun::after{content:'OFF';font:800 11px/1 var(--mono);letter-spacing:.06em;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.16);color:rgba(255,255,255,.75)}body #walkRun[aria-pressed=true]::after{content:'ON';background:#fff;color:#127a48}
+/* board collapse = small minus in the top-right corner (user, 2026-11-26) */#board #bMin{position:absolute;top:8px;right:8px;width:30px;height:30px;min-width:0;min-height:0;padding:0;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:0;cursor:pointer;z-index:1}@media (hover:hover){#board #bMin:hover{background:var(--line);color:var(--fg)}}#board #bMin:focus-visible{outline:2px solid currentColor;outline-offset:1px}#board #bMin::before,#board #bMin::after{content:'';position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;border-radius:1px;background:currentColor}#board #bMin::after{display:none;transform:rotate(90deg)}#board.closed #bMin::after{display:block}#board #bMin{top:6px;right:6px;width:28px;height:28px}#board .bh .acts{padding-top:22px}@media (pointer:coarse){#board #bMin{width:40px;height:40px;top:2px;right:2px}#board .bh .acts{padding-top:30px}}
 </style></head><body>
 <title>보이드의 기록</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -737,8 +738,8 @@ body.island #panel,body.sim #panel{display:none}
   <div class="scroll" id="list"></div>
 </aside>
 
-<aside id="board" class="glass" aria-label="보이드의 기록 복구 현황">
-  <div class="bh"><div><small>SCAN BREAK</small><h2>보이드의 기록 복구 현황</h2></div><div class="acts"><b id="bN">0 / 0</b><button id="bMin" class="x" type="button" aria-expanded="true">접기</button></div></div>
+<aside id="board" class="glass" aria-label="기록 복구 현황">
+  <div class="bh"><div><small>SCAN BREAK</small><h2>기록 복구 현황</h2></div><div class="acts"><b id="bN">0 / 0</b><button id="bMin" type="button" aria-expanded="true" aria-label="접기" title="접기"></button></div></div>
   <div class="bbar"><i id="bFill"></i></div>
   <div id="bRows"></div>
 </aside>
@@ -1852,8 +1853,8 @@ function renderBoard(){
   }
   const ok = rows.filter(r=> r.quest ? zoneDone(r.quest) : zoneState(r.campus) === 'ok').length;
   /* a team's board (user, 2026-11-13): how much is back, not which places */
-  const bk = recordCount(), bT = 3, mk = missionCount(); $('board').classList.add('solo'); $('bN').textContent = `${Math.round(bk/bT*100)}%`; $('bFill').style.width = `${bk/bT*100}%`;   /* the same count as everywhere else: filled records out of five, 20% each */
-  $('bRows').innerHTML = `<div class="bseg" role="img" aria-label="확보한 기록 ${bk} / ${bT}">${Array.from({length:bT}, (_, k)=> `<i class="${k < bk ? 'ok' : ''}"></i>`).join('')}</div><p class="bcount">확보한 기록 <b>${bk}</b> / ${bT}</p><p class="bmis"><span>미션 클리어</span><b>${mk}</b> / 5<span class="pips" aria-hidden="true">${Array.from({length:5}, (_, k)=> `<i class="${k < mk ? 'ok' : ''}"></i>`).join('')}</span></p>`; return;
+  const bk = recordCount(), bT = 3;   /* records only (user, 2026-11-26): missions are done on the island, not shown here */ $('board').classList.add('solo'); $('bN').textContent = `${Math.round(bk/bT*100)}%`; $('bFill').style.width = `${bk/bT*100}%`;   /* the same count as everywhere else: filled records out of five, 20% each */
+  $('bRows').innerHTML = `<div class="bseg" role="img" aria-label="확보한 기록 ${bk} / ${bT}">${Array.from({length:bT}, (_, k)=> `<i class="${k < bk ? 'ok' : ''}"></i>`).join('')}</div><p class="bcount">확보한 기록 <b>${bk}</b> / ${bT}</p>`; return;
   const cut = rows.findIndex(r=> r.quest ? !zoneDone(r.quest) : zoneState(r.campus) !== 'ok');   // one step at a time (user, 2026-10-28): later steps are not listed yet
   $('bRows').innerHTML = (cut < 0 ? rows : rows.slice(0, cut + 1)).map(r=> r.quest ? questRow(r) : boardRow(r)).join('');
 }
@@ -2278,7 +2279,7 @@ if(!IOS && document.documentElement.requestFullscreen && !/[?&](view=screen|admi
 function setPanel(open, save=true){ $('panel').classList.toggle('closed', !open); $('toggle').setAttribute('aria-expanded', open); $('toggle').textContent = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-panel', open ? 'open' : 'closed'); }catch(e){} } }
 function closePanel(){ setPanel(false, false); }
 $('toggle').onclick = ()=> setPanel($('panel').classList.contains('closed'));
-function setBoard(open, save=true){ $('board').classList.toggle('closed', !open); $('bMin').setAttribute('aria-expanded', open); $('bMin').textContent = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-board', open ? 'open' : 'closed'); }catch(e){} } }
+function setBoard(open, save=true){ $('board').classList.toggle('closed', !open); $('bMin').setAttribute('aria-expanded', open); $('bMin').setAttribute('aria-label', open ? '접기' : '펼치기'); $('bMin').title = open ? '접기' : '펼치기'; if(save){ try{ localStorage.setItem('void-board', open ? 'open' : 'closed'); }catch(e){} } }
 $('bMin').onclick = ()=> setBoard($('board').classList.contains('closed'));
 // phone layout (2026-10-29): the bar's height feeds the pills above it (--barH), and the board opens as a sheet from the bar's 「현황」 button
 { const bar = $('bar'), setH = ()=> document.documentElement.style.setProperty('--barH', (bar.offsetHeight || 54) + 'px'); new ResizeObserver(setH).observe(bar); setH(); }
