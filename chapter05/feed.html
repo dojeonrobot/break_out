@@ -308,7 +308,26 @@
       .round-list .news-list .ni-title { font-size: 15px; }
       .round-list .news-list .nc { gap: 7px; padding-bottom: 12px; }
       .round-list .news-list .nc-thumb { aspect-ratio: 16 / 8.4; }
+      /* 쇼츠·스토리 라운드도 같은 4×2, 한 화면 (2026-11-27 사용자 "다른 부분도 다 맞춰줘") */
+      .round-list .shorts-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+      .round-list .shorts-grid .sf { aspect-ratio: auto; height: clamp(200px, calc((100dvh - 292px) / 2), 440px); }
+      .round-list .shorts-grid .tile { gap: 5px; }
+      .round-list .shorts-grid .tile-title { -webkit-line-clamp: 1; font-size: 15px; }
     }
+    /* 스토리 카드 (목록용) */
+    .sf.t-story { background: #111; color: #fff; }
+    .t-story .shade { background: linear-gradient(180deg, rgba(0,0,0,.5), transparent 28%, transparent 50%, rgba(0,0,0,.7)); }
+    .ss-bars { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 3px; z-index: 2; }
+    .ss-bars i { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.4); } .ss-bars i.on { background: #fff; }
+    .ss-who { position: absolute; top: 18px; left: 8px; right: 8px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; z-index: 2; min-width: 0; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+    .ss-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .ss-who > span:last-child:not(.ss-ring) { opacity: .8; font-size: 11.5px; white-space: nowrap; }
+    .ss-who .vb { width: 14px; height: 14px; margin: 0; flex-shrink: 0; } .ss-who .vb .icon { width: 9px; height: 9px; }
+    .ss-ring { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; padding: 2px; background: var(--ig-grad); display: grid; place-items: center; }
+    .ss-ring.seen { background: rgba(255,255,255,.55); }
+    .ss-ring .avatar { width: 100%; height: 100%; border: 2px solid #111; font-size: 10px; }
+    .ss-txt { position: absolute; left: 10px; right: 10px; bottom: 12px; z-index: 2; padding: 7px 10px; border-radius: 8px; background: rgba(0,0,0,.55); font-size: 13px; font-weight: 700; line-height: 1.45; word-break: keep-all; text-align: center; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .t-story .tile-state { top: 52px; }
     .nw-logo { font-size: 28px; }
     .nw-by { background: #f6f7f9; margin: 12px 18px 0; padding: 10px 14px; border-radius: 12px; border: 0; gap: 8px 12px; font-size: 13px; }
     .nw-by .rp { font-size: 14.5px; } .nw-by .rp .avatar { width: 30px; height: 30px; font-size: 12px; }
@@ -1352,6 +1371,21 @@ function tileHTML(p) {
       <div class="sf-img"><img src="${src}" alt="" loading="lazy">${fmt}${stats}</div>${dur}${state}</div>`;
   return `<button class="tile${jrCls(p)}" data-open="${p.id}" aria-label="쇼츠 자세히 보기, ${esc(handle)}">${inner}<div class="tile-title">${esc(head || '(내용 없음)')}</div><div class="tile-sub"><span class="avatar" style="background:${color}">${initials(a.name)}</span><span class="nm">${esc(a.name || handle)}${vbadge(a)}</span>${a.followers ? `<span>· 구독자 ${esc(a.followers)}</span>` : ''}</div></button>`;
 }
+/* 스토리 라운드 목록: 뉴스·쇼츠와 같은 4×2 카드 (2026-11-27 사용자 "다른 부분도 다 맞춰줘").
+   인스타 스토리 첫 장 미리보기 — 진행 막대·링 아바타·첫 장 글. 누르면 기존 스토리 뷰어 */
+function storyCardHTML(p) {
+  const a = p.author || {}, handle = handleOf(a) || a.name || '', sl = slidesOf(p), first = sl[0] || {};
+  const img = first.imageId || p.thumbImageId || p.imageId, color = esc(a.color || '#4b5563');
+  const seen = !!S.data.myJudgments[p.id] || p.mine, txt = (first.text || p.body || '').replace(/\s+/g, ' ');
+  const bars = sl.slice(0, 8).map((_, i) => `<i${i === 0 ? ' class="on"' : ''}></i>`).join('');
+  return `<button class="tile tile-story${jrCls(p)}" data-open="${p.id}" aria-label="${esc(handle)} 스토리 보기">
+    <div class="sf t-story" style="background:linear-gradient(160deg, ${color}, #111)">${img ? `<img class="bg" src="${imgSrc(img)}" alt="" loading="lazy">` : ''}<div class="shade"></div>
+      <div class="ss-bars">${bars}</div>
+      <div class="ss-who"><span class="ss-ring${seen ? ' seen' : ''}"><span class="avatar" style="background:${color}">${initials(a.name)}</span></span><b>${esc(handle)}</b>${vbadge(a)}${first.time ? `<span>${esc(first.time)}</span>` : ''}</div>
+      ${txt ? `<div class="ss-txt">${esc(txt.length > 46 ? txt.slice(0, 46) + '…' : txt)}</div>` : ''}${stateBadge(p, 'tile-state')}</div>
+    <div class="tile-title">${esc(txt || '(내용 없음)')}</div>
+    <div class="tile-sub"><span class="avatar" style="background:${color}">${initials(a.name)}</span><span class="nm">${esc(a.name || handle)}${vbadge(a)}</span>${a.followers ? `<span>· 팔로워 ${esc(a.followers)}</span>` : ''}${sl.length > 1 ? `<span>· ${sl.length}장</span>` : ''}</div></button>`;
+}
 function newsItemHTML(p) {
   const a = p.author || {}, state = stateBadge(p, 'ni-state'), img = p.thumbImageId || p.imageId;
   return `<button class="nc${jrCls(p)}" data-open="${p.id}">
@@ -1387,7 +1421,7 @@ function renderRounds() {
 /* 진행 막대: 관리자(다음 단계 버튼 포함)과 진행 화면에만. 이번 라운드에 올린 조·판별 끝낸 조를 번호로 보여 줌 */
 function renderOpBar() {
   const box = $('#opBar'), d = S.data, adm = isAdmin();
-  if (!adm && !S.screen) { box.hidden = true; return; }
+  if ((!adm && !S.screen) || !d) { box.hidden = true; return; }
   const pr = d.progress || { submitted: [], judged: {}, posts: 0, seeds: 0 }, n = d.teamCount, teams = Array.from({ length: n }, (_, i) => i + 1);
   let prog = '';
   if (d.phase === 'read') prog = '';
@@ -1475,6 +1509,7 @@ function renderHomeHead() {
 }
 function renderFeed() {
   const d = S.data, home = !S.fmt;
+  if (!d) return;   /* 관리자 입장 직후 상태를 받기 전 (progress null 오류) */
   renderOpBar();
   const quizMode = !isAdmin() && d.quiz && S.fmt === curRound() && (d.phase === 'judge' || (d.phase === 'reveal' && d.quiz.done));
   if (!quizMode) { $('#quiz').hidden = true; if (S.quizRendered) { S.quizRendered = null; $('#quiz').innerHTML = ''; } }
@@ -1494,7 +1529,7 @@ function renderFeed() {
   renderFilters(posts);
   const empty = S.filter === 'todo' ? '다 판별했습니다.' : S.filter === 'mine' ? '우리 조가 만든 게시물이 없습니다.' : now && d.phase === 'make' ? '다른 조 게시물은 판별 시간에 보입니다.' : '아직 게시물이 없습니다.';
   $('#feed').innerHTML = !posts.length ? `<div class="panel-empty">${empty}</div>`
-    : f === 'story' ? `<div class="tray">${posts.map(trayHTML).join('')}</div>`
+    : f === 'story' ? `<div class="shorts-grid story-grid">${posts.map(storyCardHTML).join('')}</div>`
     : f === 'shorts' ? `<div class="shorts-grid">${posts.map(tileHTML).join('')}</div>`
     : `<div class="news-list">${posts.map(newsItemHTML).join('')}</div>`;
   renderModal();
